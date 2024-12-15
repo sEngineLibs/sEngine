@@ -8,4 +8,8 @@ await project.addProject("Subprojects/sCore");
 await project.addProject("Subprojects/sUI");
 await project.addProject("Subprojects/s2D");
 
+// -> Engine Compiler Flags
+// --> Debugging
+project.addDefine("SENGINE_DEBUG_FPS");
+
 resolve(project);
