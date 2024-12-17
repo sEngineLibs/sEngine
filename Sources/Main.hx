@@ -1,3 +1,4 @@
+import kha.System;
 import s2d.graphics.materials.PBRMaterial;
 import sengine.SEngine;
 import s2d.objects.Light;

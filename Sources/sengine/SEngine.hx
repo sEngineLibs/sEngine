@@ -51,7 +51,7 @@ class SEngine {
 		app.notifyOnRender(render);
 		app.notifyOnUpdate(update);
 		app.window.notifyOnResize(function(w, h) {
-			stage.resize(w, h);
+			stage.projection.setAspectRatio(w / h);
 			backbuffer = Image.createRenderTarget(w, h, RGBA32, DepthOnly);
 		});
 		app.window.resize(width, height);
