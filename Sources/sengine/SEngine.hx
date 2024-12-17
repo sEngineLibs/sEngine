@@ -7,6 +7,7 @@ import kha.Canvas;
 import kha.Shaders;
 import kha.Assets;
 import kha.FastFloat;
+import kha.math.FastVector2;
 // sengine
 import score.SApp;
 import sui.SUI;
@@ -46,15 +47,18 @@ class SEngine {
 			setup:Void->Void) {
 		app.start(title, width, height, vsync, samplesPerPixel, function() {
 			setup();
+
+			app.notifyOnRender(render);
+			app.notifyOnUpdate(update);
+			app.window.notifyOnResize(function(w, h) {
+				ui.resize(w, h);
+				stage.projection.setAspectRatio(w / h);
+				backbuffer = Image.createRenderTarget(w, h, RGBA32, DepthOnly);
+			});
+			app.window.resize(width, height);
+
 			S2DShaders.pbr.compile(Shaders.s2d_sprite_vert, Shaders.s2d_pbr_frag);
 		});
-		app.notifyOnRender(render);
-		app.notifyOnUpdate(update);
-		app.window.notifyOnResize(function(w, h) {
-			stage.projection.setAspectRatio(w / h);
-			backbuffer = Image.createRenderTarget(w, h, RGBA32, DepthOnly);
-		});
-		app.window.resize(width, height);
 	}
 
 	public static inline function stop() {
@@ -71,7 +75,7 @@ class SEngine {
 	public static inline function render(target:Canvas) {
 		backbuffer.g2.begin(true);
 		stage.render(backbuffer);
-		// ui.render(backbuffer);
+		ui.render(backbuffer);
 		backbuffer.g2.end();
 
 		target.g2.begin(true);
@@ -80,5 +84,12 @@ class SEngine {
 		showFPS(target);
 		#end
 		target.g2.end();
+	}
+
+	public static inline function mapToStage(point:FastVector2):FastVector2 {
+		return {
+			x: (point.x / backbuffer.width * 2 - 1) * stage.projection.transformation.scaleX,
+			y: (point.y / backbuffer.height * 2 - 1) * stage.projection.transformation.scaleY
+		}
 	}
 }
