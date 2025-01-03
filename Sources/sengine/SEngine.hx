@@ -57,7 +57,10 @@ class SEngine {
 			});
 			app.window.resize(width, height);
 
-			S2DShaders.pbr.compile(Shaders.s2d_sprite_vert, Shaders.s2d_pbr_frag);
+			S2DShaders.pbrColored.compile(Shaders.s2d_sprite_vert, Shaders.s2d_pbr_colored_frag);
+			S2DShaders.pbrTextured.compile(Shaders.s2d_sprite_vert, Shaders.s2d_pbr_textured_frag);
+			S2DShaders.toonColored.compile(Shaders.s2d_sprite_vert, Shaders.s2d_toon_colored_frag);
+			S2DShaders.toonTextured.compile(Shaders.s2d_sprite_vert, Shaders.s2d_toon_textured_frag);
 		});
 	}
 
