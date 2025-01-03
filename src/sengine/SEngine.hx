@@ -26,7 +26,7 @@ class SEngine {
 			fst = t;
 		}
 		var g2 = target.g2;
-		g2.font = Assets.fonts.get("Roboto_Regular");
+		g2.font = Assets.fonts.Roboto_Regular;
 		g2.fontSize = 14;
 		g2.color = Black;
 		g2.drawString('FPS: ${fps}', 6, 6);
@@ -36,22 +36,25 @@ class SEngine {
 	#end
 
 	@readonly public static var app = SApp;
+
+	static var backbuffer:Image;
+
 	public static var ui:SUI = new SUI();
 
 	public static inline function start(?title:String = "SApp", ?width:Int = 800, ?height:Int = 600, setup:Void->Void) {
-		app.start(title, width, height, true, 1, function() {
-			app.notifyOnRender(render);
-			app.notifyOnUpdate(update);
+		app.start(title, width, height, function() {
 			app.window.notifyOnResize(function(w, h) {
 				ui.resize(w, h);
 				S2D.resize(w, h);
-				backbuffer = Image.createRenderTarget(w, h, RGBA32);
+				backbuffer = Image.createRenderTarget(w, h);
 			});
-			app.window.resize(width, height);
-
-			S2D.init(app.window.width, app.window.height);
+			backbuffer = Image.createRenderTarget(width, height);
+			S2D.init(width, height);
 
 			setup();
+
+			app.notifyOnUpdate(update);
+			app.notifyOnRender(render);
 		});
 	}
 
@@ -63,8 +66,6 @@ class SEngine {
 		S2D.update();
 		ui.update();
 	}
-
-	static var backbuffer:Image;
 
 	public static inline function render(target:Canvas) {
 		S2D.render(backbuffer);
