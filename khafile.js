@@ -1,8 +1,7 @@
 let project = new Project("sEngine");
 
-project.addAssets("Assets/**");
-project.addShaders("Shaders/**");
-project.addSources("Sources");
+project.addAssets("assets/**");
+project.addSources("src");
 
 await project.addProject("Subprojects/sCore");
 await project.addProject("Subprojects/sUI");
