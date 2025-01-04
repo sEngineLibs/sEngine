@@ -43,13 +43,14 @@ class SEngine {
 
 	public static inline function start(?title:String = "SApp", ?width:Int = 800, ?height:Int = 600, setup:Void->Void) {
 		app.start(title, width, height, function() {
-			app.window.notifyOnResize(function(w, h) {
-				ui.resize(w, h);
-				S2D.resize(w, h);
-				backbuffer = Image.createRenderTarget(w, h);
-			});
 			backbuffer = Image.createRenderTarget(width, height);
 			S2D.init(width, height);
+
+			app.window.notifyOnResize(function(w, h) {
+				backbuffer = Image.createRenderTarget(w, h);
+				S2D.resize(w, h);
+				ui.resize(w, h);
+			});
 
 			setup();
 
