@@ -1,6 +1,10 @@
 let project = new Project("sEngine");
 
-project.addAssets("assets/**");
+project.addAssets("assets/**", {
+    nameBaseDir: "assets",
+    destination: "assets/{dir}/{name}",
+    name: "{name}",
+});
 project.addSources("src");
 
 await project.addProject("subprojects/sCore");
