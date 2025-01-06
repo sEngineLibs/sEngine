@@ -1,9 +1,0 @@
-[submodule "sCore"]
-	path = submodules/sCore
-	url = https://github.com/sEngineLibs/sCore
-[submodule "sUI"]
-	path = submodules/sUI
-	url = https://github.com/sEngineLibs/sUI
-[submodule "s2D"]
-	path = submodules/s2D
-	url = https://github.com/sEngineLibs/s2D
