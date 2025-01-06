@@ -1,4 +1,4 @@
-package score.graphics;
+package s2d.core.utils.extensions;
 
 import kha.math.Vector2;
 import kha.math.FastVector2;
@@ -13,7 +13,7 @@ import kha.graphics2.HorTextAlignment;
  * Static extension functions for Graphics2.
  * Usage: "using score.graphics.GraphicsExtension;"
 **/
-class GraphicsExtension {
+class Graphics2Ext {
 	/**
 	 * Draws a arc.
 	 * @param	ccw (optional) Specifies whether the drawing should be counterclockwise.

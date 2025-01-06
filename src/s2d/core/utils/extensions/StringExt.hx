@@ -1,4 +1,4 @@
-package score.utils;
+package s2d.core.utils.extensions;
 
 class StringExt {
 	public static inline function capitalize(word:String):String {

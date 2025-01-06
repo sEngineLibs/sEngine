@@ -9,6 +9,8 @@ import kha.graphics4.FragmentShader;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
+// s2d
+import s2d.core.graphics.Shader;
 
 @:allow(s2d.graphics.RenderPath)
 class EnvLightingPass implements Shader {

@@ -1,4 +1,4 @@
-package score.macro;
+package s2d.core.macro;
 
 import haxe.macro.Expr;
 import haxe.macro.Context;

@@ -1,4 +1,4 @@
-package score;
+package s2d.core;
 
 import kha.input.Mouse;
 import kha.input.Keyboard;

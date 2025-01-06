@@ -1,5 +1,7 @@
 package s2d;
 
+import kha.Assets;
+import kha.System;
 import kha.Canvas;
 import kha.FastFloat;
 import kha.math.FastVector3;
@@ -9,9 +11,31 @@ import s2d.Stage;
 import s2d.objects.Sprite;
 import s2d.graphics.RenderPath;
 
-using s2d.utils.FastMatrix4Ext;
+using s2d.core.utils.extensions.FastMatrix4Ext;
 
 class S2D {
+	#if S2D_DEBUG_FPS
+	static var fst:FastFloat = 0;
+	static var fpsCounter:Int = 0;
+	static var fps:Int = 0;
+
+	static inline function showFPS(g:kha.graphics2.Graphics) {
+		++fpsCounter;
+		var t = System.time;
+		if (t - fst >= 1) {
+			fps = fpsCounter;
+			fpsCounter = 0;
+			fst = t;
+		}
+		g.font = Assets.fonts.Roboto_Regular;
+		g.fontSize = 14;
+		g.color = Black;
+		g.drawString('FPS: ${fps}', 6, 6);
+		g.color = White;
+		g.drawString('FPS: ${fps}', 5, 5);
+	}
+	#end
+
 	public static var projection:FastMatrix4;
 
 	public static var width:Int;
@@ -55,9 +79,11 @@ class S2D {
 		realWidth = w;
 		realHeight = h;
 		aspectRatio = width / height;
-
-		Sprite.init();
 		RenderPath.init(width, height);
+		Sprite.init();
+	}
+
+	public static inline function compile() {
 		RenderPath.compile();
 	}
 
@@ -144,6 +170,14 @@ class S2D {
 	}
 
 	public static inline function render(target:Canvas):Void {
-		RenderPath.render(target, stage);
+		var frame = RenderPath.render(target, stage);
+
+		var g2 = target.g2;
+		g2.begin();
+		g2.drawScaledImage(frame, 0, 0, target.width, target.height);
+		#if S2D_DEBUG_FPS
+		showFPS(g2);
+		#end
+		g2.end();
 	}
 }

@@ -8,7 +8,7 @@ import s2d.objects.Light;
 import s2d.objects.Sprite;
 import s2d.objects.Object;
 
-using s2d.utils.FastMatrix4Ext;
+using s2d.core.utils.extensions.FastMatrix4Ext;
 
 @:allow(s2d.graphics.RenderPath)
 class Stage {

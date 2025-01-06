@@ -1,11 +1,11 @@
-package score.macro;
+package s2d.core.macro;
 
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Expr.Field;
 
-using score.macro.MacroExt;
-using score.utils.StringExt;
+using s2d.core.macro.MacroExt;
+using s2d.core.utils.StringExt;
 
 class SMacro {
 	public static function build():Array<Field> {

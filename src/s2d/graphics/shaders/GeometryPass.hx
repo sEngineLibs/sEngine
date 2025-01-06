@@ -10,6 +10,8 @@ import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
+// s2d
+import s2d.core.graphics.Shader;
 
 @:allow(s2d.graphics.RenderPath)
 class GeometryPass implements Shader {

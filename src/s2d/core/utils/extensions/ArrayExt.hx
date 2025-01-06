@@ -1,4 +1,4 @@
-package score.utils;
+package s2d.core.utils.extensions;
 
 class ArrayExt {
 	public static inline function last<T>(a:Array<T>):T {

@@ -1,10 +1,10 @@
-package s2d.utils;
+package s2d.core.utils.extensions;
 
 import kha.FastFloat;
 import kha.math.FastVector3;
 import kha.math.FastMatrix4;
 
-using s2d.utils.FastMatrix4Ext;
+using s2d.core.utils.extensions.FastMatrix4Ext;
 
 class FastMatrix4Ext {
 	public static inline function getTranslationX(m:FastMatrix4) {

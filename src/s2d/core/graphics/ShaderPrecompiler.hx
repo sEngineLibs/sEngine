@@ -1,9 +1,9 @@
-package s2d.utils;
+package s2d.core.graphics;
 
 import sys.io.File;
 import haxe.macro.Context;
 
-using s2d.utils.StringExt;
+using s2d.utils.extensions.StringExt;
 
 class ShaderPrecompiler {
 	static var defines = Context.getDefines();

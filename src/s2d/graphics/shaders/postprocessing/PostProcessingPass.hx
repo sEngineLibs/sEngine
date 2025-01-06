@@ -13,6 +13,8 @@ import kha.graphics4.VertexShader;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
+// s2d
+import s2d.core.graphics.Shader;
 
 @:allow(s2d.graphics.RenderPath)
 class PostProcessingPass implements Shader {

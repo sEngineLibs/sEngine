@@ -9,7 +9,7 @@ import s2d.graphics.shaders.LightingPass;
 import s2d.graphics.shaders.GeometryPass;
 import s2d.graphics.shaders.EnvLightingPass;
 
-using s2d.utils.FastMatrix4Ext;
+using s2d.core.utils.extensions.FastMatrix4Ext;
 
 @:allow(s2d.S2D)
 class RenderPath {
@@ -56,7 +56,7 @@ class RenderPath {
 		#end
 	}
 
-	static inline function render(target:Canvas, stage:Stage):Void {
+	static inline function render(target:Canvas, stage:Stage):Image {
 		var g2:kha.graphics2.Graphics, g4:kha.graphics4.Graphics;
 		var sourceInd:Int = 0, targetInd:Int = 0;
 
@@ -186,9 +186,6 @@ class RenderPath {
 		#end
 		#end
 
-		g2 = target.g2;
-		g2.begin();
-		g2.drawScaledImage(ppBuffer[sourceInd], 0, 0, target.width, target.height);
-		g2.end();
+		return ppBuffer[sourceInd];
 	};
 }

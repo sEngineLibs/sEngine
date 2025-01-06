@@ -1,14 +1,15 @@
 let project = new Project("sEngine");
 
+project.addSources("src");
+project.addShaders("shaders/compiled/**");
 project.addAssets("assets/**", {
     nameBaseDir: "assets",
     destination: "assets/{dir}/{name}",
     name: "{name}",
 });
-project.addSources("src");
 
 // Available Engine Compiler Flags
-// SENGINE_DEBUG_FPS -> enables FPS debugging
+// S2D_DEBUG_FPS -> enables FPS debugging
 
 // Available Renderer Compiler Flags:
 // S2D_RP_ENV_LIGHTING -> enables environment lighting

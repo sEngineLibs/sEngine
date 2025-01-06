@@ -1,4 +1,4 @@
-package s2d.graphics.shaders;
+package s2d.core.graphics;
 
 import kha.Canvas;
 import kha.graphics4.Graphics;

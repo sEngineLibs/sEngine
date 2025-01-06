@@ -1,4 +1,4 @@
-package score.utils;
+package s2d.core.utils;
 
 class MathUtils {
 	public static inline function arrMax(arr:Array<Dynamic>) {

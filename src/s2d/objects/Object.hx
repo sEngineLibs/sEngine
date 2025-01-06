@@ -1,9 +1,8 @@
 package s2d.objects;
 
 import kha.math.FastMatrix4;
-
 // s2d
-using s2d.utils.FastMatrix4Ext;
+using s2d.core.utils.extensions.FastMatrix4Ext;
 
 class Object {
 	@:isVar public var parent(default, null):Object = null;
