@@ -1,7 +1,7 @@
 package s2d.core;
 
-import haxe.io.Path;
 import sys.FileSystem;
+import haxe.io.Path;
 import haxe.macro.Context;
 // s2d
 import s2d.core.utils.FileUtils;
