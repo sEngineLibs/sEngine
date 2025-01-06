@@ -8,10 +8,12 @@ project.addAssets("assets/**", {
     name: "{name}",
 });
 
-// Available Engine Compiler Flags
+// Available Engine Compiler Flags:
+
+// Debug:
 // S2D_DEBUG_FPS -> enables FPS debugging
 
-// Available Renderer Compiler Flags:
+// Renderer:
 // S2D_RP_ENV_LIGHTING -> enables environment lighting
 // S2D_PP -> enables Post-Processing
 // S2D_PP_DOF -> enables Depth of Field PP effect
