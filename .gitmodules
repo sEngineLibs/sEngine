@@ -1,9 +1,9 @@
 [submodule "sCore"]
-	path = submodules/sCore
+	path = subpojects/sCore
 	url = https://github.com/sEngineLibs/sCore
 [submodule "sUI"]
-	path = submodules/sUI
+	path = subpojects/sUI
 	url = https://github.com/sEngineLibs/sUI
 [submodule "s2D"]
-	path = submodules/s2D
+	path = subpojects/s2D
 	url = https://github.com/sEngineLibs/s2D
