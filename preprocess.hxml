@@ -1,0 +1,4 @@
+-cp src
+--main s2d.core.Preprocessor
+-D S2D_PP_DOF_QUALITY=2.0
+--interp

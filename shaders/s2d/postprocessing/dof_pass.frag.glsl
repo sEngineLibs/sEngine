@@ -1,5 +1,7 @@
 #version 450
 
+//:global S2D_PP_DOF_QUALITY
+
 #ifdef GL_ES
 precision mediump float;
 #endif
