@@ -1,8 +1,7 @@
 #version 450
 
-#ifdef GL_ES
-precision mediump float;
-#endif
+#include "s2d/std/packing"
+#include "s2d/std/pbr"
 
 #define MAX_LIGHTS 16
 #define LIGHT_STRUCT_SIZE 8
@@ -36,9 +35,6 @@ Light getLight(int index) {
 
     return light;
 }
-
-import s2d.std.packing
-import s2d.std.pbr
 
 vec3 lighting(Light light, vec3 position, vec3 normal, vec3 color, float roughness, float metalness) {
     vec3 l = light.position - position;

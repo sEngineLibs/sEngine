@@ -1,8 +1,6 @@
 #version 450
 
-#ifdef GL_ES
-precision highp float;
-#endif
+#include "s2d/std/packing"
 
 uniform mat4 model;
 
@@ -17,8 +15,6 @@ uniform float Params[1];
 in vec3 fragPos;
 in vec2 fragUV;
 out vec4 fragColor;
-
-import s2d.std.packing
 
 void main() {
     // fetch material parameters

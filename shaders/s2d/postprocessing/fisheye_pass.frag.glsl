@@ -1,9 +1,5 @@
 #version 450
 
-#ifdef GL_ES
-precision mediump float;
-#endif
-
 uniform sampler2D textureMap;
 uniform vec2 resolution;
 uniform vec2 fisheyePosition;

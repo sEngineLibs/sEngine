@@ -1,17 +1,13 @@
 #version 450
 
-#ifdef GL_ES
-precision mediump float;
-#endif
+#include "s2d/std/packing"
+#include "s2d/std/pbr"
 
 uniform sampler2D gMap;
 uniform sampler2D envMap;
 
 in vec2 fragCoord;
 out vec4 fragColor;
-
-import s2d.std.packing
-import s2d.std.pbr
 
 vec3 envLighting(vec3 normal, vec3 color, float roughness, float metalness) {
     vec3 V = normalize(viewDir);

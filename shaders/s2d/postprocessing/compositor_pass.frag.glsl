@@ -1,9 +1,5 @@
 #version 450
 
-#ifdef GL_ES
-precision mediump float;
-#endif
-
 #define FXAA_SPAN_MAX 8.0
 #define FXAA_REDUCE_MUL   (0.25 / FXAA_SPAN_MAX)
 #define FXAA_REDUCE_MIN   (1.0 / 32.0)
