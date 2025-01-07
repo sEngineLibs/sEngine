@@ -1,12 +1,58 @@
+const fs = require("fs");
+const path = require("path");
+
+function preprocessShader(filePath, basePath) {
+    const includeRegex = /^\s*#include\s+"(.+)"\s*$/gm;
+
+    let shaderSource = fs.readFileSync(filePath, "utf8");
+    let match;
+
+    while ((match = includeRegex.exec(shaderSource)) !== null) {
+        const includePath = `${path.resolve(basePath, match[1])}.glsl`;
+        if (!fs.existsSync(includePath)) {
+            throw new Error(`Included file not found: ${includePath}`);
+        }
+
+        const includeContent = fs.readFileSync(includePath, "utf8");
+        shaderSource = shaderSource.replace(match[0], includeContent);
+    }
+
+    return shaderSource;
+}
+
+function preprocessShaders(shaderDir, outputDir) {
+    const shaderInputDir = path.join(__dirname, shaderDir);
+    const shaderOutputDir = path.join(__dirname, outputDir);
+
+    if (!fs.existsSync(shaderOutputDir)) {
+        fs.mkdirSync(shaderOutputDir, { recursive: true });
+    }
+
+    const shaderFiles = fs
+        .readdirSync(shaderInputDir)
+        .filter((file) => file.endsWith(".glsl"));
+
+    shaderFiles.forEach((shaderFile) => {
+        const inputPath = path.join(shaderInputDir, shaderFile);
+        const outputPath = path.join(shaderOutputDir, shaderFile);
+        const processedSource = preprocessShader(inputPath, shaderInputDir);
+
+        fs.writeFileSync(outputPath, processedSource, "utf8");
+        console.log(`Processed shader: ${shaderFile}`);
+    });
+}
+
 let project = new Project("sEngine");
 
 project.addSources("src");
-project.addShaders("shaders_compiled/**");
 project.addAssets("assets/**", {
     nameBaseDir: "assets",
     destination: "assets/{dir}/{name}",
     name: "{name}",
 });
+
+preprocessShaders("shaders", "shaders_preprocessed");
+project.addShaders("shaders_preprocessed/**");
 
 // Available Engine Compiler Flags:
 
