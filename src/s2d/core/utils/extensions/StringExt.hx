@@ -31,11 +31,15 @@ class StringExt {
 		return str.split(delimiter).map(capitalize).join(delimiter);
 	}
 
-	public static inline function cleanSpaces(input:String):String {
-		return ~/\s+/.replace(input.trim(), " ");
+	public static inline function cleanSpaces(str:String):String {
+		return ~/\s+/.replace(str.trim(), " ");
 	}
 
-	public static inline function strip(input:String):String {
-		return input.replace('\n', '');
+	public static inline function cleanLines(str:String):String {
+		return str.split("\n").filter(line -> line != "").join("\n");
+	}
+
+	public static inline function strip(str:String):String {
+		return str.replace('\n', ' ');
 	}
 }

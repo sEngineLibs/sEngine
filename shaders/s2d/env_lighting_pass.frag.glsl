@@ -10,12 +10,8 @@ uniform sampler2D envMap;
 in vec2 fragCoord;
 out vec4 fragColor;
 
-const vec3 viewDir = vec3(0.0, 0.0, 1.0); // 2D
-
-vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-    float factor = pow(1.0 - cosTheta, 5.0);
-    return F0 + (1.0 - F0) * factor;
-}
+import s2d.std.packing
+import s2d.std.pbr
 
 vec3 envLighting(vec3 normal, vec3 color, float roughness, float metalness) {
     vec3 V = normalize(viewDir);
@@ -37,15 +33,6 @@ vec3 envLighting(vec3 normal, vec3 color, float roughness, float metalness) {
     vec3 diffuse = kD * color * diffuseIrradiance;
 
     return diffuse + specular;
-}
-
-vec4 unpack(float cram) {
-    const uvec4 shift = uvec4(24, 16, 8, 0);
-
-    uvec4 haz = uvec4(floatBitsToUint(cram));
-    haz = haz >> shift & 0xFFu;
-
-    return vec4(haz) / 255.0;
 }
 
 void main() {

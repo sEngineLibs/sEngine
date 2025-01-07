@@ -7,13 +7,6 @@ precision mediump float;
 #define MAX_LIGHTS 16
 #define LIGHT_STRUCT_SIZE 8
 
-struct Light {
-    vec3 position;
-    vec3 color;
-    float power;
-    float radius;
-};
-
 uniform sampler2D gMap;
 uniform mat4 invVP;
 uniform float lightsData[1 + MAX_LIGHTS * LIGHT_STRUCT_SIZE];
@@ -23,6 +16,13 @@ out vec4 fragColor;
 
 const vec3 viewDir = vec3(0.0, 0.0, 1.0); // 2D
 const float PI = 3.14159;
+
+struct Light {
+    vec3 position;
+    vec3 color;
+    float power;
+    float radius;
+};
 
 Light getLight(int index) {
     int i = 1 + index * LIGHT_STRUCT_SIZE;
@@ -40,28 +40,8 @@ Light getLight(int index) {
     return light;
 }
 
-vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-    float factor = pow(1.0 - cosTheta, 5.0);
-    return F0 + (1.0 - F0) * factor;
-}
-
-float distributionGGX(vec3 N, vec3 H, float roughnessE2) {
-    float a = roughnessE2;
-    float a2 = a * a;
-    float NdotH = max(dot(N, H), 0.0);
-    float denom = NdotH * (a2 - 1.0) + 1.0;
-    return a2 / (PI * (denom * denom + 1e-4));
-}
-
-float geometrySchlickGGX(float NdotX, float k) {
-    return NdotX / (NdotX * (1.0 - k) + k);
-}
-
-float geometrySmith(vec3 N, vec3 V, vec3 L, float roughnessE2) {
-    float k = roughnessE2 * 0.5;
-    return geometrySchlickGGX(max(dot(N, V), 0.0), k) *
-        geometrySchlickGGX(max(dot(N, L), 0.0), k);
-}
+import s2d.std.packing
+import s2d.std.pbr
 
 vec3 lighting(Light light, vec3 position, vec3 normal, vec3 color, float roughness, float metalness) {
     vec3 l = light.position - position;
@@ -89,15 +69,6 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 color, float roughne
     vec3 diffuseLight = kD * color * max(dot(normal, dir), 0.0) / PI;
 
     return (diffuseLight + specularLight) * light.color * lightAttenuation;
-}
-
-vec4 unpack(float cram) {
-    const uvec4 shift = uvec4(24, 16, 8, 0);
-
-    uvec4 haz = uvec4(floatBitsToUint(cram));
-    haz = haz >> shift & 0xFFu;
-
-    return vec4(haz) / 255.0;
 }
 
 void main() {
