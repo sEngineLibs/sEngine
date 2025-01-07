@@ -1,7 +1,7 @@
 let project = new Project("sEngine");
 
 project.addSources("src");
-project.addShaders("shaders/compiled/**");
+project.addShaders("shaders_compiled/**");
 project.addAssets("assets/**", {
     nameBaseDir: "assets",
     destination: "assets/{dir}/{name}",

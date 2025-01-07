@@ -87,7 +87,7 @@ class Preprocessor {
 				if (compiledLine.startsWith("#"))
 					compiled.add("\n" + compiledLine + "\n");
 				else
-					compiled.add(compiledLine);
+					compiled.add(compiledLine + " ");
 		}
 
 		var pathNorm = Path.normalize(fp);

@@ -14,9 +14,6 @@ uniform float lightsData[1 + MAX_LIGHTS * LIGHT_STRUCT_SIZE];
 in vec2 fragCoord;
 out vec4 fragColor;
 
-const vec3 viewDir = vec3(0.0, 0.0, 1.0); // 2D
-const float PI = 3.14159;
-
 struct Light {
     vec3 position;
     vec3 color;

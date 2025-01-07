@@ -1,4 +1,5 @@
 const vec3 viewDir = vec3(0.0, 0.0, 1.0); // 2D
+const float PI = 3.14159;
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     float factor = pow(1.0 - cosTheta, 5.0);
