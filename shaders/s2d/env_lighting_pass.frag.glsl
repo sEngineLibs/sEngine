@@ -3,11 +3,13 @@
 #include "s2d/std/packing"
 #include "s2d/std/pbr"
 
-uniform sampler2D gMap;
-uniform sampler2D envMap;
-
 in vec2 fragCoord;
 out vec4 fragColor;
+
+uniform sampler2D gMap;
+
+#ifdef S2D_RP_ENV_LIGHTING
+uniform sampler2D envMap;
 
 vec3 envLighting(vec3 normal, vec3 color, float roughness, float metalness) {
     vec3 V = normalize(viewDir);
@@ -30,6 +32,7 @@ vec3 envLighting(vec3 normal, vec3 color, float roughness, float metalness) {
 
     return diffuse + specular;
 }
+#endif
 
 void main() {
     // fetch gbuffer textures
@@ -38,9 +41,11 @@ void main() {
     vec4 upG = unpack(packed.g);
     vec4 upB = unpack(packed.b);
 
+    vec3 glow = vec3(upR.b, upG.b, upB.b);
+
+    #ifdef S2D_RP_ENV_LIGHTING
     vec3 color = vec3(upR.r, upG.r, upB.r);
     vec3 normal = vec3(upR.g, upG.g, upB.g);
-    vec3 glow = vec3(upR.b, upG.b, upB.b);
     vec3 orm = vec3(upR.a, upG.a, upB.a);
 
     float occlusion = orm.r;
@@ -53,4 +58,7 @@ void main() {
 
     vec3 e = envLighting(normal, color, roughness, metalness);
     fragColor = vec4(glow + occlusion * e, 1.0);
+    #else
+    fragColor = vec4(glow, 1.0);
+    #endif
 }

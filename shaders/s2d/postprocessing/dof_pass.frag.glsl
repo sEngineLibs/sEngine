@@ -1,15 +1,9 @@
 #version 450
 
-// global S2D_PP_DOF_QUALITY
-
-#ifdef GL_ES
-precision mediump float;
-#endif
-
 #define gamma vec3(5.2)
 #define invGamma (1.0 / gamma)
 
-#if defined(S2D_PP_DOF_QUALITY)
+#ifdef S2D_PP_DOF_QUALITY
 #if S2D_PP_DOF_QUALITY == 0
 #define quality 4.0
 #elif S2D_PP_DOF_QUALITY == 1
@@ -56,7 +50,6 @@ void main() {
     position = worldPos.xyz / worldPos.w;
     float cameraDist = abs(-position.z - cameraPos.z - focusDistance);
 
-    // dof
     vec3 color = blur(textureMap, fragCoord, cameraDist * blurSize, resolution.x / resolution.y);
 
     fragColor = vec4(color, 1.0);

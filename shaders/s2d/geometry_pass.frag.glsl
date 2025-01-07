@@ -9,8 +9,9 @@ uniform sampler2D normalMap;
 uniform sampler2D ormMap;
 uniform sampler2D glowMap;
 
-// 1 - depth scale
-uniform float Params[1];
+// 0 - depth scale
+// 1 - glow strength
+uniform float Params[2];
 
 in vec3 fragPos;
 in vec2 fragUV;
@@ -19,6 +20,7 @@ out vec4 fragColor;
 void main() {
     // fetch material parameters
     float depthScale = Params[0];
+    float glowStrength = Params[1];
 
     float rot = atan(model[1][0], model[0][0]);
     float rotSin = sin(rot);
@@ -27,7 +29,7 @@ void main() {
     // fetch material textures
     vec4 color = texture(colorMap, fragUV);
     vec3 normal = texture(normalMap, fragUV).rgb;
-    vec3 glow = texture(glowMap, fragUV).rgb;
+    vec3 glow = texture(glowMap, fragUV).rgb * glowStrength;
     vec3 orm = texture(ormMap, fragUV).rgb;
 
     // tangent space -> world space
