@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const cwd = process.cwd();
+const verbose = process.verbose;
 
 function clearDirectory(directory) {
     const files = fs.readdirSync(directory);
@@ -66,7 +67,9 @@ function assembleShaders(shaderDir, outputDir) {
 
     shaderFilesRelative.forEach((shaderFile) => {
         function assemble(shaderFile) {
-            console.log(`Processing shader: ${shaderFile}`);
+            if (verbose) {
+                console.log(`Processing shader: ${shaderFile}`);
+            }
 
             const shaderPath = path.join(shaderDir, shaderFile);
             const outputPath = path.join(outputDir, shaderFile);
@@ -145,7 +148,7 @@ for (const def of process.defines) {
 // S2D_PP_FISHEYE -> enables Fisheye PP effect
 // S2D_PP_FILTER -> enables 3x3 image convolution multi-pass PP effects
 // S2D_PP_COMPOSITOR -> enables compositor / single-pass combination of various (AA, CC etc.) PP effects
-project.addShaders(`${shaderOutputDir}/**`, {
+project.addShaders(`${shaderOutputDir}/**/*{frag,vert}.glsl`, {
     defines: defs,
 });
 
