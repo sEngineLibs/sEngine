@@ -122,18 +122,6 @@ project.addAssets("assets/**", {
     name: "{name}",
 });
 
-let defs = [];
-for (const def of process.defines) {
-    let kv = def.split(" ");
-    if (kv.length === 2) {
-        project.addDefine(`${kv[0]}=${kv[1]}`);
-        defs.push(`${kv[0]} ${kv[1]}`);
-    } else {
-        project.addDefine(def);
-        defs.push(`${kv[0]} 1`);
-    }
-}
-
 // Available Engine Compiler Flags:
 
 // Debug:
@@ -147,6 +135,18 @@ for (const def of process.defines) {
 // S2D_PP_FISHEYE -> enables Fisheye PP effect
 // S2D_PP_FILTERS -> enables 3x3 image convolution multi-pass PP effects
 // S2D_PP_COMPOSITOR -> enables compositor / single-pass combination of various (AA, CC etc.) PP effects
+let defs = [];
+for (const def of process.defines) {
+    let kv = def.split(" ");
+    if (kv.length === 2) {
+        project.addDefine(`${kv[0]}=${kv[1]}`);
+        defs.push(`${kv[0]} ${kv[1]}`);
+    } else {
+        project.addDefine(def);
+        defs.push(`${kv[0]} 1`);
+    }
+}
+
 project.addShaders(`${shaderOutputDir}/**/*{frag,vert}.glsl`, {
     defines: defs,
 });
