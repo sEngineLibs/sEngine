@@ -1,44 +1,34 @@
 package s2d.graphics.shaders;
 
-import kha.Canvas;
-import kha.graphics4.Graphics;
-import kha.graphics4.IndexBuffer;
-import kha.graphics4.VertexBuffer;
-import kha.graphics4.VertexShader;
-import kha.graphics4.FragmentShader;
+import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 // s2d
-import s2d.core.graphics.Shader;
+import s2d.objects.Sprite;
 
-@:allow(s2d.graphics.RenderPath)
-class GeometryPass implements Shader {
-	var pipeline:PipelineState;
-	var modelCL:ConstantLocation;
-	var viewProjectionCL:ConstantLocation;
-	var colorMapTU:TextureUnit;
-	var normalMapTU:TextureUnit;
-	var ormMapTU:TextureUnit;
-	var glowMapTU:TextureUnit;
-	var paramsCL:ConstantLocation;
+@:allow(s2d.graphics.Renderer)
+@:access(s2d.graphics.Renderer)
+class GeometryPass {
+	static var pipeline:PipelineState;
+	static var modelCL:ConstantLocation;
+	static var VPCL:ConstantLocation;
+	static var colorMapTU:TextureUnit;
+	static var normalMapTU:TextureUnit;
+	static var ormMapTU:TextureUnit;
+	static var glowMapTU:TextureUnit;
+	static var paramsCL:ConstantLocation;
 
-	public inline function new() {}
-
-	inline function setUniforms(g:Graphics, ?uniforms:Array<Dynamic>) {}
-
-	inline function getUniforms() {}
-
-	inline function compile(frag:FragmentShader, ?vert:VertexShader) {
+	static inline function compile() {
 		var structure = new VertexStructure();
 		structure.add("vertPos", Float32_3X);
 		structure.add("vertUV", Float32_2X);
 
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];
-		pipeline.vertexShader = vert;
-		pipeline.fragmentShader = frag;
+		pipeline.vertexShader = Shaders.geometry_pass_vert;
+		pipeline.fragmentShader = Shaders.geometry_pass_frag;
 		pipeline.alphaBlendSource = SourceAlpha;
 		pipeline.alphaBlendDestination = InverseSourceAlpha;
 		pipeline.blendSource = BlendOne;
@@ -46,7 +36,7 @@ class GeometryPass implements Shader {
 		pipeline.compile();
 
 		modelCL = pipeline.getConstantLocation("model");
-		viewProjectionCL = pipeline.getConstantLocation("viewProjection");
+		VPCL = pipeline.getConstantLocation("VP");
 		colorMapTU = pipeline.getTextureUnit("colorMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
@@ -54,5 +44,26 @@ class GeometryPass implements Shader {
 		paramsCL = pipeline.getConstantLocation("Params");
 	}
 
-	inline function render(target:Canvas, indices:IndexBuffer, vertices:VertexBuffer, ?uniforms:Array<Dynamic>):Void {}
+	static inline function render():Void {
+		final g4 = Renderer.gBuffer.g4;
+		final VP = S2D.stage.VP;
+		final sprites = S2D.stage.sprites;
+
+		g4.begin();
+		g4.clear(Black);
+		g4.setPipeline(pipeline);
+		g4.setIndexBuffer(Sprite.indices);
+		g4.setVertexBuffer(Sprite.vertices);
+		for (sprite in sprites) {
+			g4.setMatrix(modelCL, sprite.finalTransformation);
+			g4.setMatrix(VPCL, VP);
+			g4.setTexture(colorMapTU, sprite.material.colorMap);
+			g4.setTexture(normalMapTU, sprite.material.normalMap);
+			g4.setTexture(ormMapTU, sprite.material.ormMap);
+			g4.setTexture(glowMapTU, sprite.material.glowMap);
+			g4.setFloats(paramsCL, sprite.material.params);
+			g4.drawIndexedVertices();
+		}
+		g4.end();
+	}
 }

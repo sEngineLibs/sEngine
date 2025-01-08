@@ -10,22 +10,31 @@ import s2d.objects.Object;
 
 using s2d.core.utils.extensions.FastMatrix4Ext;
 
-@:allow(s2d.graphics.RenderPath)
 class Stage {
 	public var sprites:Array<Sprite> = [];
 	public var lights:Array<Light> = [];
 	public var camera:Object = new Object();
 
-	final maxLights:Int = 16;
-	final lightStructSize:Int = 8;
+	var maxLights:Int = 16;
+	var lightStructSize:Int = 8;
+
+	#if S2D_RP_ENV_LIGHTING
+	@:isVar public var environmentMap(default, set):Image;
+
+	inline function set_environmentMap(value:Image):Image {
+		environmentMap = value;
+		environmentMap.generateMipmaps(4);
+		return value;
+	}
+	#end
 
 	public inline function new() {
 		lightsData = new Float32Array(1 * maxLights * lightStructSize);
 	}
 
-	public var viewProjection(get, null):FastMatrix4;
+	public var VP(get, null):FastMatrix4;
 
-	inline function get_viewProjection() {
+	inline function get_VP() {
 		return S2D.projection.multmat(camera.finalTransformation);
 	}
 
@@ -50,14 +59,4 @@ class Stage {
 		}
 		return lightsData;
 	}
-
-	#if S2D_RP_ENV_LIGHTING
-	@:isVar public var environmentMap(default, set):Image;
-
-	inline function set_environmentMap(value:Image):Image {
-		environmentMap = value;
-		environmentMap.generateMipmaps(4);
-		return value;
-	}
-	#end
 }

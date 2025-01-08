@@ -1,8 +1,54 @@
-package s2d.graphics;
+package s2d.graphics.postprocessing;
 
+import kha.Canvas;
+import kha.Shaders;
 import kha.math.FastMatrix3;
+import kha.graphics4.TextureUnit;
+import kha.graphics4.ConstantLocation;
 
-abstract Filter(FastMatrix3) from FastMatrix3 to FastMatrix3 {
+class Filter extends PPEffect {
+	var textureMapTU:TextureUnit;
+	var resolutionCL:ConstantLocation;
+	var kernelCL:ConstantLocation;
+
+	public var kernels:Array<FastMatrix3> = [];
+
+	public inline function new() {}
+
+	public inline function addKernel(kernel:Kernel) {
+		kernels.push(kernel);
+	}
+
+	override inline function setPipeline() {
+		pipeline.vertexShader = Shaders.s2d_2d_vert;
+		pipeline.fragmentShader = Shaders.filter_pass_frag;
+	}
+
+	override inline function getUniforms() {
+		textureMapTU = pipeline.getTextureUnit("textureMap");
+		resolutionCL = pipeline.getConstantLocation("resolution");
+		kernelCL = pipeline.getConstantLocation("kernel");
+	}
+
+	override inline function render(target:Canvas) {
+		final g2 = target.g2;
+		final g4 = target.g4;
+
+		g2.begin();
+		g4.setPipeline(pipeline);
+		g4.setIndexBuffer(S2D.indices);
+		g4.setVertexBuffer(S2D.vertices);
+		g4.setTexture(textureMapTU, Renderer.ppBuffer.src);
+		g4.setFloat2(resolutionCL, S2D.width, S2D.height);
+		for (kernel in kernels) {
+			g4.setMatrix3(kernelCL, kernel);
+			g4.drawIndexedVertices();
+		}
+		g2.end();
+	}
+}
+
+enum abstract Kernel(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 	public static var Identity = new FastMatrix3(0, 0, 0, 0, 1, 0, 0, 0, 0);
 	public static var Sharpen = new FastMatrix3(0, -1, 0, -1, 5, -1, 0, -1, 0);
 	public static var BoxBlur = new FastMatrix3(0.111, 0.111, 0.111, 0.112, 0.111, 0.111, 0.111, 0.111, 0.111);

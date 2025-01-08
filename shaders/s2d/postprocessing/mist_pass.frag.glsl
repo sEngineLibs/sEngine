@@ -1,8 +1,9 @@
 #version 450
 
+#include "s2d/std/gbuffer"
+
 uniform sampler2D textureMap;
-uniform vec2 resolution;
-uniform sampler2D positionMap;
+uniform sampler2D gBuffer;
 uniform mat4 invVP;
 uniform vec3 cameraPos;
 uniform vec2 mistScale;
@@ -12,7 +13,7 @@ in vec2 fragCoord;
 out vec4 fragColor;
 
 void main() {
-    vec3 position = texture(positionMap, fragCoord).rgb;
+    vec3 position = unpackGBufferPosition(gBuffer, fragCoord);
     vec4 worldPos = invVP * vec4(position * 2.0 - 1.0, 1.0);
     position = worldPos.xyz / worldPos.w;
     float cameraDist = 1.0 - abs(position.z - cameraPos.z);

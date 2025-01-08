@@ -7,10 +7,12 @@
 
 uniform sampler2D textureMap;
 uniform vec2 resolution;
-// 0 - posterizeGamma;
-// 1 - posterizeSteps;
-// 2 - vignetteStrength;
-uniform float Params[3];
+
+uniform float Params[7];
+#define posterizeGamma Params[0]
+#define posterizeSteps Params[1]
+#define vignetteStrength Params[2]
+#define vignetteColor vec4(Params[3], Params[4], Params[5], Params[6])
 
 in vec2 fragCoord;
 out vec4 fragColor;
@@ -59,30 +61,24 @@ vec3 posterize(vec3 col, float gamma, float steps) {
     return col;
 }
 
-float vignette(vec2 coord, float strength, vec2 resolution) {
-    vec2 center = resolution * 0.5;
-    float normalizedDist = distance(coord, center) / distance(vec2(0.0), center);
-    float vignetteValue = 1.0 - pow(normalizedDist, strength);
-    return clamp(vignetteValue, 0.0, 1.0);
+float vignette(vec2 coord) {
+    coord *= 1.0 - coord.yx;
+    return pow(coord.x * coord.y * 15.0, vignetteStrength);
 }
 
 void main() {
     vec2 texelSize = 1.0 / resolution;
 
-    // fetch compositor parameters
-    float posterizeGamma = Params[0];
-    float posterizeSteps = Params[1];
-    float vignetteStrength = Params[2];
-
     // fxaa
     vec4 uv = vec4(fragCoord, fragCoord - (texelSize * FXAA_SUBPIX_SHIFT));
-    vec3 col = FXAA(uv, textureMap, texelSize);
+    vec3 color = FXAA(uv, textureMap, texelSize);
 
     // posterize
-    // col = posterize(col, posterizeGamma, posterizeSteps);
+    color = posterize(color, posterizeGamma, posterizeSteps);
 
     // vignette
-    // col *= vignette(fragCoord, vignetteStrength, resolution);
+    float vignetteFactor = vignette(fragCoord);
+    color = mix(vignetteColor.rgb, color, vignetteFactor * vignetteColor.a);
 
-    fragColor = vec4(col, 1.0);
+    fragColor = vec4(color, 1.0);
 }

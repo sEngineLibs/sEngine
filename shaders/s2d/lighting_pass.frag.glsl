@@ -1,12 +1,12 @@
 #version 450
 
-#include "s2d/std/packing"
+#include "s2d/std/gbuffer"
 #include "s2d/std/pbr"
 
 #define MAX_LIGHTS 16
 #define LIGHT_STRUCT_SIZE 8
 
-uniform sampler2D gMap;
+uniform sampler2D gBuffer;
 uniform mat4 invVP;
 uniform float lightsData[1 + MAX_LIGHTS * LIGHT_STRUCT_SIZE];
 
@@ -66,14 +66,8 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 color, float roughne
 
 void main() {
     // fetch gbuffer textures
-    vec4 packed = texture(gMap, fragCoord);
-    vec4 upR = unpack(packed.r);
-    vec4 upG = unpack(packed.g);
-    vec4 upB = unpack(packed.b);
-
-    vec3 color = vec3(upR.r, upG.r, upB.r);
-    vec3 normal = vec3(upR.g, upG.g, upB.g);
-    vec3 orm = vec3(upR.a, upG.a, upB.a);
+    vec3 color, normal, glow, orm;
+    unpackGBuffer(gBuffer, fragCoord, color, normal, glow, orm);
 
     float occlusion = orm.r;
     float roughness = clamp(orm.g, 0.05, 1.0);

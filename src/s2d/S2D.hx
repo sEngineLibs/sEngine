@@ -6,27 +6,27 @@ import kha.Canvas;
 import kha.FastFloat;
 import kha.math.FastVector3;
 import kha.math.FastMatrix4;
+import kha.graphics4.IndexBuffer;
+import kha.graphics4.VertexBuffer;
+import kha.graphics4.VertexStructure;
 // s2d
 import s2d.Stage;
 import s2d.objects.Sprite;
-import s2d.graphics.RenderPath;
+import s2d.graphics.Renderer;
 
 using s2d.core.utils.extensions.FastMatrix4Ext;
 
 class S2D {
 	#if S2D_DEBUG_FPS
-	static var fst:FastFloat = 0;
-	static var fpsCounter:Int = 0;
-	static var fps:Int = 0;
+	static var frameTS:FastFloat = 0.0;
+	static var deltaTime:FastFloat = 0.0;
 
 	static inline function showFPS(g:kha.graphics2.Graphics) {
-		++fpsCounter;
-		var t = System.time;
-		if (t - fst >= 1) {
-			fps = fpsCounter;
-			fpsCounter = 0;
-			fst = t;
-		}
+		final t = System.time;
+		deltaTime = t - frameTS;
+		final fps = Std.int(1.0 / deltaTime);
+		frameTS = t;
+
 		g.font = Assets.fonts.Roboto_Regular;
 		g.fontSize = 14;
 		g.color = Black;
@@ -36,6 +36,8 @@ class S2D {
 	}
 	#end
 
+	public static var indices:IndexBuffer;
+	public static var vertices:VertexBuffer;
 	public static var projection:FastMatrix4;
 
 	public static var width:Int;
@@ -79,12 +81,37 @@ class S2D {
 		realWidth = w;
 		realHeight = h;
 		aspectRatio = width / height;
-		RenderPath.init(width, height);
+		Renderer.init(width, height);
 		Sprite.init();
+
+		// init indices
+		indices = new IndexBuffer(6, StaticUsage);
+		var ind = indices.lock();
+		ind[0] = 0;
+		ind[1] = 1;
+		ind[2] = 2;
+		ind[3] = 3;
+		ind[4] = 2;
+		ind[5] = 0;
+		indices.unlock();
+
+		// init structure
+		var structure = new VertexStructure();
+		structure.add("vertCoord", Float32_2X);
+		var structSize = structure.byteSize() >> 2;
+
+		// init vertices
+		vertices = new VertexBuffer(4, structure, StaticUsage);
+		var vert = vertices.lock();
+		for (i in 0...4) {
+			vert[i * structSize + 0] = i == 0 || i == 1 ? -1.0 : 1.0;
+			vert[i * structSize + 1] = i == 0 || i == 3 ? -1.0 : 1.0;
+		}
+		vertices.unlock();
 	}
 
 	public static inline function compile() {
-		RenderPath.compile();
+		Renderer.compile();
 	}
 
 	public static inline function update() {}
@@ -93,7 +120,7 @@ class S2D {
 		realWidth = w;
 		realHeight = h;
 		aspectRatio = width / height;
-		RenderPath.resize(width, height);
+		Renderer.resize(width, height);
 	}
 
 	static inline function set_scale(value:FastFloat):FastFloat {
@@ -118,7 +145,7 @@ class S2D {
 	}
 
 	public static inline function local2WorldSpace(point:FastVector3):FastVector3 {
-		var wsp = stage.viewProjection.inverse().multvec({
+		var wsp = stage.VP.inverse().multvec({
 			x: point.x * 2.0 - 1.0,
 			y: point.y * 2.0 - 1.0,
 			z: point.z * 2.0 - 1.0,
@@ -133,7 +160,7 @@ class S2D {
 	}
 
 	public static inline function world2LocalSpace(point:FastVector3):FastVector3 {
-		var ncp = stage.viewProjection.multvec({
+		var ncp = stage.VP.multvec({
 			x: point.x,
 			y: point.y,
 			z: point.z,
@@ -170,7 +197,7 @@ class S2D {
 	}
 
 	public static inline function render(target:Canvas):Void {
-		var frame = RenderPath.render(target, stage);
+		var frame = Renderer.render();
 
 		var g2 = target.g2;
 		g2.begin();

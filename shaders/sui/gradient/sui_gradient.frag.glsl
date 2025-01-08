@@ -23,8 +23,8 @@ vec4 gradCol() {
 }
 
 void main() {
-    vec2 uv = fragCoord.xy * uResolution.xy;
-    float mask = float(uv.x >= uGradBounds[ID].x) * float(uv.x <= uGradBounds[ID].z) * float(uv.y >= uGradBounds[ID].y) * float(uv.x <= uGradBounds[ID].w);
+    vec2 fragCoord = fragCoord.xy * uResolution.xy;
+    float mask = float(fragCoord.x >= uGradBounds[ID].x) * float(fragCoord.x <= uGradBounds[ID].z) * float(fragCoord.y >= uGradBounds[ID].y) * float(fragCoord.x <= uGradBounds[ID].w);
     vec4 col = gradCol();
     fragColor = vec4(col.rgb, col.a * mask);
 }

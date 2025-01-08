@@ -17,14 +17,14 @@ float sdf(vec2 cp, vec2 si, float ra) {
 }
 
 void main() {
-    vec2 uv = fragCoord.xy * uResolution;
+    vec2 fragCoord = fragCoord.xy * uResolution;
     vec4 bounds = uRectBounds[ID];
-    bounds.z -= bounds.x; 
+    bounds.z -= bounds.x;
     bounds.w -= bounds.y;
     bounds.x += bounds.z / 2;
     bounds.y += bounds.w / 2;
 
-    float rectDist = sdf(uv - bounds.xy, bounds.zw / 2, uRectAttrib[ID][0]);
+    float rectDist = sdf(fragCoord - bounds.xy, bounds.zw / 2, uRectAttrib[ID][0]);
     float rectMask = 1.0 - smoothstep(-uRectAttrib[ID][1], uRectAttrib[ID][1], rectDist);
 
     fragColor = vec4(uRectColors[ID].rgb, uRectColors[ID].a * rectMask);

@@ -1,6 +1,6 @@
 #version 450
 
-#include "s2d/std/packing"
+#include "s2d/std/gbuffer"
 
 uniform mat4 model;
 
@@ -9,19 +9,15 @@ uniform sampler2D normalMap;
 uniform sampler2D ormMap;
 uniform sampler2D glowMap;
 
-// 0 - depth scale
-// 1 - glow strength
 uniform float Params[2];
+#define depthScale Params[0]
+#define glowStrength Params[1]
 
 in vec3 fragPos;
 in vec2 fragUV;
 out vec4 fragColor;
 
 void main() {
-    // fetch material parameters
-    float depthScale = Params[0];
-    float glowStrength = Params[1];
-
     float rot = atan(model[1][0], model[0][0]);
     float rotSin = sin(rot);
     float rotCos = cos(rot);
@@ -46,10 +42,5 @@ void main() {
     glow.rgb *= color.a;
     orm.rgb *= color.a;
 
-    fragColor = vec4(
-            pack(vec4(color.r, normal.r, glow.r, orm.r)),
-            pack(vec4(color.g, normal.g, glow.g, orm.g)),
-            pack(vec4(color.b, normal.b, glow.b, orm.b)),
-            color.a
-        );
+    fragColor = packGBuffer(color.rgb, normal, glow, orm, color.a);
 }
