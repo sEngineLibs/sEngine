@@ -7,7 +7,6 @@ import kha.graphics4.VertexStructure;
 @:access(s2d.graphics.Renderer)
 class PPEffect {
 	var pipeline:PipelineState;
-
 	var index:Int;
 
 	public var enabled(get, set):Bool;

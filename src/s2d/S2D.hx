@@ -1,5 +1,6 @@
 package s2d;
 
+import kha.Scheduler;
 import kha.Assets;
 import kha.System;
 import kha.Canvas;
@@ -11,31 +12,13 @@ import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
 // s2d
 import s2d.Stage;
+import s2d.core.Time;
 import s2d.objects.Sprite;
 import s2d.graphics.Renderer;
 
 using s2d.core.utils.extensions.FastMatrix4Ext;
 
 class S2D {
-	#if S2D_DEBUG_FPS
-	static var frameTS:FastFloat = 0.0;
-	static var deltaTime:FastFloat = 0.0;
-
-	static inline function showFPS(g:kha.graphics2.Graphics) {
-		final t = System.time;
-		deltaTime = t - frameTS;
-		final fps = Std.int(1.0 / deltaTime);
-		frameTS = t;
-
-		g.font = Assets.fonts.Roboto_Regular;
-		g.fontSize = 14;
-		g.color = Black;
-		g.drawString('FPS: ${fps}', 6, 6);
-		g.color = White;
-		g.drawString('FPS: ${fps}', 5, 5);
-	}
-	#end
-
 	public static var indices:IndexBuffer;
 	public static var vertices:VertexBuffer;
 	public static var projection:FastMatrix4;
@@ -113,8 +96,6 @@ class S2D {
 	public static inline function compile() {
 		Renderer.compile();
 	}
-
-	public static inline function update() {}
 
 	public static inline function resize(w:Int, h:Int) {
 		realWidth = w;
@@ -197,6 +178,8 @@ class S2D {
 	}
 
 	public static inline function render(target:Canvas):Void {
+		Time.update();
+
 		var frame = Renderer.render();
 
 		var g2 = target.g2;
@@ -207,4 +190,17 @@ class S2D {
 		#end
 		g2.end();
 	}
+
+	#if S2D_DEBUG_FPS
+	static inline function showFPS(g:kha.graphics2.Graphics) {
+		final fps = Std.int(1.0 / Time.delta);
+
+		g.font = Assets.fonts.Roboto_Regular;
+		g.fontSize = 14;
+		g.color = Black;
+		g.drawString('FPS: ${fps}', 6, 6);
+		g.color = White;
+		g.drawString('FPS: ${fps}', 5, 5);
+	}
+	#end
 }

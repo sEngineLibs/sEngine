@@ -3,8 +3,12 @@ package s2d.graphics.materials;
 import kha.Image;
 import kha.FastFloat;
 import kha.arrays.Float32Array;
+// s2d
+import s2d.tiling.TileSheet;
 
 class Material {
+	public var sheetRows:Int = 1;
+	public var sheetColumns:Int = 1;
 	public var colorMap:Image;
 	public var normalMap:Image;
 	public var ormMap:Image;
@@ -13,6 +17,7 @@ class Material {
 	public var params:Float32Array;
 	public var depthScale(get, set):FastFloat;
 	public var glowStrength(get, set):FastFloat;
+	public var tilesheet:TileSheet = new TileSheet(1, 1);
 
 	public inline function new() {
 		params = new Float32Array(2);

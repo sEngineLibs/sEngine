@@ -1,23 +1,19 @@
 package s2d.core.utils;
 
 class MathUtils {
-	public static inline function arrMax(arr:Array<Dynamic>) {
-		var max:Dynamic = arr[0];
-		for (i in 1...arr.length)
-			if (arr[i] > max)
-				max = arr[i];
-		return max;
+	public static inline function clamp(x:Float, xmin:Float, xmax:Float):Float {
+		return Math.min(Math.max(x, xmin), xmax);
 	}
 
-	public static inline function arrMin(arr:Array<Dynamic>) {
-		var min:Dynamic = arr[0];
-		for (i in 1...arr.length)
-			if (arr[i] < min)
-				min = arr[i];
-		return min;
+	public static inline function iclamp(x:Int, xmin:Int, xmax:Int):Int {
+		return Std.int(clamp(x, xmin, xmax));
 	}
 
-	public static inline function clamp(x:Dynamic, xmin:Dynamic, xmax:Dynamic) {
-		return Math.max(Math.min(x, xmax), xmin);
+	public static inline function repeat(x:Float, xmin:Float, xmax:Float):Float {
+		return xmin + x % (xmax - xmin);
+	}
+
+	public static inline function irepeat(x:Int, xmin:Int, xmax:Int):Int {
+		return xmin + x % (xmax - xmin);
 	}
 }

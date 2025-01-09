@@ -1,5 +1,6 @@
 package s2d.graphics.shaders;
 
+import kha.math.FastVector4;
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
@@ -12,8 +13,13 @@ import s2d.objects.Sprite;
 @:access(s2d.graphics.Renderer)
 class GeometryPass {
 	static var pipeline:PipelineState;
-	static var modelCL:ConstantLocation;
+
+	// stage uniforms
 	static var VPCL:ConstantLocation;
+	// sprite uniforms
+	static var modelCL:ConstantLocation;
+	static var cropRectCL:ConstantLocation;
+	// material uniforms
 	static var colorMapTU:TextureUnit;
 	static var normalMapTU:TextureUnit;
 	static var ormMapTU:TextureUnit;
@@ -35,8 +41,12 @@ class GeometryPass {
 		pipeline.blendDestination = InverseSourceAlpha;
 		pipeline.compile();
 
-		modelCL = pipeline.getConstantLocation("model");
+		// stage uniforms
 		VPCL = pipeline.getConstantLocation("VP");
+		// sprite uniforms
+		modelCL = pipeline.getConstantLocation("model");
+		cropRectCL = pipeline.getConstantLocation("cropRect");
+		// material uniforms
 		colorMapTU = pipeline.getTextureUnit("colorMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
@@ -55,8 +65,11 @@ class GeometryPass {
 		g4.setIndexBuffer(Sprite.indices);
 		g4.setVertexBuffer(Sprite.vertices);
 		for (sprite in sprites) {
-			g4.setMatrix(modelCL, sprite.finalTransformation);
+			final cropRect = sprite.material.tilesheet.curTile.crop(sprite.cropRect);
+			
 			g4.setMatrix(VPCL, VP);
+			g4.setMatrix(modelCL, sprite.finalTransformation);
+			g4.setVector4(cropRectCL, cropRect);
 			g4.setTexture(colorMapTU, sprite.material.colorMap);
 			g4.setTexture(normalMapTU, sprite.material.normalMap);
 			g4.setTexture(ormMapTU, sprite.material.ormMap);

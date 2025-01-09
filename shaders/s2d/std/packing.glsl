@@ -1,19 +1,12 @@
-float pack(vec4 cram) {
-    const uvec4 shift = uvec4(24, 16, 8, 0);
-
-    uvec4 crd = uvec4(clamp(cram, 0.0, 1.0) * 255.0) << shift;
-    uint haz = crd.x | crd.y | crd.z | crd.w;
-    uint cond = haz << 1 >> 24; // exponent - for nan & unnorm cond (IEEE 754)
-    haz = cond != 255u ? cond == 0u ? haz | 0x1000000u : haz : haz ^ 0x1000000u;
-
-    return uintBitsToFloat(haz);
+const ivec4 _bitShift = ivec4(0, 8, 16, 24);
+    
+float pack(vec4 v) {
+    ivec4 iv = ivec4(clamp(v, 0.0, 1.0) * 255.0) << _bitShift;
+    return iv.r | iv.g | iv.b | iv.a;
 }
 
-vec4 unpack(float cram) {
-    const uvec4 shift = uvec4(24, 16, 8, 0);
-
-    uvec4 haz = uvec4(floatBitsToUint(cram));
-    haz = haz >> shift & 0xFFu;
-
-    return vec4(haz) / 255.0;
+vec4 unpack(float p) {
+    vec4 v = vec4((ivec4(p) >> _bitShift) & 0xFF);
+    return v / 255.0;
 }
+

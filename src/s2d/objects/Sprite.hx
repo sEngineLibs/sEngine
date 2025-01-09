@@ -1,5 +1,6 @@
 package s2d.objects;
 
+import s2d.math.Rect;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
@@ -41,6 +42,7 @@ class Sprite extends Object {
 		vertices.unlock();
 	}
 
+	public var cropRect:Rect = Rect.Identity;
 	public var material:Material = new Material();
 
 	public inline function new() {

@@ -88,4 +88,5 @@ void main() {
         c += lighting(getLight(i), position, normal, color, roughness, metalness);
 
     fragColor = vec4(occlusion * c, 1.0);
+    // fragColor = vec4(normal, 1.0);
 }
