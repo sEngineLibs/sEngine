@@ -11,7 +11,8 @@ class Actuator {
 	var properties:Dynamic;
 	var start:Float;
 	var duration:Float;
-	var easing:(FastFloat) -> FastFloat = Easing.Linear;
+	var easing:(FastFloat) -> FastFloat;
+	var actuating:(String, FastFloat) -> Void;
 
 	inline function new(target:Dynamic, properties:Dynamic, duration:FastFloat = 1.0) {
 		this.target = target;
@@ -20,12 +21,24 @@ class Actuator {
 
 		source = Reflect.copy(properties);
 		for (prop in Reflect.fields(properties))
-			Reflect.setField(source, prop, Reflect.field(target, prop));
-
+			Reflect.setField(source, prop, Reflect.getProperty(target, prop));
 		start = Time.time;
+
+		easing = Easing.Linear;
+		actuating = (prop, v) -> {
+			Reflect.setProperty(target, prop, v);
+		};
 	}
 
 	public inline function ease(f:(FastFloat) -> FastFloat) {
 		easing = f;
+	}
+
+	public inline function actuate(f:(String, FastFloat) -> Void) {
+		actuating = f;
+	}
+
+	public inline function stop() {
+		Motion.actuators.remove(this);
 	}
 }

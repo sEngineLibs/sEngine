@@ -4,8 +4,6 @@ import kha.Image;
 // s2d
 import s2d.graphics.shaders.*;
 
-using s2d.core.utils.extensions.FastMatrix4Ext;
-
 @:allow(s2d.graphics.postprocessing.PPEffect)
 @:access(s2d.graphics.postprocessing.PPEffect)
 class Renderer {

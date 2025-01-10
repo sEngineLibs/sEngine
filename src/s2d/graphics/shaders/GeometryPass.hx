@@ -1,7 +1,13 @@
-package s2d.graphics.shaders; import kha.Shaders; import kha.math.FastVector4; import kha.graphics4.TextureUnit; import kha.graphics4.PipelineState; import kha.graphics4.VertexStructure; import kha.graphics4.ConstantLocation; // s2d
+package s2d.graphics.shaders;
 
-import s2d.objects.Sprite; @:allow(s2d.graphics.Renderer) @:access(s2d.graphics.Renderer) class GeometryPass {
+import kha.Shaders;
+import kha.graphics4.TextureUnit;
+import kha.graphics4.PipelineState;
+import kha.graphics4.VertexStructure;
+import kha.graphics4.ConstantLocation; // s2d
+import s2d.objects.Sprite;
 
+@:allow(s2d.graphics.Renderer) @:access(s2d.graphics.Renderer) class GeometryPass {
 	static var pipeline:PipelineState;
 
 	// stage uniforms
@@ -66,7 +72,7 @@ import s2d.objects.Sprite; @:allow(s2d.graphics.Renderer) @:access(s2d.graphics.
 			final cropRect = sprite.material.SpriteSheet.curTile.crop(sprite.cropRect);
 
 			g4.setMatrix(VPCL, VP);
-			g4.setMatrix(modelCL, sprite.finalTransformation);
+			g4.setMatrix(modelCL, sprite.finalTransformation.matrix);
 			g4.setVector4(cropRectCL, cropRect);
 			g4.setTexture(albedoMapTU, sprite.material.albedoMap);
 			g4.setTexture(normalMapTU, sprite.material.normalMap);

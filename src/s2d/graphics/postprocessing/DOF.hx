@@ -6,8 +6,6 @@ import kha.FastFloat;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
 
-using s2d.core.utils.extensions.FastMatrix4Ext;
-
 class DOF extends PPEffect {
 	var textureMapTU:TextureUnit;
 	var resolutionCL:ConstantLocation;

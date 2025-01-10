@@ -6,6 +6,7 @@ import s2d.core.Time;
 import s2d.core.utils.MathUtils;
 
 @:allow(s2d.S2D)
+@:allow(s2d.animation.Actuator)
 class Motion {
 	static var actuators:Array<Actuator> = [];
 
@@ -24,15 +25,15 @@ class Motion {
 				t = MathUtils.clamp(t, 0.0, 1.0);
 				t = actuator.easing(t);
 				for (prop in Reflect.fields(actuator.properties)) {
-					final s = Reflect.field(actuator.source, prop);
-					final e = Reflect.field(actuator.properties, prop);
+					final s = Reflect.getProperty(actuator.source, prop);
+					final e = Reflect.getProperty(actuator.properties, prop);
 					final v = lerp(s, e, t);
-					Reflect.setField(actuator.target, prop, v);
+					actuator.actuating(prop, v);
 				}
 			} else {
 				for (prop in Reflect.fields(actuator.properties)) {
-					final v = Reflect.field(actuator.properties, prop);
-					Reflect.setField(actuator.target, prop, v);
+					final v = Reflect.getProperty(actuator.properties, prop);
+					Reflect.setProperty(actuator.target, prop, v);
 				}
 				rm.push(actuator);
 			}

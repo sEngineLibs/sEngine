@@ -8,8 +8,6 @@ import s2d.objects.Light;
 import s2d.objects.Sprite;
 import s2d.objects.Object;
 
-using s2d.core.utils.extensions.FastMatrix4Ext;
-
 class Stage {
 	public var sprites:Array<Sprite> = [];
 	public var lights:Array<Light> = [];
@@ -35,7 +33,7 @@ class Stage {
 	public var VP(get, null):FastMatrix4;
 
 	inline function get_VP() {
-		return S2D.projection.multmat(camera.finalTransformation);
+		return S2D.projection.multmat(camera.finalTransformation.matrix);
 	}
 
 	@:isVar var lightsData(get, null):Float32Array;
@@ -46,7 +44,7 @@ class Stage {
 		for (i in 0...lights.length) {
 			var ind = 1 + i * lightStructSize;
 			var light = lights[i];
-			var lightPosition = light.finalTransformation.getTranslation();
+			var lightPosition = light.finalTransformation.translation;
 
 			lightsData[ind + 0] = lightPosition.x;
 			lightsData[ind + 1] = lightPosition.y;

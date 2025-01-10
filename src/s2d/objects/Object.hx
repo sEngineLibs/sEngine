@@ -1,15 +1,15 @@
 package s2d.objects;
 
 import kha.math.FastMatrix4;
-
-using s2d.core.utils.extensions.FastMatrix4Ext;
+// s2d
+import s2d.geometry.Transformation;
 
 @:build(s2d.core.macro.SMacro.build())
 class Object {
 	@:isVar public var parent(default, null):Object = null;
 	@:isVar public var children(default, null):Array<Object> = [];
-	public var transformation:FastMatrix4 = FastMatrix4.identity();
-	public var finalTransformation(get, never):FastMatrix4;
+	public var transformation:Transformation = new Transformation();
+	public var finalTransformation(get, never):Transformation;
 
 	public inline function new() {}
 
@@ -47,7 +47,7 @@ class Object {
 			value.removeParent();
 	}
 
-	inline function get_finalTransformation():FastMatrix4 {
-		return parent == null ? transformation : parent.finalTransformation.multmat(transformation);
+	inline function get_finalTransformation():Transformation {
+		return parent == null ? transformation : parent.finalTransformation.multmat(transformation.matrix);
 	}
 }

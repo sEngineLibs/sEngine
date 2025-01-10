@@ -17,8 +17,6 @@ import s2d.core.Time;
 import s2d.objects.Sprite;
 import s2d.graphics.Renderer;
 
-using s2d.core.utils.extensions.FastMatrix4Ext;
-
 class S2D {
 	public static var indices:IndexBuffer;
 	public static var vertices:VertexBuffer;
@@ -185,7 +183,7 @@ class S2D {
 
 	public static inline function render(target:Canvas):Void {
 		update();
-		
+
 		var frame = Renderer.render();
 		var g2 = target.g2;
 		g2.begin();
