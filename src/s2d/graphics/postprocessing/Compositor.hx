@@ -27,7 +27,7 @@ class Compositor extends PPEffect {
 
 		posterizeGamma = 1.0;
 		posterizeSteps = 255.0;
-		vignetteStrength = 1.0;
+		vignetteStrength = 0.0;
 		vignetteColor = Black;
 	}
 

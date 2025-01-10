@@ -1,14 +1,12 @@
-package s2d.tiling;
+package s2d.animation;
 
-import kha.FastFloat;
-import kha.Scheduler;
 import kha.math.FastVector2;
 // s2d
 import s2d.math.Rect;
 import s2d.math.IVec2;
 
 @:autoBuild(s2d.core.macro.SMacro.build())
-class TileSheet {
+class SpriteSheet {
 	@:isVar public var colsNum(default, set):Int = 1;
 	@:isVar public var rowsNum(default, set):Int = 1;
 	@readonly public var length:Int = 1;
@@ -17,8 +15,6 @@ class TileSheet {
 	@readonly public var curTile:Rect = Rect.Identity;
 	@:isVar public var curTileID(default, set):Int = 0;
 	@:isVar public var curTilePosition(default, set):IVec2 = {x: 0, y: 0};
-
-	public var framerate:FastFloat = 30.0;
 
 	public inline function new(?colsNum:Int = 1, ?rowsNum:Int = 1) {
 		this.colsNum = colsNum;

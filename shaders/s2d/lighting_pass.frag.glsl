@@ -1,12 +1,20 @@
 #version 450
 
-#include "s2d/std/gbuffer"
 #include "s2d/std/pbr"
 
 #define MAX_LIGHTS 16
 #define LIGHT_STRUCT_SIZE 8
 
+#if S2D_RP_PACK_GBUFFER == 1
+#include "s2d/std/gbuffer"
 uniform sampler2D gBuffer;
+#else
+uniform sampler2D albedoMap;
+uniform sampler2D normalMap;
+uniform sampler2D ormMap;
+uniform sampler2D emissionMap;
+#endif
+
 uniform mat4 invVP;
 uniform float lightsData[1 + MAX_LIGHTS * LIGHT_STRUCT_SIZE];
 
@@ -36,7 +44,7 @@ Light getLight(int index) {
     return light;
 }
 
-vec3 lighting(Light light, vec3 position, vec3 normal, vec3 color, float roughness, float metalness) {
+vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, float roughness, float metalness) {
     vec3 l = light.position - position;
     float distSq = dot(l, l);
     float dist = sqrt(distSq);
@@ -48,7 +56,7 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 color, float roughne
     vec3 H = normalize(dir + V);
 
     // Fresnel
-    vec3 F0 = mix(vec3(0.04), color, metalness);
+    vec3 F0 = mix(vec3(0.04), albedo, metalness);
     vec3 F = fresnelSchlick(dot(H, V), F0);
 
     // BRDF components
@@ -59,15 +67,23 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 color, float roughne
 
     // diffuse
     vec3 kD = (1.0 - F) * (1.0 - metalness);
-    vec3 diffuseLight = kD * color * max(dot(normal, dir), 0.0) / PI;
+    vec3 diffuseLight = kD * albedo * max(dot(normal, dir), 0.0) / PI;
 
     return (diffuseLight + specularLight) * light.color * lightAttenuation;
 }
 
 void main() {
     // fetch gbuffer textures
-    vec3 color, normal, glow, orm;
-    unpackGBuffer(gBuffer, fragCoord, color, normal, glow, orm);
+    vec3 albedo, normal, emission, orm;
+
+    #if S2D_RP_PACK_GBUFFER == 1
+    unpackGBuffer(gBuffer, fragCoord, albedo, normal, emission, orm);
+    #else
+    albedo = texture(albedoMap, fragCoord).rgb;
+    normal = texture(normalMap, fragCoord).rgb;
+    emission = texture(emissionMap, fragCoord).rgb;
+    orm = texture(ormMap, fragCoord).rgb;
+    #endif
 
     float occlusion = orm.r;
     float roughness = clamp(orm.g, 0.05, 1.0);
@@ -83,10 +99,9 @@ void main() {
 
     // lighting
     vec3 c = vec3(0.0);
-    int lightCount = min(int(lightsData[0]), MAX_LIGHTS);
+    int lightCount = int(lightsData[0]);
     for (int i = 0; i < lightCount; ++i)
-        c += lighting(getLight(i), position, normal, color, roughness, metalness);
+        c += lighting(getLight(i), position, normal, albedo, roughness, metalness);
 
     fragColor = vec4(occlusion * c, 1.0);
-    // fragColor = vec4(normal, 1.0);
 }

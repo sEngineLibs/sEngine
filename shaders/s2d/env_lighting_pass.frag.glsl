@@ -1,14 +1,23 @@
 #version 450
 
-#include "s2d/std/gbuffer"
 #include "s2d/std/pbr"
 
 in vec2 fragCoord;
 out vec4 fragColor;
 
+#if S2D_RP_PACK_GBUFFER == 1
+#include "s2d/std/gbuffer"
 uniform sampler2D gBuffer;
+#else
+#if S2D_RP_ENV_LIGHTING == 1
+uniform sampler2D albedoMap;
+uniform sampler2D normalMap;
+uniform sampler2D ormMap;
+#endif
+uniform sampler2D emissionMap;
+#endif
 
-#ifdef S2D_RP_ENV_LIGHTING
+#if S2D_RP_ENV_LIGHTING == 1
 uniform sampler2D envMap;
 
 vec3 envLighting(vec3 normal, vec3 color, float roughness, float metalness) {
@@ -35,10 +44,19 @@ vec3 envLighting(vec3 normal, vec3 color, float roughness, float metalness) {
 #endif
 
 void main() {
-    #ifdef S2D_RP_ENV_LIGHTING
     // fetch gbuffer textures
-    vec3 color, normal, glow, orm;
-    unpackGBuffer(gBuffer, fragCoord, color, normal, glow, orm);
+    vec3 emission;
+    #if S2D_RP_ENV_LIGHTING == 1
+    vec3 albedo, normal, orm;
+
+    #if S2D_RP_PACK_GBUFFER == 1
+    unpackGBuffer(gBuffer, fragCoord, albedo, normal, emission, orm);
+    #else
+    albedo = texture(albedoMap, fragCoord).rgb;
+    normal = texture(normalMap, fragCoord).rgb;
+    emission = texture(emissionMap, fragCoord).rgb;
+    orm = texture(ormMap, fragCoord).rgb;
+    #endif
 
     float occlusion = orm.r;
     float roughness = clamp(orm.g, 0.05, 1.0);
@@ -48,11 +66,15 @@ void main() {
     normal.z = sqrt(max(0.5, 1.0 - normal.x * normal.x - normal.y * normal.y));
     normal = normalize(normal * 2.0 - 1.0);
 
-    vec3 env = envLighting(normal, color, roughness, metalness);
-    glow += occlusion * env;
+    vec3 env = envLighting(normal, albedo, roughness, metalness);
+    emission += occlusion * env;
     #else
-    vec3 glow = unpackGBufferGlow(gBuffer, fragCoord);
+    #if S2D_RP_PACK_GBUFFER == 1
+    unpackGBufferEmission(gBuffer, fragCoord, emission);
+    #else
+    emission = texture(emissionMap, fragCoord).rgb;
+    #endif
     #endif
 
-    fragColor = vec4(glow, 1.0);
+    fragColor = vec4(emission, 1.0);
 }

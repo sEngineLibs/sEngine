@@ -1,9 +1,10 @@
 package s2d.objects;
 
 import kha.math.FastMatrix4;
-// s2d
+
 using s2d.core.utils.extensions.FastMatrix4Ext;
 
+@:build(s2d.core.macro.SMacro.build())
 class Object {
 	@:isVar public var parent(default, null):Object = null;
 	@:isVar public var children(default, null):Array<Object> = [];

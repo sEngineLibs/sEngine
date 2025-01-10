@@ -1,11 +1,11 @@
 #include "s2d/std/packing"
 
-vec4 packGBuffer(vec3 color, vec3 normal, vec3 glow, vec3 orm, float alpha) {
+vec4 packGBuffer(vec4 albedo, vec3 normal, vec3 emission, vec3 orm) {
     return vec4(
-        pack(vec4(color.r, normal.r, glow.r, orm.r)),
-        pack(vec4(color.g, normal.g, glow.g, orm.g)),
-        pack(vec4(color.b, normal.b, glow.b, orm.b)),
-        alpha
+        pack(vec4(albedo.r, normal.r, emission.r, orm.r)),
+        pack(vec4(albedo.g, normal.g, emission.g, orm.g)),
+        pack(vec4(albedo.b, normal.b, emission.b, orm.b)),
+        albedo.a
     );
 }
 
@@ -16,61 +16,40 @@ void unpackRGB(sampler2D tex, vec2 uv, out vec4 upR, out vec4 upG, out vec4 upB)
     upB = unpack(packed.b);
 }
 
-vec3 unpackGBufferColor(vec4 upR, vec4 upG, vec4 upB) {
-    return vec3(upR.r, upG.r, upB.r);
-}
-
-vec3 unpackGBufferColor(sampler2D tex, vec2 uv) {
+void unpackGBuffer(sampler2D tex, vec2 uv, out vec3 albedo, out vec3 normal, out vec3 emission, out vec3 orm) {
     vec4 upR, upG, upB;
     unpackRGB(tex, uv, upR, upG, upB);
 
-    return unpackGBufferColor(upR, upG, upB);
+    albedo = vec3(upR.r, upG.r, upB.r);
+    normal = vec3(upR.g, upG.g, upB.g);
+    emission = vec3(upR.b, upG.b, upB.b);
+    orm = vec3(upR.a, upG.a, upB.a);
 }
 
-vec3 unpackGBufferNormal(vec4 upR, vec4 upG, vec4 upB) {
-    return vec3(upR.g, upG.g, upB.g);
-}
-
-vec3 unpackGBufferNormal(sampler2D tex, vec2 uv) {
+void unpackGBufferAlbedo(sampler2D tex, vec2 uv, out vec3 albedo) {
     vec4 upR, upG, upB;
     unpackRGB(tex, uv, upR, upG, upB);
 
-    return unpackGBufferNormal(upR, upG, upB);
+    albedo = vec3(upR.r, upG.r, upB.r);
 }
 
-vec3 unpackGBufferGlow(vec4 upR, vec4 upG, vec4 upB) {
-    return vec3(upR.b, upG.b, upB.b);
-}
-
-vec3 unpackGBufferGlow(sampler2D tex, vec2 uv) {
+void unpackGBufferNormal(sampler2D tex, vec2 uv, out vec3 normal) {
     vec4 upR, upG, upB;
     unpackRGB(tex, uv, upR, upG, upB);
 
-    return unpackGBufferGlow(upR, upG, upB);
+    normal = vec3(upR.g, upG.g, upB.g);
 }
 
-vec3 unpackGBufferORM(vec4 upR, vec4 upG, vec4 upB) {
-    return vec3(upR.a, upG.a, upB.a);
-}
-
-vec3 unpackGBufferORM(sampler2D tex, vec2 uv) {
+void unpackGBufferEmission(sampler2D tex, vec2 uv, out vec3 emission) {
     vec4 upR, upG, upB;
     unpackRGB(tex, uv, upR, upG, upB);
 
-    return unpackGBufferORM(upR, upG, upB);
+    emission = vec3(upR.b, upG.b, upB.b);
 }
 
-void unpackGBuffer(sampler2D tex, vec2 uv, out vec3 color, out vec3 normal, out vec3 glow, out vec3 orm) {
+void unpackGBufferORM(sampler2D tex, vec2 uv, out vec3 orm) {
     vec4 upR, upG, upB;
     unpackRGB(tex, uv, upR, upG, upB);
 
-    color = unpackGBufferColor(upR, upG, upB);
-    normal = unpackGBufferNormal(upR, upG, upB);
-    glow = unpackGBufferGlow(upR, upG, upB);
-    orm = unpackGBufferORM(upR, upG, upB);
-}
-
-vec3 unpackGBufferPosition(sampler2D tex, vec2 uv) {
-    vec3 normal = unpackGBufferNormal(tex, uv);
-    return vec3(uv, normal.z);
+    orm = vec3(upR.a, upG.a, upB.a);
 }

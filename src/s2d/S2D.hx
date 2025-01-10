@@ -1,5 +1,6 @@
 package s2d;
 
+import s2d.animation.Motion;
 import kha.Scheduler;
 import kha.Assets;
 import kha.System;
@@ -93,6 +94,11 @@ class S2D {
 		vertices.unlock();
 	}
 
+	static inline function update() {
+		Time.update();
+		Motion.update();
+	}
+
 	public static inline function compile() {
 		Renderer.compile();
 	}
@@ -178,10 +184,9 @@ class S2D {
 	}
 
 	public static inline function render(target:Canvas):Void {
-		Time.update();
-
+		update();
+		
 		var frame = Renderer.render();
-
 		var g2 = target.g2;
 		g2.begin();
 		g2.drawScaledImage(frame, 0, 0, target.width, target.height);

@@ -63,7 +63,7 @@ vec3 posterize(vec3 col, float gamma, float steps) {
 
 float vignette(vec2 coord) {
     coord *= 1.0 - coord.yx;
-    return pow(coord.x * coord.y * 15.0, vignetteStrength);
+    return pow(coord.x * coord.y * 15.5, vignetteStrength);
 }
 
 void main() {

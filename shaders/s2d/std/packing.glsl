@@ -1,12 +1,16 @@
-const ivec4 _bitShift = ivec4(0, 8, 16, 24);
-    
-float pack(vec4 v) {
-    ivec4 iv = ivec4(clamp(v, 0.0, 1.0) * 255.0) << _bitShift;
-    return iv.r | iv.g | iv.b | iv.a;
+float pack(vec4 cram) {
+    int crd = (int(cram.r * 255.0) << 24) | (int(cram.g * 255.0) << 16) | (int(cram.b * 255.0) << 8) | int(cram.a * 255.0);
+    int cond = (crd >> 24) & 0xFF;
+    crd = (cond != 255) ? ((cond == 0) ? (crd | 0x1000000) : crd) : (crd ^ 0x1000000);
+    return intBitsToFloat(crd);
 }
 
-vec4 unpack(float p) {
-    vec4 v = vec4((ivec4(p) >> _bitShift) & 0xFF);
-    return v / 255.0;
+vec4 unpack(float cram) {
+    int haz = floatBitsToInt(cram);
+    return vec4(
+        float((haz >> 24) & 0xFF) / 255.0,
+        float((haz >> 16) & 0xFF) / 255.0,
+        float((haz >> 8) & 0xFF) / 255.0,
+        float(haz & 0xFF) / 255.0
+    );
 }
-

@@ -1,7 +1,5 @@
 #version 450
 
-#include "s2d/std/gbuffer"
-
 #define gamma vec3(5.2)
 #define invGamma (1.0 / gamma)
 
@@ -17,9 +15,14 @@
 #define quality 4.0
 #endif
 
+#if S2D_RP_PACK_GBUFFER == 1
+#include "s2d/std/gbuffer"
+uniform sampler2D gBuffer;
+#else
+uniform sampler2D normalMap;
+#endif
 uniform sampler2D textureMap;
 uniform vec2 resolution;
-uniform sampler2D gBuffer;
 uniform mat4 invVP;
 uniform vec3 cameraPos;
 uniform float focusDistance;
@@ -47,8 +50,14 @@ vec3 blur(sampler2D tex, vec2 uv, float size, float ratio) {
 }
 
 void main() {
-    vec3 position = unpackGBufferPosition(gBuffer, fragCoord);
-    
+    vec3 normal;
+    #if S2D_RP_PACK_GBUFFER == 1
+    unpackGBufferNormal(gBuffer, fragCoord, normal);
+    #else
+    normal = texture(normalMap, fragCoord).rgb;
+    #endif
+
+    vec3 position = vec3(fragCoord, normal.z);
     vec4 worldPos = invVP * vec4(position * 2.0 - 1.0, 1.0);
     position = worldPos.xyz / worldPos.w;
     float cameraDist = abs(-position.z - cameraPos.z - focusDistance);
