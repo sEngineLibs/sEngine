@@ -78,11 +78,6 @@ abstract Vec4(FVecN) from FVecN to FVecN {
 		this[i] = value;
 	}
 
-	@:to
-	inline function toFloat():FastFloat {
-		return this[0];
-	}
-
 	@:op(a.b)
 	function swizzleRead(name:String):Vec4 {
 		return this.swizzleRead(name);

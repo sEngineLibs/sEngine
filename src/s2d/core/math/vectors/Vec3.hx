@@ -67,11 +67,6 @@ abstract Vec3(FVecN) from FVecN to FVecN {
 		this[i] = value;
 	}
 
-	@:to
-	inline function toFloat():FastFloat {
-		return this[0];
-	}
-
 	@:op(a.b)
 	function swizzleRead(name:String):Vec3 {
 		return this.swizzleRead(name);

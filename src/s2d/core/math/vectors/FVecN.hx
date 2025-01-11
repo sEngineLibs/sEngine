@@ -52,11 +52,6 @@ abstract FVecN(VecN<FastFloat>) from VecN<FastFloat> to VecN<FastFloat> {
 		return vec;
 	}
 
-	@:to
-	inline function toFloat():FastFloat {
-		return this[0];
-	}
-
 	@:op(a.b)
 	public function swizzleRead(name:String):Dynamic {
 		var vec = new FVecN(name.length);
@@ -114,14 +109,15 @@ abstract FVecN(VecN<FastFloat>) from VecN<FastFloat> to VecN<FastFloat> {
 	inline function bop1(op:(FastFloat, FastFloat) -> FastFloat, value:FastFloat):FVecN {
 		var vec = copy();
 		for (i in 0...size)
-			this[i] = op(this[i], value);
+			vec[i] = op(vec[i], value);
 		return vec;
 	}
 
 	inline function bopn(op:(FastFloat, FastFloat) -> FastFloat, value:FVecN):FVecN {
 		var vec = copy();
-		for (i in 0...size)
-			this[i] = op(this[i], value[i]);
+		for (i in 0...(size < value.size ? size : value.size)) {
+			vec[i] = op(vec[i], value[i]);
+		}
 		return vec;
 	}
 

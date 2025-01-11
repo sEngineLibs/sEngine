@@ -56,11 +56,6 @@ abstract IVec2(IVecN) from IVecN to IVecN {
 		this[i] = value;
 	}
 
-	@:to
-	inline function toInt():Int {
-		return this[0];
-	}
-
 	@:op(a.b)
 	function swizzleRead(name:String):IVec2 {
 		return this.swizzleRead(name);

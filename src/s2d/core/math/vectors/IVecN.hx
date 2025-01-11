@@ -52,11 +52,6 @@ abstract IVecN(VecN<Int>) from VecN<Int> to VecN<Int> {
 		return vec;
 	}
 
-	@:to
-	inline function toFloat():Int {
-		return this[0];
-	}
-
 	@:op(a.b)
 	public function swizzleRead(name:String):Dynamic {
 		var vec = new IVecN(name.length);
@@ -114,14 +109,14 @@ abstract IVecN(VecN<Int>) from VecN<Int> to VecN<Int> {
 	inline function bop1(op:(Int, Int) -> Int, value:Int):IVecN {
 		var vec = copy();
 		for (i in 0...size)
-			this[i] = op(this[i], value);
+			vec[i] = op(this[i], value);
 		return vec;
 	}
 
 	inline function bopn(op:(Int, Int) -> Int, value:IVecN):IVecN {
 		var vec = copy();
 		for (i in 0...size)
-			this[i] = op(this[i], value[i]);
+			vec[i] = op(this[i], value[i]);
 		return vec;
 	}
 
