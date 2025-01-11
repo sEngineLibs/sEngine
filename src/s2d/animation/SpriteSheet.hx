@@ -2,8 +2,8 @@ package s2d.animation;
 
 import kha.math.FastVector2;
 // s2d
-import s2d.math.Rect;
-import s2d.math.IVec2;
+import s2d.core.math.Rect;
+import s2d.core.math.IVec2;
 
 @:autoBuild(s2d.core.macro.SMacro.build())
 class SpriteSheet {

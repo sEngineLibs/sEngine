@@ -1,9 +1,6 @@
 package s2d;
 
-import s2d.animation.Motion;
-import kha.Scheduler;
 import kha.Assets;
-import kha.System;
 import kha.Canvas;
 import kha.FastFloat;
 import kha.math.FastVector3;
@@ -16,6 +13,7 @@ import s2d.Stage;
 import s2d.core.Time;
 import s2d.objects.Sprite;
 import s2d.graphics.Renderer;
+import s2d.animation.Action;
 
 class S2D {
 	public static var indices:IndexBuffer;
@@ -94,7 +92,7 @@ class S2D {
 
 	static inline function update() {
 		Time.update();
-		Motion.update();
+		Action.update(Time.time);
 	}
 
 	public static inline function compile() {

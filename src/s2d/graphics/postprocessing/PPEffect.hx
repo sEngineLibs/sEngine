@@ -5,11 +5,13 @@ import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 
 @:access(s2d.graphics.Renderer)
-class PPEffect {
+abstract class PPEffect {
 	var pipeline:PipelineState;
 	var index:Int;
 
 	public var enabled(get, set):Bool;
+
+	public inline function new() {}
 
 	inline function get_enabled():Bool {
 		return Renderer.commands.contains(command);
@@ -29,9 +31,9 @@ class PPEffect {
 		enabled = false;
 	}
 
-	function setPipeline() {}
+	abstract function setPipeline():Void;
 
-	function getUniforms() {}
+	abstract function getUniforms():Void;
 
 	public function compile() {
 		var structure = new VertexStructure();
@@ -43,7 +45,7 @@ class PPEffect {
 		getUniforms();
 	}
 
-	public function render(target:Canvas) {}
+	abstract public function render(target:Canvas):Void;
 
 	public function command():Void {
 		Renderer.ppBuffer.swap();

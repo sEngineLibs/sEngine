@@ -7,8 +7,6 @@ import kha.arrays.Float32Array;
 import s2d.animation.SpriteSheet;
 
 class Material {
-	public var sheetRows:Int = 1;
-	public var sheetColumns:Int = 1;
 	public var albedoMap:Image;
 	public var normalMap:Image;
 	public var ormMap:Image;
@@ -17,7 +15,7 @@ class Material {
 	public var params:Float32Array;
 	public var depthScale(get, set):FastFloat;
 	public var emissionStrength(get, set):FastFloat;
-	public var SpriteSheet:SpriteSheet = new SpriteSheet(1, 1);
+	public var sheet:SpriteSheet = new SpriteSheet(1, 1);
 
 	public inline function new() {
 		params = new Float32Array(2);

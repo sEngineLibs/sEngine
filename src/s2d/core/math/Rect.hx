@@ -1,4 +1,4 @@
-package s2d.math;
+package s2d.core.math;
 
 import kha.FastFloat;
 import kha.math.FastVector4;

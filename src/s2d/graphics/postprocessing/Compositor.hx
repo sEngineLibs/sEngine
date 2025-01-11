@@ -23,26 +23,27 @@ class Compositor extends PPEffect {
 	public var posterizeSteps(get, set):FastFloat;
 
 	public inline function new() {
-		params = new Float32Array(7);
+		super();
 
+		params = new Float32Array(7);
 		posterizeGamma = 1.0;
 		posterizeSteps = 255.0;
 		vignetteStrength = 0.0;
 		vignetteColor = Black;
 	}
 
-	override inline function setPipeline() {
+	inline function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
 		pipeline.fragmentShader = Shaders.compositor_pass_frag;
 	}
 
-	override inline function getUniforms() {
+	inline function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
 		resolutionCL = pipeline.getConstantLocation("resolution");
 		paramsCL = pipeline.getConstantLocation("Params");
 	}
 
-	override inline function render(target:Canvas) {
+	inline function render(target:Canvas) {
 		final g2 = target.g2;
 		final g4 = target.g4;
 

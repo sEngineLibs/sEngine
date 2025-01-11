@@ -19,14 +19,12 @@ class Mist extends PPEffect {
 	public var far:FastFloat = 1.0;
 	public var color = Color.fromFloats(0.0, 0.0, 0.0, 0.0);
 
-	public inline function new() {}
-
-	override inline function setPipeline() {
+	inline function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
 		pipeline.fragmentShader = Shaders.mist_pass_frag;
 	}
 
-	override inline function getUniforms() {
+	inline function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
 		gBufferTU = pipeline.getTextureUnit("gBuffer");
 		invVPCL = pipeline.getConstantLocation("invVP");
@@ -35,7 +33,7 @@ class Mist extends PPEffect {
 		mistColorCL = pipeline.getConstantLocation("mistColor");
 	}
 
-	override inline function render(target:Canvas) {
+	inline function render(target:Canvas) {
 		final g2 = target.g2;
 		final g4 = target.g4;
 

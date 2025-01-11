@@ -13,24 +13,22 @@ class Filter extends PPEffect {
 
 	public var kernels:Array<FastMatrix3> = [];
 
-	public inline function new() {}
-
 	public inline function addKernel(kernel:Kernel) {
 		kernels.push(kernel);
 	}
 
-	override inline function setPipeline() {
+	inline function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
 		pipeline.fragmentShader = Shaders.filter_pass_frag;
 	}
 
-	override inline function getUniforms() {
+	inline function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
 		resolutionCL = pipeline.getConstantLocation("resolution");
 		kernelCL = pipeline.getConstantLocation("kernel");
 	}
 
-	override inline function render(target:Canvas) {
+	inline function render(target:Canvas) {
 		final g2 = target.g2;
 		final g4 = target.g4;
 

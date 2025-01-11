@@ -18,14 +18,12 @@ class DOF extends PPEffect {
 	public var focusDistance:FastFloat = 0.5;
 	public var blurSize:FastFloat = 0.0;
 
-	public inline function new() {}
-
-	override inline function setPipeline() {
+	inline function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
 		pipeline.fragmentShader = Shaders.dof_pass_frag;
 	}
 
-	override inline function getUniforms() {
+	inline function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
 		resolutionCL = pipeline.getConstantLocation("resolution");
 		gBufferTU = pipeline.getTextureUnit("gBuffer");
@@ -35,7 +33,7 @@ class DOF extends PPEffect {
 		blurSizeCL = pipeline.getConstantLocation("blurSize");
 	}
 
-	override inline function render(target:Canvas) {
+	inline function render(target:Canvas) {
 		final g2 = target.g2;
 		final g4 = target.g4;
 

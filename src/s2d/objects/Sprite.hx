@@ -1,6 +1,6 @@
 package s2d.objects;
 
-import s2d.math.Rect;
+import s2d.core.math.Rect;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
