@@ -1,7 +1,6 @@
 package sui.elements;
 
 import kha.Assets;
-import kha.FastFloat;
 // sui
 import sui.elements.Element;
 import sui.layouts.Alignment;
@@ -68,7 +67,7 @@ class Font {
 	public var bold:Bool = false;
 	public var family:String = "Arial";
 	public var italic:Bool = false;
-	public var letterSpacing:FastFloat = 0.;
+	public var letterSpacing:Float = 0.;
 	public var size:Int = 14;
 	public var styleName:String = "Regular";
 	public var strikeout:Bool = false;

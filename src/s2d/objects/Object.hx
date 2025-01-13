@@ -1,17 +1,48 @@
 package s2d.objects;
 
-import kha.math.FastMatrix4;
-// s2d
-import s2d.geometry.Transformation;
+import s2d.math.Vec2;
+import s2d.math.Vec3;
+import s2d.math.Mat4;
 
-@:build(s2d.core.macro.SMacro.build())
 class Object {
 	@:isVar public var parent(default, null):Object = null;
 	@:isVar public var children(default, null):Array<Object> = [];
-	public var transformation:Transformation = new Transformation();
-	public var finalTransformation(get, never):Transformation;
+
+	public var location(get, set):Vec3;
+	public var scale(get, set):Vec2;
+	public var rotation(get, set):Float;
+
+	public var transformation:Mat4 = Mat4.identity();
+	public var finalTransformation(get, never):Mat4;
 
 	public inline function new() {}
+
+	inline function get_location():Vec3 {
+		return transformation.translation;
+	}
+
+	inline function set_location(value:Vec3):Vec3 {
+		transformation.translation = value;
+		return value;
+	}
+
+	inline function get_scale():Vec2 {
+		return transformation.scale;
+	}
+
+	inline function set_scale(value:Vec2):Vec2 {
+		transformation.scale = value;
+		return value;
+	}
+
+	inline function get_rotation():Float {
+		return transformation.rotation;
+	}
+
+	inline function set_rotation(value:Float):Float {
+		transformation.rotation = value;
+		return value;
+	}
 
 	public inline function setParent(value:Object):Void {
 		if (parent == value)
@@ -47,7 +78,7 @@ class Object {
 			value.removeParent();
 	}
 
-	inline function get_finalTransformation():Transformation {
-		return parent == null ? transformation : parent.finalTransformation.multmat(transformation.matrix);
+	inline function get_finalTransformation():Mat4 {
+		return parent == null ? transformation : parent.finalTransformation * transformation;
 	}
 }

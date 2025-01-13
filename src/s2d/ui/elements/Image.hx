@@ -1,7 +1,6 @@
 package sui.elements;
 
 import kha.Assets;
-import kha.FastFloat;
 // sui
 import sui.elements.Element;
 

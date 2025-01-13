@@ -2,7 +2,6 @@ package s2d.graphics.postprocessing;
 
 import kha.Canvas;
 import kha.Shaders;
-import kha.FastFloat;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
 
@@ -15,8 +14,8 @@ class DOF extends PPEffect {
 	var focusDistanceCL:ConstantLocation;
 	var blurSizeCL:ConstantLocation;
 
-	public var focusDistance:FastFloat = 0.5;
-	public var blurSize:FastFloat = 0.0;
+	public var focusDistance:Float = 0.5;
+	public var blurSize:Float = 0.0;
 
 	inline function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;

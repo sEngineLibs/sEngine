@@ -1,7 +1,7 @@
 package s2d.core.utils.extensions;
 
 import kha.math.Vector2;
-import kha.math.FastVector2;
+import kha.math.Vector2;
 import kha.graphics2.Graphics;
 import kha.graphics2.VerTextAlignment;
 import kha.graphics2.HorTextAlignment;
@@ -150,14 +150,14 @@ class Graphics2Ext {
 		if (y2 == y1)
 			side = x2 - x1 > 0 ? 1 : 0;
 
-		var vec = new FastVector2();
+		var vec = new Vector2();
 		if (y2 == y1)
-			vec.setFrom(new FastVector2(0, -1));
+			vec.setFrom(new Vector2(0, -1));
 		else
-			vec.setFrom(new FastVector2(1, -(x2 - x1) / (y2 - y1)));
+			vec.setFrom(new Vector2(1, -(x2 - x1) / (y2 - y1)));
 		vec.length = strength;
-		var p1 = new FastVector2(x1 + side * vec.x, y1 + side * vec.y);
-		var p2 = new FastVector2(x2 + side * vec.x, y2 + side * vec.y);
+		var p1 = new Vector2(x1 + side * vec.x, y1 + side * vec.y);
+		var p2 = new Vector2(x2 + side * vec.x, y2 + side * vec.y);
 		var p3 = p1.sub(vec);
 		var p4 = p2.sub(vec);
 		g2.fillTriangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);

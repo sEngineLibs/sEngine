@@ -2,8 +2,7 @@ package s2d.graphics.postprocessing;
 
 import kha.Canvas;
 import kha.Shaders;
-import kha.FastFloat;
-import kha.math.FastVector2;
+import kha.math.Vector2;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
 
@@ -13,8 +12,8 @@ class Fisheye extends PPEffect {
 	var positionCL:ConstantLocation;
 	var strengthCL:ConstantLocation;
 
-	public var position:FastVector2 = {x: 0.5, y: 0.5};
-	public var strength:FastFloat = 0.0;
+	public var position:Vector2 = {x: 0.5, y: 0.5};
+	public var strength:Float = 0.0;
 
 	inline function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;

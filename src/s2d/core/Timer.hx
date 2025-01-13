@@ -1,6 +1,5 @@
 package s2d.core;
 
-import kha.FastFloat;
 import s2d.core.Time.TimeListener;
 
 @:access(s2d.core.Time)
@@ -8,7 +7,7 @@ class Timer {
 	var listener:TimeListener;
 
 	var callback:Void->Void;
-	var delay:FastFloat;
+	var delay:Float;
 
 	public var started:Bool = false;
 
@@ -18,7 +17,7 @@ class Timer {
 	 * @param delay Amount of seconds to wait
 	 * @return Returns the timer instance
 	 */
-	public static inline function set(callback:Void->Void, delay:FastFloat):Timer {
+	public static inline function set(callback:Void->Void, delay:Float):Timer {
 		final timer = new Timer(callback, delay);
 		timer.start();
 		return timer;
@@ -29,7 +28,7 @@ class Timer {
 	 * @param callback A function to call after the timer was triggered
 	 * @param delay Amount of seconds to wait
 	 */
-	public inline function new(callback:Void->Void, delay:FastFloat) {
+	public inline function new(callback:Void->Void, delay:Float) {
 		this.callback = callback;
 		this.delay = delay;
 	}

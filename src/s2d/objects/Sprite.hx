@@ -1,10 +1,10 @@
 package s2d.objects;
 
-import s2d.core.math.Rect;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
 // s2d
+import s2d.math.Vec4;
 import s2d.graphics.materials.Material;
 
 class Sprite extends Object {
@@ -42,7 +42,7 @@ class Sprite extends Object {
 		vertices.unlock();
 	}
 
-	public var cropRect:Rect = Rect.Identity;
+	public var cropRect:Vec4 = new Vec4(0.0, 0.0, 1.0, 1.0);
 	public var material:Material = new Material();
 
 	public inline function new() {

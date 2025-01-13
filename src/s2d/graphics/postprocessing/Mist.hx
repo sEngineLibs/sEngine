@@ -3,7 +3,6 @@ package s2d.graphics.postprocessing;
 import kha.Color;
 import kha.Canvas;
 import kha.Shaders;
-import kha.FastFloat;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
 
@@ -15,8 +14,8 @@ class Mist extends PPEffect {
 	var mistScaleCL:ConstantLocation;
 	var mistColorCL:ConstantLocation;
 
-	public var near:FastFloat = 0.0;
-	public var far:FastFloat = 1.0;
+	public var near:Float = 0.0;
+	public var far:Float = 1.0;
 	public var color = Color.fromFloats(0.0, 0.0, 0.0, 0.0);
 
 	inline function setPipeline() {

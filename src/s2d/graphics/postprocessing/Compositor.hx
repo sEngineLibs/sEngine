@@ -3,7 +3,6 @@ package s2d.graphics.postprocessing;
 import kha.Color;
 import kha.Canvas;
 import kha.Shaders;
-import kha.FastFloat;
 import kha.arrays.Float32Array;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
@@ -17,10 +16,10 @@ class Compositor extends PPEffect {
 
 	public var letterBoxHeight:Int = 0;
 	public var letterBoxColor:Color = Black;
-	public var vignetteStrength(get, set):FastFloat;
+	public var vignetteStrength(get, set):Float;
 	public var vignetteColor(get, set):Color;
-	public var posterizeGamma(get, set):FastFloat;
-	public var posterizeSteps(get, set):FastFloat;
+	public var posterizeGamma(get, set):Float;
+	public var posterizeSteps(get, set):Float;
 
 	public inline function new() {
 		super();
@@ -60,29 +59,29 @@ class Compositor extends PPEffect {
 		g2.end();
 	}
 
-	inline function get_posterizeGamma():FastFloat {
+	inline function get_posterizeGamma():Float {
 		return params[0];
 	}
 
-	inline function set_posterizeGamma(value:FastFloat):FastFloat {
+	inline function set_posterizeGamma(value:Float):Float {
 		params[0] = value;
 		return value;
 	}
 
-	inline function get_posterizeSteps():FastFloat {
+	inline function get_posterizeSteps():Float {
 		return params[1];
 	}
 
-	inline function set_posterizeSteps(value:FastFloat):FastFloat {
+	inline function set_posterizeSteps(value:Float):Float {
 		params[1] = value;
 		return value;
 	}
 
-	inline function get_vignetteStrength():FastFloat {
+	inline function get_vignetteStrength():Float {
 		return params[2];
 	}
 
-	inline function set_vignetteStrength(value:FastFloat):FastFloat {
+	inline function set_vignetteStrength(value:Float):Float {
 		params[2] = value;
 		return value;
 	}

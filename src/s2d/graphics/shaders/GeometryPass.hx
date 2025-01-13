@@ -72,10 +72,11 @@ class GeometryPass {
 		g4.setIndexBuffer(Sprite.indices);
 		g4.setVertexBuffer(Sprite.vertices);
 		for (sprite in sprites) {
-			final cropRect = sprite.material.sheet.curTile.crop(sprite.cropRect);
+			var ct = sprite.material.sheet.curTile;
+			final cropRect = ct * sprite.cropRect;
 
 			g4.setMatrix(VPCL, VP);
-			g4.setMatrix(modelCL, sprite.finalTransformation.matrix);
+			g4.setMatrix(modelCL, sprite.finalTransformation);
 			g4.setVector4(cropRectCL, cropRect);
 			g4.setTexture(albedoMapTU, sprite.material.albedoMap);
 			g4.setTexture(normalMapTU, sprite.material.normalMap);

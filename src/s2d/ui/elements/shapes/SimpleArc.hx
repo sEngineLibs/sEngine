@@ -1,7 +1,6 @@
 package sui.elements.shapes;
 
 import kha.Canvas;
-import kha.FastFloat;
 // sui
 import sui.effects.Border;
 
@@ -10,9 +9,9 @@ using score.graphics.GraphicsExtension;
 @:structInit
 class SimpleArc extends SimpleDrawableElement {
 	public var border:Border = {};
-	public var radius:FastFloat = 0;
-	public var sAngle:FastFloat = 90;
-	public var eAngle:FastFloat = 0;
+	public var radius:Float = 0;
+	public var sAngle:Float = 90;
+	public var eAngle:Float = 0;
 	public var clockwise:Bool = false;
 	public var segments:Int = 16;
 

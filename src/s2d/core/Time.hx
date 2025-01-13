@@ -1,15 +1,14 @@
 package s2d.core;
 
 import kha.System;
-import kha.FastFloat;
 
 @:allow(s2d.S2D)
 @:build(s2d.core.macro.SMacro.build())
 class Time {
-	@readonly public static var realTime:FastFloat = 0.0;
-	@readonly public static var time:FastFloat = 0.0;
-	@readonly public static var delta:FastFloat = 0.0;
-	public static var scale:FastFloat = 1.0;
+	@readonly public static var realTime:Float = 0.0;
+	@readonly public static var time:Float = 0.0;
+	@readonly public static var delta:Float = 0.0;
+	public static var scale:Float = 1.0;
 
 	static var timeListeners:Array<TimeListener> = [];
 	static var realTimeListeners:Array<TimeListener> = [];
@@ -20,7 +19,7 @@ class Time {
 	 * @param time Timestamp in seconds
 	 * @return Returns a listener
 	 */
-	public static inline function notifyOnTime(callback:Void->Void, time:FastFloat) {
+	public static inline function notifyOnTime(callback:Void->Void, time:Float) {
 		var listener = {f: callback, time: time};
 		timeListeners.push(listener);
 		return listener;
@@ -32,7 +31,7 @@ class Time {
 	 * @param time Real timestamp in seconds
 	 * @return Returns a listener
 	 */
-	public static inline function notifyOnRealTime(callback:Void->Void, time:FastFloat) {
+	public static inline function notifyOnRealTime(callback:Void->Void, time:Float) {
 		var listener = {f: callback, time: time};
 		realTimeListeners.push(listener);
 		return listener;
@@ -60,5 +59,5 @@ class Time {
 
 typedef TimeListener = {
 	f:Void->Void,
-	time:FastFloat
+	time:Float
 }

@@ -1,13 +1,12 @@
 package sui.elements.shapes;
 
 import kha.Color;
-import kha.FastFloat;
 // sui
 import sui.elements.batches.RectBatch;
 
 class Rectangle extends DrawableElement {
-	@:isVar public var softness(default, set):FastFloat = 1;
-	@:isVar public var radius(default, set):FastFloat = 0;
+	@:isVar public var softness(default, set):Float = 1;
+	@:isVar public var radius(default, set):Float = 0;
 
 	override inline function get_batchType() {
 		return RectBatch;
@@ -21,28 +20,28 @@ class Rectangle extends DrawableElement {
 		bottom.addPositionListener(setBottom);
 	}
 
-	inline function setLeft(value:FastFloat) {
+	inline function setLeft(value:Float) {
 		if (batch != null) {
 			var b:RectBatch = cast batch;
 			b.rectBounds[instanceID * 4 + 0] = value;
 		}
 	}
 
-	inline function setTop(value:FastFloat) {
+	inline function setTop(value:Float) {
 		if (batch != null) {
 			var b:RectBatch = cast batch;
 			b.rectBounds[instanceID * 4 + 1] = value;
 		}
 	}
 
-	inline function setRight(value:FastFloat) {
+	inline function setRight(value:Float) {
 		if (batch != null) {
 			var b:RectBatch = cast batch;
 			b.rectBounds[instanceID * 4 + 2] = value;
 		}
 	}
 
-	inline function setBottom(value:FastFloat) {
+	inline function setBottom(value:Float) {
 		if (batch != null) {
 			var b:RectBatch = cast batch;
 			b.rectBounds[instanceID * 4 + 3] = value;
@@ -64,7 +63,7 @@ class Rectangle extends DrawableElement {
 		return color;
 	}
 
-	inline function set_softness(value:FastFloat) {
+	inline function set_softness(value:Float) {
 		softness = value;
 
 		if (batch != null) {
@@ -75,7 +74,7 @@ class Rectangle extends DrawableElement {
 		return softness;
 	}
 
-	inline function set_radius(value:FastFloat) {
+	inline function set_radius(value:Float) {
 		radius = value;
 
 		if (batch != null) {
@@ -85,7 +84,7 @@ class Rectangle extends DrawableElement {
 		return radius;
 	}
 
-	override inline function set_scaleX(value:FastFloat) {
+	override inline function set_scaleX(value:Float) {
 		if (batch != null) {
 			var b:RectBatch = cast batch;
 			var d = value / scaleX;
@@ -103,7 +102,7 @@ class Rectangle extends DrawableElement {
 		return value;
 	}
 
-	override inline function set_scaleY(value:FastFloat) {
+	override inline function set_scaleY(value:Float) {
 		if (batch != null) {
 			var b:RectBatch = cast batch;
 			var d = value / scaleY;
@@ -121,7 +120,7 @@ class Rectangle extends DrawableElement {
 		return value;
 	}
 
-	override inline function set_rotation(value:FastFloat) {
+	override inline function set_rotation(value:Float) {
 		if (batch != null) {
 			var b:RectBatch = cast batch;
 			var d = value - rotation;
@@ -148,7 +147,7 @@ class Rectangle extends DrawableElement {
 		return value;
 	}
 
-	override inline function set_translationX(value:FastFloat) {
+	override inline function set_translationX(value:Float) {
 		if (batch != null) {
 			var b:RectBatch = cast batch;
 			var d = (value - translationX) / SUI.scene.resolution;
@@ -164,7 +163,7 @@ class Rectangle extends DrawableElement {
 		return value;
 	}
 
-	override inline function set_translationY(value:FastFloat) {
+	override inline function set_translationY(value:Float) {
 		if (batch != null) {
 			var b:RectBatch = cast batch;
 			var d = (value - translationY) / SUI.scene.resolution;

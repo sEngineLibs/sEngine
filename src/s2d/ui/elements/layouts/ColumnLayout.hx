@@ -1,6 +1,5 @@
 package sui.elements.layouts;
 
-import kha.FastFloat;
 // sui
 import sui.elements.Element;
 import sui.positioning.Alignment;
@@ -9,11 +8,11 @@ import sui.positioning.Direction;
 using score.utils.ArrayExt;
 
 class ColumnLayout extends Element {
-	@:isVar public var spacing(default, set):FastFloat = 0.;
+	@:isVar public var spacing(default, set):Float = 0.;
 	@:isVar public var direction(default, set):Direction = Direction.TopToBottom;
 	public var alignment:Alignment = Alignment.HCenter | Alignment.VCenter;
 
-	inline function set_spacing(value:FastFloat) {
+	inline function set_spacing(value:Float) {
 		spacing = value;
 		for (i in 1...children.length)
 			children[i].anchors.topMargin = spacing;

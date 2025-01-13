@@ -1,20 +1,17 @@
 package s2d.animation;
 
-import kha.math.FastVector2;
-// s2d
-import s2d.core.math.Rect;
-import s2d.core.math.IVec2;
+import s2d.math.SMath;
 
 @:autoBuild(s2d.core.macro.SMacro.build())
 class SpriteSheet {
 	@:isVar public var colsNum(default, set):Int = 1;
 	@:isVar public var rowsNum(default, set):Int = 1;
 	@readonly public var length:Int = 1;
-	@readonly public var tileSize:FastVector2 = {x: 1.0, y: 1.0};
+	@readonly public var tileSize = vec2(1.0);
 
-	@readonly public var curTile:Rect = Rect.Identity;
+	@readonly public var curTile = vec4(0.0, 0.0, 1.0, 1.0);
 	@:isVar public var curTileID(default, set):Int = 0;
-	@:isVar public var curTilePosition(default, set):IVec2 = {x: 0, y: 0};
+	@:isVar public var curTilePosition(default, set) = vec2(0.0);
 
 	public inline function new(?colsNum:Int = 1, ?rowsNum:Int = 1) {
 		this.colsNum = colsNum;
@@ -54,9 +51,9 @@ class SpriteSheet {
 		return value;
 	}
 
-	inline function set_curTilePosition(value:IVec2):IVec2 {
+	inline function set_curTilePosition(value) {
 		curTilePosition = value;
-		curTile = new Rect(value.x * tileSize.x, value.y * tileSize.y, (value.x + 1) * tileSize.x, (value.y + 1) * tileSize.y);
+		curTile = vec4(value * tileSize, (value + 1.0) * tileSize);
 		return value;
 	}
 }

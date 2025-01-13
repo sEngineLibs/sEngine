@@ -1,13 +1,13 @@
 package sui.elements.shapes;
 
 import kha.Canvas;
-import kha.math.FastVector2;
+import kha.math.Vector2;
 
 @:structInit
 class Triangle extends SimpleDrawableElement {
-	public var v1:FastVector2 = {x: 0., y: 0.}
-	public var v2:FastVector2 = {x: 0., y: 0.}
-	public var v3:FastVector2 = {x: 0., y: 0.}
+	public var v1:Vector2 = {x: 0., y: 0.}
+	public var v2:Vector2 = {x: 0., y: 0.}
+	public var v3:Vector2 = {x: 0., y: 0.}
 
 	override inline function simpleDraw(target:Canvas) {
 		var x = left.position;

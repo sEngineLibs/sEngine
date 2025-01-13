@@ -1,6 +1,5 @@
 package sui.positioning;
 
-import kha.FastFloat;
 // sui
 import sui.elements.Element;
 
@@ -179,10 +178,10 @@ class Anchors {
 @:structInit
 @:build(score.macro.SMacro.build())
 class AnchorLine {
-	@observable public var position:FastFloat = 0;
+	@observable public var position:Float = 0;
 }
 
 private typedef AnchorLineListener = {
 	public var ID:Int;
-	public var f:FastFloat->Void;
+	public var f:Float->Void;
 }

@@ -1,9 +1,9 @@
 package s2d;
 
 import kha.Image;
-import kha.math.FastMatrix4;
 import kha.arrays.Float32Array;
 // s2d
+import s2d.math.Mat4;
 import s2d.objects.Light;
 import s2d.objects.Sprite;
 import s2d.objects.Object;
@@ -30,10 +30,10 @@ class Stage {
 		lightsData = new Float32Array(1 * maxLights * lightStructSize);
 	}
 
-	public var VP(get, null):FastMatrix4;
+	public var VP(get, null):Mat4;
 
 	inline function get_VP() {
-		return S2D.projection.multmat(camera.finalTransformation.matrix);
+		return S2D.projection * camera.finalTransformation;
 	}
 
 	@:isVar var lightsData(get, null):Float32Array;
@@ -44,7 +44,7 @@ class Stage {
 		for (i in 0...lights.length) {
 			var ind = 1 + i * lightStructSize;
 			var light = lights[i];
-			var lightPosition = light.finalTransformation.translation;
+			var lightPosition = light.location;
 
 			lightsData[ind + 0] = lightPosition.x;
 			lightsData[ind + 1] = lightPosition.y;

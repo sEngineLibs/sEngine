@@ -1,7 +1,6 @@
 package sui.elements.shapes;
 
 import kha.Canvas;
-import kha.FastFloat;
 // sui
 import sui.effects.Border;
 
@@ -9,7 +8,7 @@ using score.graphics.GraphicsExtension;
 
 class SimpleCircle extends SimpleDrawableElement {
 	public var border:Border = {};
-	public var radius:FastFloat = 0;
+	public var radius:Float = 0;
 	public var segments:Int = 64;
 
 	override inline function simpleDraw(target:Canvas) {
