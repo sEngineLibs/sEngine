@@ -5,16 +5,10 @@
 #define MAX_LIGHTS 16
 #define LIGHT_STRUCT_SIZE 8
 
-#if S2D_RP_PACK_GBUFFER == 1
-#include "s2d/std/gbuffer"
-uniform sampler2D gBuffer;
-#else
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
 uniform sampler2D ormMap;
 uniform sampler2D emissionMap;
-#endif
-
 uniform mat4 invVP;
 uniform float lightsData[1 + MAX_LIGHTS * LIGHT_STRUCT_SIZE];
 
@@ -75,15 +69,10 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, float roughn
 void main() {
     // fetch gbuffer textures
     vec3 albedo, normal, emission, orm;
-
-    #if S2D_RP_PACK_GBUFFER == 1
-    unpackGBuffer(gBuffer, fragCoord, albedo, normal, emission, orm);
-    #else
     albedo = texture(albedoMap, fragCoord).rgb;
     normal = texture(normalMap, fragCoord).rgb;
     emission = texture(emissionMap, fragCoord).rgb;
     orm = texture(ormMap, fragCoord).rgb;
-    #endif
 
     float occlusion = orm.r;
     float roughness = clamp(orm.g, 0.05, 1.0);

@@ -13,10 +13,6 @@ class LightingPass {
 	static var envPipeline:PipelineState;
 	static var pipeline:PipelineState;
 
-	#if (S2D_RP_PACK_GBUFFER == 1)
-	static var envGBufferTU:TextureUnit;
-	static var gBufferTU:TextureUnit;
-	#else
 	static var envAlbedoMapTU:TextureUnit;
 	static var envNormalMapTU:TextureUnit;
 	static var envEmissionMapTU:TextureUnit;
@@ -25,7 +21,6 @@ class LightingPass {
 	static var normalMapTU:TextureUnit;
 	static var emissionMapTU:TextureUnit;
 	static var ormMapTU:TextureUnit;
-	#end
 	#if S2D_RP_ENV_LIGHTING
 	static var envMapTU:TextureUnit;
 	#end
@@ -54,10 +49,6 @@ class LightingPass {
 		pipeline.blendOperation = Add;
 		pipeline.compile();
 
-		#if (S2D_RP_PACK_GBUFFER == 1)
-		envGBufferTU = envPipeline.getTextureUnit("gBuffer");
-		gBufferTU = pipeline.getTextureUnit("gBuffer");
-		#else
 		envAlbedoMapTU = envPipeline.getTextureUnit("albedoMap");
 		envNormalMapTU = envPipeline.getTextureUnit("normalMap");
 		envEmissionMapTU = envPipeline.getTextureUnit("emissionMap");
@@ -66,7 +57,6 @@ class LightingPass {
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		emissionMapTU = pipeline.getTextureUnit("emissionMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
-		#end
 		#if S2D_RP_ENV_LIGHTING
 		envMapTU = envPipeline.getTextureUnit("envMap");
 		#end
@@ -85,14 +75,10 @@ class LightingPass {
 		g4.setPipeline(envPipeline);
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
-		#if (S2D_RP_PACK_GBUFFER == 1)
-		g4.setTexture(envGBufferTU, Renderer.gBuffer);
-		#else
 		g4.setTexture(envAlbedoMapTU, Renderer.gBuffer[0]);
 		g4.setTexture(envNormalMapTU, Renderer.gBuffer[1]);
 		g4.setTexture(envEmissionMapTU, Renderer.gBuffer[2]);
 		g4.setTexture(envORMMapTU, Renderer.gBuffer[3]);
-		#end
 		#if S2D_RP_ENV_LIGHTING
 		g4.setTexture(envMapTU, S2D.stage.environmentMap);
 		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
@@ -100,14 +86,10 @@ class LightingPass {
 		g4.drawIndexedVertices();
 		// stage lights
 		g4.setPipeline(pipeline);
-		#if (S2D_RP_PACK_GBUFFER == 1)
-		g4.setTexture(gBufferTU, Renderer.gBuffer);
-		#else
 		g4.setTexture(albedoMapTU, Renderer.gBuffer[0]);
 		g4.setTexture(normalMapTU, Renderer.gBuffer[1]);
 		g4.setTexture(emissionMapTU, Renderer.gBuffer[2]);
 		g4.setTexture(ormMapTU, Renderer.gBuffer[3]);
-		#end
 		g4.setMatrix(invVPCL, invVP);
 		g4.setFloats(lightsDataCL, S2D.stage.lightsData);
 		g4.drawIndexedVertices();

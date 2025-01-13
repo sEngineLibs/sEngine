@@ -54,19 +54,11 @@ class GeometryPass {
 	}
 
 	static inline function render():Void {
-		#if (S2D_RP_PACK_GBUFFER == 1)
-		final g4 = Renderer.gBuffer.g4;
-		#else
 		final g4 = Renderer.gBuffer[0].g4;
-		#end
 		final VP = S2D.stage.VP;
 		final sprites = S2D.stage.sprites;
 
-		#if (S2D_RP_PACK_GBUFFER == 1)
-		g4.begin();
-		#else
 		g4.begin([Renderer.gBuffer[1], Renderer.gBuffer[2], Renderer.gBuffer[3]]);
-		#end
 		g4.clear(Black);
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(Sprite.indices);

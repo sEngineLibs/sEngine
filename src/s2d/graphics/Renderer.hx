@@ -9,12 +9,7 @@ import s2d.graphics.shaders.*;
 class Renderer {
 	static var commands:Array<Void->Void>;
 
-	#if (S2D_RP_PACK_GBUFFER == 1)
-	static var gBuffer:Image;
-	#else
 	static var gBuffer:Array<Image>;
-	#end
-
 	static var ppBuffer:PingPongBuffer;
 
 	public static inline function init(width:Int, height:Int) {
@@ -48,16 +43,12 @@ class Renderer {
 	}
 
 	public static inline function resize(width:Int, height:Int) {
-		#if (S2D_RP_PACK_GBUFFER == 1)
-		gBuffer = Image.createRenderTarget(width, height, RGBA128, DepthOnly);
-		#else
 		gBuffer = [
 			Image.createRenderTarget(width, height, RGBA32, DepthOnly),
 			Image.createRenderTarget(width, height, RGBA32, DepthOnly),
 			Image.createRenderTarget(width, height, RGBA32, DepthOnly),
 			Image.createRenderTarget(width, height, RGBA32, DepthOnly)
 		];
-		#end
 		ppBuffer = new PingPongBuffer(width, height);
 	}
 

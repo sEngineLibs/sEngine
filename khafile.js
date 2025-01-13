@@ -128,7 +128,6 @@ project.addAssets("assets/**", {
 // S2D_DEBUG_FPS -> enables FPS debugging
 
 // Renderer:
-// S2D_RP_PACK_GBUFFER -> packs gbuffer into a single texture
 // S2D_RP_ENV_LIGHTING -> enables environment lighting
 // S2D_PP_DOF -> enables Depth of Field PP effect
 // S2D_PP_DOF_QUALITY_LEVEL -> sets the quality level of DOF effect (0 - low, 1 - middle, 2 - high)

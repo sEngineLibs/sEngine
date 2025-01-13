@@ -14,15 +14,10 @@ uniform float Params[2];
 in vec3 fragPos;
 in vec2 fragUV;
 
-#if S2D_RP_PACK_GBUFFER == 1
-#include "s2d/std/gbuffer"
-out vec4 fragColor;
-#else
 layout(location = 0) out vec4 albedoColor;
 layout(location = 1) out vec4 normalColor;
 layout(location = 2) out vec4 emissionColor;
 layout(location = 3) out vec4 ormColor;
-#endif
 
 void main() {
     float rot = atan(model[1][0], model[0][0]);
@@ -49,12 +44,8 @@ void main() {
     emission.rgb *= albedo.a;
     orm.rgb *= albedo.a;
 
-    #if S2D_RP_PACK_GBUFFER == 1
-    fragColor = packGBuffer(albedo, normal, emission, orm);
-    #else
     albedoColor = albedo;
     normalColor = vec4(normal, albedo.a);
     emissionColor = vec4(emission, albedo.a);
     ormColor = vec4(orm, albedo.a);
-    #endif
 }
