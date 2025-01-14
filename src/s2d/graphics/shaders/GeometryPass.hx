@@ -13,9 +13,9 @@ class GeometryPass {
 	static var pipeline:PipelineState;
 
 	// stage uniforms
-	static var VPCL:ConstantLocation;
+	static var mvpCL:ConstantLocation;
 	// sprite uniforms
-	static var modelCL:ConstantLocation;
+	static var rotationCL:ConstantLocation;
 	static var cropRectCL:ConstantLocation;
 	// material uniforms
 	static var albedoMapTU:TextureUnit;
@@ -39,9 +39,9 @@ class GeometryPass {
 		pipeline.compile();
 
 		// stage uniforms
-		VPCL = pipeline.getConstantLocation("VP");
+		mvpCL = pipeline.getConstantLocation("MVP");
 		// sprite uniforms
-		modelCL = pipeline.getConstantLocation("model");
+		rotationCL = pipeline.getConstantLocation("rotation");
 		cropRectCL = pipeline.getConstantLocation("cropRect");
 		// material uniforms
 		albedoMapTU = pipeline.getTextureUnit("albedoMap");
@@ -65,8 +65,8 @@ class GeometryPass {
 			var ct = sprite.material.sheet.curTile;
 			final cropRect = ct * sprite.cropRect;
 
-			g4.setMatrix3(VPCL, VP);
-			g4.setMatrix3(modelCL, sprite._transformation);
+			g4.setMatrix3(mvpCL, VP * sprite._transformation);
+			g4.setFloat(rotationCL, sprite.rotation);
 			g4.setVector4(cropRectCL, cropRect);
 			g4.setTexture(albedoMapTU, sprite.material.albedoMap);
 			g4.setTexture(normalMapTU, sprite.material.normalMap);

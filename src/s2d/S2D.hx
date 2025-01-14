@@ -122,8 +122,6 @@ class S2D {
 			projection = Mat3.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale);
 		else
 			projection = Mat3.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio);
-
-		projection = projection * Mat3.lookAt(vec2(0.0), vec2(0.0), vec2(0.0));
 	}
 
 	public static inline function local2WorldSpace(point:Vec2):Vec2 {

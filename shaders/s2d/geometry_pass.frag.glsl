@@ -1,7 +1,6 @@
 #version 450
 
-uniform mat3 model;
-
+uniform float rotation;
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
 uniform sampler2D ormMap;
@@ -11,7 +10,6 @@ uniform float Params[2];
 #define depthScale Params[0]
 #define emissionStrength Params[1]
 
-in vec3 fragPos;
 in vec2 fragUV;
 
 layout(location = 0) out vec4 albedoColor;
@@ -20,10 +18,6 @@ layout(location = 2) out vec4 emissionColor;
 layout(location = 3) out vec4 ormColor;
 
 void main() {
-    float rot = atan(model[1][0], model[0][0]);
-    float rotSin = sin(rot);
-    float rotCos = cos(rot);
-
     // fetch material textures
     vec4 albedo = texture(albedoMap, fragUV);
     vec3 normal = texture(normalMap, fragUV).rgb;
@@ -32,10 +26,12 @@ void main() {
 
     // tangent space -> world space
     vec2 n = normal.xy * 2.0 - 1.0;
-    normal.x = rotCos * n.x + rotSin * n.y;
-    normal.y = -rotSin * n.x + rotCos * n.y;
+    float rotSin = sin(rotation);
+    float rotCos = cos(rotation);
+    normal.x = rotCos * n.x - rotSin * n.y;
+    normal.y = rotSin * n.x + rotCos * n.y;
     normal.xy = normal.xy * 0.5 + 0.5;
-    normal.z = fragPos.z + (normal.z * 2.0 - 1.0) * depthScale;
+    normal.z = (normal.z * 2.0 - 1.0) * depthScale;
 
     albedo.a = step(0.5, albedo.a);
 

@@ -28,16 +28,16 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 	}
 
 	extern public static inline function orthogonalProjection(left:FastFloat, right:FastFloat, bottom:FastFloat, top:FastFloat):Mat3 {
-		var tx:FastFloat = -(right + left) / (right - left);
-		var ty:FastFloat = -(top + bottom) / (top - bottom);
+		var tx = -(right + left) / (right - left);
+		var ty = -(top + bottom) / (top - bottom);
 
-		return new Mat3(2 / (right - left), 0, tx, 0, 2.0 / (top - bottom), ty, 0, 0, 1);
+		return mat3(2 / (right - left), 0, tx, 0, 2.0 / (top - bottom), ty, 0, 0, 1);
 	}
 
 	extern public static inline function lookAt(eye:Vec2, at:Vec2, up:Vec2):Mat3 {
-		var zaxis:Vec2 = normalize(at - eye);
-		var xaxis:Vec2 = vec2(-zaxis.y, zaxis.x);
-		return new Mat3(xaxis.x, xaxis.y, dot(-xaxis, eye), -zaxis.x, -zaxis.y, dot(zaxis, eye), 0, 0, 1);
+		var zaxis = normalize(at - eye);
+		var xaxis = vec2(-zaxis.y, zaxis.x);
+		return mat3(xaxis.x, xaxis.y, dot(-xaxis, eye), -zaxis.x, -zaxis.y, dot(zaxis, eye), 0, 0, 1);
 	}
 
 	public inline function new(a00:FastFloat, a10:FastFloat, a20:FastFloat, a01:FastFloat, a11:FastFloat, a21:FastFloat, a02:FastFloat, a12:FastFloat,
