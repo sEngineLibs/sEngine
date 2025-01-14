@@ -1,84 +1,127 @@
 package s2d.objects;
 
 import s2d.math.Vec2;
-import s2d.math.Vec3;
-import s2d.math.Mat4;
+import kha.FastFloat;
+import s2d.math.Mat3;
 
 class Object {
 	@:isVar public var parent(default, null):Object = null;
 	@:isVar public var children(default, null):Array<Object> = [];
 
-	public var location(get, set):Vec3;
-	public var scale(get, set):Vec2;
-	public var rotation(get, set):Float;
+	var _transformation(get, never):Mat3;
 
-	public var transformation:Mat4 = Mat4.identity();
-	public var finalTransformation(get, never):Mat4;
+	public var transformation:Mat3 = Mat3.identity();
+	public var x(get, set):FastFloat;
+	public var y(get, set):FastFloat;
+	public var scaleX(get, set):FastFloat;
+	public var scaleY(get, set):FastFloat;
+	public var rotation(get, set):FastFloat;
 
 	public inline function new() {}
 
-	inline function get_location():Vec3 {
-		return transformation.translation;
-	}
-
-	inline function set_location(value:Vec3):Vec3 {
-		transformation.translation = value;
-		return value;
-	}
-
-	inline function get_scale():Vec2 {
-		return transformation.scale;
-	}
-
-	inline function set_scale(value:Vec2):Vec2 {
-		transformation.scale = value;
-		return value;
-	}
-
-	inline function get_rotation():Float {
-		return transformation.rotation;
-	}
-
-	inline function set_rotation(value:Float):Float {
-		transformation.rotation = value;
-		return value;
-	}
-
 	public inline function setParent(value:Object):Void {
-		if (parent == value)
+		if (parent == value || value == null)
 			return;
-
-		removeParent();
-
-		if (value != null) {
-			if (!value.children.contains(this))
-				value.addChild(this);
-			parent = value;
-		}
-	}
-
-	public inline function removeParent():Void {
-		if (parent != null)
-			parent.removeChild(this);
-		parent = null;
+		value.addChild(this);
+		parent = value;
 	}
 
 	public inline function addChild(value:Object):Void {
-		if (value == null || value == this)
+		if (value == null || value == this || children.contains(value))
 			return;
-
-		if (!children.contains(value)) {
-			children.push(value);
-			value.setParent(this);
-		}
+		value.setParent(this);
 	}
 
-	public inline function removeChild(value:Object):Void {
-		if (value != null && children.remove(value))
-			value.removeParent();
+	overload extern public inline function move(x:FastFloat, y:FastFloat) {
+		this.x += x;
+		this.y += y;
 	}
 
-	inline function get_finalTransformation():Mat4 {
-		return parent == null ? transformation : parent.finalTransformation * transformation;
+	overload extern public inline function move(value:Vec2) {
+		move(value.x, value.y);
+	}
+
+	overload extern public inline function moveTo(x:FastFloat, y:FastFloat) {
+		this.x = x;
+		this.y = y;
+	}
+
+	overload extern public inline function moveTo(value:Vec2) {
+		moveTo(value.x, value.y);
+	}
+
+	overload extern public inline function scale(x:FastFloat, y:FastFloat) {
+		this.scaleX *= x;
+		this.scaleY *= y;
+	}
+
+	overload extern public inline function scale(value:Vec2) {
+		scale(value.x, value.y);
+	}
+
+	overload extern public inline function scaleTo(x:FastFloat, y:FastFloat) {
+		this.scaleX = x;
+		this.scaleY = y;
+	}
+
+	overload extern public inline function scaleTo(value:Vec2) {
+		scaleTo(value.x, value.y);
+	}
+
+	public inline function rotate(angle:FastFloat) {
+		this.rotation += angle;
+	}
+
+	public inline function rotateTo(angle:FastFloat) {
+		this.rotation = angle;
+	}
+
+	inline function get__transformation():Mat3 {
+		return parent == null ? transformation : parent._transformation * transformation;
+	}
+
+	inline function get_x():FastFloat {
+		return transformation[2][0];
+	}
+
+	inline function set_x(value:FastFloat):FastFloat {
+		transformation[2][0] = value;
+		return value;
+	}
+
+	inline function get_y():FastFloat {
+		return transformation[2][1];
+	}
+
+	inline function set_y(value:FastFloat):FastFloat {
+		transformation[2][1] = value;
+		return value;
+	}
+
+	inline function get_scaleX():FastFloat {
+		return transformation[0][0];
+	}
+
+	inline function set_scaleX(value:FastFloat):FastFloat {
+		transformation[0][0] = value;
+		return value;
+	}
+
+	inline function get_scaleY():FastFloat {
+		return transformation[1][1];
+	}
+
+	inline function set_scaleY(value:FastFloat):FastFloat {
+		transformation[1][1] = value;
+		return value;
+	}
+
+	inline function get_rotation():FastFloat {
+		return Math.atan2(transformation[1][0], transformation[0][0]);
+	}
+
+	inline function set_rotation(value:FastFloat):FastFloat {
+		transformation *= Mat3.rotation(value - rotation);
+		return value;
 	}
 }

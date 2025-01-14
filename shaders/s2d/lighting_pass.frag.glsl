@@ -9,7 +9,7 @@ uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
 uniform sampler2D ormMap;
 uniform sampler2D emissionMap;
-uniform mat4 invVP;
+uniform mat3 invVP;
 uniform float lightsData[1 + MAX_LIGHTS * LIGHT_STRUCT_SIZE];
 
 in vec2 fragCoord;
@@ -80,8 +80,7 @@ void main() {
 
     // convert data
     vec3 position = vec3(fragCoord, normal.z);
-    vec4 worldPos = invVP * vec4(position * 2.0 - 1.0, 1.0);
-    position = worldPos.xyz / worldPos.w;
+    position = invVP * vec3(position * 2.0 - 1.0);
 
     normal.z = sqrt(max(0.5, 1.0 - normal.x * normal.x - normal.y * normal.y));
     normal = normalize(normal * 2.0 - 1.0);

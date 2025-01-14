@@ -6,6 +6,7 @@ import kha.math.FastMatrix3;
 import s2d.math.SMath;
 
 abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
+	#if !macro
 	extern public static inline function empty():Mat3 {
 		return FastMatrix3.empty();
 	}
@@ -14,94 +15,108 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 		return FastMatrix3.identity();
 	}
 
-	#if !macro
-	public inline function new(a00:FastFloat, a01:FastFloat, a02:FastFloat, a10:FastFloat, a11:FastFloat, a12:FastFloat, a20:FastFloat, a21:FastFloat, a22:FastFloat) {
-		this = new FastMatrix3(a00, a01, a02, a10, a11, a12, a20, a21, a22);
+	extern public static inline function translation(x:FastFloat, y:FastFloat):Mat3 {
+		return FastMatrix3.translation(x, y);
 	}
 
-	public inline function set(a00:FastFloat, a01:FastFloat, a02:FastFloat, a10:FastFloat, a11:FastFloat, a12:FastFloat, a20:FastFloat, a21:FastFloat, a22:FastFloat) {
+	extern public static inline function scale(x:FastFloat, y:FastFloat):Mat3 {
+		return FastMatrix3.scale(x, y);
+	}
+
+	extern public static inline function rotation(alpha:FastFloat):Mat3 {
+		return FastMatrix3.rotation(alpha);
+	}
+
+	extern public static inline function orthogonalProjection(left:FastFloat, right:FastFloat, bottom:FastFloat, top:FastFloat):Mat3 {
+		var tx:FastFloat = -(right + left) / (right - left);
+		var ty:FastFloat = -(top + bottom) / (top - bottom);
+
+		return new Mat3(2 / (right - left), 0, tx, 0, 2.0 / (top - bottom), ty, 0, 0, 1);
+	}
+
+	extern public static inline function lookAt(eye:Vec2, at:Vec2, up:Vec2):Mat3 {
+		var zaxis:Vec2 = normalize(at - eye);
+		var xaxis:Vec2 = vec2(-zaxis.y, zaxis.x);
+		return new Mat3(xaxis.x, xaxis.y, dot(-xaxis, eye), -zaxis.x, -zaxis.y, dot(zaxis, eye), 0, 0, 1);
+	}
+
+	public inline function new(a00:FastFloat, a10:FastFloat, a20:FastFloat, a01:FastFloat, a11:FastFloat, a21:FastFloat, a02:FastFloat, a12:FastFloat,
+			a22:FastFloat) {
+		this = new FastMatrix3(a00, a10, a20, a01, a11, a21, a02, a12, a22);
+	}
+
+	public inline function set(a00:FastFloat, a10:FastFloat, a20:FastFloat, a01:FastFloat, a11:FastFloat, a21:FastFloat, a02:FastFloat, a12:FastFloat,
+			a22:FastFloat) {
 		this._00 = a00;
-		this._01 = a01;
-		this._02 = a02;
 		this._10 = a10;
-		this._11 = a11;
-		this._12 = a12;
 		this._20 = a20;
+		this._01 = a01;
+		this._11 = a11;
 		this._21 = a21;
+		this._02 = a02;
+		this._12 = a12;
 		this._22 = a22;
 	}
 
 	public inline function copyFrom(m:Mat3) {
 		var m:FastMatrix3 = m;
 		this._00 = m._00;
-		this._01 = m._01;
-		this._02 = m._02;
 		this._10 = m._10;
-		this._11 = m._11;
-		this._12 = m._12;
 		this._20 = m._20;
+		this._01 = m._01;
+		this._11 = m._11;
 		this._21 = m._21;
+		this._02 = m._02;
+		this._12 = m._12;
 		this._22 = m._22;
 		return this;
 	}
 
 	public inline function clone():Mat3 {
-		return new Mat3(this._00, this._01, this._02, this._10, this._11, this._12, this._20, this._21, this._22);
+		return Mat3.empty().copyFrom(this);
 	}
 
 	public inline function matrixCompMult(n:Mat3):Mat3 {
 		var n:FastMatrix3 = n;
-		return new Mat3(this._00 * n._00, this._01 * n._01, this._02 * n._02, this._10 * n._10, this._11 * n._11, this._12 * n._12, this._20 * n._20,
-			this._21 * n._21, this._22 * n._22);
+		return new Mat3(this._00 * n._00, this._10 * n._10, this._20 * n._20, this._01 * n._01, this._11 * n._11, this._21 * n._21, this._02 * n._02,
+			this._12 * n._12, this._22 * n._22);
 	}
 
 	// extended methods
 
 	public inline function transpose():Mat3 {
-		return new Mat3(this._00, this._10, this._20, this._01, this._11, this._21, this._02, this._12, this._22);
+		return this.transpose();
 	}
 
 	public inline function determinant():FastFloat {
-		var m = this;
-		return (m._00 * (m._22 * m._11 - m._12 * m._21) + m._01 * (-m._22 * m._10 + m._12 * m._20) + m._02 * (m._21 * m._10 - m._11 * m._20));
+		return this.determinant();
 	}
 
 	public inline function inverse():Mat3 {
-		var m = this;
-		var b01 = m._22 * m._11 - m._12 * m._21;
-		var b11 = -m._22 * m._10 + m._12 * m._20;
-		var b21 = m._21 * m._10 - m._11 * m._20;
-
-		// determinant
-		var det = m._00 * b01 + m._01 * b11 + m._02 * b21;
-
-		var f = 1.0 / det;
-
-		return new Mat3(b01 * f, (-m._22 * m._01 + m._02 * m._21) * f, (m._12 * m._01 - m._02 * m._11) * f, b11 * f, (m._22 * m._00 - m._02 * m._20) * f,
-			(-m._12 * m._00 + m._02 * m._10) * f, b21 * f, (-m._21 * m._00 + m._01 * m._20) * f, (m._11 * m._00 - m._01 * m._10) * f);
+		return this.inverse();
 	}
 
 	public inline function adjoint():Mat3 {
 		var m = this;
 		return new Mat3(m._11 * m._22
-			- m._12 * m._21, m._02 * m._21
-			- m._01 * m._22, m._01 * m._12
-			- m._02 * m._11, m._12 * m._20
-			- m._10 * m._22,
+			- m._21 * m._12, m._20 * m._12
+			- m._10 * m._22, m._10 * m._21
+			- m._20 * m._11, m._21 * m._02
+			- m._01 * m._22,
 			m._00 * m._22
-			- m._02 * m._20, m._02 * m._10
-			- m._00 * m._12, m._10 * m._21
-			- m._11 * m._20, m._01 * m._20
-			- m._00 * m._21,
+			- m._20 * m._02, m._20 * m._01
+			- m._00 * m._21, m._01 * m._12
+			- m._11 * m._02, m._10 * m._02
+			- m._00 * m._12,
 			m._00 * m._11
-			- m._01 * m._10);
+			- m._10 * m._01);
 	}
 
 	public inline function toString() {
 		return 'mat3('
-			+ '${this._00}, ${this._01}, ${this._02}, '
-			+ '${this._10}, ${this._11}, ${this._12}, '
-			+ '${this._20}, ${this._21}, ${this._22}'
+			+ '${this._00}, ${this._10}, ${this._20}, '
+			+ '${this._01}, ${this._11}, ${this._21}, '
+			+ '${this._02}, ${this._12}, ${this._22}'
 			+ ')';
 	}
 
@@ -110,17 +125,17 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 		return switch i {
 			case 0: {
 					x: this._00,
-					y: this._01,
-					z: this._02
+					y: this._10,
+					z: this._20
 				}
 			case 1: {
-					x: this._10,
+					x: this._01,
 					y: this._11,
-					z: this._12
+					z: this._21
 				}
 			case 2: {
-					x: this._20,
-					y: this._21,
+					x: this._02,
+					y: this._12,
 					z: this._22
 				}
 			default: null;
@@ -131,17 +146,17 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 		return switch i {
 			case 0: {
 					this._00 = v.x;
-					this._01 = v.y;
-					this._02 = v.z;
+					this._10 = v.y;
+					this._20 = v.z;
 				}
 			case 1: {
-					this._10 = v.x;
+					this._01 = v.x;
 					this._11 = v.y;
-					this._12 = v.z;
+					this._21 = v.z;
 				}
 			case 2: {
-					this._20 = v.x;
-					this._21 = v.y;
+					this._02 = v.x;
+					this._12 = v.y;
 					this._22 = v.z;
 				}
 			default: null;
@@ -150,7 +165,7 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 	@:op(-a)
 	static inline function neg(m:Mat3) {
 		var m:FastMatrix3 = m;
-		return new Mat3(-m._00, -m._01, -m._02, -m._10, -m._11, -m._12, -m._20, -m._21, -m._22);
+		return new Mat3(-m._00, -m._10, -m._20, -m._01, -m._11, -m._21, -m._02, -m._12, -m._22);
 	}
 
 	@:op(++a)
@@ -224,24 +239,13 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 
 	@:op(a + b)
 	static inline function add(m:Mat3, n:Mat3):Mat3 {
-		var m:FastMatrix3 = m;
-		var n:FastMatrix3 = n;
-		return new Mat3(m._00
-			+ n._00, m._01
-			+ n._01, m._02
-			+ n._02, m._10
-			+ n._10, m._11
-			+ n._11, m._12
-			+ n._12, m._20
-			+ n._20, m._21
-			+ n._21, m._22
-			+ n._22);
+		return (m : FastMatrix3).add((n : FastMatrix3));
 	}
 
 	@:op(a + b) @:commutative
 	static inline function addScalar(m:Mat3, f:FastFloat):Mat3 {
 		var m:FastMatrix3 = m;
-		return new Mat3(m._00 + f, m._01 + f, m._02 + f, m._10 + f, m._11 + f, m._12 + f, m._20 + f, m._21 + f, m._22 + f);
+		return new Mat3(m._00 + f, m._10 + f, m._20 + f, m._01 + f, m._11 + f, m._21 + f, m._02 + f, m._12 + f, m._22 + f);
 	}
 
 	@:op(a - b)
@@ -249,66 +253,43 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 		var m:FastMatrix3 = m;
 		var n:FastMatrix3 = n;
 		return new Mat3(m._00
-			- n._00, m._01
-			- n._01, m._02
-			- n._02, m._10
-			- n._10, m._11
-			- n._11, m._12
-			- n._12, m._20
-			- n._20, m._21
-			- n._21, m._22
+			- n._00, m._10
+			- n._10, m._20
+			- n._20, m._01
+			- n._01, m._11
+			- n._11, m._21
+			- n._21, m._02
+			- n._02, m._12
+			- n._12, m._22
 			- n._22);
 	}
 
 	@:op(a - b)
 	static inline function subScalar(m:Mat3, f:FastFloat):Mat3 {
 		var m:FastMatrix3 = m;
-		return new Mat3(m._00 - f, m._01 - f, m._02 - f, m._10 - f, m._11 - f, m._12 - f, m._20 - f, m._21 - f, m._22 - f);
+		return new Mat3(m._00 - f, m._10 - f, m._20 - f, m._01 - f, m._11 - f, m._21 - f, m._02 - f, m._12 - f, m._22 - f);
 	}
 
 	@:op(a - b)
 	static inline function subScalarInv(f:FastFloat, m:Mat3):Mat3 {
 		var m:FastMatrix3 = m;
-		return new Mat3(f - m._00, f - m._01, f - m._02, f - m._10, f - m._11, f - m._12, f - m._20, f - m._21, f - m._22);
+		return new Mat3(f - m._00, f - m._10, f - m._20, f - m._01, f - m._11, f - m._21, f - m._02, f - m._12, f - m._22);
 	}
 
 	@:op(a * b)
 	static inline function mul(m:Mat3, n:Mat3):Mat3 {
-		var m:FastMatrix3 = m;
-		var n:FastMatrix3 = n;
-		return new Mat3(m._00 * n._00
-			+ m._10 * n._01
-			+ m._20 * n._02, m._01 * n._00
-			+ m._11 * n._01
-			+ m._21 * n._02,
-			m._02 * n._00
-			+ m._12 * n._01
-			+ m._22 * n._02, m._00 * n._10
-			+ m._10 * n._11
-			+ m._20 * n._12, m._01 * n._10
-			+ m._11 * n._11
-			+ m._21 * n._12,
-			m._02 * n._10
-			+ m._12 * n._11
-			+ m._22 * n._12, m._00 * n._20
-			+ m._10 * n._21
-			+ m._20 * n._22, m._01 * n._20
-			+ m._11 * n._21
-			+ m._21 * n._22,
-			m._02 * n._20
-			+ m._12 * n._21
-			+ m._22 * n._22);
+		return (m : FastMatrix3).multmat(n);
 	}
 
 	@:op(a * b)
 	static inline function postMulVec3(m:Mat3, v:Vec3):Vec3 {
 		var m:FastMatrix3 = m;
 		return new Vec3(m._00 * v.x
-			+ m._10 * v.y
-			+ m._20 * v.z, m._01 * v.x
+			+ m._01 * v.y
+			+ m._02 * v.z, m._10 * v.x
 			+ m._11 * v.y
-			+ m._21 * v.z, m._02 * v.x
-			+ m._12 * v.y
+			+ m._12 * v.z, m._20 * v.x
+			+ m._21 * v.y
 			+ m._22 * v.z);
 	}
 
@@ -319,8 +300,7 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 
 	@:op(a * b) @:commutative
 	static inline function mulScalar(m:Mat3, f:FastFloat):Mat3 {
-		var m:FastMatrix3 = m;
-		return new Mat3(m._00 * f, m._01 * f, m._02 * f, m._10 * f, m._11 * f, m._12 * f, m._20 * f, m._21 * f, m._22 * f);
+		return (m : FastMatrix3).mult(f);
 	}
 
 	@:op(a / b)
@@ -329,14 +309,13 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 
 	@:op(a / b)
 	static inline function divScalar(m:Mat3, f:FastFloat):Mat3 {
-		var m:FastMatrix3 = m;
-		return new Mat3(m._00 / f, m._01 / f, m._02 / f, m._10 / f, m._11 / f, m._12 / f, m._20 / f, m._21 / f, m._22 / f);
+		return (m : FastMatrix3).mult(1.0 / f);
 	}
 
 	@:op(a / b)
 	static inline function divScalarInv(f:FastFloat, m:Mat3):Mat3 {
 		var m:FastMatrix3 = m;
-		return new Mat3(f / m._00, f / m._01, f / m._02, f / m._10, f / m._11, f / m._12, f / m._20, f / m._21, f / m._22);
+		return new Mat3(f / m._00, f / m._10, f / m._20, f / m._01, f / m._11, f / m._21, f / m._02, f / m._12, f / m._22);
 	}
 
 	@:op(a == b)

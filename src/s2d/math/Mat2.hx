@@ -2,64 +2,67 @@ package s2d.math;
 
 import kha.FastFloat;
 import kha.math.FastMatrix2;
-// s2d
-import s2d.math.SMath;
 
 abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 	#if !macro
-	public inline function new(a00:FastFloat, a01:FastFloat, a10:FastFloat, a11:FastFloat) {
-		this = new FastMatrix2(a00, a01, a10, a11);
+	extern public static inline function empty():Mat2 {
+		return FastMatrix2.empty();
 	}
 
-	public inline function set(a00:FastFloat, a01:FastFloat, a10:FastFloat, a11:FastFloat) {
+	extern public static inline function identity():Mat2 {
+		return FastMatrix2.identity();
+	}
+
+	public inline function new(a00:FastFloat, a10:FastFloat, a01:FastFloat, a11:FastFloat) {
+		this = new FastMatrix2(a00, a10, a01, a11);
+	}
+
+	public inline function set(a00:FastFloat, a10:FastFloat, a01:FastFloat, a11:FastFloat) {
 		this._00 = a00;
-		this._01 = a01;
 		this._10 = a10;
+		this._01 = a01;
 		this._11 = a11;
 	}
 
-	public inline function copyFrom(m:Mat2) {
-		var m:FastMatrix2 = m;
-		this._00 = m._00;
-		this._01 = m._01;
-		this._10 = m._10;
-		this._11 = m._11;
+	public inline function copyFrom(m:Mat2):Mat2 {
+		this.setFrom(m);
 		return this;
 	}
 
 	public inline function clone():Mat2 {
-		return new Mat2(this._00, this._01, this._10, this._11);
+		return Mat2.empty().copyFrom(this);
 	}
 
 	public inline function matrixCompMult(n:Mat2):Mat2 {
+		var m = this;
 		var n:FastMatrix2 = n;
-		return new Mat2(this._00 * n._00, this._01 * n._01, this._10 * n._10, this._11 * n._11);
+		return new Mat2(m._00 * n._00, m._10 * n._10, m._01 * n._01, m._11 * n._11);
 	}
 
 	// extended methods
 
 	public inline function transpose():Mat2 {
-		return new Mat2(this._00, this._10, this._01, this._11);
+		return this.transpose();
 	}
 
 	public inline function determinant():FastFloat {
 		var m = this;
-		return m._00 * m._11 - m._10 * m._01;
+		return m._00 * m._11 - m._01 * m._10;
 	}
 
 	public inline function inverse():Mat2 {
 		var m = this;
 		var f = 1.0 / determinant();
-		return new Mat2(m._11 * f, -m._01 * f, -m._10 * f, m._00 * f);
+		return new Mat2(m._11 * f, -m._10 * f, -m._01 * f, m._00 * f);
 	}
 
 	public inline function adjoint():Mat2 {
 		var m = this;
-		return new Mat2(m._11, -m._01, -m._10, m._00);
+		return new Mat2(m._11, -m._10, -m._01, m._00);
 	}
 
 	public inline function toString() {
-		return 'mat2(' + '${this._00}, ${this._01}, ' + '${this._10}, ${this._11}' + ')';
+		return 'mat2(' + '${this._00}, ${this._10}, ' + '${this._01}, ${this._11}' + ')';
 	}
 
 	@:op([])
@@ -67,10 +70,10 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 		return switch i {
 			case 0: {
 					x: this._00,
-					y: this._01
+					y: this._10
 				}
 			case 1: {
-					x: this._10,
+					x: this._01,
 					y: this._11
 				}
 			default: null;
@@ -81,10 +84,10 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 		return switch i {
 			case 0: {
 					this._00 = v.x;
-					this._01 = v.y;
+					this._10 = v.y;
 				}
 			case 1: {
-					this._10 = v.x;
+					this._01 = v.x;
 					this._11 = v.y;
 				}
 			default: null;
@@ -93,7 +96,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 	@:op(-a)
 	static inline function neg(m:Mat2) {
 		var m:FastMatrix2 = m;
-		return new Mat2(-m._00, -m._01, -m._10, -m._11);
+		return new Mat2(-m._00, -m._10, -m._01, -m._11);
 	}
 
 	@:op(++a)
@@ -164,49 +167,43 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 	static inline function add(m:Mat2, n:Mat2):Mat2 {
 		var m:FastMatrix2 = m;
 		var n:FastMatrix2 = n;
-		return new Mat2(m._00 + n._00, m._01 + n._01, m._10 + n._10, m._11 + n._11);
+		return new Mat2(m._00 + n._00, m._10 + n._10, m._01 + n._01, m._11 + n._11);
 	}
 
 	@:op(a + b) @:commutative
 	static inline function addScalar(m:Mat2, f:FastFloat):Mat2 {
 		var m:FastMatrix2 = m;
-		return new Mat2(m._00 + f, m._01 + f, m._10 + f, m._11 + f);
+		return new Mat2(m._00 + f, m._10 + f, m._01 + f, m._11 + f);
 	}
 
 	@:op(a - b)
 	static inline function sub(m:Mat2, n:Mat2):Mat2 {
 		var m:FastMatrix2 = m;
 		var n:FastMatrix2 = n;
-		return new Mat2(m._00 - n._00, m._01 - n._01, m._10 - n._10, m._11 - n._11);
+		return new Mat2(m._00 - n._00, m._10 - n._10, m._01 - n._01, m._11 - n._11);
 	}
 
 	@:op(a - b)
 	static inline function subScalar(m:Mat2, f:FastFloat):Mat2 {
 		var m:FastMatrix2 = m;
-		return new Mat2(m._00 - f, m._01 - f, m._10 - f, m._11 - f);
+		return new Mat2(m._00 - f, m._10 - f, m._01 - f, m._11 - f);
 	}
 
 	@:op(a - b)
 	static inline function subScalarInv(f:FastFloat, m:Mat2):Mat2 {
 		var m:FastMatrix2 = m;
-		return new Mat2(f - m._00, f - m._01, f - m._10, f - m._11);
+		return new Mat2(f - m._00, f - m._10, f - m._01, f - m._11);
 	}
 
 	@:op(a * b)
 	static inline function mul(m:Mat2, n:Mat2):Mat2 {
-		var m:FastMatrix2 = m;
-		var n:FastMatrix2 = n;
-		return new Mat2(m._00 * n._00
-			+ m._10 * n._01, m._01 * n._00
-			+ m._11 * n._01, m._00 * n._10
-			+ m._10 * n._11, m._01 * n._10
-			+ m._11 * n._11);
+		return (m : FastMatrix2).multmat(n);
 	}
 
 	@:op(a * b)
 	static inline function postMulVec2(m:Mat2, v:Vec2):Vec2 {
 		var m:FastMatrix2 = m;
-		return new Vec2(m._00 * v.x + m._10 * v.y, m._01 * v.x + m._11 * v.y);
+		return new Vec2(m._00 * v.x + m._01 * v.y, m._10 * v.x + m._11 * v.y);
 	}
 
 	@:op(a * b)
@@ -216,8 +213,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 
 	@:op(a * b) @:commutative
 	static inline function mulScalar(m:Mat2, f:FastFloat):Mat2 {
-		var m:FastMatrix2 = m;
-		return new Mat2(m._00 * f, m._01 * f, m._10 * f, m._11 * f);
+		return (m : FastMatrix2).mult(f);
 	}
 
 	@:op(a / b)
@@ -227,14 +223,13 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 
 	@:op(a / b)
 	static inline function divScalar(m:Mat2, f:FastFloat):Mat2 {
-		var m:FastMatrix2 = m;
-		return new Mat2(m._00 / f, m._01 / f, m._10 / f, m._11 / f);
+		return (m : FastMatrix2).mult(1.0 / f);
 	}
 
 	@:op(a / b)
 	static inline function divScalarInv(f:FastFloat, m:Mat2):Mat2 {
 		var m:FastMatrix2 = m;
-		return new Mat2(f / m._00, f / m._01, f / m._10, f / m._11);
+		return new Mat2(f / m._00, f / m._10, f / m._01, f / m._11);
 	}
 
 	@:op(a == b)

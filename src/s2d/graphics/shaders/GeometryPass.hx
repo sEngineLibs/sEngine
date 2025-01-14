@@ -5,11 +5,10 @@ import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
-// s2d
-import s2d.objects.Sprite;
 
 @:allow(s2d.graphics.Renderer)
 @:access(s2d.graphics.Renderer)
+@:access(s2d.objects.Sprite)
 class GeometryPass {
 	static var pipeline:PipelineState;
 
@@ -27,8 +26,7 @@ class GeometryPass {
 
 	static inline function compile() {
 		var structure = new VertexStructure();
-		structure.add("vertPos", Float32_3X);
-		structure.add("vertUV", Float32_2X);
+		structure.add("vertCoord", Float32_2X);
 
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];
@@ -61,14 +59,14 @@ class GeometryPass {
 		g4.begin([Renderer.gBuffer[1], Renderer.gBuffer[2], Renderer.gBuffer[3]]);
 		g4.clear(Black);
 		g4.setPipeline(pipeline);
-		g4.setIndexBuffer(Sprite.indices);
-		g4.setVertexBuffer(Sprite.vertices);
+		g4.setIndexBuffer(S2D.indices);
+		g4.setVertexBuffer(S2D.vertices);
 		for (sprite in sprites) {
 			var ct = sprite.material.sheet.curTile;
 			final cropRect = ct * sprite.cropRect;
 
-			g4.setMatrix(VPCL, VP);
-			g4.setMatrix(modelCL, sprite.finalTransformation);
+			g4.setMatrix3(VPCL, VP);
+			g4.setMatrix3(modelCL, sprite._transformation);
 			g4.setVector4(cropRectCL, cropRect);
 			g4.setTexture(albedoMapTU, sprite.material.albedoMap);
 			g4.setTexture(normalMapTU, sprite.material.normalMap);

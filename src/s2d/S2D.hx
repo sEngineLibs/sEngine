@@ -9,8 +9,8 @@ import kha.graphics4.VertexStructure;
 import s2d.Stage;
 import s2d.core.Time;
 import s2d.math.SMath;
-import s2d.math.Vec3;
-import s2d.math.Mat4;
+import s2d.math.Vec2;
+import s2d.math.Mat3;
 import s2d.objects.Sprite;
 import s2d.graphics.Renderer;
 import s2d.animation.Action;
@@ -18,7 +18,7 @@ import s2d.animation.Action;
 class S2D {
 	public static var indices:IndexBuffer;
 	public static var vertices:VertexBuffer;
-	public static var projection:Mat4;
+	public static var projection:Mat3;
 
 	public static var width:Int;
 	public static var height:Int;
@@ -62,7 +62,6 @@ class S2D {
 		realHeight = h;
 		aspectRatio = width / height;
 		Renderer.init(width, height);
-		Sprite.init();
 
 		// init indices
 		indices = new IndexBuffer(6, StaticUsage);
@@ -120,50 +119,36 @@ class S2D {
 
 	static inline function updateProjection() {
 		if (aspectRatio >= 1)
-			projection = Mat4.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale, 0.0, scale);
+			projection = Mat3.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale);
 		else
-			projection = Mat4.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio, 0.0, scale);
+			projection = Mat3.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio);
 
-		projection = projection * Mat4.lookAt({x: 0.0, y: 0.0, z: 1.0}, {x: 0.0, y: 0.0, z: 0.0}, {x: 0.0, y: 1.0, z: 0.0});
+		projection = projection * Mat3.lookAt(vec2(0.0), vec2(0.0), vec2(0.0));
 	}
 
-	public static inline function local2WorldSpace(point:Vec3):Vec3 {
-		var wsp = stage.VP.inverse() * vec4(point.x * 2.0 - 1.0, point.y * 2.0 - 1.0, point.z * 2.0 - 1.0, 1.0);
-		return {
-			x: wsp.x,
-			y: wsp.y,
-			z: wsp.z
-		};
+	public static inline function local2WorldSpace(point:Vec2):Vec2 {
+		var wsp = inverse(stage.VP) * vec3(point * 2.0 - 1.0, 1.0);
+		return wsp.xy;
 	}
 
-	public static inline function world2LocalSpace(point:Vec3):Vec3 {
-		var ncp = stage.VP * vec4(point.x, point.y, point.z, 1.0);
-		return {
-			x: ncp.x * 0.5 + 0.5,
-			y: ncp.y * 0.5 + 0.5,
-			z: ncp.z * 0.5 + 0.5
-		};
+	public static inline function world2LocalSpace(point:Vec2):Vec2 {
+		var ncp = inverse(stage.VP) * vec3(point, 1.0);
+		return ncp.xy * 0.5 + 0.5;
 	}
 
-	public static inline function screen2LocalSpace(point:Vec3):Vec3 {
-		return {
-			x: point.x / realWidth,
-			y: point.y / realHeight
-		};
+	public static inline function screen2LocalSpace(point:Vec2):Vec2 {
+		return point / vec2(realWidth, realHeight);
 	}
 
-	public static inline function local2ScreenSpace(point:Vec3):Vec3 {
-		return {
-			x: point.x * realWidth,
-			y: point.y * realHeight
-		};
+	public static inline function local2ScreenSpace(point:Vec2):Vec2 {
+		return point * vec2(realWidth, realHeight);
 	}
 
-	public static inline function screen2WorldSpace(point:Vec3):Vec3 {
+	public static inline function screen2WorldSpace(point:Vec2):Vec2 {
 		return local2WorldSpace(screen2LocalSpace(point));
 	}
 
-	public static inline function world2ScreenSpace(point:Vec3):Vec3 {
+	public static inline function world2ScreenSpace(point:Vec2):Vec2 {
 		return local2ScreenSpace(world2LocalSpace(point));
 	}
 

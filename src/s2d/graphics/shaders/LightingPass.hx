@@ -90,7 +90,7 @@ class LightingPass {
 		g4.setTexture(normalMapTU, Renderer.gBuffer[1]);
 		g4.setTexture(emissionMapTU, Renderer.gBuffer[2]);
 		g4.setTexture(ormMapTU, Renderer.gBuffer[3]);
-		g4.setMatrix(invVPCL, invVP);
+		g4.setMatrix3(invVPCL, invVP);
 		g4.setFloats(lightsDataCL, S2D.stage.lightsData);
 		g4.drawIndexedVertices();
 		g2.end();

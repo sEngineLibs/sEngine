@@ -1,6 +1,6 @@
 #version 450
 
-uniform mat4 model;
+uniform mat3 model;
 
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;

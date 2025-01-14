@@ -3,11 +3,12 @@ package s2d;
 import kha.Image;
 import kha.arrays.Float32Array;
 // s2d
-import s2d.math.Mat4;
+import s2d.math.Mat3;
 import s2d.objects.Light;
 import s2d.objects.Sprite;
 import s2d.objects.Object;
 
+@:access(s2d.objects.Object)
 class Stage {
 	public var sprites:Array<Sprite> = [];
 	public var lights:Array<Light> = [];
@@ -30,10 +31,10 @@ class Stage {
 		lightsData = new Float32Array(1 * maxLights * lightStructSize);
 	}
 
-	public var VP(get, null):Mat4;
+	public var VP(get, null):Mat3;
 
 	inline function get_VP() {
-		return S2D.projection * camera.finalTransformation;
+		return S2D.projection * camera._transformation;
 	}
 
 	@:isVar var lightsData(get, null):Float32Array;
@@ -44,11 +45,10 @@ class Stage {
 		for (i in 0...lights.length) {
 			var ind = 1 + i * lightStructSize;
 			var light = lights[i];
-			var lightPosition = light.location;
 
-			lightsData[ind + 0] = lightPosition.x;
-			lightsData[ind + 1] = lightPosition.y;
-			lightsData[ind + 2] = lightPosition.z;
+			lightsData[ind + 0] = light.x;
+			lightsData[ind + 1] = light.y;
+			lightsData[ind + 2] = 0.0;
 			lightsData[ind + 3] = light.color.R;
 			lightsData[ind + 4] = light.color.G;
 			lightsData[ind + 5] = light.color.B;
