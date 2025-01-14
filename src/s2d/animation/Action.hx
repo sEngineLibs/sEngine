@@ -8,8 +8,8 @@ import s2d.core.Time;
 class Action {
 	static var actuators:Array<Actuator> = [];
 
-	public static inline function tween(target:Dynamic, properties:Dynamic, duration:Float):Actuator {
-		final actuator = new Actuator(target, properties, duration);
+	public static inline function tween(duration:Float = 1.0, onTick:(Float) -> Void):Actuator {
+		final actuator = new Actuator(duration, onTick);
 		actuator.start = Time.time;
 		actuators.push(actuator);
 		return actuator;
@@ -17,49 +17,43 @@ class Action {
 
 	static inline function update(time:Float) {
 		for (a in actuators) {
-			for (prop in Reflect.fields(a.properties)) {
-				final t = (time - a.start) / a.duration;
-				final e = Reflect.getProperty(a.properties, prop);
-				if (t < 1.0) {
-					final s = Reflect.getProperty(a.source, prop);
-					final v = lerp(s, e, a.easing(t));
-					Reflect.setProperty(a.target, prop, v);
-				} else {
-					Reflect.setProperty(a.target, prop, e);
-					a.stop();
-				}
+			final t = (time - a.start) / a.duration;
+			if (t < 1.0) {
+				a.tick(a.easing(t));
+			} else {
+				a.done();
+				actuators.remove(a);
 			}
 		}
-	}
-
-	static inline function lerp(x:Dynamic, y:Dynamic, t:Float):Dynamic {
-		return x + (y - x) * t;
 	}
 }
 
 @:allow(s2d.animation.Action)
 private class Actuator {
-	var source:Dynamic;
-	var target:Dynamic;
-	var properties:Dynamic;
-
 	var start:Float;
 	var duration:Float;
-	var easing:(Float) -> Float;
+	var easing:Float->Float;
+	var tick:Float->Void;
+	var done:Void->Void = () -> {};
 
-	inline function new(target:Dynamic, properties:Dynamic, ?duration:Float = 1.0) {
-		source = {};
-		for (prop in Reflect.fields(properties))
-			Reflect.setProperty(source, prop, Reflect.getProperty(target, prop));
-
-		this.target = target;
-		this.properties = properties;
+	inline function new(duration:Float = 1.0, onTick:Float->Void) {
 		this.duration = duration;
+		this.tick = onTick;
 		easing = Easing.Linear;
 	}
 
-	public inline function ease(f:(Float) -> Float) {
+	public inline function ease(f:Float->Float) {
 		easing = f;
+		return this;
+	}
+
+	public inline function onTick(f:Float->Void) {
+		tick = f;
+		return this;
+	}
+
+	public inline function onDone(f:Void->Float) {
+		done = f;
 		return this;
 	}
 

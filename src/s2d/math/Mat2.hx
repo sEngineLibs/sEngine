@@ -3,6 +3,7 @@ package s2d.math;
 import kha.FastFloat;
 import kha.math.FastMatrix2;
 
+@:forward(_00, _10, _01, _11)
 abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 	#if !macro
 	extern public static inline function empty():Mat2 {
@@ -64,34 +65,6 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 	public inline function toString() {
 		return 'mat2(' + '${this._00}, ${this._10}, ' + '${this._01}, ${this._11}' + ')';
 	}
-
-	@:op([])
-	inline function arrayRead(i:Int):Vec2
-		return switch i {
-			case 0: {
-					x: this._00,
-					y: this._10
-				}
-			case 1: {
-					x: this._01,
-					y: this._11
-				}
-			default: null;
-		}
-
-	@:op([])
-	inline function arrayWrite(i:Int, v:Vec2)
-		return switch i {
-			case 0: {
-					this._00 = v.x;
-					this._10 = v.y;
-				}
-			case 1: {
-					this._01 = v.x;
-					this._11 = v.y;
-				}
-			default: null;
-		}
 
 	@:op(-a)
 	static inline function neg(m:Mat2) {
@@ -220,7 +193,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 
 	@:op(a * b)
 	static inline function preMulVec2(v:Vec2, m:Mat2):Vec2 {
-		return new Vec2(v.dot(m[0]), v.dot(m[1]));
+		return new Vec2(v.dot({x: m._00, y: m._10}), v.dot({x: m._01, y: m._11}));
 	}
 
 	@:op(a * b) @:commutative
@@ -246,7 +219,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 
 	@:op(a == b)
 	static inline function equal(m:Mat2, n:Mat2):Bool {
-		return m[0] == n[0] && m[1] == n[1];
+		return m._00 == n._00 && m._10 == n._10 && m._01 == n._01 && m._11 == n._11;
 	}
 
 	@:op(a != b)

@@ -130,7 +130,7 @@ class Element {
 		return value;
 	}
 
-	// transformation
+	// model
 	public var origin:Vector2 = {};
 	@:isVar public var scaleX(default, set):Float = 1;
 	@:isVar public var scaleY(default, set):Float = 1;

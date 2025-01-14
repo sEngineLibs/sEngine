@@ -65,7 +65,7 @@ class GeometryPass {
 			var ct = sprite.material.sheet.curTile;
 			final cropRect = ct * sprite.cropRect;
 
-			g4.setMatrix3(mvpCL, VP * sprite._transformation);
+			g4.setMatrix3(mvpCL, VP * sprite._model);
 			g4.setFloat(rotationCL, sprite.rotation);
 			g4.setVector4(cropRectCL, cropRect);
 			g4.setTexture(albedoMapTU, sprite.material.albedoMap);

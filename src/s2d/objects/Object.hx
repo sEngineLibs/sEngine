@@ -1,16 +1,18 @@
 package s2d.objects;
 
-import s2d.math.Vec2;
 import kha.FastFloat;
+// s2d
+import s2d.math.SMath;
+import s2d.math.Vec2;
 import s2d.math.Mat3;
 
 class Object {
 	@:isVar public var parent(default, null):Object = null;
 	@:isVar public var children(default, null):Array<Object> = [];
 
-	var _transformation(get, never):Mat3;
+	var _model(get, never):Mat3;
 
-	public var transformation:Mat3 = Mat3.identity();
+	public var model:Mat3 = Mat3.identity();
 	public var x(get, set):FastFloat;
 	public var y(get, set):FastFloat;
 	public var scaleX(get, set):FastFloat;
@@ -32,134 +34,179 @@ class Object {
 		value.setParent(this);
 	}
 
-	overload extern public inline function move(x:FastFloat, y:FastFloat) {
+	overload extern public inline function moveG(x:FastFloat, y:FastFloat) {
 		this.x += x;
 		this.y += y;
 	}
 
-	overload extern public inline function move(value:FastFloat) {
-		move(value, value);
+	overload extern public inline function moveG(value:FastFloat) {
+		moveG(value, value);
 	}
 
-	overload extern public inline function move(value:Vec2) {
-		move(value.x, value.y);
+	overload extern public inline function moveG(value:Vec2) {
+		moveG(value.x, value.y);
 	}
 
-	overload extern public inline function moveTo(x:FastFloat, y:FastFloat) {
+	overload extern public inline function moveToG(x:FastFloat, y:FastFloat) {
 		this.x = x;
 		this.y = y;
 	}
 
-	overload extern public inline function moveTo(value:Vec2) {
-		moveTo(value.x, value.y);
+	overload extern public inline function moveToG(value:Vec2) {
+		moveToG(value.x, value.y);
 	}
 
-	overload extern public inline function moveTo(value:FastFloat) {
-		moveTo(value, value);
+	overload extern public inline function moveToG(value:FastFloat) {
+		moveToG(value, value);
 	}
 
-	overload extern public inline function translate(x:FastFloat, y:FastFloat) {
-		transformation *= Mat3.translation(x, y);
+	overload extern public inline function scaleG(x:FastFloat, y:FastFloat) {
+		this.scaleX *= x;
+		this.scaleY *= y;
 	}
 
-	overload extern public inline function translate(value:FastFloat) {
-		translate(value, value);
+	overload extern public inline function scaleG(value:Vec2) {
+		scaleG(value.x, value.y);
 	}
 
-	overload extern public inline function translate(value:Vec2) {
-		translate(value.x, value.y);
+	overload extern public inline function scaleG(value:FastFloat) {
+		scaleG(value, value);
 	}
 
-	overload extern public inline function translateTo(x:FastFloat, y:FastFloat) {
-		transformation *= Mat3.translation(x - this.x, y - this.x);
+	overload extern public inline function scaleToG(x:FastFloat, y:FastFloat) {
+		this.scaleX = x;
+		this.scaleY = y;
 	}
 
-	overload extern public inline function translateTo(value:Vec2) {
-		translateTo(value.x, value.y);
+	overload extern public inline function scaleToG(value:Vec2) {
+		scaleToG(value.x, value.y);
 	}
 
-	overload extern public inline function translateTo(value:FastFloat) {
-		translateTo(value, value);
+	overload extern public inline function scaleToG(value:FastFloat) {
+		scaleToG(value, value);
 	}
 
-	overload extern public inline function scale(x:FastFloat, y:FastFloat) {
-		transformation *= Mat3.scale(x, y);
+	public inline function rotateG(angle:FastFloat) {
+		this.rotation += angle;
 	}
 
-	overload extern public inline function scale(value:Vec2) {
-		scale(value.x, value.y);
-	}
-
-	overload extern public inline function scale(value:FastFloat) {
-		scale(value, value);
-	}
-
-	overload extern public inline function scaleTo(x:FastFloat, y:FastFloat) {
-		transformation *= Mat3.scale(x / scaleX, y / scaleY);
-	}
-
-	overload extern public inline function scaleTo(value:Vec2) {
-		scaleTo(value.x, value.y);
-	}
-
-	overload extern public inline function scaleTo(value:FastFloat) {
-		scaleTo(value, value);
-	}
-
-	public inline function rotate(angle:FastFloat) {
-		transformation *= Mat3.rotation(angle);
-	}
-
-	public inline function rotateTo(angle:FastFloat) {
+	public inline function rotateToG(angle:FastFloat) {
 		this.rotation = angle;
 	}
 
-	inline function get__transformation():Mat3 {
-		return parent == null ? transformation : parent._transformation * transformation;
+	overload extern public inline function moveL(x:FastFloat, y:FastFloat) {
+		model = model * Mat3.translation(x, y);
+	}
+
+	overload extern public inline function moveL(value:FastFloat) {
+		moveL(value, value);
+	}
+
+	overload extern public inline function moveL(value:Vec2) {
+		moveL(value.x, value.y);
+	}
+
+	overload extern public inline function moveToL(x:FastFloat, y:FastFloat) {
+		model = model * Mat3.translation(x - this.x, y - this.y);
+	}
+
+	overload extern public inline function moveToL(value:Vec2) {
+		moveToL(value.x, value.y);
+	}
+
+	overload extern public inline function moveToL(value:FastFloat) {
+		moveToL(value, value);
+	}
+
+	overload extern public inline function scaleL(x:FastFloat, y:FastFloat) {
+		model = model * Mat3.scale(x, y);
+	}
+
+	overload extern public inline function scaleL(value:Vec2) {
+		scaleL(value.x, value.y);
+	}
+
+	overload extern public inline function scaleL(value:FastFloat) {
+		scaleL(value, value);
+	}
+
+	overload extern public inline function scaleToL(x:FastFloat, y:FastFloat) {
+		model = model * Mat3.scale(x / scaleX, y / scaleY);
+	}
+
+	overload extern public inline function scaleToL(value:Vec2) {
+		scaleToL(value.x, value.y);
+	}
+
+	overload extern public inline function scaleToL(value:FastFloat) {
+		scaleToL(value, value);
+	}
+
+	public inline function rotateL(angle:FastFloat) {
+		model = model * Mat3.rotation(angle);
+	}
+
+	public inline function rotateToL(angle:FastFloat) {
+		model = model * Mat3.rotation(angle - rotation);
+	}
+
+	inline function get__model():Mat3 {
+		return parent == null ? model : parent._model * model;
 	}
 
 	inline function get_x():FastFloat {
-		return transformation[0][2];
+		return model._20;
 	}
 
 	inline function set_x(value:FastFloat):FastFloat {
-		translate(value - x, 0.0);
+		model._20 = value;
 		return value;
 	}
 
 	inline function get_y():FastFloat {
-		return transformation[1][2];
+		return model._21;
 	}
 
 	inline function set_y(value:FastFloat):FastFloat {
-		translate(0.0, value - y);
+		model._21 = value;
 		return value;
 	}
 
 	inline function get_scaleX():FastFloat {
-		return transformation[0][0];
+		return sqrt(pow(model._00, 2.0) + pow(model._10, 2.0));
 	}
 
 	inline function set_scaleX(value:FastFloat):FastFloat {
-		scale(value / scaleX, 1.0);
+		var xt = normalize(vec2(model._00, model._10));
+		model._00 = xt.x * value;
+		model._10 = xt.y * value;
 		return value;
 	}
 
 	inline function get_scaleY():FastFloat {
-		return transformation[1][1];
+		return sqrt(pow(model._01, 2.0) + pow(model._11, 2.0));
 	}
 
 	inline function set_scaleY(value:FastFloat):FastFloat {
-		scale(1.0, value / scaleY);
+		var yt = normalize(vec2(model._01, model._11));
+		model._01 = yt.x * value;
+		model._11 = yt.y * value;
 		return value;
 	}
 
 	inline function get_rotation():FastFloat {
-		return Math.atan2(transformation[1][0], transformation[0][0]);
+		return atan2(model._10, model._00);
 	}
 
 	inline function set_rotation(value:FastFloat):FastFloat {
-		rotate(value - rotation);
+		var sx = scaleX;
+		var sy = scaleY;
+		var c = cos(value);
+		var s = sin(value);
+		model._00 = c * sx;
+		model._10 = s * sx;
+		model._01 = -s * sy;
+		model._11 = c * sy;
 		return value;
 	}
 }

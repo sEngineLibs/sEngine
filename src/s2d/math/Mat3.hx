@@ -5,6 +5,7 @@ import kha.math.FastMatrix3;
 // s2d
 import s2d.math.SMath;
 
+@:forward(_00, _10, _20, _01, _11, _21, _02, _12, _22)
 abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 	#if !macro
 	extern public static inline function empty():Mat3 {
@@ -119,48 +120,6 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 			+ '${this._02}, ${this._12}, ${this._22}'
 			+ ')';
 	}
-
-	@:op([])
-	inline function arrayRead(i:Int):Vec3
-		return switch i {
-			case 0: {
-					x: this._00,
-					y: this._10,
-					z: this._20
-				}
-			case 1: {
-					x: this._01,
-					y: this._11,
-					z: this._21
-				}
-			case 2: {
-					x: this._02,
-					y: this._12,
-					z: this._22
-				}
-			default: null;
-		}
-
-	@:op([])
-	inline function arrayWrite(i:Int, v:Vec3)
-		return switch i {
-			case 0: {
-					this._00 = v.x;
-					this._10 = v.y;
-					this._20 = v.z;
-				}
-			case 1: {
-					this._01 = v.x;
-					this._11 = v.y;
-					this._21 = v.z;
-				}
-			case 2: {
-					this._02 = v.x;
-					this._12 = v.y;
-					this._22 = v.z;
-				}
-			default: null;
-		}
 
 	@:op(-a)
 	static inline function neg(m:Mat3) {
@@ -322,7 +281,7 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 
 	@:op(a * b)
 	static inline function preMulVec3(v:Vec3, m:Mat3):Vec3 {
-		return new Vec3(v.dot(m[0]), v.dot(m[1]), v.dot(m[2]));
+		return new Vec3(v.dot({x: m._00, y: m._10, z: m._20}), v.dot({x: m._01, y: m._11, z: m._21}), v.dot({x: m._02, y: m._12, z: m._22}));
 	}
 
 	@:op(a * b) @:commutative
@@ -347,7 +306,8 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 
 	@:op(a == b)
 	static inline function equal(m:Mat3, n:Mat3):Bool {
-		return m[0] == n[0] && m[1] == n[1] && m[2] == n[2];
+		return m._00 == n._00 && m._10 == n._10 && m._20 == n._20 && m._01 == n._01 && m._11 == n._11 && m._21 == n._21 && m._02 == n._02 && m._12 == n._12
+			&& m._22 == n._22;
 	}
 
 	@:op(a != b)

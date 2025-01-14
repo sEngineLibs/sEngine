@@ -553,13 +553,13 @@ inline function cross(a:Vec3, b:Vec3):Vec3 {
 
 // # Vector Initializers
 overload extern inline function vec2(m:Mat4):Vec2
-	return new Vec2(m[0][0], m[0][1]);
+	return new Vec2(m._00, m._01);
 
 overload extern inline function vec2(m:Mat3):Vec2
-	return new Vec2(m[0][0], m[0][1]);
+	return new Vec2(m._00, m._01);
 
 overload extern inline function vec2(m:Mat2):Vec2
-	return new Vec2(m[0][0], m[0][1]);
+	return new Vec2(m._00, m._01);
 
 overload extern inline function vec2(xyzw:Vec4):Vec2
 	return new Vec2(xyzw.x, xyzw.y);
@@ -577,13 +577,13 @@ overload extern inline function vec2(x:FastFloat, y:FastFloat):Vec2
 	return new Vec2(x, y);
 
 overload extern inline function vec3(m:Mat4):Vec3
-	return new Vec3(m[0][0], m[0][1], m[0][2]);
+	return new Vec3(m._00, m._01, m._02);
 
 overload extern inline function vec3(m:Mat3):Vec3
-	return new Vec3(m[0][0], m[0][1], m[0][2]);
+	return new Vec3(m._00, m._01, m._02);
 
 overload extern inline function vec3(m:Mat2):Vec3
-	return new Vec3(m[0][0], m[0][1], m[1][0]);
+	return new Vec3(m._00, m._01, m._10);
 
 overload extern inline function vec3(xyzw:Vec4):Vec3
 	return new Vec3(xyzw.x, xyzw.y, xyzw.z);
@@ -604,13 +604,13 @@ overload extern inline function vec3(x:FastFloat, y:FastFloat, z:FastFloat):Vec3
 	return new Vec3(x, y, z);
 
 overload extern inline function vec4(m:Mat4):Vec4
-	return new Vec4(m[0][0], m[0][1], m[0][2], m[0][3]);
+	return new Vec4(m._00, m._01, m._02, m._03);
 
 overload extern inline function vec4(m:Mat3):Vec4
-	return new Vec4(m[0][0], m[0][1], m[0][2], m[1][0]);
+	return new Vec4(m._00, m._01, m._02, m._10);
 
 overload extern inline function vec4(m:Mat2):Vec4
-	return new Vec4(m[0][0], m[0][1], m[1][0], m[1][1]);
+	return new Vec4(m._00, m._01, m._10, m._11);
 
 overload extern inline function vec4(xyzw:Vec4):Vec4
 	return new Vec4(xyzw.x, xyzw.y, xyzw.z, xyzw.w);
@@ -640,10 +640,10 @@ overload extern inline function vec4(x:FastFloat, y:FastFloat, z:FastFloat, w:Fa
 	return new Vec4(x, y, z, w);
 
 overload extern inline function mat2(m:Mat4):Mat2
-	return new Mat2(m[0][0], m[0][1], m[1][0], m[1][1]);
+	return new Mat2(m._00, m._01, m._10, m._11);
 
 overload extern inline function mat2(m:Mat3):Mat2
-	return new Mat2(m[0][0], m[0][1], m[1][0], m[1][1]);
+	return new Mat2(m._00, m._01, m._10, m._11);
 
 overload extern inline function mat2(m:Mat2):Mat2
 	return m.clone();
@@ -661,13 +661,13 @@ overload extern inline function mat2(a00:FastFloat, a01:FastFloat, a10:FastFloat
 	return new Mat2(a00, a01, a10, a11);
 
 overload extern inline function mat3(m:Mat4):Mat3
-	return new Mat3(m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]);
+	return new Mat3(m._00, m._01, m._02, m._10, m._11, m._12, m._20, m._21, m._22);
 
 overload extern inline function mat3(m:Mat3):Mat3
 	return m.clone();
 
 overload extern inline function mat3(m:Mat2):Mat3
-	return new Mat3(m[0][0], m[0][1], 0.0, m[1][0], m[1][1], 0.0, 0.0, 0.0, 1.0);
+	return new Mat3(m._00, m._01, 0.0, m._10, m._11, 0.0, 0.0, 0.0, 1.0);
 
 overload extern inline function mat3(column0:Vec3, column1:Vec3, column2:Vec3):Mat3
 	return new Mat3(column0.x, column0.y, column0.z, column1.x, column1.y, column1.z, column2.x, column2.y, column2.z);
@@ -683,10 +683,10 @@ overload extern inline function mat4(m:Mat4):Mat4
 	return m.clone();
 
 overload extern inline function mat4(m:Mat3):Mat4
-	return new Mat4(m[0][0], m[0][1], m[0][2], 0.0, m[1][0], m[1][1], m[1][2], 0.0, m[2][0], m[2][1], m[2][2], 0.0, 0.0, 0.0, 0.0, 1.0);
+	return new Mat4(m._00, m._01, m._02, 0.0, m._10, m._11, m._12, 0.0, m._20, m._21, m._22, 0.0, 0.0, 0.0, 0.0, 1.0);
 
 overload extern inline function mat4(m:Mat2):Mat4
-	return new Mat4(m[0][0], m[0][1], 0.0, 0.0, m[1][0], m[1][1], 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+	return new Mat4(m._00, m._01, 0.0, 0.0, m._10, m._11, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
 
 overload extern inline function mat4(column0:Vec4, column1:Vec4, column2:Vec4, column3:Vec4):Mat4
 	return new Mat4(column0.x, column0.y, column0.z, column0.w, column1.x, column1.y, column1.z, column1.w, column2.x, column2.y, column2.z, column2.w,

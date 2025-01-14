@@ -34,7 +34,7 @@ class Stage {
 	public var VP(get, null):Mat3;
 
 	inline function get_VP() {
-		return S2D.projection * camera._transformation;
+		return S2D.projection * camera._model;
 	}
 
 	@:isVar var lightsData(get, null):Float32Array;

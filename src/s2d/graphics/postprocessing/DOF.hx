@@ -37,7 +37,7 @@ class DOF extends PPEffect {
 		final g4 = target.g4;
 
 		final invVP = S2D.stage.VP.inverse();
-		final camPos = S2D.stage.camera.transformation.getTranslation();
+		final camPos = S2D.stage.camera.model.getTranslation();
 
 		g2.begin();
 		g4.setPipeline(pipeline);

@@ -3,6 +3,7 @@ package s2d.math;
 import kha.FastFloat;
 import kha.math.FastMatrix4;
 
+@:forward(_00, _10, _20, _30, _01, _11, _21, _31, _02, _12, _22, _32, _03, _13, _23, _33)
 abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 	#if !macro
 	extern public static inline function identity():Mat4 {
@@ -139,66 +140,6 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 		return 'mat4(' + '${this._00}, ${this._10}, ${this._20}, ${this._30}, ' + '${this._01}, ${this._11}, ${this._21}, ${this._31}, '
 			+ '${this._02}, ${this._12}, ${this._22}, ${this._32}, ' + '${this._03}, ${this._13}, ${this._23}, ${this._33}' + ')';
 	}
-
-	@:op([])
-	inline function arrayRead(i:Int):Vec4
-		return switch i {
-			case 0: {
-					x: this._00,
-					y: this._10,
-					z: this._20,
-					w: this._30
-				}
-			case 1: {
-					x: this._01,
-					y: this._11,
-					z: this._21,
-					w: this._31
-				}
-			case 2: {
-					x: this._02,
-					y: this._12,
-					z: this._22,
-					w: this._32
-				}
-			case 3: {
-					x: this._03,
-					y: this._13,
-					z: this._23,
-					w: this._33
-				}
-			default: null;
-		}
-
-	@:op([])
-	inline function arrayWrite(i:Int, v:Vec4)
-		return switch i {
-			case 0: {
-					this._00 = v.x;
-					this._10 = v.y;
-					this._20 = v.z;
-					this._30 = v.w;
-				}
-			case 1: {
-					this._01 = v.x;
-					this._11 = v.y;
-					this._21 = v.z;
-					this._31 = v.w;
-				}
-			case 2: {
-					this._02 = v.x;
-					this._12 = v.y;
-					this._22 = v.z;
-					this._32 = v.w;
-				}
-			case 3: {
-					this._03 = v.x;
-					this._13 = v.y;
-					this._23 = v.z;
-					this._33 = v.w;
-				}
-			default: null;
-		}
 
 	@:op(-a)
 	static inline function neg(m:Mat4) {
@@ -455,7 +396,27 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 
 	@:op(a * b)
 	static inline function preMulVec4(v:Vec4, m:Mat4):Vec4 {
-		return new Vec4(v.dot(m[0]), v.dot(m[1]), v.dot(m[2]), v.dot(m[3]));
+		return new Vec4(v.dot({
+			x: m._00,
+			y: m._10,
+			z: m._20,
+			w: m._30
+		}), v.dot({
+			x: m._01,
+			y: m._11,
+			z: m._21,
+			w: m._31
+		}), v.dot({
+			x: m._02,
+			y: m._12,
+			z: m._22,
+			w: m._32
+		}), v.dot({
+			x: m._03,
+			y: m._13,
+			z: m._23,
+			w: m._33
+		}));
 	}
 
 	@:op(a * b) @:commutative
@@ -481,7 +442,8 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 
 	@:op(a == b)
 	static inline function equal(m:Mat4, n:Mat4):Bool {
-		return m[0] == n[0] && m[1] == n[1] && m[2] == n[2] && m[3] == n[3];
+		return m._00 == n._00 && m._10 == n._10 && m._20 == n._20 && m._30 == n._30 && m._01 == n._01 && m._11 == n._11 && m._21 == n._21 && m._31 == n._31
+			&& m._02 == n._02 && m._12 == n._12 && m._22 == n._22 && m._32 == n._32 && m._03 == n._03 && m._13 == n._13 && m._23 == n._23 && m._33 == n._33;
 	}
 
 	@:op(a != b)
