@@ -100,32 +100,44 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 	}
 
 	@:op(++a)
-	static inline function prefixIncrement(m:Mat2) {
-		++m[0];
-		++m[1];
-		return m.clone();
+	static inline function prefixIncrement(m:Mat2):Mat2 {
+		var m:FastMatrix2 = m;
+		++m._00;
+		++m._10;
+		++m._01;
+		++m._11;
+		return Mat2.empty().copyFrom(m);
 	}
 
 	@:op(--a)
 	static inline function prefixDecrement(m:Mat2) {
-		--m[0];
-		--m[1];
-		return m.clone();
+		var m:FastMatrix2 = m;
+		--m._00;
+		--m._10;
+		--m._01;
+		--m._11;
+		return Mat2.empty().copyFrom(m);
 	}
 
 	@:op(a++)
 	static inline function postfixIncrement(m:Mat2) {
 		var ret = m.clone();
-		++m[0];
-		++m[1];
+		var m:FastMatrix2 = m;
+		++m._00;
+		++m._10;
+		++m._01;
+		++m._11;
 		return ret;
 	}
 
 	@:op(a--)
 	static inline function postfixDecrement(m:Mat2) {
 		var ret = m.clone();
-		--m[0];
-		--m[1];
+		var m:FastMatrix2 = m;
+		--m._00;
+		--m._10;
+		--m._01;
+		--m._11;
 		return ret;
 	}
 

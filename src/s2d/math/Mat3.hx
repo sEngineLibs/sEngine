@@ -170,36 +170,63 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 
 	@:op(++a)
 	static inline function prefixIncrement(m:Mat3) {
-		++m[0];
-		++m[1];
-		++m[2];
-		return m.clone();
+		var m:FastMatrix3 = m;
+		++m._00;
+		++m._10;
+		++m._20;
+		++m._01;
+		++m._11;
+		++m._21;
+		++m._02;
+		++m._12;
+		++m._22;
+		return Mat3.empty().copyFrom(m);
 	}
 
 	@:op(--a)
 	static inline function prefixDecrement(m:Mat3) {
-		var _m:FastMatrix3 = m;
-		--m[0];
-		--m[1];
-		--m[2];
-		return m.clone();
+		var m:FastMatrix3 = m;
+		--m._00;
+		--m._10;
+		--m._20;
+		--m._01;
+		--m._11;
+		--m._21;
+		--m._02;
+		--m._12;
+		--m._22;
+		return Mat3.empty().copyFrom(m);
 	}
 
 	@:op(a++)
 	static inline function postfixIncrement(m:Mat3) {
 		var ret = m.clone();
-		++m[0];
-		++m[1];
-		++m[2];
+		var m:FastMatrix3 = m;
+		++m._00;
+		++m._10;
+		++m._20;
+		++m._01;
+		++m._11;
+		++m._21;
+		++m._02;
+		++m._12;
+		++m._22;
 		return ret;
 	}
 
 	@:op(a--)
 	static inline function postfixDecrement(m:Mat3) {
 		var ret = m.clone();
-		--m[0];
-		--m[1];
-		--m[2];
+		var m:FastMatrix3 = m;
+		--m._00;
+		--m._10;
+		--m._20;
+		--m._01;
+		--m._11;
+		--m._21;
+		--m._02;
+		--m._12;
+		--m._22;
 		return ret;
 	}
 
