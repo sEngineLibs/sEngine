@@ -1,5 +1,6 @@
 package s2d;
 
+import s2d.events.Dispatcher;
 import kha.Assets;
 import kha.Canvas;
 import kha.graphics4.IndexBuffer;
@@ -90,6 +91,7 @@ class S2D {
 
 	static inline function update() {
 		Time.update();
+		Dispatcher.update();
 		Action.update(Time.time);
 	}
 

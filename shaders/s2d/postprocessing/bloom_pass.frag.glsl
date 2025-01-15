@@ -10,30 +10,27 @@ uniform vec3 params;
 in vec2 fragCoord;
 out vec4 fragColor;
 
-vec3 bloom(sampler2D tex, vec2 texelSize, vec2 coord) {
-    const float mipLevel = sqrt(radius);
+vec3 bloom(sampler2D tex, vec2 uv) {
+    vec2 texelSize = radius / resolution;
 
-    vec3 col = vec3(0.0);
-    texelSize *= radius;
+    vec3 col;
+    col += texture(tex, uv + vec2(-1.0, -1.0) * texelSize, radius).rgb * (1.0 / 16.0);
+    col += texture(tex, uv + vec2(0.0, -1.0) * texelSize, radius).rgb * (1.0 / 8.0);
+    col += texture(tex, uv + vec2(1.0, -1.0) * texelSize, radius).rgb * (1.0 / 16.0);
 
-    col += textureLod(tex, coord + vec2(-1, -1) * texelSize, mipLevel).rgb * 1 / 16;
-    col += textureLod(tex, coord + vec2(0, -1) * texelSize, mipLevel).rgb * 1 / 8;
-    col += textureLod(tex, coord + vec2(1, -1) * texelSize, mipLevel).rgb * 1 / 16;
+    col += texture(tex, uv + vec2(-1.0, 0.0) * texelSize, radius).rgb * (1.0 / 8.0);
+    col += texture(tex, uv + vec2(0.0, 0.0) * texelSize, radius).rgb * (1.0 / 4.0);
+    col += texture(tex, uv + vec2(1.0, 0.0) * texelSize, radius).rgb * (1.0 / 8.0);
 
-    col += textureLod(tex, coord + vec2(-1, 0) * texelSize, mipLevel).rgb * 1 / 8;
-    col += textureLod(tex, coord + vec2(0, 0) * texelSize, mipLevel).rgb * 1 / 4;
-    col += textureLod(tex, coord + vec2(1, 0) * texelSize, mipLevel).rgb * 1 / 8;
+    col += texture(tex, uv + vec2(-1.0, 1.0) * texelSize, radius).rgb * (1.0 / 16.0);
+    col += texture(tex, uv + vec2(0.0, 1.0) * texelSize, radius).rgb * (1.0 / 8.0);
+    col += texture(tex, uv + vec2(1.0, 1.0) * texelSize, radius).rgb * (1.0 / 16.0);
 
-    col += textureLod(tex, coord + vec2(-1, 1) * texelSize, mipLevel).rgb * 1 / 16;
-    col += textureLod(tex, coord + vec2(0, 1) * texelSize, mipLevel).rgb * 1 / 8;
-    col += textureLod(tex, coord + vec2(1, 1) * texelSize, mipLevel).rgb * 1 / 16;
-
-    return smoothstep(threshold, 1.0, col);
+    return col;
 }
 
 void main() {
-    vec2 texelSize = 1.0 / resolution;
     vec3 col = texture(textureMap, fragCoord).rgb;
-    col += intensity * bloom(textureMap, texelSize, fragCoord);
-    fragColor = vec4(col, 1.0);
+    vec3 bloom = clamp(bloom(textureMap, fragCoord) - threshold, 0.0, 1.0) * 1.0 / (1.0 - threshold);
+    fragColor = vec4(1.0 - (1.0 - col) * (1.0 - bloom * intensity), 1.0);
 }
