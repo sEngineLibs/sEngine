@@ -1,14 +1,17 @@
 #version 450
 
-uniform float rotation;
+uniform vec2 spriteParams;
+#define spriteRotation spriteParams[0]
+#define spriteZ spriteParams[1]
+
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
 uniform sampler2D ormMap;
 uniform sampler2D emissionMap;
 
-uniform float Params[2];
-#define depthScale Params[0]
-#define emissionStrength Params[1]
+uniform float matParams[2];
+#define depthScale matParams[0]
+#define emissionStrength matParams[1]
 
 in vec2 fragUV;
 
@@ -26,12 +29,12 @@ void main() {
 
     // tangent space -> world space
     vec2 n = normal.xy * 2.0 - 1.0;
-    float rotSin = sin(rotation);
-    float rotCos = cos(rotation);
+    float rotSin = sin(-spriteRotation);
+    float rotCos = cos(-spriteRotation);
     normal.x = rotCos * n.x - rotSin * n.y;
     normal.y = rotSin * n.x + rotCos * n.y;
     normal.xy = normal.xy * 0.5 + 0.5;
-    normal.z = (normal.z * 2.0 - 1.0) * depthScale;
+    normal.z = spriteZ + normal.z * depthScale;
 
     albedo.a = step(0.5, albedo.a);
 

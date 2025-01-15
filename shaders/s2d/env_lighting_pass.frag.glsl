@@ -19,7 +19,7 @@ vec3 envLighting(vec3 normal, vec3 color, float roughness, float metalness) {
     vec3 V = normalize(viewDir);
 
     // radiance
-    vec3 reflection = normalize(reflect(-V, normal));
+    vec3 reflection = normalize(reflect(V, normal));
     float mipLevel = roughness * 10.0;
     vec3 radiance = textureLod(envMap, reflection.xy * 0.5 + 0.5, mipLevel).rgb;
 

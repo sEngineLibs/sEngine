@@ -1,36 +1,35 @@
 package s2d.graphics;
 
 import kha.Image;
+import haxe.ds.Vector;
 
-abstract PingPongBuffer(Array<Image>) {
-	public inline function new(width:Int, height:Int) {
-		this = [Image.createRenderTarget(width, height), Image.createRenderTarget(width, height)];
+abstract PingPongBuffer(Vector<Image>) {
+	public static var length = 2;
+
+	public var src(get, never):Image;
+	public var tgt(get, never):Image;
+
+	public inline function new(width:Int, heigth:Int) {
+		this = new Vector(length);
+		resize(width, heigth);
 	}
 
-	public var src(get, set):Image;
-	public var tgt(get, set):Image;
+	public inline function resize(width:Int, heigth:Int) {
+		for (i in 0...length)
+			this[i] = Image.createRenderTarget(width, heigth, RGBA32, DepthOnly);
+	}
+
+	public inline function swap() {
+		final k = this[0];
+		this[0] = this[1];
+		this[1] = k;
+	}
 
 	inline function get_src():Image {
 		return this[0];
 	}
 
-	inline function set_src(value:Image):Image {
-		this[0] = value;
-		return value;
-	}
-
 	inline function get_tgt():Image {
 		return this[1];
-	}
-
-	inline function set_tgt(value:Image):Image {
-		this[1] = value;
-		return value;
-	}
-
-	public inline function swap():Void {
-		var tmp = this[0];
-		this[0] = this[1];
-		this[1] = tmp;
 	}
 }

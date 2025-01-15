@@ -8,11 +8,11 @@
 uniform sampler2D textureMap;
 uniform vec2 resolution;
 
-uniform float Params[7];
-#define posterizeGamma Params[0]
-#define posterizeSteps Params[1]
-#define vignetteStrength Params[2]
-#define vignetteColor vec4(Params[3], Params[4], Params[5], Params[6])
+uniform float params[7];
+#define posterizeGamma params[0]
+#define posterizeSteps params[1]
+#define vignetteStrength params[2]
+#define vignetteColor vec4(params[3], params[4], params[5], params[6])
 
 in vec2 fragCoord;
 out vec4 fragColor;

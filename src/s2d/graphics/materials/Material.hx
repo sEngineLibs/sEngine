@@ -11,7 +11,7 @@ class Material {
 	public var ormMap:Image;
 	public var emissionMap:Image;
 
-	public var params:Float32Array;
+	var params:Float32Array;
 	public var depthScale(get, set):Float;
 	public var emissionStrength(get, set):Float;
 	public var sheet:SpriteSheet = new SpriteSheet(1, 1);

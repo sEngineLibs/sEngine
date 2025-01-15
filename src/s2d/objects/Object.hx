@@ -11,27 +11,39 @@ class Object {
 	@:isVar public var children(default, null):Array<Object> = [];
 
 	var _model(get, never):Mat3;
+	var _z(get, never):FastFloat;
 
 	public var model:Mat3 = Mat3.identity();
 	public var x(get, set):FastFloat;
 	public var y(get, set):FastFloat;
+	public var z:FastFloat;
 	public var scaleX(get, set):FastFloat;
 	public var scaleY(get, set):FastFloat;
 	public var rotation(get, set):FastFloat;
 
 	public inline function new() {}
 
-	public inline function setParent(value:Object):Void {
-		if (parent == value || value == null)
-			return;
-		value.addChild(this);
-		parent = value;
-	}
-
 	public inline function addChild(value:Object):Void {
 		if (value == null || value == this || children.contains(value))
 			return;
-		value.setParent(this);
+		value.parent = this;
+		children.push(value);
+	}
+
+	public inline function setParent(value:Object):Void {
+		value.addChild(this);
+	}
+
+	public inline function removeChild(value:Object):Void {
+		if (value == null || value == this || !children.contains(value))
+			return;
+		value.parent = null;
+		children.remove(value);
+	}
+
+	public inline function removeParent():Void {
+		if (parent != null)
+			parent.removeChild(this);
 	}
 
 	overload extern public inline function moveG(x:FastFloat, y:FastFloat) {
@@ -152,6 +164,10 @@ class Object {
 
 	inline function get__model():Mat3 {
 		return parent == null ? model : parent._model * model;
+	}
+
+	inline function get__z():FastFloat {
+		return parent == null ? z : parent._z + z;
 	}
 
 	inline function get_x():FastFloat {

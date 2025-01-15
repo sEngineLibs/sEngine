@@ -39,7 +39,7 @@ class Compositor extends PPEffect {
 	inline function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
 		resolutionCL = pipeline.getConstantLocation("resolution");
-		paramsCL = pipeline.getConstantLocation("Params");
+		paramsCL = pipeline.getConstantLocation("params");
 	}
 
 	inline function render(target:Canvas) {

@@ -2,9 +2,11 @@ package s2d.graphics.postprocessing;
 
 import kha.Canvas;
 import kha.Shaders;
-import kha.math.Vector2;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
+// s2d
+import s2d.math.Vec2;
+import s2d.math.SMath;
 
 class Fisheye extends PPEffect {
 	var textureMapTU:TextureUnit;
@@ -12,7 +14,7 @@ class Fisheye extends PPEffect {
 	var positionCL:ConstantLocation;
 	var strengthCL:ConstantLocation;
 
-	public var position:Vector2 = {x: 0.5, y: 0.5};
+	public var position:Vec2 = vec2(0.5);
 	public var strength:Float = 0.0;
 
 	inline function setPipeline() {

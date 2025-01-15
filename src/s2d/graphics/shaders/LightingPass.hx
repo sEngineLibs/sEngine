@@ -13,17 +13,17 @@ class LightingPass {
 	static var envPipeline:PipelineState;
 	static var pipeline:PipelineState;
 
+	static var envEmissionMapTU:TextureUnit;
+	#if S2D_RP_ENV_LIGHTING
+	static var envMapTU:TextureUnit;
 	static var envAlbedoMapTU:TextureUnit;
 	static var envNormalMapTU:TextureUnit;
-	static var envEmissionMapTU:TextureUnit;
 	static var envORMMapTU:TextureUnit;
+	#end
 	static var albedoMapTU:TextureUnit;
 	static var normalMapTU:TextureUnit;
 	static var emissionMapTU:TextureUnit;
 	static var ormMapTU:TextureUnit;
-	#if S2D_RP_ENV_LIGHTING
-	static var envMapTU:TextureUnit;
-	#end
 	static var invVPCL:ConstantLocation;
 	static var lightsDataCL:ConstantLocation;
 
@@ -49,17 +49,17 @@ class LightingPass {
 		pipeline.blendOperation = Add;
 		pipeline.compile();
 
+		#if S2D_RP_ENV_LIGHTING
+		envMapTU = envPipeline.getTextureUnit("envMap");
 		envAlbedoMapTU = envPipeline.getTextureUnit("albedoMap");
 		envNormalMapTU = envPipeline.getTextureUnit("normalMap");
-		envEmissionMapTU = envPipeline.getTextureUnit("emissionMap");
 		envORMMapTU = envPipeline.getTextureUnit("ormMap");
+		#end
+		envEmissionMapTU = envPipeline.getTextureUnit("emissionMap");
 		albedoMapTU = pipeline.getTextureUnit("albedoMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		emissionMapTU = pipeline.getTextureUnit("emissionMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
-		#if S2D_RP_ENV_LIGHTING
-		envMapTU = envPipeline.getTextureUnit("envMap");
-		#end
 
 		invVPCL = pipeline.getConstantLocation("invVP");
 		lightsDataCL = pipeline.getConstantLocation("lightsData");
@@ -75,21 +75,21 @@ class LightingPass {
 		g4.setPipeline(envPipeline);
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
-		g4.setTexture(envAlbedoMapTU, Renderer.gBuffer[0]);
-		g4.setTexture(envNormalMapTU, Renderer.gBuffer[1]);
-		g4.setTexture(envEmissionMapTU, Renderer.gBuffer[2]);
-		g4.setTexture(envORMMapTU, Renderer.gBuffer[3]);
+		g4.setTexture(envEmissionMapTU, Renderer.gBuffer.emissionMap);
 		#if S2D_RP_ENV_LIGHTING
 		g4.setTexture(envMapTU, S2D.stage.environmentMap);
+		g4.setTexture(envAlbedoMapTU, Renderer.gBuffer.albedoMap);
+		g4.setTexture(envNormalMapTU, Renderer.gBuffer.normalMap);
+		g4.setTexture(envORMMapTU, Renderer.gBuffer.ormMap);
 		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
 		g4.drawIndexedVertices();
 		// stage lights
 		g4.setPipeline(pipeline);
-		g4.setTexture(albedoMapTU, Renderer.gBuffer[0]);
-		g4.setTexture(normalMapTU, Renderer.gBuffer[1]);
-		g4.setTexture(emissionMapTU, Renderer.gBuffer[2]);
-		g4.setTexture(ormMapTU, Renderer.gBuffer[3]);
+		g4.setTexture(albedoMapTU, Renderer.gBuffer.albedoMap);
+		g4.setTexture(normalMapTU, Renderer.gBuffer.normalMap);
+		g4.setTexture(emissionMapTU, Renderer.gBuffer.emissionMap);
+		g4.setTexture(ormMapTU, Renderer.gBuffer.ormMap);
 		g4.setMatrix3(invVPCL, invVP);
 		g4.setFloats(lightsDataCL, S2D.stage.lightsData);
 		g4.drawIndexedVertices();

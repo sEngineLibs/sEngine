@@ -9,20 +9,21 @@ import kha.graphics4.ConstantLocation;
 @:allow(s2d.graphics.Renderer)
 @:access(s2d.graphics.Renderer)
 @:access(s2d.objects.Sprite)
+@:access(s2d.graphics.materials.Material)
 class GeometryPass {
 	static var pipeline:PipelineState;
 
 	// stage uniforms
 	static var mvpCL:ConstantLocation;
 	// sprite uniforms
-	static var rotationCL:ConstantLocation;
+	static var spriteParamsCL:ConstantLocation;
 	static var cropRectCL:ConstantLocation;
 	// material uniforms
 	static var albedoMapTU:TextureUnit;
 	static var normalMapTU:TextureUnit;
 	static var ormMapTU:TextureUnit;
 	static var emissionMapTU:TextureUnit;
-	static var paramsCL:ConstantLocation;
+	static var matParamsCL:ConstantLocation;
 
 	static inline function compile() {
 		var structure = new VertexStructure();
@@ -41,22 +42,26 @@ class GeometryPass {
 		// stage uniforms
 		mvpCL = pipeline.getConstantLocation("MVP");
 		// sprite uniforms
-		rotationCL = pipeline.getConstantLocation("rotation");
+		spriteParamsCL = pipeline.getConstantLocation("spriteParams");
 		cropRectCL = pipeline.getConstantLocation("cropRect");
 		// material uniforms
 		albedoMapTU = pipeline.getTextureUnit("albedoMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
 		emissionMapTU = pipeline.getTextureUnit("emissionMap");
-		paramsCL = pipeline.getConstantLocation("Params");
+		matParamsCL = pipeline.getConstantLocation("matParams");
 	}
 
 	static inline function render():Void {
-		final g4 = Renderer.gBuffer[0].g4;
+		final g4 = Renderer.gBuffer.albedoMap.g4;
 		final VP = S2D.stage.VP;
 		final sprites = S2D.stage.sprites;
 
-		g4.begin([Renderer.gBuffer[1], Renderer.gBuffer[2], Renderer.gBuffer[3]]);
+		g4.begin([
+			Renderer.gBuffer.normalMap,
+			Renderer.gBuffer.emissionMap,
+			Renderer.gBuffer.ormMap
+		]);
 		g4.clear(Black);
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(S2D.indices);
@@ -66,13 +71,13 @@ class GeometryPass {
 			final cropRect = ct * sprite.cropRect;
 
 			g4.setMatrix3(mvpCL, VP * sprite._model);
-			g4.setFloat(rotationCL, sprite.rotation);
+			g4.setFloat2(spriteParamsCL, sprite.rotation, sprite._z);
 			g4.setVector4(cropRectCL, cropRect);
 			g4.setTexture(albedoMapTU, sprite.material.albedoMap);
 			g4.setTexture(normalMapTU, sprite.material.normalMap);
 			g4.setTexture(ormMapTU, sprite.material.ormMap);
 			g4.setTexture(emissionMapTU, sprite.material.emissionMap);
-			g4.setFloats(paramsCL, sprite.material.params);
+			g4.setFloats(matParamsCL, sprite.material.params);
 			g4.drawIndexedVertices();
 		}
 		g4.end();

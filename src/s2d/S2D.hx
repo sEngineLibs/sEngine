@@ -11,7 +11,6 @@ import s2d.core.Time;
 import s2d.math.SMath;
 import s2d.math.Vec2;
 import s2d.math.Mat3;
-import s2d.objects.Sprite;
 import s2d.graphics.Renderer;
 import s2d.animation.Action;
 

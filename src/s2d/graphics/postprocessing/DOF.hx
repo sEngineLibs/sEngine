@@ -4,12 +4,13 @@ import kha.Canvas;
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
+// s2d
+import s2d.math.SMath;
 
 class DOF extends PPEffect {
 	var textureMapTU:TextureUnit;
 	var resolutionCL:ConstantLocation;
-	var gBufferTU:TextureUnit;
-	var invVPCL:ConstantLocation;
+	var normalMapTU:TextureUnit;
 	var cameraPosCL:ConstantLocation;
 	var focusDistanceCL:ConstantLocation;
 	var blurSizeCL:ConstantLocation;
@@ -25,8 +26,7 @@ class DOF extends PPEffect {
 	inline function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
 		resolutionCL = pipeline.getConstantLocation("resolution");
-		gBufferTU = pipeline.getTextureUnit("gBuffer");
-		invVPCL = pipeline.getConstantLocation("invVP");
+		normalMapTU = pipeline.getTextureUnit("normalMap");
 		cameraPosCL = pipeline.getConstantLocation("cameraPos");
 		focusDistanceCL = pipeline.getConstantLocation("focusDistance");
 		blurSizeCL = pipeline.getConstantLocation("blurSize");
@@ -36,17 +36,16 @@ class DOF extends PPEffect {
 		final g2 = target.g2;
 		final g4 = target.g4;
 
-		final invVP = S2D.stage.VP.inverse();
-		final camPos = S2D.stage.camera.model.getTranslation();
+		final c = S2D.stage.camera;
+		final camPos = vec3(c.x, c.y, c.z);
 
 		g2.begin();
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
-		g4.setTexture(gBufferTU, Renderer.gBuffer);
+		g4.setTexture(normalMapTU, Renderer.gBuffer.normalMap);
 		g4.setTexture(textureMapTU, Renderer.ppBuffer.src);
 		g4.setFloat2(resolutionCL, S2D.width, S2D.height);
-		g4.setMatrix(invVPCL, invVP);
 		g4.setVector3(cameraPosCL, camPos);
 		g4.setFloat(focusDistanceCL, focusDistance);
 		g4.setFloat(blurSizeCL, blurSize);

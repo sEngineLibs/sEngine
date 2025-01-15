@@ -9,7 +9,7 @@ import s2d.graphics.shaders.*;
 class Renderer {
 	static var commands:Array<Void->Void>;
 
-	static var gBuffer:Array<Image>;
+	static var gBuffer:GBuffer;
 	static var ppBuffer:PingPongBuffer;
 
 	public static inline function init(width:Int, height:Int) {
@@ -43,12 +43,7 @@ class Renderer {
 	}
 
 	public static inline function resize(width:Int, height:Int) {
-		gBuffer = [
-			Image.createRenderTarget(width, height, RGBA32, DepthOnly),
-			Image.createRenderTarget(width, height, RGBA32, DepthOnly),
-			Image.createRenderTarget(width, height, RGBA32, DepthOnly),
-			Image.createRenderTarget(width, height, RGBA32, DepthOnly)
-		];
+		gBuffer = new GBuffer(width, height);
 		ppBuffer = new PingPongBuffer(width, height);
 	}
 

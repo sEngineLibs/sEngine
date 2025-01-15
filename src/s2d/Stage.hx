@@ -14,8 +14,8 @@ class Stage {
 	public var lights:Array<Light> = [];
 	public var camera:Object = new Object();
 
-	var maxLights:Int = 16;
-	var lightStructSize:Int = 8;
+	static final maxLights:Int = 16;
+	static final lightStructSize:Int = 8;
 
 	#if S2D_RP_ENV_LIGHTING
 	@:isVar public var environmentMap(default, set):Image;
@@ -48,7 +48,7 @@ class Stage {
 
 			lightsData[ind + 0] = light.x;
 			lightsData[ind + 1] = light.y;
-			lightsData[ind + 2] = 0.0;
+			lightsData[ind + 2] = light.z;
 			lightsData[ind + 3] = light.color.R;
 			lightsData[ind + 4] = light.color.G;
 			lightsData[ind + 5] = light.color.B;

@@ -1,6 +1,5 @@
 package s2d.objects;
 
-// s2d
 import s2d.math.Vec4;
 import s2d.graphics.materials.Material;
 
