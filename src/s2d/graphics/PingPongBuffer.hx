@@ -15,8 +15,9 @@ abstract PingPongBuffer(Vector<Image>) {
 	}
 
 	public inline function resize(width:Int, heigth:Int) {
-		for (i in 0...length)
-			this[i] = Image.createRenderTarget(width, heigth, RGBA32, DepthOnly);
+		for (i in 0...length) {
+			this[i] = Image.createRenderTarget(width, heigth);
+		}
 	}
 
 	public inline function swap() {

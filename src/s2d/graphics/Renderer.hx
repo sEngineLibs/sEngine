@@ -2,7 +2,8 @@ package s2d.graphics;
 
 import kha.Image;
 // s2d
-import s2d.graphics.shaders.*;
+import s2d.graphics.lighting.GeometryPass;
+import s2d.graphics.lighting.LightingPass;
 
 @:allow(s2d.graphics.postprocessing.PPEffect)
 @:access(s2d.graphics.postprocessing.PPEffect)
@@ -24,6 +25,11 @@ class Renderer {
 		#if S2D_PP_DOF
 		PostProcessing.dof.index = 3;
 		PostProcessing.dof.enable();
+		#end
+
+		#if S2D_PP_BLOOM
+		PostProcessing.bloom.index = 3;
+		PostProcessing.bloom.enable();
 		#end
 
 		#if S2D_PP_FISHEYE
@@ -56,6 +62,9 @@ class Renderer {
 		#end
 		#if S2D_PP_MIST
 		PostProcessing.mist.compile();
+		#end
+		#if S2D_PP_BLOOM
+		PostProcessing.bloom.compile();
 		#end
 		#if S2D_PP_FILTER
 		PostProcessing.filter.compile();

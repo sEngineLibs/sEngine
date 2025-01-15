@@ -82,8 +82,8 @@ void main() {
     vec3 position = vec3(fragCoord, normal.z);
     position = invVP * vec3(position * 2.0 - 1.0);
 
-    normal.z = sqrt(max(0.5, 1.0 - normal.x * normal.x - normal.y * normal.y));
     normal = normalize(normal * 2.0 - 1.0);
+    normal.z = sqrt(max(0.5, 1.0 - normal.x * normal.x - normal.y * normal.y));
 
     // lighting
     vec3 c = vec3(0.0);

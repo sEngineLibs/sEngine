@@ -1,4 +1,4 @@
-package s2d.graphics.shaders;
+package s2d.graphics.lighting;
 
 import kha.Shaders;
 import kha.graphics4.TextureUnit;

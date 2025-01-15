@@ -37,12 +37,6 @@ void main() {
     normal.z = spriteZ + normal.z * depthScale;
 
     albedo.a = step(0.5, albedo.a);
-
-    // premultiply alpha
-    normal.rgb *= albedo.a;
-    emission.rgb *= albedo.a;
-    orm.rgb *= albedo.a;
-
     albedoColor = albedo;
     normalColor = vec4(normal, albedo.a);
     emissionColor = vec4(emission, albedo.a);

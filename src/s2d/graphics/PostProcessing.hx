@@ -9,6 +9,9 @@ class PostProcessing {
 	#if S2D_PP_MIST
 	@:isVar public static var mist(default, never) = new Mist();
 	#end
+	#if S2D_PP_BLOOM
+	@:isVar public static var bloom(default, never) = new Bloom();
+	#end
 	#if S2D_PP_FISHEYE
 	@:isVar public static var fisheye(default, never) = new Fisheye();
 	#end

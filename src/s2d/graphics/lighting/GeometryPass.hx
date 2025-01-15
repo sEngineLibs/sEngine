@@ -1,10 +1,12 @@
-package s2d.graphics.shaders;
+package s2d.graphics.lighting;
 
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
+// s2d
+import s2d.math.SMath;
 
 @:allow(s2d.graphics.Renderer)
 @:access(s2d.graphics.Renderer)
@@ -35,7 +37,7 @@ class GeometryPass {
 		pipeline.fragmentShader = Shaders.geometry_pass_frag;
 		pipeline.alphaBlendSource = SourceAlpha;
 		pipeline.alphaBlendDestination = InverseSourceAlpha;
-		pipeline.blendSource = BlendOne;
+		pipeline.blendSource = SourceAlpha;
 		pipeline.blendDestination = InverseSourceAlpha;
 		pipeline.compile();
 
@@ -67,11 +69,13 @@ class GeometryPass {
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
 		for (sprite in sprites) {
-			var ct = sprite.material.sheet.curTile;
-			final cropRect = ct * sprite.cropRect;
+			final ct = sprite.material.sheet.curTile;
+			final model = sprite._model;
+			final rot = atan2(model._10, model._00);
+			final cropRect = vec4(mix(ct.xy, ct.zw, sprite.cropRect.xy), mix(ct.xy, ct.zw, sprite.cropRect.zw));
 
 			g4.setMatrix3(mvpCL, VP * sprite._model);
-			g4.setFloat2(spriteParamsCL, sprite.rotation, sprite._z);
+			g4.setFloat2(spriteParamsCL, rot, sprite._z);
 			g4.setVector4(cropRectCL, cropRect);
 			g4.setTexture(albedoMapTU, sprite.material.albedoMap);
 			g4.setTexture(normalMapTU, sprite.material.normalMap);
