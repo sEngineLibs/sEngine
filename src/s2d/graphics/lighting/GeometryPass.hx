@@ -35,10 +35,8 @@ class GeometryPass {
 		pipeline.inputLayout = [structure];
 		pipeline.vertexShader = Shaders.geometry_pass_vert;
 		pipeline.fragmentShader = Shaders.geometry_pass_frag;
-		pipeline.alphaBlendSource = SourceAlpha;
-		pipeline.alphaBlendDestination = InverseSourceAlpha;
-		pipeline.blendSource = SourceAlpha;
-		pipeline.blendDestination = InverseSourceAlpha;
+		pipeline.depthWrite = true;
+		pipeline.depthMode = Greater;
 		pipeline.compile();
 
 		// stage uniforms
@@ -64,7 +62,7 @@ class GeometryPass {
 			Renderer.gBuffer.emissionMap,
 			Renderer.gBuffer.ormMap
 		]);
-		g4.clear(Black);
+		g4.clear(Black, 0.0);
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);

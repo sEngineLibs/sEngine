@@ -4,8 +4,10 @@ package s2d.events;
 class Dispatcher {
 	static var listeners:Array<EventListener> = [];
 
-	public static inline function add(event:Void->Bool, callback:Void->Void, ?breakable:Bool = true) {
-		listeners.push(new EventListener(event, callback, breakable));
+	public static inline function addEventListener(event:Void->Bool, callback:Void->Void, ?breakable:Bool = true):EventListener {
+		final listener = new EventListener(event, callback, breakable);
+		listeners.push(listener);
+		return listener;
 	}
 
 	static inline function update() {

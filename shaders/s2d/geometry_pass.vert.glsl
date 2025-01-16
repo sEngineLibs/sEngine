@@ -2,6 +2,8 @@
 
 uniform mat3 MVP;
 uniform vec4 cropRect;
+uniform vec2 spriteParams;
+#define spriteZ spriteParams[1]
 
 in vec2 vertCoord;
 out vec2 fragUV;
@@ -9,7 +11,7 @@ out vec2 fragUV;
 void main() {
     // calculate vertex position
     vec3 pos = MVP * vec3(vertCoord, 1.0);
-    gl_Position = vec4(pos, 1.0);
+    gl_Position = vec4(pos.xy, spriteZ, 1.0);
 
     // calculate UV
     fragUV = mix(cropRect.xy, cropRect.zw, vertCoord * 0.5 + 0.5);
