@@ -2,8 +2,8 @@
 
 #define FXAA_SPAN_MAX 8.0
 #define FXAA_REDUCE_MUL   (0.25 / FXAA_SPAN_MAX)
-#define FXAA_REDUCE_MIN   (1.0 / 32.0)
-#define FXAA_SUBPIX_SHIFT 0.75
+#define FXAA_REDUCE_MIN   (1.0 / 128.0)
+#define FXAA_SUBPIX_SHIFT 0.33
 
 uniform sampler2D textureMap;
 uniform vec2 resolution;
