@@ -20,7 +20,7 @@ class DOF extends PPEffect {
 
 	inline function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
-		pipeline.fragmentShader = Shaders.dof_pass_frag;
+		pipeline.fragmentShader = Shaders.dof_frag;
 	}
 
 	inline function getUniforms() {

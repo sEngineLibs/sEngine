@@ -33,8 +33,12 @@ class GeometryPass {
 
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];
-		pipeline.vertexShader = Shaders.geometry_pass_vert;
-		pipeline.fragmentShader = Shaders.geometry_pass_frag;
+		pipeline.vertexShader = Shaders.sprite_vert;
+		pipeline.fragmentShader = Shaders.geometry_deferred_frag;
+		pipeline.alphaBlendSource = SourceAlpha;
+		pipeline.alphaBlendDestination = InverseSourceAlpha;
+		pipeline.blendSource = SourceAlpha;
+		pipeline.blendDestination = InverseSourceAlpha;
 		pipeline.depthWrite = true;
 		pipeline.depthMode = Greater;
 		pipeline.compile();

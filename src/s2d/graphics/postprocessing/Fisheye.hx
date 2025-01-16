@@ -19,7 +19,7 @@ class Fisheye extends PPEffect {
 
 	inline function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
-		pipeline.fragmentShader = Shaders.fisheye_pass_frag;
+		pipeline.fragmentShader = Shaders.fisheye_frag;
 	}
 
 	inline function getUniforms() {

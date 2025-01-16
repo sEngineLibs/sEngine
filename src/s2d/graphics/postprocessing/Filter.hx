@@ -20,7 +20,7 @@ class Filter extends PPEffect {
 
 	inline function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
-		pipeline.fragmentShader = Shaders.filter_pass_frag;
+		pipeline.fragmentShader = Shaders.filter_frag;
 	}
 
 	inline function getUniforms() {

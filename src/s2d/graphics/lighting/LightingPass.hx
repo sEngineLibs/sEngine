@@ -34,7 +34,7 @@ class LightingPass {
 		envPipeline = new PipelineState();
 		envPipeline.inputLayout = [structure];
 		envPipeline.vertexShader = Shaders.s2d_2d_vert;
-		envPipeline.fragmentShader = Shaders.env_lighting_pass_frag;
+		envPipeline.fragmentShader = Shaders.env_lighting_deferred_frag;
 		envPipeline.blendSource = BlendOne;
 		envPipeline.blendDestination = BlendOne;
 		envPipeline.blendOperation = Add;
@@ -43,7 +43,7 @@ class LightingPass {
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
-		pipeline.fragmentShader = Shaders.lighting_pass_frag;
+		pipeline.fragmentShader = Shaders.lighting_deferred_frag;
 		pipeline.blendSource = BlendOne;
 		pipeline.blendDestination = BlendOne;
 		pipeline.blendOperation = Add;

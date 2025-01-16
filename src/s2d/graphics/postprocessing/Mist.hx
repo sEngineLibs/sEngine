@@ -21,7 +21,7 @@ class Mist extends PPEffect {
 
 	inline function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
-		pipeline.fragmentShader = Shaders.mist_pass_frag;
+		pipeline.fragmentShader = Shaders.mist_frag;
 	}
 
 	inline function getUniforms() {

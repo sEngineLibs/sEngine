@@ -33,7 +33,7 @@ class Compositor extends PPEffect {
 
 	inline function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
-		pipeline.fragmentShader = Shaders.compositor_pass_frag;
+		pipeline.fragmentShader = Shaders.compositor_frag;
 	}
 
 	inline function getUniforms() {
