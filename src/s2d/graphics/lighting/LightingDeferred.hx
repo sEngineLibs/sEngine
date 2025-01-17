@@ -67,8 +67,8 @@ class LightingDeferred {
 	}
 
 	static inline function render():Void {
-		final g2 = Renderer.ppBuffer.tgt.g2;
-		final g4 = Renderer.ppBuffer.tgt.g4;
+		final g2 = Renderer.buffer.tgt.g2;
+		final g4 = Renderer.buffer.tgt.g4;
 		final invVP = S2D.stage.VP.inverse();
 
 		g2.begin();
@@ -76,21 +76,21 @@ class LightingDeferred {
 		g4.setPipeline(envPipeline);
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
-		g4.setTexture(envEmissionMapTU, Renderer.gBuffer.emissionMap);
+		g4.setTexture(envEmissionMapTU, Renderer.buffer.emissionMap);
 		#if (S2D_RP_ENV_LIGHTING == 1)
 		g4.setTexture(envMapTU, S2D.stage.environmentMap);
-		g4.setTexture(envAlbedoMapTU, Renderer.gBuffer.albedoMap);
-		g4.setTexture(envNormalMapTU, Renderer.gBuffer.normalMap);
-		g4.setTexture(envORMMapTU, Renderer.gBuffer.ormMap);
+		g4.setTexture(envAlbedoMapTU, Renderer.buffer.albedoMap);
+		g4.setTexture(envNormalMapTU, Renderer.buffer.normalMap);
+		g4.setTexture(envORMMapTU, Renderer.buffer.ormMap);
 		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
 		g4.drawIndexedVertices();
 		// stage lights
 		g4.setPipeline(pipeline);
-		g4.setTexture(albedoMapTU, Renderer.gBuffer.albedoMap);
-		g4.setTexture(normalMapTU, Renderer.gBuffer.normalMap);
-		g4.setTexture(emissionMapTU, Renderer.gBuffer.emissionMap);
-		g4.setTexture(ormMapTU, Renderer.gBuffer.ormMap);
+		g4.setTexture(albedoMapTU, Renderer.buffer.albedoMap);
+		g4.setTexture(normalMapTU, Renderer.buffer.normalMap);
+		g4.setTexture(emissionMapTU, Renderer.buffer.emissionMap);
+		g4.setTexture(ormMapTU, Renderer.buffer.ormMap);
 		g4.setMatrix3(invVPCL, invVP);
 		g4.setFloats(lightsDataCL, S2D.stage.lightsData);
 		g4.drawIndexedVertices();

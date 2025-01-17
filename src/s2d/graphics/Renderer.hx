@@ -13,13 +13,11 @@ import s2d.graphics.lighting.LightingForward;
 @:access(s2d.graphics.postprocessing.PPEffect)
 class Renderer {
 	static var commands:Array<Void->Void>;
-
-	static var gBuffer:GBuffer;
-	static var ppBuffer:PingPongBuffer;
+	static var buffer:RenderBuffer;
 
 	public static inline function init(width:Int, height:Int) {
-		resize(width, height);
-		
+		buffer = new RenderBuffer(width, height);
+
 		#if (S2D_RP_LIGHTING_DEFFERED == 1)
 		commands = [GeometryDeferred.render, LightingDeferred.render];
 		#else
@@ -45,7 +43,7 @@ class Renderer {
 		PostProcessing.fisheye.index = 4;
 		PostProcessing.fisheye.enable();
 		#end
- 
+
 		#if S2D_PP_FILTER
 		PostProcessing.filter.index = 5;
 		PostProcessing.filter.enable();
@@ -58,13 +56,12 @@ class Renderer {
 	}
 
 	public static inline function resize(width:Int, height:Int) {
-		gBuffer = new GBuffer(width, height);
-		ppBuffer = new PingPongBuffer(width, height);
+		buffer.resize(width, height);
 	}
 
 	public static inline function compile() {
 		#if (S2D_RP_LIGHTING_DEFFERED == 1)
-		Geometry.compile();
+		GeometryDeferred.compile();
 		LightingDeferred.compile();
 		#else
 		LightingForward.compile();
@@ -93,6 +90,6 @@ class Renderer {
 	public static inline function render():Image {
 		for (command in commands)
 			command();
-		return ppBuffer.tgt;
+		return buffer.tgt;
 	};
 }

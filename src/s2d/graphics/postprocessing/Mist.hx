@@ -41,8 +41,8 @@ class Mist extends PPEffect {
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
-		g4.setTexture(textureMapTU, Renderer.ppBuffer.src);
-		g4.setTexture(depthMapTU, Renderer.gBuffer.depthMap);
+		g4.setTexture(textureMapTU, Renderer.buffer.src);
+		g4.setTexture(depthMapTU, Renderer.buffer.depthMap);
 		g4.setFloat2(mistScaleCL, near, far);
 		g4.setFloat4(mistColorCL, color.R, color.G, color.B, color.A);
 		g4.drawIndexedVertices();

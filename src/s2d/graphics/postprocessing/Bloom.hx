@@ -27,13 +27,13 @@ class Bloom extends PPEffect {
 		final g2 = target.g2;
 		final g4 = target.g4;
 
-		Renderer.ppBuffer.src.generateMipmaps(4);
+		Renderer.buffer.src.generateMipmaps(4);
 
 		g2.begin();
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
-		g4.setTexture(textureMapTU, Renderer.ppBuffer.src);
+		g4.setTexture(textureMapTU, Renderer.buffer.src);
 		g4.setTextureParameters(textureMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		g4.setFloat3(paramsCL, radius, threshold, intensity);
 		g4.drawIndexedVertices();

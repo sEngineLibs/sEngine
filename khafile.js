@@ -128,7 +128,7 @@ project.addAssets("assets/**", {
 // S2D_DEBUG_FPS -> enables FPS debugging
 
 // Renderer:
-// S2D_RP_DEFERRED -> deferred lighting (forward by default)
+// S2D_RP_LIGHTING_DEFERRED -> deferred lighting (forward by default)
 // S2D_RP_ENV_LIGHTING -> enables environment lighting
 // S2D_PP_BLOOM -> enables Bloom PP effect
 // S2D_PP_DOF -> enables Depth of Field PP effect

@@ -24,8 +24,9 @@ uniform float matParams[2];
 #define emissionStrength matParams[1]
 
 in vec2 fragUV;
-layout(location = 0) out vec4 fragColor;
-layout(location = 1) out vec4 depthColor;
+
+layout(location = 0) out vec4 depthColor;
+layout(location = 1) out vec4 fragColor;
 
 void main() {
     // fetch material textures
@@ -34,6 +35,7 @@ void main() {
     vec3 emission = texture(emissionMap, fragUV).rgb * emissionStrength;
     vec3 orm = texture(ormMap, fragUV).rgb;
     float depth = spriteZ + (1.0 - normal.a) * depthScale;
+    depthColor = vec4(vec3(depth), albedo.a);
 
     // tangent space -> world space
     vec3 n = normal.xyz * 2.0 - 1.0;
@@ -65,5 +67,4 @@ void main() {
         col += lighting(getLight(lightsData, i), position, n, albedo.rgb, roughness, metalness);
 
     fragColor = vec4((emission + occlusion * col) / albedo.a, albedo.a);
-    depthColor = vec4(vec3(depth), albedo.a);
 }

@@ -48,7 +48,7 @@ abstract class PPEffect {
 	abstract public function render(target:Canvas):Void;
 
 	public function command():Void {
-		Renderer.ppBuffer.swap();
-		render(Renderer.ppBuffer.tgt);
+		Renderer.buffer.swap();
+		render(Renderer.buffer.tgt);
 	}
 }

@@ -40,8 +40,6 @@ class GeometryDeferred {
 		pipeline.alphaBlendDestination = InverseSourceAlpha;
 		pipeline.blendSource = SourceAlpha;
 		pipeline.blendDestination = InverseSourceAlpha;
-		pipeline.depthWrite = true;
-		pipeline.depthMode = Greater;
 		pipeline.compile();
 
 		// stage uniforms
@@ -58,17 +56,17 @@ class GeometryDeferred {
 	}
 
 	static inline function render():Void {
-		final g4 = Renderer.gBuffer.albedoMap.g4;
+		final g4 = Renderer.buffer.albedoMap.g4;
 		final VP = S2D.stage.VP;
 		final sprites = S2D.stage.sprites;
 
 		g4.begin([
-			Renderer.gBuffer.normalMap,
-			Renderer.gBuffer.emissionMap,
-			Renderer.gBuffer.ormMap,
-			Renderer.gBuffer.depthMap
+			Renderer.buffer.normalMap,
+			Renderer.buffer.emissionMap,
+			Renderer.buffer.ormMap,
+			Renderer.buffer.depthMap
 		]);
-		g4.clear(Black, 0.0);
+		g4.clear(Black);
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);

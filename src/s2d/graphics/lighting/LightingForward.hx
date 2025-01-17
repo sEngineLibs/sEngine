@@ -1,5 +1,6 @@
 package s2d.graphics.lighting;
 
+#if (S2D_RP_LIGHTING_DEFFERED != 1)
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
@@ -66,11 +67,11 @@ class LightingForward {
 	}
 
 	static inline function render():Void {
-		final g4 = Renderer.ppBuffer.tgt.g4;
+		final g4 = Renderer.buffer.depthMap.g4;
 		final VP = S2D.stage.VP;
 		final sprites = S2D.stage.sprites;
 
-		g4.begin([Renderer.gBuffer.depthMap]);
+		g4.begin([Renderer.buffer.tgt]);
 		g4.clear(Black);
 		// emission + environment
 		g4.setPipeline(pipeline);
@@ -81,6 +82,7 @@ class LightingForward {
 		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
 		g4.setMatrix3(invVPCL, inverse(VP));
+		// lighting
 		for (sprite in sprites) {
 			final ct = sprite.material.sheet.curTile;
 			final model = sprite._model;
@@ -101,3 +103,4 @@ class LightingForward {
 		g4.end();
 	}
 }
+#end
