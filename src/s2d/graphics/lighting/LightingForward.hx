@@ -66,12 +66,12 @@ class LightingForward {
 	}
 
 	static inline function render():Void {
-		final g2 = Renderer.ppBuffer.tgt.g2;
 		final g4 = Renderer.ppBuffer.tgt.g4;
 		final VP = S2D.stage.VP;
 		final sprites = S2D.stage.sprites;
 
-		g2.begin();
+		g4.begin([Renderer.gBuffer.depthMap]);
+		g4.clear(Black);
 		// emission + environment
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(S2D.indices);
@@ -98,6 +98,6 @@ class LightingForward {
 			g4.setFloats(lightsDataCL, S2D.stage.lightsData);
 			g4.drawIndexedVertices();
 		}
-		g2.end();
+		g4.end();
 	}
 }

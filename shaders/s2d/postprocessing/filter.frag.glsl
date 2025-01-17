@@ -1,13 +1,15 @@
 #version 450
 
 uniform sampler2D textureMap;
-uniform vec2 resolution;
 uniform mat3 kernel;
 
 in vec2 fragCoord;
 out vec4 fragColor;
 
-vec3 convolve3x3(sampler2D tex, vec2 texelSize, vec2 coord, mat3 kernel) {
+vec3 convolve3x3(sampler2D tex, vec2 coord, mat3 kernel) {
+    vec2 R = textureSize(textureMap, 0);
+    vec2 texelSize = 1.0 / R;
+
     vec3 col = vec3(0.0);
     vec2 offset;
     for (int i = 0; i < 3; i++) {
@@ -21,7 +23,6 @@ vec3 convolve3x3(sampler2D tex, vec2 texelSize, vec2 coord, mat3 kernel) {
 }
 
 void main() {
-    vec2 texelSize = 1.0 / resolution;
-    vec3 col = convolve3x3(textureMap, texelSize, fragCoord, kernel);
+    vec3 col = convolve3x3(textureMap, fragCoord, kernel);
     fragColor = vec4(col, 1.0);
 }

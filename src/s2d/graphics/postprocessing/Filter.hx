@@ -9,7 +9,6 @@ import s2d.math.Mat3;
 
 class Filter extends PPEffect {
 	var textureMapTU:TextureUnit;
-	var resolutionCL:ConstantLocation;
 	var kernelCL:ConstantLocation;
 
 	public var kernels:Array<Mat3> = [];
@@ -25,7 +24,6 @@ class Filter extends PPEffect {
 
 	inline function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
-		resolutionCL = pipeline.getConstantLocation("resolution");
 		kernelCL = pipeline.getConstantLocation("kernel");
 	}
 
@@ -38,7 +36,6 @@ class Filter extends PPEffect {
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
 		g4.setTexture(textureMapTU, Renderer.ppBuffer.src);
-		g4.setFloat2(resolutionCL, S2D.width, S2D.height);
 		for (kernel in kernels) {
 			g4.setMatrix3(kernelCL, kernel);
 			g4.drawIndexedVertices();

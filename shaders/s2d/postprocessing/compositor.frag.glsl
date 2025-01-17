@@ -6,7 +6,6 @@
 #define FXAA_SUBPIX_SHIFT 0.75
 
 uniform sampler2D textureMap;
-uniform vec2 resolution;
 
 uniform float params[7];
 #define posterizeGamma params[0]

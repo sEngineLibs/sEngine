@@ -9,7 +9,6 @@ import kha.graphics4.ConstantLocation;
 
 class Compositor extends PPEffect {
 	var textureMapTU:TextureUnit;
-	var resolutionCL:ConstantLocation;
 	var paramsCL:ConstantLocation;
 
 	var params:Float32Array;
@@ -38,7 +37,6 @@ class Compositor extends PPEffect {
 
 	inline function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
-		resolutionCL = pipeline.getConstantLocation("resolution");
 		paramsCL = pipeline.getConstantLocation("params");
 	}
 
@@ -52,7 +50,6 @@ class Compositor extends PPEffect {
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
 		g4.setTexture(textureMapTU, Renderer.ppBuffer.src);
-		g4.setFloat2(resolutionCL, S2D.width, S2D.height);
 		g4.setFloats(paramsCL, params);
 		g4.drawIndexedVertices();
 		g4.disableScissor();

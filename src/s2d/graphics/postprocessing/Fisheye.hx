@@ -10,7 +10,6 @@ import s2d.math.SMath;
 
 class Fisheye extends PPEffect {
 	var textureMapTU:TextureUnit;
-	var resolutionCL:ConstantLocation;
 	var positionCL:ConstantLocation;
 	var strengthCL:ConstantLocation;
 
@@ -24,7 +23,6 @@ class Fisheye extends PPEffect {
 
 	inline function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
-		resolutionCL = pipeline.getConstantLocation("resolution");
 		positionCL = pipeline.getConstantLocation("fisheyePosition");
 		strengthCL = pipeline.getConstantLocation("fisheyeStrength");
 	}
@@ -38,7 +36,6 @@ class Fisheye extends PPEffect {
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
 		g4.setTexture(textureMapTU, Renderer.ppBuffer.src);
-		g4.setFloat2(resolutionCL, S2D.width, S2D.height);
 		g4.setVector2(positionCL, position);
 		g4.setFloat(strengthCL, strength);
 		g4.drawIndexedVertices();

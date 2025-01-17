@@ -65,7 +65,8 @@ class GeometryDeferred {
 		g4.begin([
 			Renderer.gBuffer.normalMap,
 			Renderer.gBuffer.emissionMap,
-			Renderer.gBuffer.ormMap
+			Renderer.gBuffer.ormMap,
+			Renderer.gBuffer.depthMap
 		]);
 		g4.clear(Black, 0.0);
 		g4.setPipeline(pipeline);

@@ -1,7 +1,6 @@
 #version 450
 
 uniform sampler2D textureMap;
-uniform vec2 resolution;
 uniform vec2 fisheyePosition;
 uniform float fisheyeStrength;
 
@@ -33,8 +32,8 @@ vec2 fisheyeUV(vec2 coord, vec2 position, float strength, float ratio) {
 }
 
 void main() {
-    float ratio = resolution.x / resolution.y;
-    vec2 uv = fisheyeUV(fragCoord, fisheyePosition, fisheyeStrength, ratio);
+    vec2 R = textureSize(textureMap, 0);
+    vec2 uv = fisheyeUV(fragCoord, fisheyePosition, fisheyeStrength, R.x / R.y);
     vec3 col = texture(textureMap, uv).rgb;
     fragColor = vec4(col, 1.0);
 }

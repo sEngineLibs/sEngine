@@ -10,8 +10,7 @@ import s2d.math.SMath;
 
 class Mist extends PPEffect {
 	var textureMapTU:TextureUnit;
-	var normalMapTU:TextureUnit;
-	var cameraPosCL:ConstantLocation;
+	var depthMapTU:TextureUnit;
 	var mistScaleCL:ConstantLocation;
 	var mistColorCL:ConstantLocation;
 
@@ -26,8 +25,7 @@ class Mist extends PPEffect {
 
 	inline function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
-		normalMapTU = pipeline.getTextureUnit("normalMap");
-		cameraPosCL = pipeline.getConstantLocation("cameraPos");
+		depthMapTU = pipeline.getTextureUnit("depthMap");
 		mistScaleCL = pipeline.getConstantLocation("mistScale");
 		mistColorCL = pipeline.getConstantLocation("mistColor");
 	}
@@ -44,8 +42,7 @@ class Mist extends PPEffect {
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
 		g4.setTexture(textureMapTU, Renderer.ppBuffer.src);
-		g4.setTexture(normalMapTU, Renderer.gBuffer.normalMap);
-		g4.setVector3(cameraPosCL, camPos);
+		g4.setTexture(depthMapTU, Renderer.gBuffer.depthMap);
 		g4.setFloat2(mistScaleCL, near, far);
 		g4.setFloat4(mistColorCL, color.R, color.G, color.B, color.A);
 		g4.drawIndexedVertices();

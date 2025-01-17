@@ -16,7 +16,6 @@ uniform sampler2D emissionMap;
 void main() {
     // output color
     vec3 col;
-
     // environment lighting
     #if S2D_RP_ENV_LIGHTING == 1
     // fetch gbuffer textures
@@ -32,7 +31,6 @@ void main() {
 
     // convert data
     normal = normalize(normal * 2.0 - 1.0);
-    normal.z = sqrt(max(0.5, 1.0 - normal.x * normal.x - normal.y * normal.y));
 
     vec3 env = envLighting(envMap, normal, albedo, roughness, metalness);
     col = emission + occlusion * env;

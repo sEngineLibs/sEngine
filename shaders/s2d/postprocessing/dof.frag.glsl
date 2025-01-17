@@ -15,11 +15,8 @@
 #define quality 4.0
 #endif
 
-uniform sampler2D normalMap;
+uniform sampler2D depthMap;
 uniform sampler2D textureMap;
-uniform vec2 resolution;
-uniform mat4 invVP;
-uniform vec3 cameraPos;
 uniform float focusDistance;
 uniform float blurSize;
 
@@ -45,13 +42,10 @@ vec3 blur(sampler2D tex, vec2 uv, float size, float ratio) {
 }
 
 void main() {
-    vec3 normal = texture(normalMap, fragCoord).rgb;
-    vec3 position = vec3(fragCoord, normal.z);
-    vec4 worldPos = invVP * vec4(position * 2.0 - 1.0, 1.0);
-    position = worldPos.xyz / worldPos.w;
-    float cameraDist = abs(-position.z - cameraPos.z - focusDistance);
-
-    vec3 color = blur(textureMap, fragCoord, cameraDist * blurSize, resolution.x / resolution.y);
+    vec2 R = textureSize(textureMap, 0);
+    float depth = texture(depthMap, fragCoord).r;
+    float f = abs(depth - focusDistance);
+    vec3 color = blur(textureMap, fragCoord, f * blurSize, R.x / R.y);
 
     fragColor = vec4(color, 1.0);
 }

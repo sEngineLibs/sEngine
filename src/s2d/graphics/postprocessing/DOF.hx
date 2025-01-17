@@ -9,8 +9,7 @@ import s2d.math.SMath;
 
 class DOF extends PPEffect {
 	var textureMapTU:TextureUnit;
-	var resolutionCL:ConstantLocation;
-	var normalMapTU:TextureUnit;
+	var depthMapTU:TextureUnit;
 	var cameraPosCL:ConstantLocation;
 	var focusDistanceCL:ConstantLocation;
 	var blurSizeCL:ConstantLocation;
@@ -25,8 +24,7 @@ class DOF extends PPEffect {
 
 	inline function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
-		resolutionCL = pipeline.getConstantLocation("resolution");
-		normalMapTU = pipeline.getTextureUnit("normalMap");
+		depthMapTU = pipeline.getTextureUnit("depthMap");
 		cameraPosCL = pipeline.getConstantLocation("cameraPos");
 		focusDistanceCL = pipeline.getConstantLocation("focusDistance");
 		blurSizeCL = pipeline.getConstantLocation("blurSize");
@@ -43,9 +41,8 @@ class DOF extends PPEffect {
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
-		g4.setTexture(normalMapTU, Renderer.gBuffer.normalMap);
+		g4.setTexture(depthMapTU, Renderer.gBuffer.depthMap);
 		g4.setTexture(textureMapTU, Renderer.ppBuffer.src);
-		g4.setFloat2(resolutionCL, S2D.width, S2D.height);
 		g4.setVector3(cameraPosCL, camPos);
 		g4.setFloat(focusDistanceCL, focusDistance);
 		g4.setFloat(blurSizeCL, blurSize);
