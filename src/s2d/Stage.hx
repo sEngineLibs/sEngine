@@ -17,7 +17,7 @@ class Stage {
 	static final maxLights:Int = 16;
 	static final lightStructSize:Int = 8;
 
-	#if S2D_RP_ENV_LIGHTING
+	#if (S2D_RP_ENV_LIGHTING == 1)
 	@:isVar public var environmentMap(default, set):Image;
 
 	inline function set_environmentMap(value:Image):Image {

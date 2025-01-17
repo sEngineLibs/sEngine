@@ -2,20 +2,30 @@ package s2d.graphics;
 
 import kha.Image;
 // s2d
-import s2d.graphics.lighting.GeometryPass;
-import s2d.graphics.lighting.LightingPass;
+#if (S2D_RP_LIGHTING_DEFFERED == 1)
+import s2d.graphics.lighting.GeometryDeferred;
+import s2d.graphics.lighting.LightingDeferred;
+#else
+import s2d.graphics.lighting.LightingForward;
+#end
 
 @:allow(s2d.graphics.postprocessing.PPEffect)
 @:access(s2d.graphics.postprocessing.PPEffect)
 class Renderer {
 	static var commands:Array<Void->Void>;
 
+	#if (S2D_RP_LIGHTING_DEFFERED == 1)
 	static var gBuffer:GBuffer;
+	#end
 	static var ppBuffer:PingPongBuffer;
 
 	public static inline function init(width:Int, height:Int) {
 		resize(width, height);
-		commands = [GeometryPass.render, LightingPass.render];
+		#if (S2D_RP_LIGHTING_DEFFERED == 1)
+		commands = [GeometryDeferred.render, LightingDeferred.render];
+		#else
+		commands = [LightingForward.render];
+		#end
 
 		#if S2D_PP_MIST
 		PostProcessing.mist.index = 2;
@@ -49,13 +59,19 @@ class Renderer {
 	}
 
 	public static inline function resize(width:Int, height:Int) {
+		#if (S2D_RP_LIGHTING_DEFFERED == 1)
 		gBuffer = new GBuffer(width, height);
+		#end
 		ppBuffer = new PingPongBuffer(width, height);
 	}
 
 	public static inline function compile() {
-		GeometryPass.compile();
-		LightingPass.compile();
+		#if (S2D_RP_LIGHTING_DEFFERED == 1)
+		Geometry.compile();
+		LightingDeferred.compile();
+		#else
+		LightingForward.compile();
+		#end
 
 		#if S2D_PP_DOF
 		PostProcessing.dof.compile();

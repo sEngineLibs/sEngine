@@ -1,5 +1,6 @@
 package s2d.graphics.lighting;
 
+#if (S2D_RP_LIGHTING_DEFFERED == 1)
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
@@ -12,7 +13,7 @@ import s2d.math.SMath;
 @:access(s2d.graphics.Renderer)
 @:access(s2d.objects.Sprite)
 @:access(s2d.graphics.materials.Material)
-class GeometryPass {
+class GeometryDeferred {
 	static var pipeline:PipelineState;
 
 	// stage uniforms
@@ -89,3 +90,4 @@ class GeometryPass {
 		g4.end();
 	}
 }
+#end

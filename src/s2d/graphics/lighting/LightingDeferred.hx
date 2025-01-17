@@ -1,5 +1,6 @@
 package s2d.graphics.lighting;
 
+#if (S2D_RP_LIGHTING_DEFFERED == 1)
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
@@ -9,12 +10,12 @@ import kha.graphics4.ConstantLocation;
 @:access(s2d.Stage)
 @:allow(s2d.graphics.Renderer)
 @:access(s2d.graphics.Renderer)
-class LightingPass {
+class LightingDeferred {
 	static var envPipeline:PipelineState;
 	static var pipeline:PipelineState;
 
 	static var envEmissionMapTU:TextureUnit;
-	#if S2D_RP_ENV_LIGHTING
+	#if (S2D_RP_ENV_LIGHTING == 1)
 	static var envMapTU:TextureUnit;
 	static var envAlbedoMapTU:TextureUnit;
 	static var envNormalMapTU:TextureUnit;
@@ -49,7 +50,7 @@ class LightingPass {
 		pipeline.blendOperation = Add;
 		pipeline.compile();
 
-		#if S2D_RP_ENV_LIGHTING
+		#if (S2D_RP_ENV_LIGHTING == 1)
 		envMapTU = envPipeline.getTextureUnit("envMap");
 		envAlbedoMapTU = envPipeline.getTextureUnit("albedoMap");
 		envNormalMapTU = envPipeline.getTextureUnit("normalMap");
@@ -76,7 +77,7 @@ class LightingPass {
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
 		g4.setTexture(envEmissionMapTU, Renderer.gBuffer.emissionMap);
-		#if S2D_RP_ENV_LIGHTING
+		#if (S2D_RP_ENV_LIGHTING == 1)
 		g4.setTexture(envMapTU, S2D.stage.environmentMap);
 		g4.setTexture(envAlbedoMapTU, Renderer.gBuffer.albedoMap);
 		g4.setTexture(envNormalMapTU, Renderer.gBuffer.normalMap);
@@ -96,3 +97,4 @@ class LightingPass {
 		g2.end();
 	}
 }
+#end

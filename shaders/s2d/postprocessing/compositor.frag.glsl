@@ -17,28 +17,6 @@ uniform float params[7];
 in vec2 fragCoord;
 out vec4 fragColor;
 
-vec2 hash22(vec2 p) {
-    vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
-    p3 += dot(p3, p3.yzx + 33.33);
-    return fract((p3.xx + p3.yz) * p3.zy);
-}
-
-vec3 AA(sampler2D T, vec2 p) {
-    const float AA_STAGES = 8.0;
-    const float AA_TOTAL_PASSES = AA_STAGES * AA_STAGES * 4 + 1.0;
-    const float AA_JITTER = 0.5;
-
-    vec2 uv = p / textureSize(textureMap, 0);
-    vec3 color = texture(textureMap, uv).rgb;
-    for (float x = -AA_STAGES; x < AA_STAGES; x++) {
-        for (float y = -AA_STAGES; y < AA_STAGES; y++) {
-            vec2 offset = AA_JITTER * (2.0 * hash22(vec2(x, y)) - 1.0);
-            color += texture(T, (p + offset) / textureSize(T, 0)).rgb;
-        }
-    }
-    return color / AA_TOTAL_PASSES;
-}
-
 vec3 posterize(vec3 col, float gamma, float steps) {
     col = pow(col, vec3(gamma));
     col = floor(col * steps) / steps;
@@ -53,7 +31,7 @@ float vignette(vec2 coord) {
 
 void main() {
     // aa
-    vec3 color = AA(textureMap, gl_FragCoord.xy);
+    vec3 color = texture(textureMap, fragCoord).rgb;
 
     // posterize
     color = posterize(color, posterizeGamma, posterizeSteps);
