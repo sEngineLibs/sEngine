@@ -5,6 +5,7 @@ uniform vec4 cropRect;
 
 in vec2 vertCoord;
 out vec2 fragUV;
+out vec2 fragCoord;
 
 void main() {
     // calculate vertex position
@@ -13,4 +14,5 @@ void main() {
 
     // calculate UV
     fragUV = mix(cropRect.xy, cropRect.zw, vertCoord * 0.5 + 0.5);
+    fragCoord = pos.xy * 0.5 + 0.5;
 }

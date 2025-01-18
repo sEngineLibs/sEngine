@@ -35,9 +35,8 @@ class RenderBuffer {
 	}
 
 	public inline function swap() {
-		final k = srcInd;
-		srcInd = tgtInd;
-		tgtInd = k;
+		srcInd = 1 - srcInd;
+		tgtInd = 1 - tgtInd;
 	}
 
 	inline function get_depthMap():Image {

@@ -24,23 +24,22 @@ layout(location = 4) out vec4 depthColor;
 void main() {
     // fetch material textures
     vec4 albedo = texture(albedoMap, fragUV);
-    albedo.a = step(0.5, albedo.a);
-
-    vec4 normal = texture(normalMap, fragUV);
+    vec3 normal = texture(normalMap, fragUV).rgb;
     vec3 emission = texture(emissionMap, fragUV).rgb * emissionStrength;
     vec3 orm = texture(ormMap, fragUV).rgb;
 
     // tangent space -> world space
-    vec2 n = normal.xy * 2.0 - 1.0;
+    normal = normalize(vec3(normal.xy * 2.0 - 1.0, normal.z));
+    vec2 n = normal.xy;
     float rotSin = sin(-spriteRotation);
     float rotCos = cos(-spriteRotation);
     normal.x = rotCos * n.x - rotSin * n.y;
     normal.y = rotSin * n.x + rotCos * n.y;
-    normal.xy = normal.xy * 0.5 + 0.5;
+    normal.z = sqrt(1 - normal.x * normal.x - normal.y * normal.y);
 
     albedoColor = albedo;
-    normalColor = vec4(normal.rgb, albedo.a);
+    normalColor = vec4(normal, albedo.a);
     emissionColor = vec4(emission, albedo.a);
     ormColor = vec4(orm, albedo.a);
-    depthColor = vec4(vec3(spriteZ + (1.0 - normal.a) * depthScale), albedo.a);
+    depthColor = vec4(vec3(spriteZ + (1.0 - normal.z) * depthScale), albedo.a);
 }
