@@ -4,7 +4,11 @@ import kha.Image;
 import haxe.ds.Vector;
 
 class RenderBuffer {
+	#if (S2D_RP_LIGHTING_DEFERRED != 1)
 	static final length = 2;
+	#else
+	static final length = 6;
+	#end
 
 	var buffer:Vector<Image>;
 
@@ -14,6 +18,12 @@ class RenderBuffer {
 
 	public var src(get, never):Image;
 	public var tgt(get, never):Image;
+	#if (S2D_RP_LIGHTING_DEFERRED == 1)
+	public var albedoMap(get, never):Image;
+	public var normalMap(get, never):Image;
+	public var emissionMap(get, never):Image;
+	public var ormMap(get, never):Image;
+	#end
 
 	public inline function new(width:Int, heigth:Int) {
 		buffer = new Vector(length);
@@ -22,8 +32,13 @@ class RenderBuffer {
 
 	public inline function resize(width:Int, heigth:Int) {
 		for (i in 0...length) {
-			buffer[i] = Image.createRenderTarget(width, heigth);
+			buffer[i] = Image.createRenderTarget(width, heigth, RGBA32, DepthOnly);
 		}
+	}
+
+	public inline function swap() {
+		srcInd = 1 - srcInd;
+		tgtInd = 1 - tgtInd;
 	}
 
 	inline function get_src():Image {
@@ -34,8 +49,21 @@ class RenderBuffer {
 		return buffer[tgtInd];
 	}
 
-	public inline function swap() {
-		srcInd = 1 - srcInd;
-		tgtInd = 1 - tgtInd;
+	#if (S2D_RP_LIGHTING_DEFERRED == 1)
+	inline function get_albedoMap():Image {
+		return buffer[2];
 	}
+
+	inline function get_normalMap():Image {
+		return buffer[3];
+	}
+
+	inline function get_emissionMap():Image {
+		return buffer[4];
+	}
+
+	inline function get_ormMap():Image {
+		return buffer[5];
+	}
+	#end
 }

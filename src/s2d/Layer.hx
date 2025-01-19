@@ -2,14 +2,15 @@ package s2d;
 
 import kha.arrays.Float32Array;
 // s2d
+import s2d.SpriteAtlas;
 import s2d.objects.Light;
 import s2d.objects.Sprite;
-import s2d.objects.Object;
 
 @:access(s2d.objects.Object)
 class Layer {
 	public var lights:Array<Light> = [];
 	public var sprites:Array<Sprite> = [];
+	public var spriteAtlases:Array<SpriteAtlas> = [];
 
 	static final maxLights:Int = 16;
 	static final lightStructSize:Int = 9;
@@ -18,26 +19,16 @@ class Layer {
 		lightsData = new Float32Array(1 + maxLights * lightStructSize);
 	}
 
-	public inline function add(object:Object) {
-		if (object is Sprite)
-			addSprite(cast object);
-		else if (object is Light)
-			addLight(cast object);
-	}
-
 	public inline function addLight(light:Light) {
 		lights.push(light);
 	}
 
 	public inline function addSprite(sprite:Sprite) {
-		if (sprites.length > 0) {
-			var i = 0;
-			while (sprites[i].z > sprite.z)
-				++i;
-			sprites.insert(i, sprite);
-		} else {
-			sprites.push(sprite);
-		}
+		sprites.push(sprite);
+	}
+
+	public inline function addSpriteAtlas(atlas:SpriteAtlas) {
+		spriteAtlases.push(atlas);
 	}
 
 	@:isVar var lightsData(get, null):Float32Array;

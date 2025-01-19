@@ -9,6 +9,7 @@ class Light extends Object {
 	public var volume:Float = 0.0;
 
 	public inline function new(layer:Layer) {
-		super(layer);
+		super();
+		layer.addLight(this);
 	}
 }

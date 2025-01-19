@@ -21,9 +21,7 @@ class Object {
 	public var scaleY(get, set):FastFloat;
 	public var rotation(get, set):FastFloat;
 
-	public inline function new(layer:Layer) {
-		layer.add(this);
-	}
+	public inline function new() {}
 
 	public inline function addChild(value:Object):Void {
 		if (value == null || value == this || children.contains(value))

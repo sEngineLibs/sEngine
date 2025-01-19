@@ -12,10 +12,15 @@ uniform sampler2D envMap;
 // material uniforms
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
-uniform sampler2D ormMap;
 uniform sampler2D emissionMap;
-// sprite uniforms
+uniform sampler2D ormMap;
+uniform float depth;
+
+#if (S2D_SPRITE_INSTANCING != 1)
 uniform mat3 model;
+#else
+in mat3 model;
+#endif
 
 in vec2 fragCoord;
 in vec2 fragUV;
@@ -52,4 +57,8 @@ void main() {
         col += lighting(getLight(lightsData, i), position, normal, albedo.rgb, roughness, metalness);
 
     fragColor = vec4(emission + occlusion * col, albedo.a);
+    if (albedo.a == 1.0)
+        gl_FragDepth = depth;
+    else
+        gl_FragDepth = 1.0;
 }
