@@ -1,14 +1,19 @@
 package s2d.graphics;
 
-import s2d.graphics.postprocessing.*;
+#if S2D_PP_BLOOM
+import s2d.graphics.postprocessing.Bloom;
+#end
+#if S2D_PP_FISHEYE
+import s2d.graphics.postprocessing.Fisheye;
+#end
+#if S2D_PP_FILTER
+import s2d.graphics.postprocessing.Filter;
+#end
+#if S2D_PP_COMPOSITOR
+import s2d.graphics.postprocessing.Compositor;
+#end
 
 class PostProcessing {
-	#if S2D_PP_DOF
-	@:isVar public static var dof(default, never) = new DOF();
-	#end
-	#if S2D_PP_MIST
-	@:isVar public static var mist(default, never) = new Mist();
-	#end
 	#if S2D_PP_BLOOM
 	@:isVar public static var bloom(default, never) = new Bloom();
 	#end

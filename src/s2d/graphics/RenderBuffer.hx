@@ -4,9 +4,9 @@ import kha.Image;
 import haxe.ds.Vector;
 
 class RenderBuffer {
-	var buffer:Vector<Image>;
+	static final length = 2;
 
-	public var depthMap(get, never):Image;
+	var buffer:Vector<Image>;
 
 	// ping-pong
 	var srcInd:Int = 0;
@@ -38,35 +38,4 @@ class RenderBuffer {
 		srcInd = 1 - srcInd;
 		tgtInd = 1 - tgtInd;
 	}
-
-	inline function get_depthMap():Image {
-		return buffer[2];
-	}
-
-	#if (S2D_RP_LIGHTING_DEFFERED == 1)
-	static final length = 7;
-
-	public var albedoMap(get, never):Image;
-	public var normalMap(get, never):Image;
-	public var emissionMap(get, never):Image;
-	public var ormMap(get, never):Image;
-
-	inline function get_albedoMap():Image {
-		return buffer[3];
-	}
-
-	inline function get_normalMap():Image {
-		return buffer[4];
-	}
-
-	inline function get_emissionMap():Image {
-		return buffer[5];
-	}
-
-	inline function get_ormMap():Image {
-		return buffer[6];
-	}
-	#else
-	static final length = 3;
-	#end
 }

@@ -5,6 +5,7 @@ import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
 
+@:access(s2d.graphics.Renderer)
 class Bloom extends PPEffect {
 	var textureMapTU:TextureUnit;
 	var paramsCL:ConstantLocation;

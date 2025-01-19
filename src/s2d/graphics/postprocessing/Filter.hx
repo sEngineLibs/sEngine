@@ -7,6 +7,7 @@ import kha.graphics4.ConstantLocation;
 // s2d
 import s2d.math.Mat3;
 
+@:access(s2d.graphics.Renderer)
 class Filter extends PPEffect {
 	var textureMapTU:TextureUnit;
 	var kernelCL:ConstantLocation;

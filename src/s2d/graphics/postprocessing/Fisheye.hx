@@ -8,6 +8,7 @@ import kha.graphics4.ConstantLocation;
 import s2d.math.Vec2;
 import s2d.math.SMath;
 
+@:access(s2d.graphics.Renderer)
 class Fisheye extends PPEffect {
 	var textureMapTU:TextureUnit;
 	var positionCL:ConstantLocation;

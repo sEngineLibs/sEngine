@@ -7,6 +7,7 @@ import kha.arrays.Float32Array;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
 
+@:access(s2d.graphics.Renderer)
 class Compositor extends PPEffect {
 	var textureMapTU:TextureUnit;
 	var paramsCL:ConstantLocation;

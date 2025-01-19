@@ -77,14 +77,13 @@ class S2D {
 		// init structure
 		var structure = new VertexStructure();
 		structure.add("vertCoord", Float32_2X);
-		var structSize = structure.byteSize() >> 2;
 
 		// init vertices
 		vertices = new VertexBuffer(4, structure, StaticUsage);
 		var vert = vertices.lock();
 		for (i in 0...4) {
-			vert[i * structSize + 0] = i == 0 || i == 1 ? -1.0 : 1.0;
-			vert[i * structSize + 1] = i == 0 || i == 3 ? -1.0 : 1.0;
+			vert[i * 2 + 0] = i == 0 || i == 1 ? -1.0 : 1.0;
+			vert[i * 2 + 1] = i == 0 || i == 3 ? -1.0 : 1.0;
 		}
 		vertices.unlock();
 	}
@@ -126,12 +125,12 @@ class S2D {
 	}
 
 	public static inline function local2WorldSpace(point:Vec2):Vec2 {
-		var wsp = inverse(stage.VP) * vec3(point * 2.0 - 1.0, 1.0);
+		var wsp = inverse(stage.viewProjection) * vec3(point * 2.0 - 1.0, 1.0);
 		return wsp.xy;
 	}
 
 	public static inline function world2LocalSpace(point:Vec2):Vec2 {
-		var ncp = inverse(stage.VP) * vec3(point, 1.0);
+		var ncp = stage.viewProjection * vec3(point, 1.0);
 		return ncp.xy * 0.5 + 0.5;
 	}
 
