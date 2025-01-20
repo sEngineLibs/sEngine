@@ -129,9 +129,10 @@ project.addAssets("assets/**", {
 
 // Renderer:
 // S2D_SPRITE_INSTANCING -> enables atlas instancing
-// S2D_RP_ENV_LIGHTING -> enables environment lighting
-// S2D_RP_LIGHTING -> enables lighting
-// S2D_RP_LIGHTING_DEFERRED -> deferred lighting
+// S2D_LIGHTING -> enables lighting
+// S2D_LIGHTING_SHADOWS -> enables shadows
+// S2D_LIGHTING_DEFERRED -> deferred lighting
+// S2D_LIGHTING_ENVIRONMENT -> enables environment lighting
 // S2D_PP_BLOOM -> enables Bloom PP effect
 // S2D_PP_FISHEYE -> enables Fisheye PP effect
 // S2D_PP_FILTERS -> enables 3x3 image convolution multi-pass PP effects

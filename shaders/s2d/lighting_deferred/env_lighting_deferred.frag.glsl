@@ -5,7 +5,7 @@
 in vec2 fragCoord;
 out vec4 fragColor;
 
-#if S2D_RP_ENV_LIGHTING == 1
+#if S2D_LIGHTING_ENVIRONMENT == 1
 uniform sampler2D envMap;
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
@@ -15,7 +15,7 @@ uniform sampler2D emissionMap;
 
 void main() {
     // environment lighting
-    #if S2D_RP_ENV_LIGHTING == 1
+    #if S2D_LIGHTING_ENVIRONMENT == 1
     // fetch gbuffer textures
     vec3 albedo, normal, emission, orm;
     albedo = texture(albedoMap, fragCoord).rgb;

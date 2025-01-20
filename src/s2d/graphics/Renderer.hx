@@ -1,21 +1,16 @@
 package s2d.graphics;
 
 import kha.Image;
-// s2d
-#if (S2D_RP_LIGHTING == 1)
-#if (S2D_RP_LIGHTING_DEFERRED == 1)
-import s2d.graphics.lighting.GeometryDeferred;
-import s2d.graphics.lighting.LightingDeferred;
-#else
-import s2d.graphics.lighting.LightingForward;
-#end
-#else
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
-#end
+// s2d
+import s2d.graphics.lighting.ShadowCaster;
+import s2d.graphics.lighting.GeometryDeferred;
+import s2d.graphics.lighting.LightingDeferred;
+import s2d.graphics.lighting.LightingForward;
 
 class Renderer {
 	static var commands:Array<Void->Void>;
@@ -24,8 +19,8 @@ class Renderer {
 	@:access(s2d.graphics.postprocessing.PPEffect)
 	public static inline function ready(width:Int, height:Int) {
 		buffer = new RenderBuffer(width, height);
-		#if (S2D_RP_LIGHTING == 1)
-		#if (S2D_RP_LIGHTING_DEFERRED == 1)
+		#if (S2D_LIGHTING == 1)
+		#if (S2D_LIGHTING_DEFERRED == 1)
 		commands = [GeometryDeferred.render, LightingDeferred.render];
 		#else
 		commands = [LightingForward.render];
@@ -60,12 +55,15 @@ class Renderer {
 	}
 
 	public static inline function set() {
-		#if (S2D_RP_LIGHTING == 1)
-		#if (S2D_RP_LIGHTING_DEFERRED == 1)
+		#if (S2D_LIGHTING == 1)
+		#if (S2D_LIGHTING_DEFERRED == 1)
 		GeometryDeferred.compile();
 		LightingDeferred.compile();
 		#else
 		LightingForward.compile();
+		#end
+		#if (S2D_LIGHTING_SHADOWS == 1)
+		ShadowCaster.compile();
 		#end
 		#else
 		compile();
@@ -91,7 +89,7 @@ class Renderer {
 		return buffer.tgt;
 	};
 
-	#if (S2D_RP_LIGHTING != 1)
+	#if (S2D_LIGHTING != 1)
 	public static var structures:Array<VertexStructure> = [];
 	// GEOMETRY PASS
 	static var pipeline:PipelineState;

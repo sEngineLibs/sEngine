@@ -12,7 +12,7 @@ uniform vec2 lightAttrib;
 #define lightPower lightAttrib.x
 #define lightRadius lightAttrib.y
 
-#if S2D_RP_ENV_LIGHTING == 1
+#if S2D_LIGHTING_ENVIRONMENT == 1
 uniform sampler2D envMap;
 #endif
 
@@ -49,7 +49,7 @@ void main() {
     vec3 col = vec3(0.0);
 
     // environment lighting
-    #if S2D_RP_ENV_LIGHTING == 1
+    #if S2D_LIGHTING_ENVIRONMENT == 1
     col += envLighting(envMap, normal, albedo.rgb, orm);
     #endif
 

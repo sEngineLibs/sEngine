@@ -1,6 +1,6 @@
 package s2d.graphics.lighting;
 
-#if (S2D_RP_LIGHTING == 1)
+#if (S2D_LIGHTING == 1)
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
@@ -17,7 +17,7 @@ class LightingForward {
 	static var lightPositionCL:ConstantLocation;
 	static var lightColorCL:ConstantLocation;
 	static var lightAttribCL:ConstantLocation;
-	#if (S2D_RP_ENV_LIGHTING == 1) static var envMapTU:TextureUnit; #end // S2D_RP_ENV_LIGHTING
+	#if (S2D_LIGHTING_ENVIRONMENT == 1) static var envMapTU:TextureUnit; #end // S2D_LIGHTING_ENVIRONMENT
 	static var albedoMapTU:TextureUnit;
 	static var normalMapTU:TextureUnit;
 	static var emissionMapTU:TextureUnit;
@@ -60,7 +60,7 @@ class LightingForward {
 		emissionMapTU = pipeline.getTextureUnit("emissionMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
 
-		#if (S2D_RP_ENV_LIGHTING == 1) envMapTU = pipeline.getTextureUnit("envMap"); #end // S2D_RP_ENV_LIGHTING
+		#if (S2D_LIGHTING_ENVIRONMENT == 1) envMapTU = pipeline.getTextureUnit("envMap"); #end // S2D_LIGHTING_ENVIRONMENT
 		#if (S2D_SPRITE_INSTANCING != 1) modelCL = pipeline.getConstantLocation("model");
 		cropRectCL = pipeline.getConstantLocation("cropRect"); #end // S2D_SPRITE_INSTANCING
 	}
@@ -77,7 +77,7 @@ class LightingForward {
 		#if (S2D_SPRITE_INSTANCING != 1)
 		g4.setVertexBuffer(S2D.vertices);
 		#end
-		#if (S2D_RP_ENV_LIGHTING == 1)
+		#if (S2D_LIGHTING_ENVIRONMENT == 1)
 		g4.setTexture(envMapTU, S2D.stage.environmentMap);
 		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
@@ -85,7 +85,7 @@ class LightingForward {
 			for (light in layer.lights) {
 				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);
 				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);
-				#if (S2D_RP_LIGHTING_DEFERRED == 1)
+				#if (S2D_LIGHTING_DEFERRED == 1)
 				g4.setFloat3(lightAttribCL, light.power, light.radius, light.volume);
 				#else
 				g4.setFloat2(lightAttribCL, light.power, light.radius);

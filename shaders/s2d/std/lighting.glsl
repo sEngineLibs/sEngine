@@ -7,9 +7,7 @@ struct Light {
     vec3 color;
     float power;
     float radius;
-    #if S2D_RP_LIGHTING_DEFERRED == 1
     float volume;
-    #endif
 };
 
 vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, vec3 orm) {
@@ -41,14 +39,14 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, vec3 orm) {
     vec3 kD = (1.0 - F) * (1.0 - metalness);
     vec3 diffuseLight = kD * albedo * max(dot(normal, dir), 0.0) / PI;
 
-    #if S2D_RP_LIGHTING_DEFERRED == 1
+    #if S2D_LIGHTING_DEFERRED == 1
     return (occlusion * (diffuseLight + specularLight) + light.volume) * light.color * lightAttenuation;
     #else
     return (occlusion * (diffuseLight + specularLight)) * light.color * lightAttenuation;
     #endif
 }
 
-#if S2D_RP_ENV_LIGHTING == 1
+#if S2D_LIGHTING_ENVIRONMENT == 1
 vec3 envLighting(sampler2D envMap, vec3 normal, vec3 color, vec3 orm) {
     float occlusion = orm.r;
     float roughness = clamp(orm.g, 0.05, 1.0);

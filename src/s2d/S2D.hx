@@ -138,14 +138,14 @@ class S2D {
 	public static inline function screen2LocalSpace(point:FastVector2):FastVector2 {
 		return {
 			x: point.x / realWidth,
-			y: point.x / realHeight,
+			y: point.y / realHeight,
 		};
 	}
 
 	public static inline function local2ScreenSpace(point:FastVector2):FastVector2 {
 		return {
 			x: point.x * realWidth,
-			y: point.x * realHeight,
+			y: point.y * realHeight,
 		};
 	}
 

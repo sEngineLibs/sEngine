@@ -1,6 +1,6 @@
 package s2d;
 
-#if (S2D_RP_ENV_LIGHTING == 1)
+#if (S2D_LIGHTING_ENVIRONMENT == 1)
 import kha.Image;
 #end
 import s2d.core.Buffer;
@@ -18,7 +18,7 @@ class Stage {
 		return S2D.projection.multmat(camera);
 	}
 
-	#if (S2D_RP_ENV_LIGHTING == 1)
+	#if (S2D_LIGHTING_ENVIRONMENT == 1)
 	@:isVar public var environmentMap(default, set):Image;
 
 	inline function set_environmentMap(value:Image):Image {

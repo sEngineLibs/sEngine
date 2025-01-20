@@ -4,12 +4,6 @@ import kha.Image;
 import haxe.ds.Vector;
 
 class RenderBuffer {
-	#if (S2D_RP_LIGHTING_DEFERRED != 1)
-	static final length = 2;
-	#else
-	static final length = 6;
-	#end
-
 	var buffer:Vector<Image>;
 
 	// ping-pong
@@ -18,13 +12,29 @@ class RenderBuffer {
 
 	public var src(get, never):Image;
 	public var tgt(get, never):Image;
-	#if (S2D_RP_LIGHTING_DEFERRED == 1)
+
+	#if (S2D_LIGHTING_DEFERRED == 1)
 	public var albedoMap(get, never):Image;
 	public var normalMap(get, never):Image;
 	public var emissionMap(get, never):Image;
 	public var ormMap(get, never):Image;
-	#end
 
+	#if (S2D_LIGHTING_SHADOWS == 1)
+	static final length = 7;
+
+	public var shadowMap(get, never):Image;
+	#else
+	static final length = 6;
+	#end
+	#else
+	#if (S2D_LIGHTING_SHADOWS == 1)
+	static final length = 3;
+
+	public var shadowMap(get, never):Image;
+	#else
+	static final length = 2;
+	#end
+	#end
 	public inline function new(width:Int, heigth:Int) {
 		buffer = new Vector(length);
 		resize(width, heigth);
@@ -49,7 +59,7 @@ class RenderBuffer {
 		return buffer[tgtInd];
 	}
 
-	#if (S2D_RP_LIGHTING_DEFERRED == 1)
+	#if (S2D_LIGHTING_DEFERRED == 1)
 	inline function get_albedoMap():Image {
 		return buffer[2];
 	}
@@ -65,5 +75,17 @@ class RenderBuffer {
 	inline function get_ormMap():Image {
 		return buffer[5];
 	}
+
+	#if (S2D_LIGHTING_SHADOWS == 1)
+	inline function get_shadowMap():Image {
+		return buffer[6];
+	}
+	#end
+	#else
+	#if (S2D_LIGHTING_SHADOWS == 1)
+	inline function get_shadowMap():Image {
+		return buffer[2];
+	}
+	#end
 	#end
 }

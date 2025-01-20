@@ -1,6 +1,6 @@
 package s2d.graphics.lighting;
 
-#if (S2D_RP_LIGHTING && S2D_RP_LIGHTING_DEFERRED == 1)
+#if (S2D_LIGHTING && S2D_LIGHTING_DEFERRED == 1)
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
@@ -11,6 +11,9 @@ import kha.graphics4.ConstantLocation;
 class LightingDeferred {
 	static var pipeline:PipelineState;
 	static var viewProjectionCL:ConstantLocation;
+	#if (S2D_LIGHTING_SHADOWS == 1)
+	static var shadowMapTU:TextureUnit;
+	#end
 	static var lightPositionCL:ConstantLocation;
 	static var lightColorCL:ConstantLocation;
 	static var lightAttribCL:ConstantLocation;
@@ -20,12 +23,12 @@ class LightingDeferred {
 
 	// ENVIRONMENT PASS
 	static var envPipeline:PipelineState;
-	#if (S2D_RP_ENV_LIGHTING == 1)
+	#if (S2D_LIGHTING_ENVIRONMENT == 1)
 	static var envMapTU:TextureUnit;
 	static var envAlbedoMapTU:TextureUnit;
 	static var envNormalMapTU:TextureUnit;
 	static var envORMMapTU:TextureUnit;
-	#end // S2D_RP_ENV_LIGHTING
+	#end // S2D_LIGHTING_ENVIRONMENT
 	static var envEmissionMapTU:TextureUnit;
 
 	public static inline function compile() {
@@ -42,10 +45,13 @@ class LightingDeferred {
 		pipeline.blendOperation = Add;
 		pipeline.compile();
 
+		viewProjectionCL = pipeline.getConstantLocation("viewProjection");
+		#if (S2D_LIGHTING_SHADOWS == 1)
+		shadowMapTU = pipeline.getTextureUnit("shadowMap");
+		#end
 		lightPositionCL = pipeline.getConstantLocation("lightPosition");
 		lightColorCL = pipeline.getConstantLocation("lightColor");
 		lightAttribCL = pipeline.getConstantLocation("lightAttrib");
-		viewProjectionCL = pipeline.getConstantLocation("viewProjection");
 		albedoMapTU = pipeline.getTextureUnit("albedoMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
@@ -60,12 +66,12 @@ class LightingDeferred {
 		envPipeline.blendOperation = Add;
 		envPipeline.compile();
 
-		#if (S2D_RP_ENV_LIGHTING == 1)
+		#if (S2D_LIGHTING_ENVIRONMENT == 1)
 		envMapTU = envPipeline.getTextureUnit("envMap");
 		envAlbedoMapTU = envPipeline.getTextureUnit("albedoMap");
 		envNormalMapTU = envPipeline.getTextureUnit("normalMap");
 		envORMMapTU = envPipeline.getTextureUnit("ormMap");
-		#end // S2D_RP_ENV_LIGHTING
+		#end // S2D_LIGHTING_ENVIRONMENT
 		envEmissionMapTU = envPipeline.getTextureUnit("emissionMap");
 	}
 
@@ -80,7 +86,7 @@ class LightingDeferred {
 		g4.setVertexBuffer(S2D.vertices);
 		// emission + (environment)
 		g4.setTexture(envEmissionMapTU, Renderer.buffer.emissionMap);
-		#if (S2D_RP_ENV_LIGHTING == 1)
+		#if (S2D_LIGHTING_ENVIRONMENT == 1)
 		g4.setTexture(envMapTU, S2D.stage.environmentMap);
 		g4.setTexture(envAlbedoMapTU, Renderer.buffer.albedoMap);
 		g4.setTexture(envNormalMapTU, Renderer.buffer.normalMap);
@@ -88,6 +94,7 @@ class LightingDeferred {
 		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
 		g4.drawIndexedVertices();
+
 		// stage lights
 		g4.setPipeline(pipeline);
 		g4.setMatrix3(viewProjectionCL, viewProjection);
@@ -96,9 +103,16 @@ class LightingDeferred {
 		g4.setTexture(ormMapTU, Renderer.buffer.ormMap);
 		for (layer in S2D.stage.layers) {
 			for (light in layer.lights) {
+				#if (S2D_LIGHTING_SHADOWS == 1)
+				g4.end();
+				ShadowCaster.castShadows(Renderer.buffer.shadowMap, light, layer.sprites);
+				g4.begin();
+				g4.setPipeline(pipeline);
+				g4.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
+				#end
 				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);
 				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);
-				#if (S2D_RP_LIGHTING_DEFERRED == 1)
+				#if (S2D_LIGHTING_DEFERRED == 1)
 				g4.setFloat3(lightAttribCL, light.power, light.radius, light.volume);
 				#else
 				g4.setFloat2(lightAttribCL, light.power, light.radius);

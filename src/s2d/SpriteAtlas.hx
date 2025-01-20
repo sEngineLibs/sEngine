@@ -4,8 +4,8 @@ import haxe.ds.Vector;
 import kha.Image;
 // s2d
 import s2d.objects.Sprite;
-#if (S2D_RP_LIGHTING == 1)
-#if (S2D_RP_LIGHTING_DEFERRED == 1)
+#if (S2D_LIGHTING == 1)
+#if (S2D_LIGHTING_DEFERRED == 1)
 import s2d.graphics.lighting.GeometryDeferred;
 #else
 import s2d.graphics.lighting.LightingForward;
@@ -23,7 +23,7 @@ class SpriteAtlas {
 	@:isVar public var layer(default, set):Layer;
 	public var sprites:Vector<Sprite> = new Vector(0);
 
-	#if (S2D_RP_LIGHTING == 1)
+	#if (S2D_LIGHTING == 1)
 	public var albedoMap:Image;
 	public var normalMap:Image;
 	public var ormMap:Image;
@@ -51,8 +51,8 @@ class SpriteAtlas {
 	inline function init() {
 		vertices = [
 			S2D.vertices,
-			#if (S2D_RP_LIGHTING == 1)
-			#if (S2D_RP_LIGHTING_DEFERRED == 1)
+			#if (S2D_LIGHTING == 1)
+			#if (S2D_LIGHTING_DEFERRED == 1)
 			new VertexBuffer(0, GeometryDeferred.structures[1], StaticUsage, 1), // crop rect
 			new VertexBuffer(0, GeometryDeferred.structures[2], StaticUsage, 1) // model
 			#else
@@ -77,8 +77,8 @@ class SpriteAtlas {
 		vertices[1].delete();
 		vertices[2].delete();
 
-		#if (S2D_RP_LIGHTING == 1)
-		#if (S2D_RP_LIGHTING_DEFERRED == 1)
+		#if (S2D_LIGHTING == 1)
+		#if (S2D_LIGHTING_DEFERRED == 1)
 		vertices[1] = new VertexBuffer(sprites.length, GeometryDeferred.structures[1], StaticUsage, 1);
 		vertices[2] = new VertexBuffer(sprites.length, GeometryDeferred.structures[2], StaticUsage, 1);
 		#else
@@ -92,8 +92,8 @@ class SpriteAtlas {
 	}
 
 	inline function update() {
-		#if (S2D_RP_LIGHTING == 1)
-		#if (S2D_RP_LIGHTING_DEFERRED == 1)
+		#if (S2D_LIGHTING == 1)
+		#if (S2D_LIGHTING_DEFERRED == 1)
 		final cStructSize = GeometryDeferred.structures[1].byteSize() >> 2;
 		final mStructSize = GeometryDeferred.structures[2].byteSize() >> 2;
 		#else
