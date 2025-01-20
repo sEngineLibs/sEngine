@@ -1,5 +1,7 @@
 package s2d;
 
+import kha.math.FastVector3;
+import s2d.core.utils.extensions.FastMatrix3Ext;
 import s2d.events.Dispatcher;
 import kha.Assets;
 import kha.Canvas;
@@ -9,16 +11,15 @@ import kha.graphics4.VertexStructure;
 // s2d
 import s2d.Stage;
 import s2d.core.Time;
-import s2d.math.SMath;
-import s2d.math.Vec2;
-import s2d.math.Mat3;
+import kha.math.FastVector2;
+import kha.math.FastMatrix3;
 import s2d.graphics.Renderer;
 import s2d.animation.Action;
 
 class S2D {
 	public static var indices:IndexBuffer;
 	public static var vertices:VertexBuffer;
-	public static var projection:Mat3;
+	public static var projection:FastMatrix3;
 
 	public static var width:Int;
 	public static var height:Int;
@@ -57,11 +58,11 @@ class S2D {
 		return value;
 	}
 
-	public static inline function init(w:Int, h:Int) {
+	public static inline function ready(w:Int, h:Int) {
 		realWidth = w;
 		realHeight = h;
 		aspectRatio = width / height;
-		Renderer.init(width, height);
+		Renderer.ready(width, height);
 
 		// init indices
 		indices = new IndexBuffer(6, StaticUsage);
@@ -94,8 +95,8 @@ class S2D {
 		Action.update(Time.time);
 	}
 
-	public static inline function compile() {
-		Renderer.compile();
+	public static inline function set() {
+		Renderer.set();
 	}
 
 	public static inline function resize(w:Int, h:Int) {
@@ -119,34 +120,40 @@ class S2D {
 
 	static inline function updateProjection() {
 		if (aspectRatio >= 1)
-			projection = Mat3.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale);
+			projection = FastMatrix3Ext.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale);
 		else
-			projection = Mat3.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio);
+			projection = FastMatrix3Ext.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio);
 	}
 
-	public static inline function local2WorldSpace(point:Vec2):Vec2 {
-		var wsp = inverse(stage.viewProjection) * vec3(point * 2.0 - 1.0, 1.0);
-		return wsp.xy;
+	public static inline function local2WorldSpace(point:FastVector2):FastVector2 {
+		var wsp = stage.viewProjection.inverse().multvec({x: point.x * 2.0 - 1.0, y: point.y * 2.0 - 1.0});
+		return wsp;
 	}
 
-	public static inline function world2LocalSpace(point:Vec2):Vec2 {
-		var ncp = stage.viewProjection * vec3(point, 1.0);
-		return ncp.xy * 0.5 + 0.5;
+	public static inline function world2LocalSpace(point:FastVector2):FastVector2 {
+		var ncp = stage.viewProjection.multvec(point);
+		return {x: ncp.x * 0.5 + 0.5, y: ncp.y * 0.5 + 0.5};
 	}
 
-	public static inline function screen2LocalSpace(point:Vec2):Vec2 {
-		return point / vec2(realWidth, realHeight);
+	public static inline function screen2LocalSpace(point:FastVector2):FastVector2 {
+		return {
+			x: point.x / realWidth,
+			y: point.x / realHeight,
+		};
 	}
 
-	public static inline function local2ScreenSpace(point:Vec2):Vec2 {
-		return point * vec2(realWidth, realHeight);
+	public static inline function local2ScreenSpace(point:FastVector2):FastVector2 {
+		return {
+			x: point.x * realWidth,
+			y: point.x * realHeight,
+		};
 	}
 
-	public static inline function screen2WorldSpace(point:Vec2):Vec2 {
+	public static inline function screen2WorldSpace(point:FastVector2):FastVector2 {
 		return local2WorldSpace(screen2LocalSpace(point));
 	}
 
-	public static inline function world2ScreenSpace(point:Vec2):Vec2 {
+	public static inline function world2ScreenSpace(point:FastVector2):FastVector2 {
 		return local2ScreenSpace(world2LocalSpace(point));
 	}
 

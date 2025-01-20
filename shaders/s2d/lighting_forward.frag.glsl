@@ -14,7 +14,6 @@ uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
 uniform sampler2D emissionMap;
 uniform sampler2D ormMap;
-uniform float depth;
 
 #if (S2D_SPRITE_INSTANCING != 1)
 uniform mat3 model;
@@ -30,7 +29,6 @@ void main() {
     // fetch material textures
     vec4 albedo = texture(albedoMap, fragUV);
     albedo.rgb /= albedo.a;
-    vec3 normal = texture(normalMap, fragUV).rgb;
     vec3 emission = texture(emissionMap, fragUV).rgb;
     vec3 orm = texture(ormMap, fragUV).rgb;
 
@@ -38,9 +36,10 @@ void main() {
     float roughness = clamp(orm.g, 0.05, 1.0);
     float metalness = orm.b;
 
-    // convert data
-    normal = normalize(normal * 2.0 - 1.0);
-    normal = model * normal;
+    vec3 normal = texture(normalMap, fragUV).rgb * 2.0 - 1.0;
+    normal.xy = inverse(mat2(model)) * normal.xy;
+    normal = normalize(vec3(normal.xy, normal.z));
+
     vec3 position = inverse(viewProjection) * vec3(fragCoord, 0.0);
 
     // output color
@@ -57,8 +56,4 @@ void main() {
         col += lighting(getLight(lightsData, i), position, normal, albedo.rgb, roughness, metalness);
 
     fragColor = vec4(emission + occlusion * col, albedo.a);
-    if (albedo.a == 1.0)
-        gl_FragDepth = depth;
-    else
-        gl_FragDepth = 1.0;
 }

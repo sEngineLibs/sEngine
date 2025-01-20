@@ -7,7 +7,6 @@ uniform float lightsData[1 + MAX_LIGHTS * LIGHT_STRUCT_SIZE];
 
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
-uniform sampler2D emissionMap;
 uniform sampler2D ormMap;
 
 in vec2 fragCoord;
@@ -15,14 +14,13 @@ out vec4 fragColor;
 
 void main() {
     // fetch gbuffer textures
-    vec3 albedo, normal, emission, orm;
+    vec3 albedo, normal, orm;
     albedo = texture(albedoMap, fragCoord).rgb;
     normal = texture(normalMap, fragCoord).rgb;
+    orm = texture(ormMap, fragCoord).rgb;
+
     normal = normalize(normal * 2.0 - 1.0);
 
-    emission = texture(emissionMap, fragCoord).rgb;
-
-    orm = texture(ormMap, fragCoord).rgb;
     float occlusion = orm.r;
     float roughness = clamp(orm.g, 0.05, 1.0);
     float metalness = orm.b;

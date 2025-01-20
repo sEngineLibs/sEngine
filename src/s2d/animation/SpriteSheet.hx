@@ -1,7 +1,5 @@
 package s2d.animation;
 
-import s2d.math.SMath;
-
 @:autoBuild(s2d.core.macro.SMacro.build())
 class SpriteSheet {
 	@:isVar public var colsNum(default, set):Int = 1;

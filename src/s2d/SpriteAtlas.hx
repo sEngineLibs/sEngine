@@ -1,25 +1,36 @@
 package s2d;
 
+import haxe.ds.Vector;
 import kha.Image;
 // s2d
 import s2d.objects.Sprite;
-#if (S2D_SPRITE_INSTANCING == 1)
-import kha.graphics4.IndexBuffer;
-import kha.graphics4.VertexBuffer;
-// s2d
-import s2d.objects.Sprite;
+#if (S2D_RP_LIGHTING == 1)
+#if (S2D_RP_LIGHTING_DEFERRED == 1)
+import s2d.graphics.lighting.GeometryDeferred;
+#else
+import s2d.graphics.lighting.LightingForward;
+#end
+#else
 import s2d.graphics.Renderer;
 #end
+#if (S2D_SPRITE_INSTANCING == 1)
+import kha.graphics4.VertexBuffer;
+#end
 
+@:access(s2d.objects.Sprite)
 @:access(s2d.graphics.Renderer)
 class SpriteAtlas {
 	@:isVar public var layer(default, set):Layer;
-	public var sprites:Array<Sprite> = [];
+	public var sprites:Vector<Sprite> = new Vector(0);
 
+	#if (S2D_RP_LIGHTING == 1)
 	public var albedoMap:Image;
 	public var normalMap:Image;
 	public var ormMap:Image;
 	public var emissionMap:Image;
+	#else
+	public var textureMap:Image;
+	#end
 
 	public inline function new(layer:Layer) {
 		this.layer = layer;
@@ -40,50 +51,83 @@ class SpriteAtlas {
 	inline function init() {
 		vertices = [
 			S2D.vertices,
-			// sprite crop rects
-			new VertexBuffer(sprites.length, Renderer.structures[1], StaticUsage, 1),
-			// sprite models
-			new VertexBuffer(sprites.length, Renderer.structures[2], StaticUsage, 1)
+			#if (S2D_RP_LIGHTING == 1)
+			#if (S2D_RP_LIGHTING_DEFERRED == 1)
+			new VertexBuffer(0, GeometryDeferred.structures[1], StaticUsage, 1), // crop rect
+			new VertexBuffer(0, GeometryDeferred.structures[2], StaticUsage, 1) // model
+			#else
+			new VertexBuffer(0, LightingForward.structures[1], StaticUsage, 1), // crop rect
+			new VertexBuffer(0, LightingForward.structures[2], StaticUsage, 1) // model
+			#end
+			#else
+			new VertexBuffer(0, Renderer.structures[1], StaticUsage, 1), // crop rect
+			new VertexBuffer(0, Renderer.structures[2], StaticUsage, 1) // model
+			#end
 		];
 	}
 
 	public inline function addSprite(sprite:Sprite) {
-		sprites.push(sprite);
+		final tmp = sprites;
+		sprites = new Vector(tmp.length + 1);
+
+		for (i in 0...tmp.length)
+			sprites[i] = tmp[i];
+		sprites[tmp.length] = sprite;
+
+		vertices[1].delete();
+		vertices[2].delete();
+
+		#if (S2D_RP_LIGHTING == 1)
+		#if (S2D_RP_LIGHTING_DEFERRED == 1)
+		vertices[1] = new VertexBuffer(sprites.length, GeometryDeferred.structures[1], StaticUsage, 1);
+		vertices[2] = new VertexBuffer(sprites.length, GeometryDeferred.structures[2], StaticUsage, 1);
+		#else
+		vertices[1] = new VertexBuffer(sprites.length, LightingForward.structures[1], StaticUsage, 1);
+		vertices[2] = new VertexBuffer(sprites.length, LightingForward.structures[2], StaticUsage, 1);
+		#end
+		#else
 		vertices[1] = new VertexBuffer(sprites.length, Renderer.structures[1], StaticUsage, 1);
 		vertices[2] = new VertexBuffer(sprites.length, Renderer.structures[2], StaticUsage, 1);
-		update();
+		#end
 	}
 
 	inline function update() {
-		// copy crop rects
-		var structSize = Renderer.structures[1].byteSize() >> 2;
-		var vert = vertices[1].lock();
+		#if (S2D_RP_LIGHTING == 1)
+		#if (S2D_RP_LIGHTING_DEFERRED == 1)
+		final cStructSize = GeometryDeferred.structures[1].byteSize() >> 2;
+		final mStructSize = GeometryDeferred.structures[2].byteSize() >> 2;
+		#else
+		final cStructSize = LightingForward.structures[1].byteSize() >> 2;
+		final mStructSize = LightingForward.structures[2].byteSize() >> 2;
+		#end
+		#else
+		final cStructSize = Renderer.structures[1].byteSize() >> 2;
+		final mStructSize = Renderer.structures[2].byteSize() >> 2;
+		#end
+		var cData = vertices[1].lock();
+		var mData = vertices[2].lock();
 		for (i in 0...sprites.length) {
-			final sprite = sprites[i];
-			vert[i * structSize + 0] = sprite.cropRect.x;
-			vert[i * structSize + 1] = sprite.cropRect.y;
-			vert[i * structSize + 2] = sprite.cropRect.z;
-			vert[i * structSize + 3] = sprite.cropRect.w;
+			final c = sprites[i].cropRect;
+			final m = sprites[i]._model;
+			// crop rect
+			var ci = i * cStructSize;
+			cData[ci + 0] = c.x;
+			cData[ci + 1] = c.y;
+			cData[ci + 2] = c.z;
+			cData[ci + 3] = c.w;
+			// model
+			var mi = i * mStructSize;
+			mData[mi + 0] = m._00;
+			mData[mi + 1] = m._01;
+			mData[mi + 2] = m._02;
+			mData[mi + 3] = m._10;
+			mData[mi + 4] = m._11;
+			mData[mi + 5] = m._12;
+			mData[mi + 6] = m._20;
+			mData[mi + 7] = m._21;
+			mData[mi + 8] = m._22;
 		}
 		vertices[1].unlock();
-		// copy models
-		structSize = Renderer.structures[2].byteSize() >> 2;
-		vert = vertices[2].lock();
-		for (i in 0...sprites.length) {
-			final sprite = sprites[i];
-			// model0
-			vert[i * structSize + 0] = sprite.model._00;
-			vert[i * structSize + 1] = sprite.model._01;
-			vert[i * structSize + 2] = sprite.model._02;
-			// model1
-			vert[i * structSize + 3] = sprite.model._10;
-			vert[i * structSize + 4] = sprite.model._11;
-			vert[i * structSize + 5] = sprite.model._12;
-			// model2
-			vert[i * structSize + 6] = sprite.model._20;
-			vert[i * structSize + 7] = sprite.model._21;
-			vert[i * structSize + 8] = sprite.model._22;
-		}
 		vertices[2].unlock();
 	}
 	#end

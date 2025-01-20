@@ -2,16 +2,17 @@ package s2d;
 
 import kha.FastFloat;
 // s2d
-import s2d.math.Mat3;
-import s2d.math.SMath;
+import kha.math.FastMatrix3;
 
-abstract Camera(Mat3) from Mat3 to Mat3 {
+using s2d.core.utils.extensions.FastMatrix3Ext;
+
+abstract Camera(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 	public var x(get, set):FastFloat;
 	public var y(get, set):FastFloat;
 	public var rotation(get, set):FastFloat;
 
 	public inline function new() {
-		this = Mat3.lookAt(vec2(0.0, 0.0), vec2(0.0, -1.0), vec2(0.0, 1.0));
+		this = FastMatrix3Ext.lookAt({x: 0.0, y: 0.0}, {x: 0.0, y: -1.0}, {x: 0.0, y: 1.0});
 	}
 
 	inline function get_x():FastFloat {
@@ -33,13 +34,13 @@ abstract Camera(Mat3) from Mat3 to Mat3 {
 	}
 
 	inline function get_rotation():FastFloat {
-		return atan2(-this._01, this._00);
+		return Math.atan2(-this._01, this._00);
 	}
 
 	inline function set_rotation(value:FastFloat):FastFloat {
 		var dr = value - rotation;
-		var cos = cos(dr);
-		var sin = sin(dr);
+		var cos = Math.cos(dr);
+		var sin = Math.sin(dr);
 
 		var old_00 = this._00;
 		var old_01 = this._01;

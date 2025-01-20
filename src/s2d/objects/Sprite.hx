@@ -1,11 +1,11 @@
 package s2d.objects;
 
 // s2d
-import s2d.math.Vec4;
+import kha.math.FastVector4;
 
 @:access(s2d.graphics.Lighting)
-class Sprite extends Object {
-	public var cropRect:Vec4 = new Vec4(0.0, 0.0, 1.0, 1.0);
+class Sprite extends StageObject {
+	public var cropRect:FastVector4 = new FastVector4(0.0, 0.0, 1.0, 1.0);
 
 	public inline function new(atlas:SpriteAtlas) {
 		super();

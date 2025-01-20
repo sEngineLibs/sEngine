@@ -1,103 +1,27 @@
-package s2d.graphics;
+package s2d.graphics.lighting;
 
-import kha.Image;
-// s2d
 #if (S2D_RP_LIGHTING == 1)
-#if (S2D_RP_LIGHTING_DEFERRED == 1)
-import s2d.graphics.lighting.GeometryDeferred;
-import s2d.graphics.lighting.LightingDeferred;
-#else
-import s2d.graphics.lighting.LightingForward;
-#end
-#else
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
-#end
 
-class Renderer {
-	static var commands:Array<Void->Void>;
-	public static var buffer:RenderBuffer;
-
-	public static inline function ready(width:Int, height:Int) {
-		buffer = new RenderBuffer(width, height);
-		#if (S2D_RP_LIGHTING == 1)
-		#if (S2D_RP_LIGHTING_DEFERRED == 1)
-		commands = [GeometryDeferred.render, LightingDeferred.render];
-		#else
-		commands = [LightingForward.render];
-		#end
-		#else
-		commands = [draw];
-		#end
-
-		#if S2D_PP_BLOOM
-		PostProcessing.bloom.index = 1;
-		PostProcessing.bloom.enable();
-		#end
-
-		#if S2D_PP_FISHEYE
-		PostProcessing.fisheye.index = 2;
-		PostProcessing.fisheye.enable();
-		#end
-
-		#if S2D_PP_FILTER
-		PostProcessing.filter.index = 3;
-		PostProcessing.filter.enable();
-		#end
-
-		#if S2D_PP_COMPOSITOR
-		PostProcessing.compositor.index = 4;
-		PostProcessing.compositor.enable();
-		#end
-	}
-
-	public static inline function resize(width:Int, height:Int) {
-		buffer.resize(width, height);
-	}
-
-	public static inline function set() {
-		#if (S2D_RP_LIGHTING == 1)
-		#if (S2D_RP_LIGHTING_DEFERRED == 1)
-		GeometryDeferred.compile();
-		LightingDeferred.compile();
-		#else
-		LightingForward.compile();
-		#end
-		#else
-		compile();
-		#end
-
-		#if S2D_PP_BLOOM
-		PostProcessing.bloom.compile();
-		#end
-		#if S2D_PP_FILTER
-		PostProcessing.filter.compile();
-		#end
-		#if S2D_PP_FISHEYE
-		PostProcessing.fisheye.compile();
-		#end
-		#if S2D_PP_COMPOSITOR
-		PostProcessing.compositor.compile();
-		#end
-	}
-
-	public static inline function render():Image {
-		for (command in commands)
-			command();
-		return buffer.tgt;
-	};
-
-	#if (S2D_RP_LIGHTING != 1)
+@:access(s2d.Layer)
+@:access(s2d.SpriteAtlas)
+@:access(s2d.objects.Sprite)
+class LightingForward {
 	public static var structures:Array<VertexStructure> = [];
-	// GEOMETRY PASS
 	static var pipeline:PipelineState;
+	static var lightsDataCL:ConstantLocation;
 	static var viewProjectionCL:ConstantLocation;
+	#if (S2D_RP_ENV_LIGHTING == 1) static var envMapTU:TextureUnit; #end // S2D_RP_ENV_LIGHTING
+	static var albedoMapTU:TextureUnit;
+	static var normalMapTU:TextureUnit;
+	static var emissionMapTU:TextureUnit;
+	static var ormMapTU:TextureUnit;
 	#if (S2D_SPRITE_INSTANCING != 1) static var modelCL:ConstantLocation;
 	static var cropRectCL:ConstantLocation; #end // S2D_SPRITE_INSTANCING
-	static var textureMapTU:TextureUnit;
 
 	public static inline function compile() {
 		// coord
@@ -118,23 +42,27 @@ class Renderer {
 		pipeline = new PipelineState();
 		pipeline.inputLayout = structures;
 		pipeline.vertexShader = Shaders.sprite_vert;
-		pipeline.fragmentShader = Shaders.sprite_frag;
+		pipeline.fragmentShader = Shaders.lighting_forward_frag;
 		pipeline.alphaBlendSource = SourceAlpha;
 		pipeline.alphaBlendDestination = InverseSourceAlpha;
 		pipeline.blendSource = SourceAlpha;
 		pipeline.blendDestination = InverseSourceAlpha;
 		pipeline.compile();
 
-		// GEOMETRY PASS
+		// LIGHTING PASS
+		lightsDataCL = pipeline.getConstantLocation("lightsData");
 		viewProjectionCL = pipeline.getConstantLocation("viewProjection");
+		albedoMapTU = pipeline.getTextureUnit("albedoMap");
+		normalMapTU = pipeline.getTextureUnit("normalMap");
+		emissionMapTU = pipeline.getTextureUnit("emissionMap");
+		ormMapTU = pipeline.getTextureUnit("ormMap");
+
+		#if (S2D_RP_ENV_LIGHTING == 1) envMapTU = pipeline.getTextureUnit("envMap"); #end // S2D_RP_ENV_LIGHTING
 		#if (S2D_SPRITE_INSTANCING != 1) modelCL = pipeline.getConstantLocation("model");
 		cropRectCL = pipeline.getConstantLocation("cropRect"); #end // S2D_SPRITE_INSTANCING
-		textureMapTU = pipeline.getTextureUnit("textureMap");
 	}
 
-	@:access(s2d.SpriteAtlas)
-	@:access(s2d.objects.Sprite)
-	public static inline function draw():Void {
+	public static inline function render():Void {
 		final g4 = Renderer.buffer.tgt.g4;
 		final viewProjection = S2D.stage.viewProjection;
 
@@ -142,29 +70,40 @@ class Renderer {
 		g4.clear(Black);
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(S2D.indices);
+		g4.setMatrix3(viewProjectionCL, viewProjection);
 		#if (S2D_SPRITE_INSTANCING != 1)
 		g4.setVertexBuffer(S2D.vertices);
 		#end
-		g4.setMatrix3(viewProjectionCL, viewProjection);
+		#if (S2D_RP_ENV_LIGHTING == 1)
+		g4.setTexture(envMapTU, S2D.stage.environmentMap);
+		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
+		#end
 		for (layer in S2D.stage.layers) {
+			g4.setFloats(lightsDataCL, layer.lightsData);
 			#if (S2D_SPRITE_INSTANCING == 1)
 			for (atlas in layer.spriteAtlases) {
 				atlas.update();
 
 				g4.setVertexBuffers(atlas.vertices);
-				g4.setTexture(textureMapTU, atlas.textureMap);
+				g4.setTexture(albedoMapTU, atlas.albedoMap);
+				g4.setTexture(normalMapTU, atlas.normalMap);
+				g4.setTexture(ormMapTU, atlas.ormMap);
+				g4.setTexture(emissionMapTU, atlas.emissionMap);
 				g4.drawIndexedVerticesInstanced(atlas.sprites.length);
 			}
 			#else
 			for (sprite in layer.sprites) {
 				g4.setMatrix3(modelCL, sprite._model);
 				g4.setVector4(cropRectCL, sprite.cropRect);
-				g4.setTexture(textureMapTU, sprite.atlas.textureMap);
+				g4.setTexture(albedoMapTU, sprite.atlas.albedoMap);
+				g4.setTexture(normalMapTU, sprite.atlas.normalMap);
+				g4.setTexture(ormMapTU, sprite.atlas.ormMap);
+				g4.setTexture(emissionMapTU, sprite.atlas.emissionMap);
 				g4.drawIndexedVertices();
 			}
 			#end
 		}
 		g4.end();
 	}
-	#end
 }
+#end
