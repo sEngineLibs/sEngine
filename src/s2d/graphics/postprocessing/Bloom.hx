@@ -5,7 +5,6 @@ import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
 
-@:access(s2d.graphics.Renderer)
 class Bloom extends PPEffect {
 	var textureMapTU:TextureUnit;
 	var paramsCL:ConstantLocation;
@@ -24,6 +23,7 @@ class Bloom extends PPEffect {
 		paramsCL = pipeline.getConstantLocation("params");
 	}
 
+	@:access(s2d.graphics.Renderer)
 	inline function render(target:Canvas) {
 		final g2 = target.g2;
 		final g4 = target.g4;

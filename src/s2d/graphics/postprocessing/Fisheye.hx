@@ -7,13 +7,12 @@ import kha.graphics4.ConstantLocation;
 // s2d
 import kha.math.FastVector2;
 
-@:access(s2d.graphics.Renderer)
 class Fisheye extends PPEffect {
 	var textureMapTU:TextureUnit;
 	var positionCL:ConstantLocation;
 	var strengthCL:ConstantLocation;
 
-	public var position:FastVector2 = vec2(0.5);
+	public var position:FastVector2 = new FastVector2(0.5, 0.5);
 	public var strength:Float = 0.0;
 
 	inline function setPipeline() {
@@ -27,6 +26,7 @@ class Fisheye extends PPEffect {
 		strengthCL = pipeline.getConstantLocation("fisheyeStrength");
 	}
 
+	@:access(s2d.graphics.Renderer)
 	inline function render(target:Canvas) {
 		final g2 = target.g2;
 		final g4 = target.g4;

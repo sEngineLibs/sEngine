@@ -1,9 +1,5 @@
 #include "s2d/std/pbr"
 
-#ifndef MAX_LIGHTS
-#define MAX_LIGHTS 16
-#endif
-
 const vec3 viewDir = vec3(0.0, 0.0, 1.0); // 2D
 
 struct Light {
@@ -11,26 +7,16 @@ struct Light {
     vec3 color;
     float power;
     float radius;
+    #if S2D_RP_LIGHTING_DEFERRED == 1
+    float volume;
+    #endif
 };
-#define LIGHT_STRUCT_SIZE 8
 
-Light getLight(float lightsData[1 + MAX_LIGHTS * LIGHT_STRUCT_SIZE], int index) {
-    int i = 1 + index * LIGHT_STRUCT_SIZE;
+vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, vec3 orm) {
+    float occlusion = orm.r;
+    float roughness = clamp(orm.g, 0.05, 1.0);
+    float metalness = orm.b;
 
-    Light light;
-    light.position = vec3(lightsData[i + 0],
-            lightsData[i + 1],
-            lightsData[i + 2]);
-    light.color = vec3(lightsData[i + 3],
-            lightsData[i + 4],
-            lightsData[i + 5]);
-    light.power = lightsData[i + 6];
-    light.radius = lightsData[i + 7];
-
-    return light;
-}
-
-vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, float roughness, float metalness) {
     vec3 l = light.position - position;
     float distSq = dot(l, l);
     float dist = sqrt(distSq);
@@ -55,11 +41,19 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, float roughn
     vec3 kD = (1.0 - F) * (1.0 - metalness);
     vec3 diffuseLight = kD * albedo * max(dot(normal, dir), 0.0) / PI;
 
-    return (diffuseLight + specularLight) * light.color * lightAttenuation;
+    #if S2D_RP_LIGHTING_DEFERRED == 1
+    return (occlusion * (diffuseLight + specularLight) + light.volume) * light.color * lightAttenuation;
+    #else
+    return (occlusion * (diffuseLight + specularLight)) * light.color * lightAttenuation;
+    #endif
 }
 
 #if S2D_RP_ENV_LIGHTING == 1
-vec3 envLighting(sampler2D envMap, vec3 normal, vec3 color, float roughness, float metalness) {
+vec3 envLighting(sampler2D envMap, vec3 normal, vec3 color, vec3 orm) {
+    float occlusion = orm.r;
+    float roughness = clamp(orm.g, 0.05, 1.0);
+    float metalness = orm.b;
+
     vec3 V = normalize(viewDir);
 
     // radiance
@@ -78,6 +72,6 @@ vec3 envLighting(sampler2D envMap, vec3 normal, vec3 color, float roughness, flo
     vec3 kD = (1.0 - F) * (1.0 - metalness);
     vec3 diffuse = kD * color * diffuseIrradiance;
 
-    return diffuse + specular;
+    return occlusion * (diffuse + specular);
 }
 #endif

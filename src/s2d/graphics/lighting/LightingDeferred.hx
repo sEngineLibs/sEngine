@@ -10,8 +10,10 @@ import kha.graphics4.ConstantLocation;
 @:access(s2d.Layer)
 class LightingDeferred {
 	static var pipeline:PipelineState;
-	static var lightsDataCL:ConstantLocation;
 	static var viewProjectionCL:ConstantLocation;
+	static var lightPositionCL:ConstantLocation;
+	static var lightColorCL:ConstantLocation;
+	static var lightAttribCL:ConstantLocation;
 	static var albedoMapTU:TextureUnit;
 	static var normalMapTU:TextureUnit;
 	static var ormMapTU:TextureUnit;
@@ -40,7 +42,9 @@ class LightingDeferred {
 		pipeline.blendOperation = Add;
 		pipeline.compile();
 
-		lightsDataCL = pipeline.getConstantLocation("lightsData");
+		lightPositionCL = pipeline.getConstantLocation("lightPosition");
+		lightColorCL = pipeline.getConstantLocation("lightColor");
+		lightAttribCL = pipeline.getConstantLocation("lightAttrib");
 		viewProjectionCL = pipeline.getConstantLocation("viewProjection");
 		albedoMapTU = pipeline.getTextureUnit("albedoMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
@@ -91,8 +95,16 @@ class LightingDeferred {
 		g4.setTexture(normalMapTU, Renderer.buffer.normalMap);
 		g4.setTexture(ormMapTU, Renderer.buffer.ormMap);
 		for (layer in S2D.stage.layers) {
-			g4.setFloats(lightsDataCL, layer.lightsData);
-			g4.drawIndexedVertices();
+			for (light in layer.lights) {
+				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);
+				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);
+				#if (S2D_RP_LIGHTING_DEFERRED == 1)
+				g4.setFloat3(lightAttribCL, light.power, light.radius, light.volume);
+				#else
+				g4.setFloat2(lightAttribCL, light.power, light.radius);
+				#end
+				g4.drawIndexedVertices();
+			}
 		}
 		g4.end();
 	}

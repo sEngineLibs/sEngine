@@ -21,6 +21,7 @@ class Renderer {
 	static var commands:Array<Void->Void>;
 	public static var buffer:RenderBuffer;
 
+	@:access(s2d.graphics.postprocessing.PPEffect)
 	public static inline function ready(width:Int, height:Int) {
 		buffer = new RenderBuffer(width, height);
 		#if (S2D_RP_LIGHTING == 1)

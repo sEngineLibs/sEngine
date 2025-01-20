@@ -7,7 +7,6 @@ import kha.graphics4.ConstantLocation;
 // s2d
 import kha.math.FastMatrix3;
 
-@:access(s2d.graphics.Renderer)
 class Filter extends PPEffect {
 	var textureMapTU:TextureUnit;
 	var kernelCL:ConstantLocation;
@@ -28,6 +27,7 @@ class Filter extends PPEffect {
 		kernelCL = pipeline.getConstantLocation("kernel");
 	}
 
+	@:access(s2d.graphics.Renderer)
 	inline function render(target:Canvas) {
 		final g2 = target.g2;
 		final g4 = target.g4;

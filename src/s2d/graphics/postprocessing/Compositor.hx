@@ -7,7 +7,6 @@ import kha.arrays.Float32Array;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
 
-@:access(s2d.graphics.Renderer)
 class Compositor extends PPEffect {
 	var textureMapTU:TextureUnit;
 	var paramsCL:ConstantLocation;
@@ -41,6 +40,7 @@ class Compositor extends PPEffect {
 		paramsCL = pipeline.getConstantLocation("params");
 	}
 
+	@:access(s2d.graphics.Renderer)
 	inline function render(target:Canvas) {
 		final g2 = target.g2;
 		final g4 = target.g4;

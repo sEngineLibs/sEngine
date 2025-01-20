@@ -14,8 +14,6 @@ uniform sampler2D ormMap;
 uniform sampler2D emissionMap;
 
 void main() {
-    // output color
-    vec3 col;
     // environment lighting
     #if S2D_RP_ENV_LIGHTING == 1
     // fetch gbuffer textures
@@ -25,19 +23,12 @@ void main() {
     emission = texture(emissionMap, fragCoord).rgb;
     orm = texture(ormMap, fragCoord).rgb;
 
-    float occlusion = orm.r;
-    float roughness = clamp(orm.g, 0.05, 1.0);
-    float metalness = orm.b;
-
-    // convert data
     normal = normalize(normal * 2.0 - 1.0);
 
-    vec3 env = envLighting(envMap, normal, albedo, roughness, metalness);
-    col = emission + occlusion * env;
-
+    vec3 col = emission + envLighting(envMap, normal, albedo, orm);
     // just emission
     #else
-    col = texture(emissionMap, fragCoord).rgb;
+    vec3 col = texture(emissionMap, fragCoord).rgb;
     #endif
 
     fragColor = vec4(col, 1.0);

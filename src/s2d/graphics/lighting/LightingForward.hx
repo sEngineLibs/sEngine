@@ -13,8 +13,10 @@ import kha.graphics4.ConstantLocation;
 class LightingForward {
 	public static var structures:Array<VertexStructure> = [];
 	static var pipeline:PipelineState;
-	static var lightsDataCL:ConstantLocation;
 	static var viewProjectionCL:ConstantLocation;
+	static var lightPositionCL:ConstantLocation;
+	static var lightColorCL:ConstantLocation;
+	static var lightAttribCL:ConstantLocation;
 	#if (S2D_RP_ENV_LIGHTING == 1) static var envMapTU:TextureUnit; #end // S2D_RP_ENV_LIGHTING
 	static var albedoMapTU:TextureUnit;
 	static var normalMapTU:TextureUnit;
@@ -49,9 +51,10 @@ class LightingForward {
 		pipeline.blendDestination = InverseSourceAlpha;
 		pipeline.compile();
 
-		// LIGHTING PASS
-		lightsDataCL = pipeline.getConstantLocation("lightsData");
 		viewProjectionCL = pipeline.getConstantLocation("viewProjection");
+		lightPositionCL = pipeline.getConstantLocation("lightPosition");
+		lightColorCL = pipeline.getConstantLocation("lightColor");
+		lightAttribCL = pipeline.getConstantLocation("lightAttrib");
 		albedoMapTU = pipeline.getTextureUnit("albedoMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		emissionMapTU = pipeline.getTextureUnit("emissionMap");
@@ -79,29 +82,36 @@ class LightingForward {
 		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
 		for (layer in S2D.stage.layers) {
-			g4.setFloats(lightsDataCL, layer.lightsData);
-			#if (S2D_SPRITE_INSTANCING == 1)
-			for (atlas in layer.spriteAtlases) {
-				atlas.update();
-
-				g4.setVertexBuffers(atlas.vertices);
-				g4.setTexture(albedoMapTU, atlas.albedoMap);
-				g4.setTexture(normalMapTU, atlas.normalMap);
-				g4.setTexture(ormMapTU, atlas.ormMap);
-				g4.setTexture(emissionMapTU, atlas.emissionMap);
-				g4.drawIndexedVerticesInstanced(atlas.sprites.length);
+			for (light in layer.lights) {
+				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);
+				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);
+				#if (S2D_RP_LIGHTING_DEFERRED == 1)
+				g4.setFloat3(lightAttribCL, light.power, light.radius, light.volume);
+				#else
+				g4.setFloat2(lightAttribCL, light.power, light.radius);
+				#end
+				#if (S2D_SPRITE_INSTANCING == 1)
+				for (atlas in layer.spriteAtlases) {
+					atlas.update();
+					g4.setVertexBuffers(atlas.vertices);
+					g4.setTexture(albedoMapTU, atlas.albedoMap);
+					g4.setTexture(normalMapTU, atlas.normalMap);
+					g4.setTexture(ormMapTU, atlas.ormMap);
+					g4.setTexture(emissionMapTU, atlas.emissionMap);
+					g4.drawIndexedVerticesInstanced(atlas.sprites.length);
+				}
+				#else
+				for (sprite in layer.sprites) {
+					g4.setMatrix3(modelCL, sprite._model);
+					g4.setVector4(cropRectCL, sprite.cropRect);
+					g4.setTexture(albedoMapTU, sprite.atlas.albedoMap);
+					g4.setTexture(normalMapTU, sprite.atlas.normalMap);
+					g4.setTexture(ormMapTU, sprite.atlas.ormMap);
+					g4.setTexture(emissionMapTU, sprite.atlas.emissionMap);
+					g4.drawIndexedVertices();
+				}
+				#end
 			}
-			#else
-			for (sprite in layer.sprites) {
-				g4.setMatrix3(modelCL, sprite._model);
-				g4.setVector4(cropRectCL, sprite.cropRect);
-				g4.setTexture(albedoMapTU, sprite.atlas.albedoMap);
-				g4.setTexture(normalMapTU, sprite.atlas.normalMap);
-				g4.setTexture(ormMapTU, sprite.atlas.ormMap);
-				g4.setTexture(emissionMapTU, sprite.atlas.emissionMap);
-				g4.drawIndexedVertices();
-			}
-			#end
 		}
 		g4.end();
 	}
