@@ -4,14 +4,15 @@
 #define MAX_LIGHTS 16
 #endif
 
+const vec3 viewDir = vec3(0.0, 0.0, 1.0); // 2D
+
 struct Light {
     vec3 position;
     vec3 color;
     float power;
     float radius;
-    float volume;
 };
-#define LIGHT_STRUCT_SIZE 9
+#define LIGHT_STRUCT_SIZE 8
 
 Light getLight(float lightsData[1 + MAX_LIGHTS * LIGHT_STRUCT_SIZE], int index) {
     int i = 1 + index * LIGHT_STRUCT_SIZE;
@@ -25,7 +26,6 @@ Light getLight(float lightsData[1 + MAX_LIGHTS * LIGHT_STRUCT_SIZE], int index) 
             lightsData[i + 5]);
     light.power = lightsData[i + 6];
     light.radius = lightsData[i + 7];
-    light.volume = lightsData[i + 8];
 
     return light;
 }
@@ -55,7 +55,7 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, float roughn
     vec3 kD = (1.0 - F) * (1.0 - metalness);
     vec3 diffuseLight = kD * albedo * max(dot(normal, dir), 0.0) / PI;
 
-    return (diffuseLight + specularLight + light.volume) * light.color * lightAttenuation;
+    return (diffuseLight + specularLight) * light.color * lightAttenuation;
 }
 
 #if S2D_RP_ENV_LIGHTING == 1

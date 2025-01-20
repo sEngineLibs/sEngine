@@ -13,7 +13,7 @@ class Layer {
 	public var spriteAtlases:Array<SpriteAtlas> = [];
 
 	static final maxLights:Int = 16;
-	static final lightStructSize:Int = 9;
+	static final lightStructSize:Int = 8;
 
 	public inline function new() {
 		lightsData = new Float32Array(1 + maxLights * lightStructSize);
@@ -48,7 +48,6 @@ class Layer {
 			lightsData[ind + 5] = light.color.B;
 			lightsData[ind + 6] = light.power;
 			lightsData[ind + 7] = light.radius;
-			lightsData[ind + 8] = light.volume;
 		}
 		return lightsData;
 	}
