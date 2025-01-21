@@ -54,14 +54,17 @@ class SpriteAtlas {
 			#if (S2D_LIGHTING == 1)
 			#if (S2D_LIGHTING_DEFERRED == 1)
 			new VertexBuffer(0, GeometryDeferred.structures[1], StaticUsage, 1), // crop rect
-			new VertexBuffer(0, GeometryDeferred.structures[2], StaticUsage, 1) // model
+			new VertexBuffer(0, GeometryDeferred.structures[2], StaticUsage, 1), // model
+			new VertexBuffer(0, GeometryDeferred.structures[3], StaticUsage, 1) // depth
 			#else
 			new VertexBuffer(0, LightingForward.structures[1], StaticUsage, 1), // crop rect
-			new VertexBuffer(0, LightingForward.structures[2], StaticUsage, 1) // model
+			new VertexBuffer(0, LightingForward.structures[2], StaticUsage, 1), // model
+			new VertexBuffer(0, LightingForward.structures[3], StaticUsage, 1) // depth
 			#end
 			#else
 			new VertexBuffer(0, Renderer.structures[1], StaticUsage, 1), // crop rect
-			new VertexBuffer(0, Renderer.structures[2], StaticUsage, 1) // model
+			new VertexBuffer(0, Renderer.structures[2], StaticUsage, 1), // model
+			new VertexBuffer(0, Renderer.structures[3], StaticUsage, 1) // depth
 			#end
 		];
 	}
@@ -81,13 +84,16 @@ class SpriteAtlas {
 		#if (S2D_LIGHTING_DEFERRED == 1)
 		vertices[1] = new VertexBuffer(sprites.length, GeometryDeferred.structures[1], StaticUsage, 1);
 		vertices[2] = new VertexBuffer(sprites.length, GeometryDeferred.structures[2], StaticUsage, 1);
+		vertices[3] = new VertexBuffer(sprites.length, GeometryDeferred.structures[3], StaticUsage, 1);
 		#else
 		vertices[1] = new VertexBuffer(sprites.length, LightingForward.structures[1], StaticUsage, 1);
 		vertices[2] = new VertexBuffer(sprites.length, LightingForward.structures[2], StaticUsage, 1);
+		vertices[3] = new VertexBuffer(sprites.length, LightingForward.structures[3], StaticUsage, 1);
 		#end
 		#else
 		vertices[1] = new VertexBuffer(sprites.length, Renderer.structures[1], StaticUsage, 1);
 		vertices[2] = new VertexBuffer(sprites.length, Renderer.structures[2], StaticUsage, 1);
+		vertices[3] = new VertexBuffer(sprites.length, Renderer.structures[3], StaticUsage, 1);
 		#end
 	}
 
@@ -96,27 +102,33 @@ class SpriteAtlas {
 		#if (S2D_LIGHTING_DEFERRED == 1)
 		final cStructSize = GeometryDeferred.structures[1].byteSize() >> 2;
 		final mStructSize = GeometryDeferred.structures[2].byteSize() >> 2;
+		final dStructSize = GeometryDeferred.structures[3].byteSize() >> 2;
 		#else
 		final cStructSize = LightingForward.structures[1].byteSize() >> 2;
 		final mStructSize = LightingForward.structures[2].byteSize() >> 2;
+		final dStructSize = LightingForward.structures[3].byteSize() >> 2;
 		#end
 		#else
 		final cStructSize = Renderer.structures[1].byteSize() >> 2;
 		final mStructSize = Renderer.structures[2].byteSize() >> 2;
+		final dStructSize = Renderer.structures[3].byteSize() >> 2;
 		#end
-		var cData = vertices[1].lock();
-		var mData = vertices[2].lock();
-		for (i in 0...sprites.length) {
-			final c = sprites[i].cropRect;
-			final m = sprites[i]._model;
+		final cData = vertices[1].lock();
+		final mData = vertices[2].lock();
+		final dData = vertices[3].lock();
+		final length = sprites.length;
+		var i = 0;
+		for (sprite in sprites) {
+			final c = sprite.cropRect;
+			final m = sprite._model;
 			// crop rect
-			var ci = i * cStructSize;
+			final ci = i * cStructSize;
 			cData[ci + 0] = c.x;
 			cData[ci + 1] = c.y;
 			cData[ci + 2] = c.z;
 			cData[ci + 3] = c.w;
 			// model
-			var mi = i * mStructSize;
+			final mi = i * mStructSize;
 			mData[mi + 0] = m._00;
 			mData[mi + 1] = m._01;
 			mData[mi + 2] = m._02;
@@ -126,9 +138,14 @@ class SpriteAtlas {
 			mData[mi + 6] = m._20;
 			mData[mi + 7] = m._21;
 			mData[mi + 8] = m._22;
+			// depth
+			final di = i * dStructSize;
+			dData[di] = i / length;
+			++i;
 		}
 		vertices[1].unlock();
 		vertices[2].unlock();
+		vertices[3].unlock();
 	}
 	#end
 }

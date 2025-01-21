@@ -6,6 +6,7 @@ import kha.math.FastVector2;
 import kha.math.FastMatrix3;
 
 class StageObject {
+	public var layer:Layer;
 	public var parent:StageObject = null;
 	public var children:Array<StageObject> = [];
 	public var source:StageObject = null;
@@ -22,7 +23,9 @@ class StageObject {
 	public var scaleY(get, set):FastFloat;
 	public var rotation(get, set):FastFloat;
 
-	public inline function new() {}
+	public inline function new(layer:Layer) {
+		this.layer = layer;
+	}
 
 	inline function get__model():FastMatrix3 {
 		var m = model;

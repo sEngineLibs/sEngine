@@ -1,17 +1,24 @@
 package s2d.graphics;
 
+import kha.graphics4.Graphics;
 import kha.Image;
+#if (S2D_LIGHTING != 1)
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
-// s2d
+#else
+#if (S2D_LIGHTING_SHADOWS == 1)
 import s2d.graphics.lighting.ShadowCaster;
+#end
+#if (S2D_LIGHTING_DEFERRED == 1)
 import s2d.graphics.lighting.GeometryDeferred;
 import s2d.graphics.lighting.LightingDeferred;
+#else
 import s2d.graphics.lighting.LightingForward;
-
+#end
+#end
 class Renderer {
 	static var commands:Array<Void->Void>;
 	public static var buffer:RenderBuffer;
@@ -86,8 +93,8 @@ class Renderer {
 	public static inline function render():Image {
 		for (command in commands)
 			command();
-		return buffer.shadowMap;
-	};
+		return buffer.tgt;
+	}
 
 	#if (S2D_LIGHTING != 1)
 	public static var structures:Array<VertexStructure> = [];
@@ -112,6 +119,9 @@ class Renderer {
 		structures[2].add("model0", Float32_3X);
 		structures[2].add("model1", Float32_3X);
 		structures[2].add("model2", Float32_3X);
+		structures.push(new VertexStructure());
+		structures[3].instanced = true;
+		structures[3].add("depth", Float32_1X);
 		#end // S2D_SPRITE_INSTANCING
 
 		pipeline = new PipelineState();
@@ -131,11 +141,9 @@ class Renderer {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
 	}
 
-	@:access(s2d.SpriteAtlas)
 	@:access(s2d.objects.Sprite)
 	public static inline function draw():Void {
 		final g4 = Renderer.buffer.tgt.g4;
-		final viewProjection = S2D.stage.viewProjection;
 
 		g4.begin();
 		g4.clear(Black);
@@ -144,12 +152,10 @@ class Renderer {
 		#if (S2D_SPRITE_INSTANCING != 1)
 		g4.setVertexBuffer(S2D.vertices);
 		#end
-		g4.setMatrix3(viewProjectionCL, viewProjection);
+		g4.setMatrix3(viewProjectionCL, S2D.stage.viewProjection);
 		for (layer in S2D.stage.layers) {
 			#if (S2D_SPRITE_INSTANCING == 1)
 			for (atlas in layer.spriteAtlases) {
-				atlas.update();
-
 				g4.setVertexBuffers(atlas.vertices);
 				g4.setTexture(textureMapTU, atlas.textureMap);
 				g4.drawIndexedVerticesInstanced(atlas.sprites.length);

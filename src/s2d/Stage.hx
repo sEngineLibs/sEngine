@@ -9,12 +9,12 @@ import kha.math.FastMatrix3;
 class Stage {
 	public var layers:Array<Layer> = [];
 	public var camera:Camera = new Camera();
-	public var viewProjection(get, null):FastMatrix3;
+	public var viewProjection:FastMatrix3;
 
 	public inline function new() {}
 
-	inline function get_viewProjection() {
-		return S2D.projection.multmat(camera);
+	public inline function updateViewProjection() {
+		viewProjection = S2D.projection.multmat(camera);
 	}
 
 	#if (S2D_LIGHTING_ENVIRONMENT == 1)

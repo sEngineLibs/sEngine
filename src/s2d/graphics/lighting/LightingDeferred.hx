@@ -77,7 +77,11 @@ class LightingDeferred {
 
 	public static inline function render():Void {
 		final g4 = Renderer.buffer.tgt.g4;
-		final viewProjection = S2D.stage.viewProjection;
+
+		#if (S2D_LIGHTING_SHADOWS == 1)
+		for (layer in S2D.stage.layers)
+			layer.drawShadows();
+		#end
 
 		g4.begin();
 		g4.clear(Black);
@@ -97,19 +101,20 @@ class LightingDeferred {
 
 		// stage lights
 		g4.setPipeline(pipeline);
-		g4.setMatrix3(viewProjectionCL, viewProjection);
+		g4.setMatrix3(viewProjectionCL, S2D.stage.viewProjection);
 		g4.setTexture(albedoMapTU, Renderer.buffer.albedoMap);
 		g4.setTexture(normalMapTU, Renderer.buffer.normalMap);
 		g4.setTexture(ormMapTU, Renderer.buffer.ormMap);
 		for (layer in S2D.stage.layers) {
+			#if (S2D_LIGHTING_SHADOWS == 1)
+			var i = 0;
+			#end
 			for (light in layer.lights) {
 				#if (S2D_LIGHTING_SHADOWS == 1)
-				g4.end();
-				layer.castShadows(light);
-				ShadowCaster.drawShadows(Renderer.buffer.shadowMap, layer);
-				g4.begin();
-				g4.setPipeline(pipeline);
-				g4.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
+				if (light.isCastingShadows) {
+					g4.setTexture(shadowMapTU, layer.shadowMaps[i]);
+					++i;
+				}
 				#end
 				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);
 				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);

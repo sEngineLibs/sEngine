@@ -22,8 +22,11 @@ class LightingForward {
 	static var normalMapTU:TextureUnit;
 	static var emissionMapTU:TextureUnit;
 	static var ormMapTU:TextureUnit;
-	#if (S2D_SPRITE_INSTANCING != 1) static var modelCL:ConstantLocation;
-	static var cropRectCL:ConstantLocation; #end // S2D_SPRITE_INSTANCING
+	#if (S2D_SPRITE_INSTANCING != 1)
+	static var depthCL:ConstantLocation;
+	static var modelCL:ConstantLocation;
+	static var cropRectCL:ConstantLocation;
+	#end // S2D_SPRITE_INSTANCING
 
 	public static inline function compile() {
 		// coord
@@ -39,6 +42,9 @@ class LightingForward {
 		structures[2].add("model0", Float32_3X);
 		structures[2].add("model1", Float32_3X);
 		structures[2].add("model2", Float32_3X);
+		structures.push(new VertexStructure());
+		structures[3].instanced = true;
+		structures[3].add("depth", Float32_1X);
 		#end // S2D_SPRITE_INSTANCING
 
 		pipeline = new PipelineState();
@@ -61,8 +67,11 @@ class LightingForward {
 		ormMapTU = pipeline.getTextureUnit("ormMap");
 
 		#if (S2D_LIGHTING_ENVIRONMENT == 1) envMapTU = pipeline.getTextureUnit("envMap"); #end // S2D_LIGHTING_ENVIRONMENT
-		#if (S2D_SPRITE_INSTANCING != 1) modelCL = pipeline.getConstantLocation("model");
-		cropRectCL = pipeline.getConstantLocation("cropRect"); #end // S2D_SPRITE_INSTANCING
+		#if (S2D_SPRITE_INSTANCING != 1)
+		depthCL = pipeline.getConstantLocation("depth");
+		modelCL = pipeline.getConstantLocation("model");
+		cropRectCL = pipeline.getConstantLocation("cropRect");
+		#end // S2D_SPRITE_INSTANCING
 	}
 
 	public static inline function render():Void {
@@ -92,7 +101,6 @@ class LightingForward {
 				#end
 				#if (S2D_SPRITE_INSTANCING == 1)
 				for (atlas in layer.spriteAtlases) {
-					atlas.update();
 					g4.setVertexBuffers(atlas.vertices);
 					g4.setTexture(albedoMapTU, atlas.albedoMap);
 					g4.setTexture(normalMapTU, atlas.normalMap);
@@ -101,7 +109,9 @@ class LightingForward {
 					g4.drawIndexedVerticesInstanced(atlas.sprites.length);
 				}
 				#else
+				var i = 0;
 				for (sprite in layer.sprites) {
+					g4.setFloat(depthCL, i / layer.sprites.length);
 					g4.setMatrix3(modelCL, sprite._model);
 					g4.setVector4(cropRectCL, sprite.cropRect);
 					g4.setTexture(albedoMapTU, sprite.atlas.albedoMap);
@@ -109,6 +119,7 @@ class LightingForward {
 					g4.setTexture(ormMapTU, sprite.atlas.ormMap);
 					g4.setTexture(emissionMapTU, sprite.atlas.emissionMap);
 					g4.drawIndexedVertices();
+					++i;
 				}
 				#end
 			}

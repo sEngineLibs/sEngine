@@ -13,14 +13,15 @@ class Sprite extends StageObject {
 	public var atlas:SpriteAtlas;
 	#end
 	#if (S2D_LIGHTING_SHADOWS == 1)
-	@:isVar public var mesh(default, set):Vector<FastVector4> = new Vector(0);
+	public var isCastingShadows:Bool = true;
 	public var shadowOpacity:Float = 1.0;
+	@:isVar public var mesh(default, set):Vector<FastVector4> = new Vector(0);
 	#end
 
 	public inline function new(atlas:SpriteAtlas) {
-		super();
+		super(atlas.layer);
 		this.atlas = atlas;
-		atlas.layer.addSprite(this);
+		layer.addSprite(this);
 	}
 
 	#if (S2D_SPRITE_INSTANCING == 1)
@@ -35,8 +36,9 @@ class Sprite extends StageObject {
 	@:access(s2d.Layer)
 	inline function set_mesh(value:Vector<FastVector4>) {
 		// each mesh edge produces 4 shadow vertices
-		atlas.layer.adjustShadowBuffers((value.length - mesh.length) * 4);
+		final d = (value.length - mesh.length) * 4;
 		mesh = value;
+		layer.adjustShadowBuffers(d);
 		return value;
 	}
 	#end

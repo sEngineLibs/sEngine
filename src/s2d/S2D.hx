@@ -89,10 +89,17 @@ class S2D {
 		vertices.unlock();
 	}
 
+	@:access(s2d.SpriteAtlas)
 	static inline function update() {
 		Time.update();
 		Dispatcher.update();
 		Action.update(Time.time);
+		S2D.stage.updateViewProjection();
+		#if (S2D_SPRITE_INSTANCING == 1)
+		for (layer in S2D.stage.layers)
+			for (atlas in layer.spriteAtlases)
+				atlas.update();
+		#end
 	}
 
 	public static inline function set() {
@@ -126,26 +133,24 @@ class S2D {
 	}
 
 	public static inline function local2WorldSpace(point:FastVector2):FastVector2 {
-		var wsp = stage.viewProjection.inverse().multvec({x: point.x * 2.0 - 1.0, y: point.y * 2.0 - 1.0});
-		return wsp;
+		return stage.viewProjection.inverse().multvec(point);
 	}
 
 	public static inline function world2LocalSpace(point:FastVector2):FastVector2 {
-		var ncp = stage.viewProjection.multvec(point);
-		return {x: ncp.x * 0.5 + 0.5, y: ncp.y * 0.5 + 0.5};
+		return stage.viewProjection.multvec(point);
 	}
 
 	public static inline function screen2LocalSpace(point:FastVector2):FastVector2 {
 		return {
-			x: point.x / realWidth,
-			y: point.y / realHeight,
+			x: point.x / realWidth * 2.0 - 1.0,
+			y: point.y / realHeight * 2.0 - 1.0
 		};
 	}
 
 	public static inline function local2ScreenSpace(point:FastVector2):FastVector2 {
 		return {
-			x: point.x * realWidth,
-			y: point.y * realHeight,
+			x: point.x * realWidth * 0.5 - 0.5,
+			y: point.y * realHeight * 0.5 - 0.5
 		};
 	}
 

@@ -40,7 +40,7 @@ void main() {
 
     vec3 l = lighting(light, position, normal, albedo.rgb, orm);
     #if S2D_LIGHTING_SHADOWS == 1
-    float shadow = texture(shadowMap, fragCoord).r;
+    vec3 shadow = texture(shadowMap, fragCoord).rgb;
     fragColor = vec4(l * shadow, 1.0);
     #else
     fragColor = vec4(l, 1.0);
