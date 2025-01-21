@@ -48,11 +48,7 @@ class GeometryDeferred {
 		pipeline.vertexShader = Shaders.sprite_vert;
 		pipeline.fragmentShader = Shaders.geometry_frag;
 		pipeline.depthWrite = true;
-		pipeline.depthMode = Always;
-		pipeline.alphaBlendSource = SourceAlpha;
-		pipeline.alphaBlendDestination = InverseSourceAlpha;
-		pipeline.blendSource = SourceAlpha;
-		pipeline.blendDestination = InverseSourceAlpha;
+		pipeline.depthMode = Greater;
 		pipeline.compile();
 
 		// GEOMETRY PASS

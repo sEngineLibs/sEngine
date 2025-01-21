@@ -39,5 +39,5 @@ void main() {
     emissionColor = vec4(emission, albedo.a);
     ormColor = vec4(orm, albedo.a);
     if (albedo.a == 1.0)
-        gl_FragDepth = 1.0; // this needs to be fixed
+        gl_FragDepth = 0.5 + depth; // this needs to be fixed
 }
