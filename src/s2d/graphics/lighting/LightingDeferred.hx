@@ -105,7 +105,8 @@ class LightingDeferred {
 			for (light in layer.lights) {
 				#if (S2D_LIGHTING_SHADOWS == 1)
 				g4.end();
-				ShadowCaster.castShadows(Renderer.buffer.shadowMap, light, layer.sprites);
+				layer.castShadows(light);
+				ShadowCaster.drawShadows(Renderer.buffer.shadowMap, layer);
 				g4.begin();
 				g4.setPipeline(pipeline);
 				g4.setTexture(shadowMapTU, Renderer.buffer.shadowMap);

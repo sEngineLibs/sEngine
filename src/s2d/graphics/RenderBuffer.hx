@@ -42,7 +42,7 @@ class RenderBuffer {
 
 	public inline function resize(width:Int, heigth:Int) {
 		for (i in 0...length) {
-			buffer[i] = Image.createRenderTarget(width, heigth, RGBA32, DepthOnly);
+			buffer[i] = Image.createRenderTarget(width, heigth, RGBA32);
 		}
 	}
 

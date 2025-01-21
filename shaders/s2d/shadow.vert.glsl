@@ -1,12 +1,10 @@
 #version 450
 
-uniform mat3 MVP;
+uniform mat3 VP;
 
 in vec2 vertCoord;
-out vec2 fragCoord;
 
 void main() {
-    vec3 pos = MVP * vec3(vertCoord, 1.0);
+    vec3 pos = VP * vec3(vertCoord, 1.0);
     gl_Position = vec4(pos, 1.0);
-    fragCoord = vertCoord * 0.5 + 0.5;
 }

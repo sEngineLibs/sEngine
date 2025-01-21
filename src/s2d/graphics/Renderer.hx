@@ -86,7 +86,7 @@ class Renderer {
 	public static inline function render():Image {
 		for (command in commands)
 			command();
-		return buffer.tgt;
+		return buffer.shadowMap;
 	};
 
 	#if (S2D_LIGHTING != 1)

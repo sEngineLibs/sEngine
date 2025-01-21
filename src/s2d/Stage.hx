@@ -3,12 +3,11 @@ package s2d;
 #if (S2D_LIGHTING_ENVIRONMENT == 1)
 import kha.Image;
 #end
-import s2d.core.Buffer;
 import kha.math.FastMatrix3;
 
 @:access(s2d.objects.Object)
 class Stage {
-	public var layers:Buffer<Layer> = [];
+	public var layers:Array<Layer> = [];
 	public var camera:Camera = new Camera();
 	public var viewProjection(get, null):FastMatrix3;
 
