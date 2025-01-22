@@ -58,6 +58,7 @@ class S2D {
 		return value;
 	}
 
+	@:access(s2d.graphics.Renderer)
 	public static inline function ready(w:Int, h:Int) {
 		realWidth = w;
 		realHeight = h;
@@ -102,10 +103,12 @@ class S2D {
 		#end
 	}
 
+	@:access(s2d.graphics.Renderer)
 	public static inline function set() {
 		Renderer.set();
 	}
 
+	@:access(s2d.graphics.Renderer)
 	public static inline function resize(w:Int, h:Int) {
 		realWidth = w;
 		realHeight = h;
@@ -130,6 +133,7 @@ class S2D {
 			projection = FastMatrix3Ext.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale);
 		else
 			projection = FastMatrix3Ext.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio);
+		stage.updateViewProjection();
 	}
 
 	public static inline function local2WorldSpace(point:FastVector2):FastVector2 {
@@ -162,6 +166,7 @@ class S2D {
 		return local2ScreenSpace(world2LocalSpace(point));
 	}
 
+	@:access(s2d.graphics.Renderer)
 	public static inline function render(target:Canvas):Void {
 		update();
 

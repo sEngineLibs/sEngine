@@ -10,7 +10,7 @@ import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 #else
 #if (S2D_LIGHTING_SHADOWS == 1)
-import s2d.graphics.lighting.ShadowCaster;
+import s2d.graphics.lighting.ShadowDrawer;
 #end
 #if (S2D_LIGHTING_DEFERRED == 1)
 import s2d.graphics.lighting.GeometryDeferred;
@@ -21,10 +21,10 @@ import s2d.graphics.lighting.LightingForward;
 #end
 class Renderer {
 	static var commands:Array<Void->Void>;
-	public static var buffer:RenderBuffer;
+	static var buffer:RenderBuffer;
 
 	@:access(s2d.graphics.postprocessing.PPEffect)
-	public static inline function ready(width:Int, height:Int) {
+	static inline function ready(width:Int, height:Int) {
 		buffer = new RenderBuffer(width, height);
 		#if (S2D_LIGHTING == 1)
 		#if (S2D_LIGHTING_DEFERRED == 1)
@@ -57,11 +57,15 @@ class Renderer {
 		#end
 	}
 
-	public static inline function resize(width:Int, height:Int) {
+	@:access(s2d.Layer)
+	static inline function resize(width:Int, height:Int) {
 		buffer.resize(width, height);
+		for (layer in S2D.stage.layers) {
+			layer.resizeShadowMaps(width, height);
+		}
 	}
 
-	public static inline function set() {
+	static inline function set() {
 		#if (S2D_LIGHTING == 1)
 		#if (S2D_LIGHTING_DEFERRED == 1)
 		GeometryDeferred.compile();
@@ -70,7 +74,7 @@ class Renderer {
 		LightingForward.compile();
 		#end
 		#if (S2D_LIGHTING_SHADOWS == 1)
-		ShadowCaster.compile();
+		ShadowDrawer.compile();
 		#end
 		#else
 		compile();
@@ -90,21 +94,21 @@ class Renderer {
 		#end
 	}
 
-	public static inline function render():Image {
+	static inline function render():Image {
 		for (command in commands)
 			command();
 		return buffer.tgt;
 	}
 
 	#if (S2D_LIGHTING != 1)
-	public static var structures:Array<VertexStructure> = [];
+	static var structures:Array<VertexStructure> = [];
 	static var pipeline:PipelineState;
 	static var viewProjectionCL:ConstantLocation;
 	#if (S2D_SPRITE_INSTANCING != 1) static var modelCL:ConstantLocation;
 	static var cropRectCL:ConstantLocation; #end // S2D_SPRITE_INSTANCING
 	static var textureMapTU:TextureUnit;
 
-	public static inline function compile() {
+	static inline function compile() {
 		structures.push(new VertexStructure());
 		structures[0].add("vertCoord", Float32_2X);
 
@@ -139,7 +143,7 @@ class Renderer {
 	}
 
 	@:access(s2d.objects.Sprite)
-	public static inline function draw():Void {
+	static inline function draw():Void {
 		final g4 = Renderer.buffer.tgt.g4;
 
 		g4.begin();

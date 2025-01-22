@@ -9,38 +9,55 @@ import s2d.core.utils.MathUtils;
 @:autoBuild(s2d.core.macro.SMacro.build())
 abstract class StageObject {
 	@readonly public var layer:Layer;
-	@readonly public var children:Array<StageObject> = [];
-	@readonly public var targets:Array<StageObject> = [];
 	@readonly public var model:FastMatrix3 = FastMatrix3.identity();
 
 	var _parent:StageObject = null;
-	var _source:StageObject = null;
+	var _transformationSource:StageObject = null;
 
 	public var parent(get, set):StageObject;
-	public var source(get, set):StageObject;
+	public var transformationSource(get, set):StageObject;
+	@readonly public var children:Array<StageObject> = [];
+	@readonly public var transformationTargets:Array<StageObject> = [];
 
-	@:isVar public var z(default, set):FastFloat;
+	var finalModel:FastMatrix3;
+	var finalZ:FastFloat;
+
+	@:isVar public var z(default, set):FastFloat = 0.0;
 	public var x(get, set):FastFloat;
 	public var y(get, set):FastFloat;
 	public var scaleX(get, set):FastFloat;
 	public var scaleY(get, set):FastFloat;
 	public var rotation(get, set):FastFloat;
 
-	var finalModel:FastMatrix3;
-	var finalZ:FastFloat;
-
 	public inline function new(layer:Layer) {
 		this.layer = layer;
 	}
 
-	abstract function reset():Void;
+	abstract function onZChanged():Void;
 
-	inline function invalidate():Void {
-		reset();
+	abstract function onTransformationChanged():Void;
+
+	inline function invalidateZ():Void {
+		if (parent != null)
+			finalZ = clamp(parent.finalZ + z, 0.0, 1.0);
+		else
+			finalZ = clamp(z, 0.0, 1.0);
+		onZChanged();
 		for (c in children)
-			c.invalidate();
-		for (t in targets)
-			t.invalidate();
+			c.invalidateZ();
+	}
+
+	inline function invalidateTransformation():Void {
+		finalModel = model;
+		if (parent != null)
+			finalModel = parent.finalModel.multmat(finalModel);
+		if (transformationSource != null)
+			finalModel = finalModel.multmat(transformationSource.finalModel);
+		onTransformationChanged();
+		for (c in children)
+			c.invalidateTransformation();
+		for (t in transformationTargets)
+			t.invalidateTransformation();
 	}
 
 	public inline function addChild(value:StageObject):Void {
@@ -67,33 +84,33 @@ abstract class StageObject {
 			_parent.removeChild(this);
 	}
 
-	public inline function addTarget(value:StageObject):Void {
-		if (value == null || value == this || targets.contains(value))
+	public inline function addTransformationTarget(value:StageObject):Void {
+		if (value == null || value == this || transformationTargets.contains(value))
 			return;
-		value._source = this;
-		targets.push(value);
+		value._transformationSource = this;
+		transformationTargets.push(value);
 	}
 
-	public inline function removeTarget(value:StageObject):Void {
-		if (value == null || value == this || !targets.contains(value))
+	public inline function removeTransformationTarget(value:StageObject):Void {
+		if (value == null || value == this || !transformationTargets.contains(value))
 			return;
-		value._source = null;
-		targets.remove(value);
+		value._transformationSource = null;
+		transformationTargets.remove(value);
 	}
 
-	public inline function setSource(value:StageObject):Void {
+	public inline function setTransformationSource(value:StageObject):Void {
 		if (value != null)
-			value.addTarget(this);
+			value.addTransformationTarget(this);
 	}
 
-	public inline function removeSource():Void {
-		if (_source != null)
-			_source.removeTarget(this);
+	public inline function removeTransformationSource():Void {
+		if (_transformationSource != null)
+			_transformationSource.removeTransformationTarget(this);
 	}
 
 	inline function transform(f:Void->Void) {
 		f();
-		invalidate();
+		invalidateTransformation();
 	}
 
 	overload extern public inline function moveG(x:FastFloat, y:FastFloat) {
@@ -245,17 +262,18 @@ abstract class StageObject {
 		return value;
 	}
 
-	inline function get_source():StageObject {
-		return _source;
+	inline function get_transformationSource():StageObject {
+		return _transformationSource;
 	}
 
-	inline function set_source(value:StageObject):StageObject {
-		setSource(value);
+	inline function set_transformationSource(value:StageObject):StageObject {
+		setTransformationSource(value);
 		return value;
 	}
 
 	inline function set_z(value:FastFloat) {
-		z = clamp(value, 0.0, 1.0);
+		z = value;
+		invalidateZ();
 		return z;
 	}
 

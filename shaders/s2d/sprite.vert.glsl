@@ -10,9 +10,8 @@ in vec4 cropRect;
 in vec3 model0;
 in vec3 model1;
 in vec3 model2;
-in float spriteDepth;
+in float vertDepth;
 out mat3 model;
-out float depth;
 #endif
 
 in vec2 vertPos;
@@ -22,7 +21,6 @@ out vec2 fragUV;
 void main() {
     #if (S2D_SPRITE_INSTANCING == 1)
     model = mat3(model0, model1, model2);
-    depth = spriteDepth;
     #endif
     vec3 pos = viewProjection * model * vec3(vertPos, 1.0);
     gl_Position = vec4(pos.xy, depth, 1.0);

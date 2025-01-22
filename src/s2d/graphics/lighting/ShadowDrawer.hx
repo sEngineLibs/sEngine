@@ -6,7 +6,7 @@ import kha.Shaders;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 
-class ShadowCaster {
+class ShadowDrawer {
 	static var structure:VertexStructure;
 	static var pipeline:PipelineState;
 
@@ -27,6 +27,7 @@ class ShadowCaster {
 		pipeline.compile();
 	}
 
+	@:access(s2d.graphics.Renderer)
 	@:access(s2d.Layer)
 	public static inline function render(target:Image, layer:Layer):Void {
 		final g4 = target.g4;

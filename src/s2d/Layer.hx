@@ -1,5 +1,6 @@
 package s2d;
 
+import kha.math.FastVector2;
 import haxe.ds.Vector;
 // s2d
 import s2d.SpriteAtlas;
@@ -10,7 +11,7 @@ import kha.Image;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 // s2d
-import s2d.graphics.lighting.ShadowCaster;
+import s2d.graphics.lighting.ShadowDrawer;
 #end
 
 using s2d.core.utils.extensions.VectorExt;
@@ -27,6 +28,7 @@ class Layer {
 	}
 
 	public inline function addSprite(sprite:Sprite) {
+		@:privateAccess sprite.index = sprites.length;
 		sprites = sprites.push(sprite);
 	}
 
@@ -37,29 +39,42 @@ class Layer {
 	#if (S2D_LIGHTING_SHADOWS == 1)
 	var shadowVertices:VertexBuffer;
 	var shadowIndices:IndexBuffer;
+	var shadowMaps:Vector<Image>;
 
-	@:isVar public var shadowMaps(default, null):Vector<Image> = new Vector(0);
-
-	inline function adjustShadowMaps(d:Int) {
-		shadowMaps = new Vector(shadowMaps.length + d);
-		for (i in 0...shadowMaps.length)
-			shadowMaps[i] = Image.createRenderTarget(S2D.width, S2D.height, RGBA32, DepthOnly);
+	inline function resizeShadowMaps(width:Int, height:Int) {
+		shadowMaps = new Vector(shadowMaps.length, Image.createRenderTarget(width, height, L8));
+		drawLayerShadows();
 	}
 
-	@:access(s2d.graphics.lighting.ShadowCaster)
+	@:access(s2d.objects.Light)
+	inline function adjustShadowMaps(light:Light) {
+		var i = 0;
+		for (light in lights) {
+			if (light.isMappingShadows) {
+				light.shadowMapID = i;
+				++i;
+			}
+		}
+		shadowMaps = new Vector(i, Image.createRenderTarget(S2D.width, S2D.width, L8));
+		drawLightShadows(light);
+	}
+
+	@:access(s2d.objects.Sprite)
+	@:access(s2d.graphics.lighting.ShadowDrawer)
 	inline function adjustShadowBuffers(d:Int) {
 		var vCount = d;
 		if (shadowVertices != null)
 			vCount += shadowVertices.count();
 
-		shadowVertices = new VertexBuffer(vCount, ShadowCaster.structure, DynamicUsage);
+		shadowVertices = new VertexBuffer(vCount, ShadowDrawer.structure, DynamicUsage);
 		shadowIndices = new IndexBuffer((vCount - 2) * 3, StaticUsage);
 		final ind = shadowIndices.lock();
 		var e = 0;
 		for (sprite in sprites) {
 			for (_ in sprite.mesh) {
-				final i = e * 6;
-				final v = e * 4;
+				// each edge produces 2 triangles
+				final i = e * 6; // 6 indices
+				final v = e * 4; // 4 vertices
 				// p1 -> p2 -> e1
 				ind[i + 0] = v + 0;
 				ind[i + 1] = v + 1;
@@ -75,61 +90,84 @@ class Layer {
 	}
 
 	@:access(s2d.objects.Sprite)
-	inline function buildShadows(light:Light):Void {
+	inline function mapShadows(light:Light):Void {
 		final lightPos = S2D.world2LocalSpace({x: light.x, y: light.y});
 		final distance = light.radius * light.power;
 
 		final vert = shadowVertices.lock();
-		final length = sprites.length;
-		var v = 0;
-		var i = 0;
+		var offset = 0;
 		for (sprite in sprites) {
 			if (sprite.isCastingShadows) {
-				final z = i / length;
 				final mvp = S2D.stage.viewProjection.multmat(sprite.finalModel);
+				final normalMatrix = sprite.finalModel.inverse().transpose();
 				for (edge in sprite.mesh) {
-					var p1 = mvp.multvec({x: edge.x, y: edge.y});
-					var p2 = mvp.multvec({x: edge.z, y: edge.w});
-					var e1 = p1.add(p1.sub(lightPos).mult(distance));
-					var e2 = p2.add(p2.sub(lightPos).mult(distance));
+					var v1 = mvp.multvec(edge.v1);
+					var v2 = mvp.multvec(edge.v2);
+					var l:FastVector2 = { // light direction
+						x: lightPos.x - (v1.x + v2.x) / 2,
+						y: lightPos.y - (v1.y + v2.y) / 2
+					};
+					var normalTransformed = normalMatrix.multvec(edge.normal).normalized();
+					if (l.dot(normalTransformed) < 0) {
+						var e1 = v1.add(v1.sub(lightPos).mult(distance));
+						var e2 = v2.add(v2.sub(lightPos).mult(distance));
 
-					vert[v + 0] = p1.x;
-					vert[v + 1] = p1.y;
-					vert[v + 2] = z;
-					vert[v + 3] = sprite.shadowOpacity;
+						vert[offset + 0] = v1.x;
+						vert[offset + 1] = v1.y;
+						vert[offset + 2] = sprite.finalZ;
+						vert[offset + 3] = sprite.shadowOpacity;
 
-					vert[v + 4] = p2.x;
-					vert[v + 5] = p2.y;
-					vert[v + 6] = z;
-					vert[v + 7] = sprite.shadowOpacity;
+						vert[offset + 4] = v2.x;
+						vert[offset + 5] = v2.y;
+						vert[offset + 6] = sprite.finalZ;
+						vert[offset + 7] = sprite.shadowOpacity;
 
-					vert[v + 8] = e1.x;
-					vert[v + 9] = e1.y;
-					vert[v + 10] = z;
-					vert[v + 11] = 0.0;
+						vert[offset + 8] = e1.x;
+						vert[offset + 9] = e1.y;
+						vert[offset + 10] = sprite.finalZ;
+						vert[offset + 11] = 0.0;
 
-					vert[v + 12] = e2.x;
-					vert[v + 13] = e2.y;
-					vert[v + 14] = z;
-					vert[v + 15] = 0.0;
+						vert[offset + 12] = e2.x;
+						vert[offset + 13] = e2.y;
+						vert[offset + 14] = sprite.finalZ;
+						vert[offset + 15] = 0.0;
+					} else {
+						vert[offset + 0] = 0.0;
+						vert[offset + 1] = 0.0;
+						vert[offset + 2] = 0.0;
+						vert[offset + 3] = 0.0;
 
-					v += 4 * 4;
+						vert[offset + 4] = 0.0;
+						vert[offset + 5] = 0.0;
+						vert[offset + 6] = 0.0;
+						vert[offset + 7] = 0.0;
+
+						vert[offset + 8] = 0.0;
+						vert[offset + 9] = 0.0;
+						vert[offset + 10] = 0.0;
+						vert[offset + 11] = 0.0;
+
+						vert[offset + 12] = 0.0;
+						vert[offset + 13] = 0.0;
+						vert[offset + 14] = 0.0;
+						vert[offset + 15] = 0.0;
+					}
+					offset += 4 * 4;
 				}
 			}
-			++i;
 		}
 		shadowVertices.unlock();
 	}
 
-	inline function drawShadows() {
-		var i = 0;
-		for (light in lights) {
-			if (light.isCastingShadows) {
-				buildShadows(light);
-				ShadowCaster.render(shadowMaps[i], this);
-				++i;
-			}
-		}
+	inline function drawLightShadows(light:Light) {
+		this.mapShadows(light);
+		@:privateAccess ShadowDrawer.render(this.shadowMaps[light.shadowMapID], this);
+	}
+
+	inline function drawLayerShadows() {
+		for (light in lights)
+			if (light.isMappingShadows)
+				drawLightShadows(light);
 	}
 	#end
 }

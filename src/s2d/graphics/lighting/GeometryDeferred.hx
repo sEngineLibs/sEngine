@@ -61,6 +61,7 @@ class GeometryDeferred {
 		ormMapTU = pipeline.getTextureUnit("ormMap");
 	}
 
+	@:access(s2d.graphics.Renderer)
 	public static inline function render():Void {
 		final g4 = Renderer.buffer.depthMap.g4;
 
@@ -88,10 +89,8 @@ class GeometryDeferred {
 				g4.drawIndexedVerticesInstanced(atlas.sprites.length);
 			}
 			#else
-			final length = layer.sprites.length;
-			var i = 0;
 			for (sprite in layer.sprites) {
-				g4.setFloat(depthCL, i / length);
+				g4.setFloat(depthCL, sprite.finalZ);
 				g4.setMatrix3(modelCL, sprite.finalModel);
 				g4.setVector4(cropRectCL, sprite.cropRect);
 				g4.setTexture(albedoMapTU, sprite.atlas.albedoMap);
@@ -99,7 +98,6 @@ class GeometryDeferred {
 				g4.setTexture(ormMapTU, sprite.atlas.ormMap);
 				g4.setTexture(emissionMapTU, sprite.atlas.emissionMap);
 				g4.drawIndexedVertices();
-				++i;
 			}
 			#end
 		}

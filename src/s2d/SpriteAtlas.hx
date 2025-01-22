@@ -116,7 +116,6 @@ class SpriteAtlas {
 		final cData = vertices[1].lock();
 		final mData = vertices[2].lock();
 		final dData = vertices[3].lock();
-		final length = sprites.length;
 		var i = 0;
 		for (sprite in sprites) {
 			final c = sprite.cropRect;
@@ -140,7 +139,7 @@ class SpriteAtlas {
 			mData[mi + 8] = m._22;
 			// depth
 			final di = i * dStructSize;
-			dData[di] = i / length;
+			dData[di] = sprite.finalZ;
 			++i;
 		}
 		vertices[1].unlock();

@@ -75,13 +75,9 @@ class LightingDeferred {
 		envEmissionMapTU = envPipeline.getTextureUnit("emissionMap");
 	}
 
+	@:access(s2d.graphics.Renderer)
 	public static inline function render():Void {
 		final g4 = Renderer.buffer.tgt.g4;
-
-		#if (S2D_LIGHTING_SHADOWS == 1)
-		for (layer in S2D.stage.layers)
-			layer.drawShadows();
-		#end
 
 		g4.begin();
 		g4.clear(Black);
@@ -105,15 +101,10 @@ class LightingDeferred {
 		g4.setTexture(normalMapTU, Renderer.buffer.normalMap);
 		g4.setTexture(ormMapTU, Renderer.buffer.ormMap);
 		for (layer in S2D.stage.layers) {
-			#if (S2D_LIGHTING_SHADOWS == 1)
-			var i = 0;
-			#end
 			for (light in layer.lights) {
 				#if (S2D_LIGHTING_SHADOWS == 1)
-				if (light.isCastingShadows) {
-					g4.setTexture(shadowMapTU, layer.shadowMaps[i]);
-					++i;
-				}
+				if (light.isMappingShadows)
+					@:privateAccess g4.setTexture(shadowMapTU, layer.shadowMaps[light.shadowMapID]);
 				#end
 				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);
 				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);

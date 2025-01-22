@@ -16,7 +16,7 @@ class RenderBuffer {
 	public var depthMap(get, never):Image;
 
 	#if (S2D_LIGHTING_DEFERRED == 1)
-	static final length = 7;
+	static inline final length = 7;
 
 	public var albedoMap(get, never):Image;
 	public var normalMap(get, never):Image;
@@ -43,7 +43,7 @@ class RenderBuffer {
 		return buffer[6];
 	}
 	#else
-	static final length = 3;
+	static inline final length = 3;
 
 	inline function get_depthMap():Image {
 		return buffer[2];
@@ -63,7 +63,7 @@ class RenderBuffer {
 		for (i in 2...length - 1)
 			buffer[i] = Image.createRenderTarget(width, heigth, RGBA32);
 		// depth map
-		buffer[length - 1] = Image.createRenderTarget(width, heigth, A16, DepthOnly);
+		buffer[length - 1] = Image.createRenderTarget(width, heigth, L8, DepthOnly);
 	}
 
 	public inline function swap() {
