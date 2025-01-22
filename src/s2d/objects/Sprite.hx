@@ -24,6 +24,8 @@ class Sprite extends StageObject {
 		layer.addSprite(this);
 	}
 
+	inline function reset() {}
+
 	#if (S2D_SPRITE_INSTANCING == 1)
 	inline function set_atlas(value:SpriteAtlas) {
 		value.addSprite(this);

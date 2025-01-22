@@ -29,7 +29,6 @@ class LightingForward {
 	#end // S2D_SPRITE_INSTANCING
 
 	public static inline function compile() {
-		// coord
 		structures.push(new VertexStructure());
 		structures[0].add("vertCoord", Float32_2X);
 
@@ -94,11 +93,7 @@ class LightingForward {
 			for (light in layer.lights) {
 				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);
 				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);
-				#if (S2D_LIGHTING_DEFERRED == 1)
-				g4.setFloat3(lightAttribCL, light.power, light.radius, light.volume);
-				#else
 				g4.setFloat2(lightAttribCL, light.power, light.radius);
-				#end
 				#if (S2D_SPRITE_INSTANCING == 1)
 				for (atlas in layer.spriteAtlases) {
 					g4.setVertexBuffers(atlas.vertices);
@@ -112,7 +107,7 @@ class LightingForward {
 				var i = 0;
 				for (sprite in layer.sprites) {
 					g4.setFloat(depthCL, i / layer.sprites.length);
-					g4.setMatrix3(modelCL, sprite._model);
+					g4.setMatrix3(modelCL, sprite.finalModel);
 					g4.setVector4(cropRectCL, sprite.cropRect);
 					g4.setTexture(albedoMapTU, sprite.atlas.albedoMap);
 					g4.setTexture(normalMapTU, sprite.atlas.normalMap);

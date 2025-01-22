@@ -86,7 +86,7 @@ class Layer {
 		for (sprite in sprites) {
 			if (sprite.isCastingShadows) {
 				final z = i / length;
-				final mvp = S2D.stage.viewProjection.multmat(sprite._model);
+				final mvp = S2D.stage.viewProjection.multmat(sprite.finalModel);
 				for (edge in sprite.mesh) {
 					var p1 = mvp.multvec({x: edge.x, y: edge.y});
 					var p2 = mvp.multvec({x: edge.z, y: edge.w});

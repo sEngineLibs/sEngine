@@ -9,6 +9,7 @@ import kha.graphics4.ConstantLocation;
 
 @:access(s2d.Layer)
 class LightingDeferred {
+	// LIGHTING PASS
 	static var pipeline:PipelineState;
 	static var viewProjectionCL:ConstantLocation;
 	#if (S2D_LIGHTING_SHADOWS == 1)
@@ -20,7 +21,6 @@ class LightingDeferred {
 	static var albedoMapTU:TextureUnit;
 	static var normalMapTU:TextureUnit;
 	static var ormMapTU:TextureUnit;
-
 	// ENVIRONMENT PASS
 	static var envPipeline:PipelineState;
 	#if (S2D_LIGHTING_ENVIRONMENT == 1)
@@ -98,7 +98,6 @@ class LightingDeferred {
 		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
 		g4.drawIndexedVertices();
-
 		// stage lights
 		g4.setPipeline(pipeline);
 		g4.setMatrix3(viewProjectionCL, S2D.stage.viewProjection);
@@ -118,11 +117,7 @@ class LightingDeferred {
 				#end
 				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);
 				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);
-				#if (S2D_LIGHTING_DEFERRED == 1)
 				g4.setFloat3(lightAttribCL, light.power, light.radius, light.volume);
-				#else
-				g4.setFloat2(lightAttribCL, light.power, light.radius);
-				#end
 				g4.drawIndexedVertices();
 			}
 		}

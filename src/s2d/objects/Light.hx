@@ -21,6 +21,8 @@ class Light extends StageObject {
 		#end
 	}
 
+	inline function reset() {}
+
 	#if (S2D_LIGHTING_SHADOWS == 1)
 	@:access(s2d.Layer)
 	inline function set_isCastingShadows(value:Bool) {

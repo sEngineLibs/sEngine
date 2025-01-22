@@ -98,7 +98,6 @@ class Renderer {
 
 	#if (S2D_LIGHTING != 1)
 	public static var structures:Array<VertexStructure> = [];
-	// GEOMETRY PASS
 	static var pipeline:PipelineState;
 	static var viewProjectionCL:ConstantLocation;
 	#if (S2D_SPRITE_INSTANCING != 1) static var modelCL:ConstantLocation;
@@ -106,7 +105,6 @@ class Renderer {
 	static var textureMapTU:TextureUnit;
 
 	public static inline function compile() {
-		// coord
 		structures.push(new VertexStructure());
 		structures[0].add("vertCoord", Float32_2X);
 
@@ -134,7 +132,6 @@ class Renderer {
 		pipeline.blendDestination = InverseSourceAlpha;
 		pipeline.compile();
 
-		// GEOMETRY PASS
 		viewProjectionCL = pipeline.getConstantLocation("viewProjection");
 		#if (S2D_SPRITE_INSTANCING != 1) modelCL = pipeline.getConstantLocation("model");
 		cropRectCL = pipeline.getConstantLocation("cropRect"); #end // S2D_SPRITE_INSTANCING
@@ -162,7 +159,7 @@ class Renderer {
 			}
 			#else
 			for (sprite in layer.sprites) {
-				g4.setMatrix3(modelCL, sprite._model);
+				g4.setMatrix3(modelCL, sprite.finalModel);
 				g4.setVector4(cropRectCL, sprite.cropRect);
 				g4.setTexture(textureMapTU, sprite.atlas.textureMap);
 				g4.drawIndexedVertices();
