@@ -11,7 +11,7 @@ import s2d.graphics.lighting.ShadowPass;
 using s2d.core.utils.extensions.VectorExt;
 
 class Sprite extends StageObject {
-	var index:Int = -1;
+	var index:UInt;
 	var mesh:Vector<Edge> = new Vector(0);
 
 	public var cropRect:FastVector4 = new FastVector4(0.0, 0.0, 1.0, 1.0);
@@ -22,20 +22,24 @@ class Sprite extends StageObject {
 	#end
 
 	#if (S2D_LIGHTING_SHADOWS == 1)
-	var shadowBufferOffset:Int = 0;
+	var shadowBuffersOffset:UInt;
+	var shadowBuffersLength:UInt;
 
 	@:isVar public var isCastingShadows(default, set):Bool = false;
 	@:isVar public var shadowOpacity(default, set):Float = 1.0;
 
 	function set_isCastingShadows(value:Bool) {
+		if (!isCastingShadows && value)
+			@:privateAccess layer.shadowBuffers.addSprite(this);
+		else if (isCastingShadows && !value)
+			@:privateAccess layer.shadowBuffers.removeSprite(this);
 		isCastingShadows = value;
-		@:privateAccess layer.shadowBuffers.adjust();
 		return value;
 	}
 
 	function set_shadowOpacity(value:Float) {
 		shadowOpacity = value;
-		updateShadowBuffers(3, shadowOpacity);
+		updateShadowBuffersValue(3, shadowOpacity);
 		return value;
 	}
 	#end
@@ -51,13 +55,6 @@ class Sprite extends StageObject {
 		for (p in value)
 			edgeCounter += p.length;
 
-		#if (S2D_LIGHTING_SHADOWS == 1)
-		// extend layer shadow buffers if needed
-		final d = edgeCounter - mesh.length;
-		if (d != 0)
-			@:privateAccess layer.shadowBuffers.updateSprite(this);
-		#end
-
 		// build mesh
 		mesh = new Vector(edgeCounter);
 		var offset = 0;
@@ -71,6 +68,13 @@ class Sprite extends StageObject {
 			}
 			offset += m.length;
 		}
+
+		#if (S2D_LIGHTING_SHADOWS == 1)
+		// extend layer shadow buffers if needed
+		final d = edgeCounter - mesh.length;
+		if (d != 0)
+			@:privateAccess layer.shadowBuffers.updateSpriteMesh(this);
+		#end
 	}
 
 	function computeNormal(v1:FastVector2, v2:FastVector2, polygon:Array<FastVector2>):FastVector2 {
@@ -91,9 +95,9 @@ class Sprite extends StageObject {
 	}
 
 	#if (S2D_LIGHTING_SHADOWS == 1)
-	function updateShadowBuffers(index:Int, value:FastFloat) {
+	function updateShadowBuffersValue(index:Int, value:FastFloat) {
 		final structSize = @:privateAccess ShadowPass.structure.byteSize() >> 2;
-		var offset = shadowBufferOffset;
+		var offset = shadowBuffersOffset;
 		for (buffer in @:privateAccess layer.shadowBuffers.buffers) {
 			final v = @:privateAccess buffer.vertexData;
 			for (_ in mesh) {
@@ -110,7 +114,7 @@ class Sprite extends StageObject {
 		// rearrange layer sprites
 		var i = 0;
 		for (sprite in layer.sprites) {
-			if (sprite.finalZ <= z) {
+			if (sprite.finalZ <= finalZ) {
 				layer.sprites.rearrange(index, i);
 				index = i;
 				break;
@@ -120,14 +124,14 @@ class Sprite extends StageObject {
 		// update corresponding shadow vertices if needed
 		#if (S2D_LIGHTING_SHADOWS == 1)
 		if (isCastingShadows)
-			updateShadowBuffers(2, finalZ);
+			updateShadowBuffersValue(2, finalZ);
 		#end
 	}
 
 	function onTransformationChanged() {
 		#if (S2D_LIGHTING_SHADOWS == 1)
 		if (isCastingShadows)
-			@:privateAccess layer.shadowBuffers.updateSprite(this);
+			@:privateAccess layer.shadowBuffers.updateSpriteShadows(this);
 		#end
 	}
 

@@ -19,7 +19,7 @@ class Layer {
 
 	public function new() {
 		#if (S2D_LIGHTING_SHADOWS == 1)
-		shadowBuffers = @:privateAccess new ShadowBuffers(this);
+		shadowBuffers = @:privateAccess new ShadowBuffers();
 		#end
 	}
 

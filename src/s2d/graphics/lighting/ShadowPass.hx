@@ -32,7 +32,6 @@ class ShadowPass {
 	@:access(s2d.graphics.Renderer)
 	public static function render():Void {
 		for (layer in S2D.stage.layers) {
-			layer.shadowBuffers.unlock();
 			for (shadowBuffer in layer.shadowBuffers.buffers) {
 				final target = @:privateAccess shadowBuffer.map;
 				target.setDepthStencilFrom(Renderer.buffer.depthMap);
@@ -46,7 +45,6 @@ class ShadowPass {
 				g4.drawIndexedVertices();
 				g4.end();
 			}
-			layer.shadowBuffers.lock();
 		}
 	}
 }

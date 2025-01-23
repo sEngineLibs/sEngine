@@ -20,9 +20,9 @@ class Light extends StageObject {
 
 	function set_isMappingShadows(value:Bool) {
 		if (!isMappingShadows && value)
-			@:privateAccess layer.shadowBuffers.addLightShadowBuffer(this);
+			@:privateAccess layer.shadowBuffers.addLight(this);
 		else if (isMappingShadows && !value)
-			@:privateAccess layer.shadowBuffers.removeLightShadowBuffer(this.shadowBuffer);
+			@:privateAccess layer.shadowBuffers.removeLight(this);
 		isMappingShadows = value;
 		return value;
 	}
@@ -38,7 +38,7 @@ class Light extends StageObject {
 	function onTransformationChanged() {
 		#if (S2D_LIGHTING_SHADOWS == 1)
 		if (isMappingShadows)
-			@:privateAccess shadowBuffer.updateLight();
+			@:privateAccess shadowBuffer.updateLightShadows();
 		#end
 	}
 }
