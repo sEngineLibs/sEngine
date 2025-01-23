@@ -10,7 +10,7 @@ import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 #else
 #if (S2D_LIGHTING_SHADOWS == 1)
-import s2d.graphics.lighting.ShadowDrawer;
+import s2d.graphics.lighting.ShadowPass;
 #end
 #if (S2D_LIGHTING_DEFERRED == 1)
 import s2d.graphics.lighting.GeometryDeferred;
@@ -57,12 +57,11 @@ class Renderer {
 		#end
 	}
 
-	@:access(s2d.Layer)
 	static function resize(width:Int, height:Int) {
 		buffer.resize(width, height);
 		#if (S2D_LIGHTING_SHADOWS == 1)
 		for (layer in S2D.stage.layers)
-			layer.resizeShadowMaps(width, height);
+			@:privateAccess layer.shadowBuffers.resize(width, height);
 		#end
 	}
 
@@ -75,7 +74,7 @@ class Renderer {
 		LightingForward.compile();
 		#end
 		#if (S2D_LIGHTING_SHADOWS == 1)
-		ShadowDrawer.compile();
+		ShadowPass.compile();
 		#end
 		#else
 		compile();
@@ -96,17 +95,8 @@ class Renderer {
 	}
 
 	static function render():Image {
-		#if (S2D_LIGHTING_SHADOWS == 1)
-		for (layer in S2D.stage.layers)
-			@:privateAccess layer.unlockShadowBuffers();
-		#end
 		for (command in commands)
 			command();
-		#if (S2D_LIGHTING_SHADOWS == 1)
-		for (layer in S2D.stage.layers)
-			@:privateAccess layer.lockShadowBuffers();
-		#end
-
 		return buffer.tgt;
 	}
 

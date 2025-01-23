@@ -5,7 +5,7 @@ import kha.FastFloat;
 import kha.math.FastVector2;
 import kha.math.FastVector4;
 #if (S2D_LIGHTING_SHADOWS == 1)
-import s2d.graphics.lighting.ShadowDrawer;
+import s2d.graphics.lighting.ShadowPass;
 #end
 
 using s2d.core.utils.extensions.VectorExt;
@@ -29,7 +29,7 @@ class Sprite extends StageObject {
 
 	function set_isCastingShadows(value:Bool) {
 		isCastingShadows = value;
-		@:privateAccess layer.adjustShadowBuffers();
+		@:privateAccess layer.shadowBuffers.adjust();
 		return value;
 	}
 
@@ -48,14 +48,14 @@ class Sprite extends StageObject {
 
 	public function setMesh(value:Array<Array<FastVector2>>) {
 		var edgeCounter = 0;
-		for (m in value)
-			edgeCounter += m.length;
+		for (p in value)
+			edgeCounter += p.length;
 
 		#if (S2D_LIGHTING_SHADOWS == 1)
 		// extend layer shadow buffers if needed
 		final d = edgeCounter - mesh.length;
 		if (d != 0)
-			@:privateAccess layer.adjustShadowBuffers();
+			@:privateAccess layer.shadowBuffers.updateSprite(this);
 		#end
 
 		// build mesh
@@ -91,14 +91,16 @@ class Sprite extends StageObject {
 	}
 
 	#if (S2D_LIGHTING_SHADOWS == 1)
-	@:access(s2d.Layer)
 	function updateShadowBuffers(index:Int, value:FastFloat) {
-		final structSize = @:privateAccess ShadowDrawer.structure.byteSize() >> 2;
+		final structSize = @:privateAccess ShadowPass.structure.byteSize() >> 2;
 		var offset = shadowBufferOffset;
-		for (_ in mesh) {
-			for (i in 0...4) {
-				layer.shadowVerticesData[offset + index] = value;
-				offset += structSize;
+		for (buffer in @:privateAccess layer.shadowBuffers.buffers) {
+			final v = @:privateAccess buffer.vertexData;
+			for (_ in mesh) {
+				for (i in 0...4) {
+					v[offset + index] = value;
+					offset += structSize;
+				}
 			}
 		}
 	}
@@ -125,7 +127,7 @@ class Sprite extends StageObject {
 	function onTransformationChanged() {
 		#if (S2D_LIGHTING_SHADOWS == 1)
 		if (isCastingShadows)
-			@:privateAccess layer.drawLayerShadows();
+			@:privateAccess layer.shadowBuffers.updateSprite(this);
 		#end
 	}
 

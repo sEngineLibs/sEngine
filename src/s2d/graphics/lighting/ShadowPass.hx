@@ -1,12 +1,11 @@
 package s2d.graphics.lighting;
 
 #if (S2D_LIGHTING && S2D_LIGHTING_SHADOWS == 1)
-import kha.Image;
 import kha.Shaders;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 
-class ShadowDrawer {
+class ShadowPass {
 	static var structure:VertexStructure;
 	static var pipeline:PipelineState;
 
@@ -28,21 +27,27 @@ class ShadowDrawer {
 		pipeline.compile();
 	}
 
-	@:access(s2d.graphics.Renderer)
 	@:access(s2d.Layer)
-	public static function render(target:Image, layer:Layer):Void {
-		final g4 = target.g4;
+	@:access(s2d.ShadowBuffers)
+	@:access(s2d.graphics.Renderer)
+	public static function render():Void {
+		for (layer in S2D.stage.layers) {
+			layer.shadowBuffers.unlock();
+			for (shadowBuffer in layer.shadowBuffers.buffers) {
+				final target = @:privateAccess shadowBuffer.map;
+				target.setDepthStencilFrom(Renderer.buffer.depthMap);
+				final g4 = target.g4;
 
-		g4.begin();
-		g4.clear(White);
-		if (layer.shadowVertices != null && layer.shadowIndices != null) {
-			target.setDepthStencilFrom(Renderer.buffer.depthMap);
-			g4.setPipeline(pipeline);
-			g4.setIndexBuffer(layer.shadowIndices);
-			g4.setVertexBuffer(layer.shadowVertices);
-			g4.drawIndexedVertices();
+				g4.begin();
+				g4.clear(White);
+				g4.setPipeline(pipeline);
+				g4.setIndexBuffer(layer.shadowBuffers.indices);
+				g4.setVertexBuffer(@:privateAccess shadowBuffer.vertices);
+				g4.drawIndexedVertices();
+				g4.end();
+			}
+			layer.shadowBuffers.lock();
 		}
-		g4.end();
 	}
 }
 #end

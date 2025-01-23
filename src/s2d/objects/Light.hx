@@ -1,6 +1,9 @@
 package s2d.objects;
 
 import kha.Color;
+#if (S2D_LIGHTING_SHADOWS == 1)
+import s2d.ShadowBuffers.LightShadowBuffer;
+#end
 
 class Light extends StageObject {
 	public var color:Color = Color.White;
@@ -11,14 +14,16 @@ class Light extends StageObject {
 	#end
 
 	#if (S2D_LIGHTING_SHADOWS == 1)
-	var shadowMapIndex:Int = -1;
+	var shadowBuffer:LightShadowBuffer;
 
 	@:isVar public var isMappingShadows(default, set):Bool = false;
 
-	@:access(s2d.Layer)
 	function set_isMappingShadows(value:Bool) {
+		if (!isMappingShadows && value)
+			@:privateAccess layer.shadowBuffers.addLightShadowBuffer(this);
+		else if (isMappingShadows && !value)
+			@:privateAccess layer.shadowBuffers.removeLightShadowBuffer(this.shadowBuffer);
 		isMappingShadows = value;
-		layer.adjustShadowMaps(this);
 		return value;
 	}
 	#end
@@ -33,7 +38,7 @@ class Light extends StageObject {
 	function onTransformationChanged() {
 		#if (S2D_LIGHTING_SHADOWS == 1)
 		if (isMappingShadows)
-			@:privateAccess layer.drawLightShadows(this);
+			@:privateAccess shadowBuffer.updateLight();
 		#end
 	}
 }

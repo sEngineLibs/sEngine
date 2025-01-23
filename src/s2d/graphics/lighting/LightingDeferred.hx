@@ -105,7 +105,7 @@ class LightingDeferred {
 			for (light in layer.lights) {
 				#if (S2D_LIGHTING_SHADOWS == 1)
 				if (light.isMappingShadows)
-					@:privateAccess g4.setTexture(shadowMapTU, layer.shadowMaps[light.shadowMapIndex]);
+					g4.setTexture(shadowMapTU, @:privateAccess light.shadowBuffer.map);
 				else
 					g4.setTexture(shadowMapTU, Assets.images.white);
 				#end
