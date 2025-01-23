@@ -12,7 +12,7 @@ class VectorExt {
 	 * @param x The element to be added
 	 * @return Returns a new vector with the added element
 	 */
-	public static inline function push<T>(a:Vector<T>, x:T):Vector<T> {
+	public static function push<T>(a:Vector<T>, x:T):Vector<T> {
 		final v = new Vector<T>(a.length + 1);
 		Vector.blit(a, 0, v, 0, a.length);
 		v[a.length] = x;
@@ -27,7 +27,7 @@ class VectorExt {
 	 * @param b The vector whose elements will be appended
 	 * @return Returns a new vector containing elements of `a` and `b`
 	 */
-	public static inline function concat<T>(a:Vector<T>, b:Vector<T>):Vector<T> {
+	public static function concat<T>(a:Vector<T>, b:Vector<T>):Vector<T> {
 		final v = new Vector<T>(a.length + b.length);
 		Vector.blit(a, 0, v, 0, a.length);
 		Vector.blit(b, 0, v, a.length, b.length);
@@ -45,7 +45,7 @@ class VectorExt {
 	 * @param to Target position of the element
 	 * @return Returns a new rearranged vector
 	 */
-	public static inline function rearrange<T>(a:Vector<T>, from:Int, to:Int):Void {
+	public static function rearrange<T>(a:Vector<T>, from:Int, to:Int):Void {
 		if (from == to)
 			return;
 		from = clamp(from, 0, a.length);

@@ -2,8 +2,8 @@
 
 #include "s2d/std/lighting"
 
-in vec2 fragCoord;
-out vec4 fragColor;
+layout(location = 0) in vec2 fragCoord;
+layout(location = 0) out vec4 fragColor;
 
 #if S2D_LIGHTING_ENVIRONMENT == 1
 uniform sampler2D envMap;

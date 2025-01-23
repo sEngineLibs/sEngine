@@ -24,7 +24,7 @@ class Renderer {
 	static var buffer:RenderBuffer;
 
 	@:access(s2d.graphics.postprocessing.PPEffect)
-	static inline function ready(width:Int, height:Int) {
+	static function ready(width:Int, height:Int) {
 		buffer = new RenderBuffer(width, height);
 		#if (S2D_LIGHTING == 1)
 		#if (S2D_LIGHTING_DEFERRED == 1)
@@ -58,14 +58,15 @@ class Renderer {
 	}
 
 	@:access(s2d.Layer)
-	static inline function resize(width:Int, height:Int) {
+	static function resize(width:Int, height:Int) {
 		buffer.resize(width, height);
-		for (layer in S2D.stage.layers) {
+		#if (S2D_LIGHTING_SHADOWS == 1)
+		for (layer in S2D.stage.layers)
 			layer.resizeShadowMaps(width, height);
-		}
+		#end
 	}
 
-	static inline function set() {
+	static function set() {
 		#if (S2D_LIGHTING == 1)
 		#if (S2D_LIGHTING_DEFERRED == 1)
 		GeometryDeferred.compile();
@@ -94,9 +95,18 @@ class Renderer {
 		#end
 	}
 
-	static inline function render():Image {
+	static function render():Image {
+		#if (S2D_LIGHTING_SHADOWS == 1)
+		for (layer in S2D.stage.layers)
+			@:privateAccess layer.unlockShadowBuffers();
+		#end
 		for (command in commands)
 			command();
+		#if (S2D_LIGHTING_SHADOWS == 1)
+		for (layer in S2D.stage.layers)
+			@:privateAccess layer.lockShadowBuffers();
+		#end
+
 		return buffer.tgt;
 	}
 
@@ -108,7 +118,7 @@ class Renderer {
 	static var cropRectCL:ConstantLocation; #end // S2D_SPRITE_INSTANCING
 	static var textureMapTU:TextureUnit;
 
-	static inline function compile() {
+	static function compile() {
 		structures.push(new VertexStructure());
 		structures[0].add("vertCoord", Float32_2X);
 
@@ -143,7 +153,7 @@ class Renderer {
 	}
 
 	@:access(s2d.objects.Sprite)
-	static inline function draw():Void {
+	static function draw():Void {
 		final g4 = Renderer.buffer.tgt.g4;
 
 		g4.begin();
@@ -157,7 +167,7 @@ class Renderer {
 		for (layer in S2D.stage.layers) {
 			#if (S2D_SPRITE_INSTANCING == 1)
 			for (atlas in layer.spriteAtlases) {
-				g4.setVertexBuffers(atlas.vertices);
+				@:privateAccess g4.setVertexBuffers(atlas.vertices);
 				g4.setTexture(textureMapTU, atlas.textureMap);
 				g4.drawIndexedVerticesInstanced(atlas.sprites.length);
 			}

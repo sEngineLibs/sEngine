@@ -36,11 +36,11 @@ class Element {
 	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
 	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
 
-	inline function get_x():Float {
+	function get_x():Float {
 		return left.position;
 	}
 
-	inline function set_x(value:Float):Float {
+	function set_x(value:Float):Float {
 		var d = value - x;
 		left.position = value;
 		horizontalCenter.position += d / 2;
@@ -48,11 +48,11 @@ class Element {
 		return value;
 	}
 
-	inline function get_y():Float {
+	function get_y():Float {
 		return top.position;
 	}
 
-	inline function set_y(value:Float):Float {
+	function set_y(value:Float):Float {
 		var d = value - y;
 		top.position = value;
 		verticalCenter.position += d / 2;
@@ -60,11 +60,11 @@ class Element {
 		return value;
 	}
 
-	inline function get_centerX():Float {
+	function get_centerX():Float {
 		return horizontalCenter.position;
 	}
 
-	inline function set_centerX(value:Float):Float {
+	function set_centerX(value:Float):Float {
 		var d = value - centerX;
 		left.position += d;
 		horizontalCenter.position = value;
@@ -72,11 +72,11 @@ class Element {
 		return value;
 	}
 
-	inline function get_centerY():Float {
+	function get_centerY():Float {
 		return verticalCenter.position;
 	}
 
-	inline function set_centerY(value:Float):Float {
+	function set_centerY(value:Float):Float {
 		var d = value - centerY;
 		top.position += d;
 		verticalCenter.position = value;
@@ -84,47 +84,47 @@ class Element {
 		return value;
 	}
 
-	inline function get_width():Float {
+	function get_width():Float {
 		return right.position - x;
 	}
 
-	inline function set_width(value:Float):Float {
+	function set_width(value:Float):Float {
 		value = MathUtils.clamp(value, minWidth, maxWidth);
 		horizontalCenter.position = x + value / 2;
 		right.position = x + value;
 		return value;
 	}
 
-	inline function get_height():Float {
+	function get_height():Float {
 		return bottom.position - y;
 	}
 
-	inline function set_height(value:Float):Float {
+	function set_height(value:Float):Float {
 		value = MathUtils.clamp(value, minHeight, maxHeight);
 		verticalCenter.position = y + value / 2;
 		bottom.position = y + value;
 		return value;
 	}
 
-	inline function set_minWidth(value:Float):Float {
+	function set_minWidth(value:Float):Float {
 		minWidth = value;
 		width = width;
 		return value;
 	}
 
-	inline function set_maxWidth(value:Float):Float {
+	function set_maxWidth(value:Float):Float {
 		maxWidth = value;
 		width = width;
 		return value;
 	}
 
-	inline function set_minHeight(value:Float):Float {
+	function set_minHeight(value:Float):Float {
 		minHeight = value;
 		height = height;
 		return value;
 	}
 
-	inline function set_maxHeight(value:Float):Float {
+	function set_maxHeight(value:Float):Float {
 		maxHeight = value;
 		height = height;
 		return value;
@@ -163,16 +163,16 @@ class Element {
 		return value;
 	}
 
-	public inline function scale(?x:Float = 1, ?y:Float = 1) {
+	public function scale(?x:Float = 1, ?y:Float = 1) {
 		scaleX *= x;
 		scaleY *= y;
 	}
 
-	public inline function rotate(angle:Float = 0) {
+	public function rotate(angle:Float = 0) {
 		rotation += angle;
 	}
 
-	public inline function translate(?x:Float = 0, ?y:Float = 0) {
+	public function translate(?x:Float = 0, ?y:Float = 0) {
 		translationX += x;
 		translationY += y;
 	}
@@ -200,7 +200,7 @@ class Element {
 		height = h;
 	}
 
-	public inline function resizeTree(w:Int, h:Int) {
+	public function resizeTree(w:Int, h:Int) {
 		resize(w, h);
 		for (child in children)
 			child.resizeTree(w, h);
@@ -234,19 +234,19 @@ class Element {
 		parent.removeChild(this);
 	}
 
-	public inline function mapFromGlobal(point:Vector2):Vector2 {
+	public function mapFromGlobal(point:Vector2):Vector2 {
 		return {x: point.x - x, y: point.y - y};
 	}
 
-	public inline function mapToGlobal(point:Vector2):Vector2 {
+	public function mapToGlobal(point:Vector2):Vector2 {
 		return {x: point.x + x, y: point.y + y};
 	}
 
-	public static inline function mapFromElement(element:Element, point:Vector2):Vector2 {
+	public static function mapFromElement(element:Element, point:Vector2):Vector2 {
 		return element.mapToGlobal(point);
 	}
 
-	public static inline function mapToElement(element:Element, point:Vector2):Vector2 {
+	public static function mapToElement(element:Element, point:Vector2):Vector2 {
 		return element.mapFromGlobal(point);
 	}
 }

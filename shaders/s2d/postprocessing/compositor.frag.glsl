@@ -6,15 +6,14 @@
 #define FXAA_SUBPIX_SHIFT 0.75
 
 uniform sampler2D textureMap;
-
 uniform float params[7];
 #define posterizeGamma params[0]
 #define posterizeSteps params[1]
 #define vignetteStrength params[2]
 #define vignetteColor vec4(params[3], params[4], params[5], params[6])
 
-in vec2 fragCoord;
-out vec4 fragColor;
+layout(location = 0) in vec2 fragCoord;
+layout(location = 0) out vec4 fragColor;
 
 vec3 posterize(vec3 col, float gamma, float steps) {
     col = pow(col, vec3(gamma));

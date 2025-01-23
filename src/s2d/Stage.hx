@@ -11,16 +11,16 @@ class Stage {
 	public var camera:Camera = new Camera();
 	public var viewProjection:FastMatrix3;
 
-	public inline function new() {}
+	public function new() {}
 
-	public inline function updateViewProjection() {
+	public function updateViewProjection() {
 		viewProjection = S2D.projection.multmat(camera);
 	}
 
 	#if (S2D_LIGHTING_ENVIRONMENT == 1)
 	@:isVar public var environmentMap(default, set):Image;
 
-	inline function set_environmentMap(value:Image):Image {
+	function set_environmentMap(value:Image):Image {
 		environmentMap = value;
 		environmentMap.generateMipmaps(4);
 		return value;

@@ -5,8 +5,8 @@ uniform sampler2D textureMap;
 uniform vec2 mistScale;
 uniform vec4 mistColor;
 
-in vec2 fragCoord;
-out vec4 fragColor;
+layout(location = 0) in vec2 fragCoord;
+layout(location = 0) out vec4 fragColor;
 
 void main() {
     float depth = texture(depthMap, fragCoord).r;

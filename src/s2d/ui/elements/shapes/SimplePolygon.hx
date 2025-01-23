@@ -12,7 +12,7 @@ class Polygon extends SimpleDrawableElement {
 	public var border:Border = {};
 	public var vertices:Array<Vector2> = [{}];
 
-	override inline function simpleDraw(target:Canvas) {
+	override function simpleDraw(target:Canvas) {
 		var x = left.position;
 		var y = top.position;
 

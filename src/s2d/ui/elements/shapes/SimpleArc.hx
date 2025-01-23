@@ -15,7 +15,7 @@ class SimpleArc extends SimpleDrawableElement {
 	public var clockwise:Bool = false;
 	public var segments:Int = 16;
 
-	override inline function simpleDraw(target:Canvas) {
+	override function simpleDraw(target:Canvas) {
 		var x = left.position;
 		var y = top.position;
 

@@ -24,7 +24,7 @@ class SMacro {
 		return fields;
 	}
 
-	public static inline function buildAlias(field:Field, fields:Array<Field>) {
+	public static function buildAlias(field:Field, fields:Array<Field>) {
 		switch (field.kind) {
 			case FVar(varType, e):
 				field.meta.push({name: ":isVar", pos: Context.currentPos()});
@@ -68,7 +68,7 @@ class SMacro {
 		}
 	}
 
-	public static inline function buildReadonly(field:Field, fields:Array<Field>) {
+	public static function buildReadonly(field:Field, fields:Array<Field>) {
 		switch (field.kind) {
 			case FVar(varType, e):
 				field.meta.push({name: ":isVar", pos: Context.currentPos()});
@@ -78,7 +78,7 @@ class SMacro {
 		}
 	}
 
-	public static inline function buildObservable(field:Field, fields:Array<Field>) {
+	public static function buildObservable(field:Field, fields:Array<Field>) {
 		switch (field.kind) {
 			case FVar(varType, e):
 				field.meta.push({name: ":isVar", pos: Context.currentPos()});

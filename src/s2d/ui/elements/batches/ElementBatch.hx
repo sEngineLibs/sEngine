@@ -10,7 +10,7 @@ class ElementBatch extends DrawableElement {
 
 	function add(element:Element) {}
 
-	override inline function addChild(element:Element) {
+	override function addChild(element:Element) {
 		element.instanceID = children.length;
 		element.batch = this;
 		children.push(element);

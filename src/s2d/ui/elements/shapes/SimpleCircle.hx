@@ -11,7 +11,7 @@ class SimpleCircle extends SimpleDrawableElement {
 	public var radius:Float = 0;
 	public var segments:Int = 64;
 
-	override inline function simpleDraw(target:Canvas) {
+	override function simpleDraw(target:Canvas) {
 		var x = left.position;
 		var y = top.position;
 

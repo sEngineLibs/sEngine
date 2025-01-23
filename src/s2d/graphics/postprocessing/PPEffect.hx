@@ -11,23 +11,23 @@ abstract class PPEffect {
 
 	public var enabled(get, set):Bool;
 
-	public inline function new() {}
+	public function new() {}
 
-	inline function get_enabled():Bool {
+	function get_enabled():Bool {
 		return Renderer.commands.contains(command);
 	}
 
-	inline function set_enabled(value:Bool):Bool {
+	function set_enabled(value:Bool):Bool {
 		if (!enabled)
 			Renderer.commands.insert(index, command);
 		return value;
 	}
 
-	public inline function enable() {
+	public function enable() {
 		enabled = true;
 	}
 
-	public inline function disable() {
+	public function disable() {
 		enabled = false;
 	}
 

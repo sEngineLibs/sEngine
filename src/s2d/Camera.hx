@@ -11,33 +11,33 @@ abstract Camera(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 	public var y(get, set):FastFloat;
 	public var rotation(get, set):FastFloat;
 
-	public inline function new() {
+	public function new() {
 		this = FastMatrix3Ext.lookAt({x: 0.0, y: 0.0}, {x: 0.0, y: -1.0}, {x: 0.0, y: 1.0});
 	}
 
-	inline function get_x():FastFloat {
+	function get_x():FastFloat {
 		return this._02;
 	}
 
-	inline function set_x(value:FastFloat):FastFloat {
+	function set_x(value:FastFloat):FastFloat {
 		this._02 = value;
 		return value;
 	}
 
-	inline function get_y():FastFloat {
+	function get_y():FastFloat {
 		return this._12;
 	}
 
-	inline function set_y(value:FastFloat):FastFloat {
+	function set_y(value:FastFloat):FastFloat {
 		this._12 = value;
 		return value;
 	}
 
-	inline function get_rotation():FastFloat {
+	function get_rotation():FastFloat {
 		return Math.atan2(-this._01, this._00);
 	}
 
-	inline function set_rotation(value:FastFloat):FastFloat {
+	function set_rotation(value:FastFloat):FastFloat {
 		var dr = value - rotation;
 		var cos = Math.cos(dr);
 		var sin = Math.sin(dr);

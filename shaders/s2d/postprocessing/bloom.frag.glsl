@@ -7,13 +7,13 @@ uniform vec3 params;
 #define threshold params[1]
 #define intensity params[2]
 
-in vec2 fragCoord;
-out vec4 fragColor;
+layout(location = 0) in vec2 fragCoord;
+layout(location = 0) out vec4 fragColor;
 
 vec3 bloom(sampler2D tex, vec2 uv) {
     vec2 texelSize = radius / resolution;
 
-    vec3 col;
+    vec3 col = vec3(0.0);
     col += texture(tex, uv + vec2(-1.0, -1.0) * texelSize, radius).rgb * (1.0 / 16.0);
     col += texture(tex, uv + vec2(0.0, -1.0) * texelSize, radius).rgb * (1.0 / 8.0);
     col += texture(tex, uv + vec2(1.0, -1.0) * texelSize, radius).rgb * (1.0 / 16.0);

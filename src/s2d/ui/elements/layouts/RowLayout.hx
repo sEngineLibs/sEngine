@@ -12,14 +12,14 @@ class RowLayout extends Element {
 	@:isVar public var direction(default, set):Direction = Direction.LeftToRight;
 	public var alignment:Alignment = Alignment.HCenter | Alignment.VCenter;
 
-	inline function set_spacing(value:Float) {
+	function set_spacing(value:Float) {
 		spacing = value;
 		for (i in 1...children.length)
 			children[i].anchors.leftMargin = spacing;
 		return value;
 	}
 
-	inline function set_direction(value:Direction) {
+	function set_direction(value:Direction) {
 		if (direction == Direction.LeftToRight && value == Direction.RightToLeft || direction == Direction.RightToLeft && value == Direction.LeftToRight)
 			children.reverse();
 		buildLayout();
@@ -27,7 +27,7 @@ class RowLayout extends Element {
 		return value;
 	}
 
-	inline function buildLayout() {
+	function buildLayout() {
 		if (direction == Direction.RightToLeft)
 			children.reverse();
 

@@ -13,7 +13,7 @@ class Layout extends Element {
 		this.alignment = alignment;
 	}
 
-	override inline function addChild(element:Element) {
+	override function addChild(element:Element) {
 		children.push(element);
 		element.parent = this;
 

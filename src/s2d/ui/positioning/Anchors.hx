@@ -52,27 +52,27 @@ class Anchors {
 		};
 	}
 
-	inline function _propagateLeft(position:Float) {
+	function _propagateLeft(position:Float) {
 		_el.x = position + leftMargin;
 	}
 
-	inline function _propagateTop(position:Float) {
+	function _propagateTop(position:Float) {
 		_el.y = position + topMargin;
 	}
 
-	inline function _propagateRight(position:Float) {
+	function _propagateRight(position:Float) {
 		_el.width = position - rightMargin - _el.x;
 	}
 
-	inline function _propagateBottom(position:Float) {
+	function _propagateBottom(position:Float) {
 		_el.height = position - bottomMargin - _el.y;
 	}
 
-	inline function _propagateHorizontalCenter(position:Float) {
+	function _propagateHorizontalCenter(position:Float) {
 		_el.centerX = position + horizontalCenterOffset;
 	}
 
-	inline function _propagateVerticalCenter(position:Float) {
+	function _propagateVerticalCenter(position:Float) {
 		_el.centerY = position + verticalCenterOffset;
 	}
 
@@ -83,7 +83,7 @@ class Anchors {
 	var propagateHorizontalCenter:AnchorLineListener;
 	var propagateVerticalCenter:AnchorLineListener;
 
-	inline function setAnchorLine(anchorLine:AnchorLine, listener:AnchorLineListener, value:AnchorLine) {
+	function setAnchorLine(anchorLine:AnchorLine, listener:AnchorLineListener, value:AnchorLine) {
 		if (value == null && anchorLine != null)
 			anchorLine.removePositionListener(listener.ID);
 		else
@@ -93,31 +93,31 @@ class Anchors {
 		return value;
 	}
 
-	inline function set_left(value:AnchorLine):AnchorLine {
+	function set_left(value:AnchorLine):AnchorLine {
 		return setAnchorLine(left, propagateLeft, value);
 	}
 
-	inline function set_top(value:AnchorLine):AnchorLine {
+	function set_top(value:AnchorLine):AnchorLine {
 		return setAnchorLine(top, propagateTop, value);
 	}
 
-	inline function set_right(value:AnchorLine):AnchorLine {
+	function set_right(value:AnchorLine):AnchorLine {
 		return setAnchorLine(right, propagateRight, value);
 	}
 
-	inline function set_bottom(value:AnchorLine):AnchorLine {
+	function set_bottom(value:AnchorLine):AnchorLine {
 		return setAnchorLine(bottom, propagateBottom, value);
 	}
 
-	inline function set_horizontalCenter(value:AnchorLine):AnchorLine {
+	function set_horizontalCenter(value:AnchorLine):AnchorLine {
 		return setAnchorLine(horizontalCenter, propagateHorizontalCenter, value);
 	}
 
-	inline function set_verticalCenter(value:AnchorLine):AnchorLine {
+	function set_verticalCenter(value:AnchorLine):AnchorLine {
 		return setAnchorLine(verticalCenter, propagateVerticalCenter, value);
 	}
 
-	inline function set_margins(value:Float) {
+	function set_margins(value:Float) {
 		margins = value;
 		leftMargin = value;
 		topMargin = value;
@@ -126,50 +126,50 @@ class Anchors {
 		return value;
 	}
 
-	inline function set_leftMargin(value:Float):Float {
+	function set_leftMargin(value:Float):Float {
 		_el.x += value - leftMargin;
 		leftMargin = value;
 		return value;
 	}
 
-	inline function set_topMargin(value:Float):Float {
+	function set_topMargin(value:Float):Float {
 		_el.y += value - topMargin;
 		topMargin = value;
 		return value;
 	}
 
-	inline function set_rightMargin(value:Float):Float {
+	function set_rightMargin(value:Float):Float {
 		_el.width -= value - rightMargin;
 		rightMargin = value;
 		return value;
 	}
 
-	inline function set_bottomMargin(value:Float):Float {
+	function set_bottomMargin(value:Float):Float {
 		_el.height -= value - bottomMargin;
 		bottomMargin = value;
 		return value;
 	}
 
-	inline function set_horizontalCenterOffset(value:Float):Float {
+	function set_horizontalCenterOffset(value:Float):Float {
 		_el.centerX += value - horizontalCenterOffset;
 		horizontalCenterOffset = value;
 		return value;
 	}
 
-	inline function set_verticalCenterOffset(value:Float):Float {
+	function set_verticalCenterOffset(value:Float):Float {
 		_el.centerY += value - verticalCenterOffset;
 		verticalCenterOffset = value;
 		return value;
 	}
 
-	public inline function fill(element:Element) {
+	public function fill(element:Element) {
 		left = element.left;
 		top = element.top;
 		right = element.right;
 		bottom = element.bottom;
 	}
 
-	public inline function centerIn(element:Element) {
+	public function centerIn(element:Element) {
 		horizontalCenter = element.horizontalCenter;
 		verticalCenter = element.verticalCenter;
 	}

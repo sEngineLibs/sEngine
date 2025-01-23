@@ -11,26 +11,26 @@ class Light extends StageObject {
 	#end
 
 	#if (S2D_LIGHTING_SHADOWS == 1)
-	var shadowMapID:Int = -1;
+	var shadowMapIndex:Int = -1;
 
 	@:isVar public var isMappingShadows(default, set):Bool = false;
 
 	@:access(s2d.Layer)
-	inline function set_isMappingShadows(value:Bool) {
+	function set_isMappingShadows(value:Bool) {
 		isMappingShadows = value;
 		layer.adjustShadowMaps(this);
 		return value;
 	}
 	#end
 
-	public inline function new(layer:Layer) {
+	public function new(layer:Layer) {
 		super(layer);
 		layer.addLight(this);
 	}
 
-	inline function onZChanged() {}
+	function onZChanged() {}
 
-	inline function onTransformationChanged() {
+	function onTransformationChanged() {
 		#if (S2D_LIGHTING_SHADOWS == 1)
 		if (isMappingShadows)
 			@:privateAccess layer.drawLightShadows(this);

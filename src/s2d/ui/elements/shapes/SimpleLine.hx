@@ -9,7 +9,7 @@ class SimpleLine extends SimpleDrawableElement {
 	public var start:Vector2 = {x: 0, y: 0}
 	public var end:Vector2 = {x: 0, y: 0}
 
-	override inline function simpleDraw(target:Canvas) {
+	override function simpleDraw(target:Canvas) {
 		var x = left.position;
 		var y = right.position;
 

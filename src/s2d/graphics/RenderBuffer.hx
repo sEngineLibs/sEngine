@@ -23,39 +23,39 @@ class RenderBuffer {
 	public var emissionMap(get, never):Image;
 	public var ormMap(get, never):Image;
 
-	inline function get_albedoMap():Image {
+	function get_albedoMap():Image {
 		return buffer[2];
 	}
 
-	inline function get_normalMap():Image {
+	function get_normalMap():Image {
 		return buffer[3];
 	}
 
-	inline function get_emissionMap():Image {
+	function get_emissionMap():Image {
 		return buffer[4];
 	}
 
-	inline function get_ormMap():Image {
+	function get_ormMap():Image {
 		return buffer[5];
 	}
 
-	inline function get_depthMap():Image {
+	function get_depthMap():Image {
 		return buffer[6];
 	}
 	#else
 	static inline final length = 3;
 
-	inline function get_depthMap():Image {
+	function get_depthMap():Image {
 		return buffer[2];
 	}
 	#end
 
-	public inline function new(width:Int, heigth:Int) {
+	public function new(width:Int, heigth:Int) {
 		buffer = new Vector(length);
 		resize(width, heigth);
 	}
 
-	public inline function resize(width:Int, heigth:Int) {
+	public function resize(width:Int, heigth:Int) {
 		// ping-pong
 		for (i in 0...2)
 			buffer[i] = Image.createRenderTarget(width, heigth, RGBA32);
@@ -66,16 +66,16 @@ class RenderBuffer {
 		buffer[length - 1] = Image.createRenderTarget(width, heigth, L8, DepthOnly);
 	}
 
-	public inline function swap() {
+	public function swap() {
 		srcInd = 1 - srcInd;
 		tgtInd = 1 - tgtInd;
 	}
 
-	inline function get_src():Image {
+	function get_src():Image {
 		return buffer[srcInd];
 	}
 
-	inline function get_tgt():Image {
+	function get_tgt():Image {
 		return buffer[tgtInd];
 	}
 }

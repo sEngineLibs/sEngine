@@ -19,8 +19,8 @@ uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
 uniform sampler2D ormMap;
 
-in vec2 fragCoord;
-out vec4 fragColor;
+layout(location = 0) in vec2 fragCoord;
+layout(location = 0) out vec3 fragColor;
 
 void main() {
     vec3 albedo, normal, orm;
@@ -31,18 +31,18 @@ void main() {
     normal = normalize(normal * 2.0 - 1.0);
     vec3 position = inverse(viewProjection) * vec3(fragCoord * 2.0 - 1.0, 0.0);
 
-    Light light;
-    light.position = lightPosition;
-    light.color = lightColor;
-    light.power = lightPower;
-    light.radius = lightRadius;
-    light.volume = lightVolume;
-
+    Light light = Light(
+            lightPosition,
+            lightColor,
+            lightPower,
+            lightRadius,
+            lightVolume
+        );
     vec3 l = lighting(light, position, normal, albedo.rgb, orm);
     #if S2D_LIGHTING_SHADOWS == 1
     float shadow = texture(shadowMap, fragCoord).r;
-    fragColor = vec4(l * shadow, 1.0);
+    fragColor = l * shadow;
     #else
-    fragColor = vec4(l, 1.0);
+    fragColor = l;
     #endif
 }

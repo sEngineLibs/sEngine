@@ -13,18 +13,18 @@ class Bloom extends PPEffect {
 	public var threshold:Float = 0.25;
 	public var intensity:Float = 0.75;
 
-	inline function setPipeline() {
+	function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
 		pipeline.fragmentShader = Shaders.bloom_frag;
 	}
 
-	inline function getUniforms() {
+	function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
 		paramsCL = pipeline.getConstantLocation("params");
 	}
 
 	@:access(s2d.graphics.Renderer)
-	inline function render(target:Canvas) {
+	function render(target:Canvas) {
 		final g2 = target.g2;
 		final g4 = target.g4;
 

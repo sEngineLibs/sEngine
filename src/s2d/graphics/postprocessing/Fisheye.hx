@@ -15,19 +15,19 @@ class Fisheye extends PPEffect {
 	public var position:FastVector2 = new FastVector2(0.5, 0.5);
 	public var strength:Float = 0.0;
 
-	inline function setPipeline() {
+	function setPipeline() {
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
 		pipeline.fragmentShader = Shaders.fisheye_frag;
 	}
 
-	inline function getUniforms() {
+	function getUniforms() {
 		textureMapTU = pipeline.getTextureUnit("textureMap");
 		positionCL = pipeline.getConstantLocation("fisheyePosition");
 		strengthCL = pipeline.getConstantLocation("fisheyeStrength");
 	}
 
 	@:access(s2d.graphics.Renderer)
-	inline function render(target:Canvas) {
+	function render(target:Canvas) {
 		final g2 = target.g2;
 		final g4 = target.g4;
 

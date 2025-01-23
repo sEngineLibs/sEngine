@@ -17,7 +17,7 @@ class Timer {
 	 * @param delay Amount of seconds to wait
 	 * @return Returns the timer instance
 	 */
-	public static inline function set(callback:Void->Void, delay:Float):Timer {
+	public static function set(callback:Void->Void, delay:Float):Timer {
 		final timer = new Timer(callback, delay);
 		timer.start();
 		return timer;
@@ -28,7 +28,7 @@ class Timer {
 	 * @param callback A function to call after the timer was triggered
 	 * @param delay Amount of seconds to wait
 	 */
-	public inline function new(callback:Void->Void, delay:Float) {
+	public function new(callback:Void->Void, delay:Float) {
 		this.callback = callback;
 		this.delay = delay;
 	}
@@ -38,7 +38,7 @@ class Timer {
 	 * @param lock Whether to skip if the timer is already started
 	 * @return Returns true if the timer was started
 	 */
-	public inline function start(?lock:Bool = true):Bool {
+	public function start(?lock:Bool = true):Bool {
 		if (!lock || !started) {
 			started = true;
 			listener = Time.notifyOnTime(() -> {
@@ -53,7 +53,7 @@ class Timer {
 	/**
 	 * Stops the timer
 	 */
-	public inline function stop() {
+	public function stop() {
 		Time.timeListeners.remove(listener);
 	}
 
@@ -63,7 +63,7 @@ class Timer {
 	 * @param lock Whether to skip if the timer is already started
 	 * @return Returns true if the timer was started
 	 */
-	public inline function repeat(count:Int = 1, ?lock:Bool = true):Bool {
+	public function repeat(count:Int = 1, ?lock:Bool = true):Bool {
 		if (count <= 0)
 			return false;
 

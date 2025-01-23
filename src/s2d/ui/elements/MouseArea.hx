@@ -59,27 +59,27 @@ class MouseArea extends Element {
 		});
 	}
 
-	public inline function notifyOnDown(f:(button:Int, x:Int, y:Int) -> Void) {
+	public function notifyOnDown(f:(button:Int, x:Int, y:Int) -> Void) {
 		downListeners.push(f);
 	}
 
-	public inline function notifyOnUp(f:(button:Int, x:Int, y:Int) -> Void) {
+	public function notifyOnUp(f:(button:Int, x:Int, y:Int) -> Void) {
 		upListeners.push(f);
 	}
 
-	public inline function notifyOnEnter(f:(x:Int, y:Int) -> Void) {
+	public function notifyOnEnter(f:(x:Int, y:Int) -> Void) {
 		enterListeners.push(f);
 	}
 
-	public inline function notifyOnExit(f:(x:Int, y:Int) -> Void) {
+	public function notifyOnExit(f:(x:Int, y:Int) -> Void) {
 		exitListeners.push(f);
 	}
 
-	public inline function notifyOnMove(f:(x:Int, y:Int, moveX:Int, moveY:Int) -> Void) {
+	public function notifyOnMove(f:(x:Int, y:Int, moveX:Int, moveY:Int) -> Void) {
 		moveListeners.push(f);
 	}
 
-	public inline function notifyOnWheel(f:(delta:Int) -> Void) {
+	public function notifyOnWheel(f:(delta:Int) -> Void) {
 		wheelListeners.push(f);
 	}
 }

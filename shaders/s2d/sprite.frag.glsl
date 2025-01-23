@@ -2,8 +2,8 @@
 
 uniform sampler2D textureMap;
 
-in vec2 fragUV;
-out vec4 fragColor;
+layout(location = 0) in vec2 fragUV;
+layout(location = 0) out vec4 fragColor;
 
 void main() {
     vec4 color = texture(textureMap, fragUV);

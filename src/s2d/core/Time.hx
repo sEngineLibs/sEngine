@@ -19,7 +19,7 @@ class Time {
 	 * @param time Timestamp in seconds
 	 * @return Returns a listener
 	 */
-	public static inline function notifyOnTime(callback:Void->Void, time:Float) {
+	public static function notifyOnTime(callback:Void->Void, time:Float) {
 		var listener = {f: callback, time: time};
 		timeListeners.push(listener);
 		return listener;
@@ -31,13 +31,13 @@ class Time {
 	 * @param time Real timestamp in seconds
 	 * @return Returns a listener
 	 */
-	public static inline function notifyOnRealTime(callback:Void->Void, time:Float) {
+	public static function notifyOnRealTime(callback:Void->Void, time:Float) {
 		var listener = {f: callback, time: time};
 		realTimeListeners.push(listener);
 		return listener;
 	}
 
-	static inline function update() {
+	static function update() {
 		final rt = System.time;
 		delta = (rt - realTime) * scale;
 		realTime = rt;

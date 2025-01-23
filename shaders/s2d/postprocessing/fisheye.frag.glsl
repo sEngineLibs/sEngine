@@ -4,8 +4,8 @@ uniform sampler2D textureMap;
 uniform vec2 fisheyePosition;
 uniform float fisheyeStrength;
 
-in vec2 fragCoord;
-out vec4 fragColor;
+layout(location = 0) in vec2 fragCoord;
+layout(location = 0) out vec4 fragColor;
 
 vec2 fisheyeUV(vec2 coord, vec2 position, float strength, float ratio) {
     if (strength == 0.0)

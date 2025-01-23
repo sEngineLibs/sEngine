@@ -1,5 +1,6 @@
 package s2d.graphics.lighting;
 
+import kha.Assets;
 #if (S2D_LIGHTING && S2D_LIGHTING_DEFERRED == 1)
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
@@ -31,7 +32,7 @@ class LightingDeferred {
 	#end // S2D_LIGHTING_ENVIRONMENT
 	static var envEmissionMapTU:TextureUnit;
 
-	public static inline function compile() {
+	public static function compile() {
 		var structure = new VertexStructure();
 		structure.add("vertCoord", Float32_2X);
 
@@ -76,7 +77,7 @@ class LightingDeferred {
 	}
 
 	@:access(s2d.graphics.Renderer)
-	public static inline function render():Void {
+	public static function render():Void {
 		final g4 = Renderer.buffer.tgt.g4;
 
 		g4.begin();
@@ -104,7 +105,9 @@ class LightingDeferred {
 			for (light in layer.lights) {
 				#if (S2D_LIGHTING_SHADOWS == 1)
 				if (light.isMappingShadows)
-					@:privateAccess g4.setTexture(shadowMapTU, layer.shadowMaps[light.shadowMapID]);
+					@:privateAccess g4.setTexture(shadowMapTU, layer.shadowMaps[light.shadowMapIndex]);
+				else
+					g4.setTexture(shadowMapTU, Assets.images.white);
 				#end
 				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);
 				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);

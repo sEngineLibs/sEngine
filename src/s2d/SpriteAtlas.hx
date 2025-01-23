@@ -32,14 +32,14 @@ class SpriteAtlas {
 	public var textureMap:Image;
 	#end
 
-	public inline function new(layer:Layer) {
+	public function new(layer:Layer) {
 		this.layer = layer;
 		#if (S2D_SPRITE_INSTANCING == 1)
 		init();
 		#end
 	}
 
-	inline function set_layer(value:Layer) {
+	function set_layer(value:Layer) {
 		value.addSpriteAtlas(this);
 		layer = value;
 		return value;
@@ -48,7 +48,7 @@ class SpriteAtlas {
 	#if (S2D_SPRITE_INSTANCING == 1)
 	var vertices:Array<VertexBuffer>;
 
-	inline function init() {
+	function init() {
 		vertices = [
 			S2D.vertices,
 			#if (S2D_LIGHTING == 1)
@@ -69,7 +69,7 @@ class SpriteAtlas {
 		];
 	}
 
-	public inline function addSprite(sprite:Sprite) {
+	public function addSprite(sprite:Sprite) {
 		final tmp = sprites;
 		sprites = new Vector(tmp.length + 1);
 
@@ -97,7 +97,7 @@ class SpriteAtlas {
 		#end
 	}
 
-	inline function update() {
+	function update() {
 		#if (S2D_LIGHTING == 1)
 		#if (S2D_LIGHTING_DEFERRED == 1)
 		final cStructSize = GeometryDeferred.structures[1].byteSize() >> 2;

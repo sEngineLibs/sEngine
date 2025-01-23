@@ -28,7 +28,7 @@ class LightingForward {
 	static var cropRectCL:ConstantLocation;
 	#end // S2D_SPRITE_INSTANCING
 
-	public static inline function compile() {
+	public static function compile() {
 		structures.push(new VertexStructure());
 		structures[0].add("vertCoord", Float32_2X);
 
@@ -51,9 +51,9 @@ class LightingForward {
 		pipeline.vertexShader = Shaders.sprite_vert;
 		pipeline.fragmentShader = Shaders.lighting_forward_frag;
 		pipeline.alphaBlendSource = SourceAlpha;
-		pipeline.alphaBlendDestination = InverseSourceAlpha;
-		pipeline.blendSource = SourceAlpha;
-		pipeline.blendDestination = InverseSourceAlpha;
+		pipeline.blendSource = BlendOne;
+		pipeline.blendDestination = BlendOne;
+		pipeline.blendOperation = Add;
 		pipeline.compile();
 
 		viewProjectionCL = pipeline.getConstantLocation("viewProjection");
@@ -73,8 +73,8 @@ class LightingForward {
 		#end // S2D_SPRITE_INSTANCING
 	}
 
-	public static inline function render():Void {
-		final g4 = Renderer.buffer.tgt.g4;
+	public static function render():Void {
+		final g4 = @:privateAccess Renderer.buffer.tgt.g4;
 		final viewProjection = S2D.stage.viewProjection;
 
 		g4.begin();

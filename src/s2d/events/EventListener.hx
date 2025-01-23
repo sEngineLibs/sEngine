@@ -7,13 +7,13 @@ class EventListener {
 	var callback:Void->Void;
 	var breakable:Bool;
 
-	inline function new(event:Void->Bool, callback:Void->Void, breakable:Bool) {
+	function new(event:Void->Bool, callback:Void->Void, breakable:Bool) {
 		this.event = event;
 		this.callback = callback;
 		this.breakable = breakable;
 	}
 
-	inline function update():Bool {
+	function update():Bool {
 		if (event()) {
 			callback();
 			return breakable;
@@ -21,7 +21,7 @@ class EventListener {
 		return false;
 	}
 
-	public inline function stop() {
+	public function stop() {
 		Dispatcher.listeners.remove(this);
 	}
 }

@@ -21,22 +21,21 @@ layout(location = 4) out vec3 ormColor;
 
 void main() {
     vec4 albedo = texture(albedoMap, fragUV);
-    if (albedo.a > 0.5) {
-        vec3 normal = texture(normalMap, fragUV).rgb * 2.0 - 1.0;
-        vec3 emission = texture(emissionMap, fragUV).rgb;
-        vec3 orm = texture(ormMap, fragUV).rgb;
+    if (albedo.a < 0.5)
+        discard;
+        
+    vec3 normal = texture(normalMap, fragUV).rgb * 2.0 - 1.0;
+    vec3 emission = texture(emissionMap, fragUV).rgb;
+    vec3 orm = texture(ormMap, fragUV).rgb;
 
-        // local space -> world space
-        normal.xy = inverse(mat2(model)) * normal.xy;
-        normal = normalize(vec3(normal.xy, normal.z));
-        normal = normal * 0.5 + 0.5;
+    // local space -> world space
+    normal.xy = inverse(mat2(model)) * normal.xy;
+    normal = normalize(vec3(normal.xy, normal.z));
+    normal = normal * 0.5 + 0.5;
 
-        depthColor = gl_FragCoord.z;
-        albedoColor = albedo.rgb / albedo.a;
-        normalColor = normal;
-        emissionColor = emission;
-        ormColor = orm;
-
-        gl_FragDepth = depthColor;
-    }
+    depthColor = gl_FragCoord.z;
+    albedoColor = albedo.rgb / albedo.a;
+    normalColor = normal;
+    emissionColor = emission;
+    ormColor = orm;
 }

@@ -9,7 +9,7 @@ class Triangle extends SimpleDrawableElement {
 	public var v2:Vector2 = {x: 0., y: 0.}
 	public var v3:Vector2 = {x: 0., y: 0.}
 
-	override inline function simpleDraw(target:Canvas) {
+	override function simpleDraw(target:Canvas) {
 		var x = left.position;
 		var y = right.position;
 

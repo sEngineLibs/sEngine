@@ -25,12 +25,12 @@ uniform sampler2D ormMap;
 #if (S2D_SPRITE_INSTANCING != 1)
 uniform mat3 model;
 #else
-in mat3 model;
+layout(location = 2) in mat3 model;
 #endif
 
-in vec2 fragCoord;
-in vec2 fragUV;
-out vec4 fragColor;
+layout(location = 0) in vec2 fragCoord;
+layout(location = 1) in vec2 fragUV;
+layout(location = 0) out vec4 fragColor;
 
 void main() {
     // fetch material textures
@@ -53,11 +53,13 @@ void main() {
     col += envLighting(envMap, normal, albedo.rgb, orm);
     #endif
 
-    Light light;
-    light.position = lightPosition;
-    light.color = lightColor;
-    light.power = lightPower;
-    light.radius = lightRadius;
+    Light light = Light(
+            lightPosition,
+            lightColor,
+            lightPower,
+            lightRadius,
+            0.0
+        );
 
     fragColor = vec4(emission + lighting(light, position, normal, albedo.rgb, orm), albedo.a);
 }

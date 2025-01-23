@@ -1,30 +1,30 @@
 #version 450
 
 uniform mat3 viewProjection;
+
+layout(location = 0) in vec2 vertCoord;
+layout(location = 0) out vec2 fragCoord;
+layout(location = 1) out vec2 fragUV;
 #if (S2D_SPRITE_INSTANCING != 1)
 uniform float depth;
 uniform mat3 model;
 uniform vec4 cropRect;
 #else
-in vec4 cropRect;
-in vec3 model0;
-in vec3 model1;
-in vec3 model2;
-in float vertDepth;
-out mat3 model;
+layout(location = 1) in vec4 cropRect;
+layout(location = 2) in vec3 model0;
+layout(location = 3) in vec3 model1;
+layout(location = 4) in vec3 model2;
+layout(location = 5) in float depth;
+layout(location = 2) out mat3 model;
 #endif
-
-in vec2 vertPos;
-out vec2 fragCoord;
-out vec2 fragUV;
 
 void main() {
     #if (S2D_SPRITE_INSTANCING == 1)
     model = mat3(model0, model1, model2);
     #endif
-    vec3 pos = viewProjection * model * vec3(vertPos, 1.0);
+    vec3 pos = viewProjection * model * vec3(vertCoord, 1.0);
     gl_Position = vec4(pos.xy, depth, 1.0);
 
     fragCoord = gl_Position.xy;
-    fragUV = cropRect.xy + (vertPos.xy * 0.5 + 0.5) * cropRect.zw;
+    fragUV = cropRect.xy + (vertCoord * 0.5 + 0.5) * cropRect.zw;
 }

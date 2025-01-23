@@ -12,14 +12,14 @@ class ColumnLayout extends Element {
 	@:isVar public var direction(default, set):Direction = Direction.TopToBottom;
 	public var alignment:Alignment = Alignment.HCenter | Alignment.VCenter;
 
-	inline function set_spacing(value:Float) {
+	function set_spacing(value:Float) {
 		spacing = value;
 		for (i in 1...children.length)
 			children[i].anchors.topMargin = spacing;
 		return value;
 	}
 
-	inline function set_direction(value:Direction) {
+	function set_direction(value:Direction) {
 		if (direction == Direction.BottomToTop && value == Direction.TopToBottom)
 			children.reverse();
 		buildLayout();
@@ -27,7 +27,7 @@ class ColumnLayout extends Element {
 		return value;
 	}
 
-	inline function buildLayout() {
+	function buildLayout() {
 		if (direction == Direction.BottomToTop)
 			children.reverse();
 

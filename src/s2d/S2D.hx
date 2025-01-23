@@ -32,25 +32,25 @@ class S2D {
 
 	public static var stage:Stage = new Stage();
 
-	static inline function get_realWidth():Int {
+	static function get_realWidth():Int {
 		return Std.int(width / resolutionScale);
 	}
 
-	static inline function set_realWidth(value:Int):Int {
+	static function set_realWidth(value:Int):Int {
 		width = Std.int(value * resolutionScale);
 		return value;
 	}
 
-	static inline function get_realHeight():Int {
+	static function get_realHeight():Int {
 		return Std.int(height / resolutionScale);
 	}
 
-	static inline function set_realHeight(value:Int):Int {
+	static function set_realHeight(value:Int):Int {
 		height = Std.int(value * resolutionScale);
 		return value;
 	}
 
-	static inline function set_resolutionScale(value:Float):Float {
+	static function set_resolutionScale(value:Float):Float {
 		width = Std.int(width * resolutionScale / value);
 		height = Std.int(height * resolutionScale / value);
 		resolutionScale = value;
@@ -59,7 +59,7 @@ class S2D {
 	}
 
 	@:access(s2d.graphics.Renderer)
-	public static inline function ready(w:Int, h:Int) {
+	public static function ready(w:Int, h:Int) {
 		realWidth = w;
 		realHeight = h;
 		aspectRatio = width / height;
@@ -91,7 +91,7 @@ class S2D {
 	}
 
 	@:access(s2d.SpriteAtlas)
-	static inline function update() {
+	static function update() {
 		Time.update();
 		Dispatcher.update();
 		Action.update(Time.time);
@@ -104,31 +104,31 @@ class S2D {
 	}
 
 	@:access(s2d.graphics.Renderer)
-	public static inline function set() {
+	public static function set() {
 		Renderer.set();
 	}
 
 	@:access(s2d.graphics.Renderer)
-	public static inline function resize(w:Int, h:Int) {
+	public static function resize(w:Int, h:Int) {
 		realWidth = w;
 		realHeight = h;
 		aspectRatio = width / height;
 		Renderer.resize(width, height);
 	}
 
-	static inline function set_scale(value:Float):Float {
+	static function set_scale(value:Float):Float {
 		scale = value;
 		updateProjection();
 		return value;
 	}
 
-	static inline function set_aspectRatio(value:Float):Float {
+	static function set_aspectRatio(value:Float):Float {
 		aspectRatio = value;
 		updateProjection();
 		return value;
 	}
 
-	static inline function updateProjection() {
+	static function updateProjection() {
 		if (aspectRatio >= 1)
 			projection = FastMatrix3Ext.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale);
 		else
@@ -136,38 +136,38 @@ class S2D {
 		stage.updateViewProjection();
 	}
 
-	public static inline function local2WorldSpace(point:FastVector2):FastVector2 {
+	public static function local2WorldSpace(point:FastVector2):FastVector2 {
 		return stage.viewProjection.inverse().multvec(point);
 	}
 
-	public static inline function world2LocalSpace(point:FastVector2):FastVector2 {
+	public static function world2LocalSpace(point:FastVector2):FastVector2 {
 		return stage.viewProjection.multvec(point);
 	}
 
-	public static inline function screen2LocalSpace(point:FastVector2):FastVector2 {
+	public static function screen2LocalSpace(point:FastVector2):FastVector2 {
 		return {
 			x: point.x / realWidth * 2.0 - 1.0,
 			y: point.y / realHeight * 2.0 - 1.0
 		};
 	}
 
-	public static inline function local2ScreenSpace(point:FastVector2):FastVector2 {
+	public static function local2ScreenSpace(point:FastVector2):FastVector2 {
 		return {
 			x: point.x * realWidth * 0.5 - 0.5,
 			y: point.y * realHeight * 0.5 - 0.5
 		};
 	}
 
-	public static inline function screen2WorldSpace(point:FastVector2):FastVector2 {
+	public static function screen2WorldSpace(point:FastVector2):FastVector2 {
 		return local2WorldSpace(screen2LocalSpace(point));
 	}
 
-	public static inline function world2ScreenSpace(point:FastVector2):FastVector2 {
+	public static function world2ScreenSpace(point:FastVector2):FastVector2 {
 		return local2ScreenSpace(world2LocalSpace(point));
 	}
 
 	@:access(s2d.graphics.Renderer)
-	public static inline function render(target:Canvas):Void {
+	public static function render(target:Canvas):Void {
 		update();
 
 		var frame = Renderer.render();
@@ -181,7 +181,7 @@ class S2D {
 	}
 
 	#if S2D_DEBUG_FPS
-	static inline function showFPS(g:kha.graphics2.Graphics) {
+	static function showFPS(g:kha.graphics2.Graphics) {
 		final fps = Std.int(1.0 / Time.delta);
 
 		g.font = Assets.fonts.Roboto_Regular;

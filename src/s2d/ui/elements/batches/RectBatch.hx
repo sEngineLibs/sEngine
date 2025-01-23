@@ -13,7 +13,7 @@ class RectBatch extends ElementBatch {
 	public var rectAttrib:Float32Array;
 	public var rectColors:Float32Array;
 
-	override inline function add(element:Element) {
+	override function add(element:Element) {
 		var n = children.length;
 
 		rectBounds = new Float32Array(n * 4);
@@ -26,7 +26,7 @@ class RectBatch extends ElementBatch {
 			copyRect(cast(c, Rectangle));
 	}
 
-	inline function copyRect(rect:Rectangle) {
+	function copyRect(rect:Rectangle) {
 		var i = rect.instanceID;
 
 		rectBounds[i * 4 + 0] = rect.left.position;
@@ -93,7 +93,7 @@ class RectBatch extends ElementBatch {
 		vertices.unlock();
 	}
 
-	override public inline function render(target:Canvas) {
+	override public function render(target:Canvas) {
 		SUIShaders.RectDrawer.render(target, vertices, indices, [rectBounds, rectAttrib, rectColors]);
 	}
 }

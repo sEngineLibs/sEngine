@@ -4,13 +4,13 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 
 class MacroExt {
-	static public inline function sanitize(pos:Position)
+	static public function sanitize(pos:Position)
 		return if (pos == null) Context.currentPos(); else pos;
 
-	static public inline function field(e:Expr, field, ?pos)
+	static public function field(e:Expr, field, ?pos)
 		return at(EField(e, field), pos);
 
-	static public inline function at(e:ExprDef, ?pos:Position)
+	static public function at(e:ExprDef, ?pos:Position)
 		return {
 			expr: e,
 			pos: sanitize(pos)
@@ -24,6 +24,6 @@ class MacroExt {
 		return target;
 	}
 
-	static public inline function resolve(s:String, ?pos)
+	static public function resolve(s:String, ?pos)
 		return drill(s.split('.'), pos);
 }

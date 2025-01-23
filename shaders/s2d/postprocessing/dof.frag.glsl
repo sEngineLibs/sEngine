@@ -20,8 +20,8 @@ uniform sampler2D textureMap;
 uniform float focusDistance;
 uniform float blurSize;
 
-in vec2 fragCoord;
-out vec4 fragColor;
+layout(location = 0) in vec2 fragCoord;
+layout(location = 0) out vec4 fragColor;
 
 vec3 blur(sampler2D tex, vec2 uv, float size, float ratio) {
     vec3 col = vec3(0.0);

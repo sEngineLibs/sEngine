@@ -1,10 +1,12 @@
 package s2d.objects;
 
-import kha.math.FastVector2;
-#if (S2D_LIGHTING_SHADOWS == 1)
 import haxe.ds.Vector;
-#end
+import kha.FastFloat;
+import kha.math.FastVector2;
 import kha.math.FastVector4;
+#if (S2D_LIGHTING_SHADOWS == 1)
+import s2d.graphics.lighting.ShadowDrawer;
+#end
 
 using s2d.core.utils.extensions.VectorExt;
 
@@ -18,18 +20,33 @@ class Sprite extends StageObject {
 	#else
 	public var atlas:SpriteAtlas;
 	#end
+
 	#if (S2D_LIGHTING_SHADOWS == 1)
-	public var isCastingShadows:Bool = true;
-	public var shadowOpacity:Float = 1.0;
+	var shadowBufferOffset:Int = 0;
+
+	@:isVar public var isCastingShadows(default, set):Bool = false;
+	@:isVar public var shadowOpacity(default, set):Float = 1.0;
+
+	function set_isCastingShadows(value:Bool) {
+		isCastingShadows = value;
+		@:privateAccess layer.adjustShadowBuffers();
+		return value;
+	}
+
+	function set_shadowOpacity(value:Float) {
+		shadowOpacity = value;
+		updateShadowBuffers(3, shadowOpacity);
+		return value;
+	}
 	#end
 
-	public inline function new(atlas:SpriteAtlas) {
+	public function new(atlas:SpriteAtlas) {
 		super(atlas.layer);
 		this.atlas = atlas;
 		layer.addSprite(this);
 	}
 
-	public inline function setMesh(value:Array<Array<FastVector2>>) {
+	public function setMesh(value:Array<Array<FastVector2>>) {
 		var edgeCounter = 0;
 		for (m in value)
 			edgeCounter += m.length;
@@ -38,7 +55,7 @@ class Sprite extends StageObject {
 		// extend layer shadow buffers if needed
 		final d = edgeCounter - mesh.length;
 		if (d != 0)
-			@:privateAccess layer.adjustShadowBuffers(d * 4);
+			@:privateAccess layer.adjustShadowBuffers();
 		#end
 
 		// build mesh
@@ -56,7 +73,7 @@ class Sprite extends StageObject {
 		}
 	}
 
-	private function computeNormal(v1:FastVector2, v2:FastVector2, polygon:Array<FastVector2>):FastVector2 {
+	function computeNormal(v1:FastVector2, v2:FastVector2, polygon:Array<FastVector2>):FastVector2 {
 		var dx = v2.x - v1.x;
 		var dy = v2.y - v1.y;
 
@@ -73,26 +90,47 @@ class Sprite extends StageObject {
 		return normal.normalized();
 	}
 
-	inline function onZChanged() {
+	#if (S2D_LIGHTING_SHADOWS == 1)
+	@:access(s2d.Layer)
+	function updateShadowBuffers(index:Int, value:FastFloat) {
+		final structSize = @:privateAccess ShadowDrawer.structure.byteSize() >> 2;
+		var offset = shadowBufferOffset;
+		for (_ in mesh) {
+			for (i in 0...4) {
+				layer.shadowVerticesData[offset + index] = value;
+				offset += structSize;
+			}
+		}
+	}
+	#end
+
+	function onZChanged() {
+		// rearrange layer sprites
 		var i = 0;
 		for (sprite in layer.sprites) {
-			if (sprite.finalZ >= z) {
+			if (sprite.finalZ <= z) {
 				layer.sprites.rearrange(index, i);
 				index = i;
-				return;
+				break;
 			}
 			++i;
 		}
+		// update corresponding shadow vertices if needed
+		#if (S2D_LIGHTING_SHADOWS == 1)
+		if (isCastingShadows)
+			updateShadowBuffers(2, finalZ);
+		#end
 	}
 
-	inline function onTransformationChanged() {
+	function onTransformationChanged() {
 		#if (S2D_LIGHTING_SHADOWS == 1)
-		@:privateAccess layer.drawLayerShadows();
+		if (isCastingShadows)
+			@:privateAccess layer.drawLayerShadows();
 		#end
 	}
 
 	#if (S2D_SPRITE_INSTANCING == 1)
-	inline function set_atlas(value:SpriteAtlas) {
+	function set_atlas(value:SpriteAtlas) {
 		value.addSprite(this);
 		atlas = value;
 		return value;
@@ -106,7 +144,7 @@ class Edge {
 	public var v2:FastVector2;
 	public var normal:FastVector2;
 
-	public inline function new(v1:FastVector2, v2:FastVector2, normal:FastVector2) {
+	public function new(v1:FastVector2, v2:FastVector2, normal:FastVector2) {
 		this.v1 = v1;
 		this.v2 = v2;
 		this.normal = normal;

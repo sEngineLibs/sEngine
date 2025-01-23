@@ -14,11 +14,11 @@ class Shader {
 	public var structure:VertexStructure;
 	public var structSize(get, never):Int;
 
-	inline function get_structSize():Int {
+	function get_structSize():Int {
 		return structure.byteSize() >> 2;
 	}
 
-	public inline function new() {
+	public function new() {
 		initStructure();
 	}
 
@@ -44,7 +44,7 @@ class Shader {
 
 	function setUniforms(target:Canvas, ?uniforms:Dynamic) {}
 
-	public inline function render(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, ?uniforms:Dynamic):Void {
+	public function render(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, ?uniforms:Dynamic):Void {
 		target.g4.setPipeline(pipeline);
 		target.g4.setVertexBuffer(vertices);
 		target.g4.setIndexBuffer(indices);

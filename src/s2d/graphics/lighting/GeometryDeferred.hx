@@ -23,7 +23,7 @@ class GeometryDeferred {
 	static var ormMapTU:TextureUnit;
 	static var emissionMapTU:TextureUnit;
 
-	public static inline function compile() {
+	public static function compile() {
 		structures.push(new VertexStructure());
 		structures[0].add("vertCoord", Float32_2X);
 
@@ -46,7 +46,8 @@ class GeometryDeferred {
 		pipeline.vertexShader = Shaders.sprite_vert;
 		pipeline.fragmentShader = Shaders.geometry_frag;
 		pipeline.depthWrite = true;
-		pipeline.depthMode = Greater;
+		pipeline.depthMode = Less;
+		pipeline.depthStencilAttachment = DepthOnly;
 		pipeline.compile();
 
 		viewProjectionCL = pipeline.getConstantLocation("viewProjection");
@@ -62,7 +63,7 @@ class GeometryDeferred {
 	}
 
 	@:access(s2d.graphics.Renderer)
-	public static inline function render():Void {
+	public static function render():Void {
 		final g4 = Renderer.buffer.depthMap.g4;
 
 		g4.begin([
@@ -71,7 +72,7 @@ class GeometryDeferred {
 			Renderer.buffer.emissionMap,
 			Renderer.buffer.ormMap
 		]);
-		g4.clear(Black, 0.0);
+		g4.clear(Black, 1.0);
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(S2D.indices);
 		#if (S2D_SPRITE_INSTANCING != 1)

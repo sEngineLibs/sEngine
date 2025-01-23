@@ -10,7 +10,7 @@ class ShadowDrawer {
 	static var structure:VertexStructure;
 	static var pipeline:PipelineState;
 
-	public static inline function compile() {
+	public static function compile() {
 		structure = new VertexStructure();
 		structure.add("vertData", Float32_4X);
 
@@ -20,6 +20,7 @@ class ShadowDrawer {
 		pipeline.fragmentShader = Shaders.shadow_frag;
 		pipeline.depthWrite = false;
 		pipeline.depthMode = Greater;
+		pipeline.depthStencilAttachment = DepthOnly;
 		pipeline.alphaBlendSource = SourceAlpha;
 		pipeline.alphaBlendDestination = InverseSourceAlpha;
 		pipeline.blendSource = SourceAlpha;
@@ -29,16 +30,18 @@ class ShadowDrawer {
 
 	@:access(s2d.graphics.Renderer)
 	@:access(s2d.Layer)
-	public static inline function render(target:Image, layer:Layer):Void {
+	public static function render(target:Image, layer:Layer):Void {
 		final g4 = target.g4;
-		target.setDepthStencilFrom(Renderer.buffer.depthMap);
 
 		g4.begin();
 		g4.clear(White);
-		g4.setPipeline(pipeline);
-		g4.setIndexBuffer(layer.shadowIndices);
-		g4.setVertexBuffer(layer.shadowVertices);
-		g4.drawIndexedVertices();
+		if (layer.shadowVertices != null && layer.shadowIndices != null) {
+			target.setDepthStencilFrom(Renderer.buffer.depthMap);
+			g4.setPipeline(pipeline);
+			g4.setIndexBuffer(layer.shadowIndices);
+			g4.setVertexBuffer(layer.shadowVertices);
+			g4.drawIndexedVertices();
+		}
 		g4.end();
 	}
 }

@@ -3,8 +3,8 @@
 uniform sampler2D textureMap;
 uniform mat3 kernel;
 
-in vec2 fragCoord;
-out vec4 fragColor;
+layout(location = 0) in vec2 fragCoord;
+layout(location = 0) out vec4 fragColor;
 
 vec3 convolve3x3(sampler2D tex, vec2 coord, mat3 kernel) {
     vec2 R = textureSize(textureMap, 0);

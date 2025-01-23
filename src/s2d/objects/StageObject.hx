@@ -22,22 +22,24 @@ abstract class StageObject {
 	var finalModel:FastMatrix3;
 	var finalZ:FastFloat;
 
-	@:isVar public var z(default, set):FastFloat = 0.0;
+	@:isVar public var z(default, set):FastFloat;
 	public var x(get, set):FastFloat;
 	public var y(get, set):FastFloat;
 	public var scaleX(get, set):FastFloat;
 	public var scaleY(get, set):FastFloat;
 	public var rotation(get, set):FastFloat;
 
-	public inline function new(layer:Layer) {
+	public function new(layer:Layer) {
 		this.layer = layer;
+		z = 0.0;
+		finalModel = model;
 	}
 
 	abstract function onZChanged():Void;
 
 	abstract function onTransformationChanged():Void;
 
-	inline function invalidateZ():Void {
+	function invalidateZ():Void {
 		if (parent != null)
 			finalZ = clamp(parent.finalZ + z, 0.0, 1.0);
 		else
@@ -47,12 +49,12 @@ abstract class StageObject {
 			c.invalidateZ();
 	}
 
-	inline function invalidateTransformation():Void {
+	function invalidateTransformation():Void {
 		finalModel = model;
 		if (parent != null)
 			finalModel = parent.finalModel.multmat(finalModel);
-		if (transformationSource != null)
-			finalModel = finalModel.multmat(transformationSource.finalModel);
+		if (_transformationSource != null)
+			finalModel = finalModel.multmat(_transformationSource.finalModel);
 		onTransformationChanged();
 		for (c in children)
 			c.invalidateTransformation();
@@ -60,55 +62,55 @@ abstract class StageObject {
 			t.invalidateTransformation();
 	}
 
-	public inline function addChild(value:StageObject):Void {
+	public function addChild(value:StageObject):Void {
 		if (value == null || value == this || children.contains(value))
 			return;
 		value._parent = this;
 		children.push(value);
 	}
 
-	public inline function removeChild(value:StageObject):Void {
+	public function removeChild(value:StageObject):Void {
 		if (value == null || value == this || !children.contains(value))
 			return;
 		value._parent = null;
 		children.remove(value);
 	}
 
-	public inline function setParent(value:StageObject):Void {
+	public function setParent(value:StageObject):Void {
 		if (value != null)
 			value.addChild(this);
 	}
 
-	public inline function removeParent():Void {
+	public function removeParent():Void {
 		if (_parent != null)
 			_parent.removeChild(this);
 	}
 
-	public inline function addTransformationTarget(value:StageObject):Void {
+	public function addTransformationTarget(value:StageObject):Void {
 		if (value == null || value == this || transformationTargets.contains(value))
 			return;
 		value._transformationSource = this;
 		transformationTargets.push(value);
 	}
 
-	public inline function removeTransformationTarget(value:StageObject):Void {
+	public function removeTransformationTarget(value:StageObject):Void {
 		if (value == null || value == this || !transformationTargets.contains(value))
 			return;
 		value._transformationSource = null;
 		transformationTargets.remove(value);
 	}
 
-	public inline function setTransformationSource(value:StageObject):Void {
+	public function setTransformationSource(value:StageObject):Void {
 		if (value != null)
 			value.addTransformationTarget(this);
 	}
 
-	public inline function removeTransformationSource():Void {
+	public function removeTransformationSource():Void {
 		if (_transformationSource != null)
 			_transformationSource.removeTransformationTarget(this);
 	}
 
-	inline function transform(f:Void->Void) {
+	function transform(f:Void->Void) {
 		f();
 		invalidateTransformation();
 	}
@@ -173,13 +175,13 @@ abstract class StageObject {
 		scaleToG(value, value);
 	}
 
-	public inline function rotateG(angle:FastFloat) {
+	public function rotateG(angle:FastFloat) {
 		transform(() -> {
 			this.rotation += angle;
 		});
 	}
 
-	public inline function rotateToG(angle:FastFloat) {
+	public function rotateToG(angle:FastFloat) {
 		transform(() -> {
 			this.rotation = angle;
 		});
@@ -241,69 +243,69 @@ abstract class StageObject {
 		scaleToL(value, value);
 	}
 
-	public inline function rotateL(angle:FastFloat) {
+	public function rotateL(angle:FastFloat) {
 		transform(() -> {
 			model = model.multmat(FastMatrix3.rotation(angle));
 		});
 	}
 
-	public inline function rotateToL(angle:FastFloat) {
+	public function rotateToL(angle:FastFloat) {
 		transform(() -> {
 			model = model.multmat(FastMatrix3.rotation(angle - rotation));
 		});
 	}
 
-	inline function get_parent():StageObject {
+	function get_parent():StageObject {
 		return _parent;
 	}
 
-	inline function set_parent(value:StageObject):StageObject {
+	function set_parent(value:StageObject):StageObject {
 		setParent(value);
 		return value;
 	}
 
-	inline function get_transformationSource():StageObject {
+	function get_transformationSource():StageObject {
 		return _transformationSource;
 	}
 
-	inline function set_transformationSource(value:StageObject):StageObject {
+	function set_transformationSource(value:StageObject):StageObject {
 		setTransformationSource(value);
 		return value;
 	}
 
-	inline function set_z(value:FastFloat) {
+	function set_z(value:FastFloat) {
 		z = value;
 		invalidateZ();
 		return z;
 	}
 
-	inline function get_x():FastFloat {
+	function get_x():FastFloat {
 		return model._20;
 	}
 
-	inline function set_x(value:FastFloat):FastFloat {
+	function set_x(value:FastFloat):FastFloat {
 		transform(() -> {
 			model._20 = value;
 		});
 		return value;
 	}
 
-	inline function get_y():FastFloat {
+	function get_y():FastFloat {
 		return model._21;
 	}
 
-	inline function set_y(value:FastFloat):FastFloat {
+	function set_y(value:FastFloat):FastFloat {
 		transform(() -> {
 			model._21 = value;
 		});
 		return value;
 	}
 
-	inline function get_scaleX():FastFloat {
+	function get_scaleX():FastFloat {
 		return Math.sqrt(model._00 * model._00 + model._10 * model._10);
 	}
 
-	inline function set_scaleX(value:FastFloat):FastFloat {
+	function set_scaleX(value:FastFloat):FastFloat {
 		transform(() -> {
 			var xt = new FastVector2(model._00, model._10).normalized();
 			model._00 = xt.x * value;
@@ -312,11 +314,11 @@ abstract class StageObject {
 		return value;
 	}
 
-	inline function get_scaleY():FastFloat {
+	function get_scaleY():FastFloat {
 		return Math.sqrt(model._01 * model._01 + model._11 * model._11);
 	}
 
-	inline function set_scaleY(value:FastFloat):FastFloat {
+	function set_scaleY(value:FastFloat):FastFloat {
 		transform(() -> {
 			var yt = new FastVector2(model._01, model._11).normalized();
 			model._01 = yt.x * value;
@@ -325,11 +327,11 @@ abstract class StageObject {
 		return value;
 	}
 
-	inline function get_rotation():FastFloat {
+	function get_rotation():FastFloat {
 		return Math.atan2(model._10, model._00);
 	}
 
-	inline function set_rotation(value:FastFloat):FastFloat {
+	function set_rotation(value:FastFloat):FastFloat {
 		transform(() -> {
 			var sx = scaleX;
 			var sy = scaleY;
