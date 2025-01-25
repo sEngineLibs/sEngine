@@ -65,6 +65,17 @@ class S2D {
 		aspectRatio = width / height;
 		Renderer.ready(width, height);
 
+		// init structure
+		var structure = new VertexStructure();
+		structure.add("vertCoord", Float32_2X);
+		// init vertices
+		vertices = new VertexBuffer(4, structure, StaticUsage);
+		var vert = vertices.lock();
+		for (i in 0...4) {
+			vert[i * 2 + 0] = i == 0 || i == 1 ? -1.0 : 1.0;
+			vert[i * 2 + 1] = i == 0 || i == 3 ? -1.0 : 1.0;
+		}
+		vertices.unlock();
 		// init indices
 		indices = new IndexBuffer(6, StaticUsage);
 		var ind = indices.lock();
@@ -75,19 +86,6 @@ class S2D {
 		ind[4] = 2;
 		ind[5] = 0;
 		indices.unlock();
-
-		// init structure
-		var structure = new VertexStructure();
-		structure.add("vertCoord", Float32_2X);
-
-		// init vertices
-		vertices = new VertexBuffer(4, structure, StaticUsage);
-		var vert = vertices.lock();
-		for (i in 0...4) {
-			vert[i * 2 + 0] = i == 0 || i == 1 ? -1.0 : 1.0;
-			vert[i * 2 + 1] = i == 0 || i == 3 ? -1.0 : 1.0;
-		}
-		vertices.unlock();
 	}
 
 	@:access(s2d.SpriteAtlas)

@@ -15,10 +15,11 @@ import s2d.graphics.lighting.ShadowPass;
 
 class ShadowBuffers {
 	var indices:IndexBuffer;
-	var buffers:Vector<LightShadowBuffer>;
+	var buffers:Array<LightShadowBuffer>;
+	var v:Int = 0;
 
 	function new() {
-		buffers = new Vector(0);
+		buffers = [];
 		indices = new IndexBuffer(0, StaticUsage);
 	}
 
@@ -28,37 +29,27 @@ class ShadowBuffers {
 	}
 
 	function addLight(light:Light) {
-		var _buffers = new Vector(buffers.length + 1);
-		var count = 0;
-		for (_ in buffers) {
-			_buffers[count] = buffers[count];
-			++count;
-		}
-		_buffers[buffers.length] = new LightShadowBuffer(light);
-		_buffers[buffers.length].updateLightShadows();
-		buffers = _buffers;
+		buffers.push(new LightShadowBuffer(light));
 	}
 
 	@:access(s2d.objects.Light)
 	function removeLight(light:Light) {
+		buffers.remove(light.shadowBuffer);
 		light.shadowBuffer.free();
-		var _buffers = new Vector(buffers.length - 1);
-		var _count = 0;
-		var count = 0;
-		for (_ in buffers) {
-			if (count != light.shadowBuffer.index) {
-				_buffers[_count] = buffers[count];
-				++_count;
-			}
-			++count;
-		}
-		buffers = _buffers;
 	}
 
-	function addSprite(sprite:Sprite) {
-		for (buffer in buffers)
-			buffer.addSprite(sprite);
-		updateIndices();
+	function addSprite(sprite:Sprite) @:privateAccess {
+		var vertexCount = 0;
+		for (_ in sprite.mesh)
+			vertexCount += 4;
+		if (vertexCount > 0) {
+			for (buffer in buffers)
+				buffer.addSprite(sprite, vertexCount);
+			sprite.shadowBuffersOffset = v;
+			sprite.shadowBuffersLength = vertexCount;
+			v += vertexCount;
+			updateIndices();
+		}
 	}
 
 	function removeSprite(sprite:Sprite) {
@@ -67,10 +58,19 @@ class ShadowBuffers {
 		updateIndices();
 	}
 
-	function updateSpriteMesh(sprite:Sprite) {
-		for (buffer in buffers)
-			buffer.updateSpriteMesh(sprite);
-		updateIndices();
+	function updateSpriteMesh(sprite:Sprite) @:privateAccess {
+		var vertexCount = 0;
+		for (_ in sprite.mesh)
+			vertexCount += 4;
+		var d = vertexCount - sprite.shadowBuffersLength;
+		if (vertexCount > 0) {
+			for (buffer in buffers)
+				buffer.updateSpriteMesh(sprite, d);
+			sprite.shadowBuffersOffset = v + d - vertexCount;
+			sprite.shadowBuffersLength = vertexCount;
+			v += d;
+			updateIndices();
+		}
 	}
 
 	@:access(s2d.objects.Sprite)
@@ -87,19 +87,19 @@ class ShadowBuffers {
 			} else {
 				indices = new IndexBuffer((vertexCount - 1) * 6, StaticUsage);
 				final ind = indices.lock();
-				var quadCounter = 0;
+				var c = 0;
 				for (i in 0...(vertexCount - 1)) {
 					final v = i * 4; // 4 vertices per quad
-					final indexOffset = quadCounter * 6; // 6 indices per quad
+					final io = c * 6; // 6 indices per quad
 					// p1 -> p2 -> e1
-					ind[indexOffset + 0] = v + 0;
-					ind[indexOffset + 1] = v + 1;
-					ind[indexOffset + 2] = v + 2;
+					ind[io + 0] = v + 0;
+					ind[io + 1] = v + 1;
+					ind[io + 2] = v + 2;
 					// e1 -> e2 -> p2
-					ind[indexOffset + 3] = v + 2;
-					ind[indexOffset + 4] = v + 3;
-					ind[indexOffset + 5] = v + 1;
-					quadCounter++;
+					ind[io + 3] = v + 2;
+					ind[io + 4] = v + 3;
+					ind[io + 5] = v + 1;
+					c++;
 				}
 			}
 		} else {
@@ -121,9 +121,21 @@ class LightShadowBuffer {
 	function new(light:Light) {
 		this.light = light;
 		light.shadowBuffer = this;
+		map = Image.createRenderTarget(S2D.width, S2D.height, L8);
 
-		vertices = new VertexBuffer(0, @:privateAccess ShadowPass.structure, DynamicUsage);
-		vertexData = new Float32Array(0);
+		var vertexCount = 0;
+		for (sprite in light.layer.sprites)
+			if (sprite.isCastingShadows)
+				vertexCount += @:privateAccess sprite.mesh.length * 4;
+		vertices = new VertexBuffer(vertexCount, @:privateAccess ShadowPass.structure, DynamicUsage);
+		vertexData = vertices.lock();
+		final lightPos = S2D.world2LocalSpace({x: light.x, y: light.y});
+		final lightDis = light.radius * light.power;
+		for (sprite in light.layer.sprites)
+			if (sprite.isCastingShadows)
+				mapSpriteShadows(sprite, lightPos, lightDis);
+
+		vertices.unlock();
 	}
 
 	function free() {
@@ -132,24 +144,20 @@ class LightShadowBuffer {
 	}
 
 	function resize(width:Int, height:Int) {
-		var img = Image.createRenderTarget(width, height, L8);
-		img.g2.begin();
-		img.g2.drawScaledImage(map, 0, 0, width, height);
-		img.g2.end();
-		map.unload();
-		map = img;
+		if (map.width != width || map.height != height) {
+			var img = Image.createRenderTarget(width, height, L8);
+			img.g2.begin();
+			img.g2.drawScaledImage(map, 0, 0, width, height);
+			img.g2.end();
+			map.unload();
+			map = img;
+		}
 	}
 
 	@:access(s2d.objects.Sprite)
-	function addSprite(sprite:Sprite) {
-		sprite.shadowBuffersOffset = vertices.count();
-		var vertexCount = 0;
-		for (_ in sprite.mesh)
-			vertexCount += 4;
-		sprite.shadowBuffersLength = vertexCount;
-
+	function addSprite(sprite:Sprite, d:Int) {
 		vertices.delete();
-		vertices = new VertexBuffer(vertices.count() + vertexCount, @:privateAccess ShadowPass.structure, DynamicUsage);
+		vertices = new VertexBuffer(vertices.count() + d, @:privateAccess ShadowPass.structure, DynamicUsage);
 		var v = vertices.lock();
 		for (i in 0...vertexData.length)
 			v[i] = vertexData[i];
@@ -163,7 +171,6 @@ class LightShadowBuffer {
 		vertices.delete();
 		vertices = new VertexBuffer(vertices.count() - sprite.shadowBuffersLength, @:privateAccess ShadowPass.structure, DynamicUsage);
 		var v = vertices.lock();
-		var c = 0;
 		for (i in 0...v.length) {
 			if (i < sprite.shadowBuffersOffset)
 				v[i] = vertexData[i];
@@ -175,24 +182,23 @@ class LightShadowBuffer {
 	}
 
 	@:access(s2d.objects.Sprite)
-	function updateSpriteMesh(sprite:Sprite) {
-		var vertexCount = 0;
-		for (_ in sprite.mesh)
-			vertexCount += 4;
-		vertices.delete();
-		vertices = new VertexBuffer(vertexCount - sprite.shadowBuffersLength, @:privateAccess ShadowPass.structure, DynamicUsage);
-		sprite.shadowBuffersLength = vertexCount;
-		var v = vertices.lock();
-		var c = 0;
-		for (i in 0...v.length) {
-			if (i < sprite.shadowBuffersOffset)
-				v[i] = vertexData[i];
-			else
-				v[i] = vertexData[i + sprite.shadowBuffersLength];
+	function updateSpriteMesh(sprite:Sprite, d:Int) {
+		var c = vertices.count();
+		if (d != 0) {
+			vertices.delete();
+			vertices = new VertexBuffer(c + d, @:privateAccess ShadowPass.structure, DynamicUsage);
 		}
-		vertices.unlock();
+		var v = vertices.lock();
+		for (i in 0...vertexData.length) {
+			if (i < sprite.shadowBuffersOffset) {
+				v[i] = vertexData[i];
+			} else if (i + sprite.shadowBuffersLength < vertexData.length) {
+				v[i] = vertexData[i + sprite.shadowBuffersLength];
+			}
+		}
 		vertexData = v;
 		updateSpriteShadows(sprite);
+		vertices.unlock();
 	}
 
 	@:access(s2d.objects.Sprite)

@@ -54,6 +54,7 @@ class Sprite extends StageObject {
 		var edgeCounter = 0;
 		for (p in value)
 			edgeCounter += p.length;
+		final d = edgeCounter - mesh.length;
 
 		// build mesh
 		mesh = new Vector(edgeCounter);
@@ -71,7 +72,6 @@ class Sprite extends StageObject {
 
 		#if (S2D_LIGHTING_SHADOWS == 1)
 		// extend layer shadow buffers if needed
-		final d = edgeCounter - mesh.length;
 		if (d != 0)
 			@:privateAccess layer.shadowBuffers.updateSpriteMesh(this);
 		#end

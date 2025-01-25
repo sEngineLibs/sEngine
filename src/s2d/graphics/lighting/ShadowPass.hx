@@ -17,8 +17,8 @@ class ShadowPass {
 		pipeline.inputLayout = [structure];
 		pipeline.vertexShader = Shaders.shadow_vert;
 		pipeline.fragmentShader = Shaders.shadow_frag;
-		pipeline.depthWrite = false;
-		pipeline.depthMode = Greater;
+		pipeline.depthWrite = true;
+		pipeline.depthMode = Less;
 		pipeline.depthStencilAttachment = DepthOnly;
 		pipeline.alphaBlendSource = SourceAlpha;
 		pipeline.alphaBlendDestination = InverseSourceAlpha;
@@ -35,6 +35,7 @@ class ShadowPass {
 			for (shadowBuffer in layer.shadowBuffers.buffers) {
 				final target = @:privateAccess shadowBuffer.map;
 				target.setDepthStencilFrom(Renderer.buffer.depthMap);
+
 				final g4 = target.g4;
 
 				g4.begin();

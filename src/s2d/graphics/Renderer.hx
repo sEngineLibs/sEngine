@@ -29,6 +29,9 @@ class Renderer {
 		#if (S2D_LIGHTING == 1)
 		#if (S2D_LIGHTING_DEFERRED == 1)
 		commands = [GeometryDeferred.render, LightingDeferred.render];
+		#if (S2D_LIGHTING_SHADOWS == 1)
+		commands.insert(1, ShadowPass.render);
+		#end
 		#else
 		commands = [LightingForward.render];
 		#end
@@ -97,7 +100,8 @@ class Renderer {
 	static function render():Image {
 		for (command in commands)
 			command();
-		return buffer.tgt;
+		// return buffer.depthMap;
+		return @:privateAccess S2D.stage.layers[0].shadowBuffers.buffers[0].map;
 	}
 
 	#if (S2D_LIGHTING != 1)
