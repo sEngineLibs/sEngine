@@ -10,10 +10,10 @@ uniform sampler2D shadowMap;
 // light uniforms
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
-uniform vec3 lightAttrib;
+uniform vec2 lightAttrib;
 #define lightPower lightAttrib.x
 #define lightRadius lightAttrib.y
-#define lightVolume lightAttrib.z
+// #define lightVolume lightAttrib.z
 
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
@@ -35,8 +35,8 @@ void main() {
             lightPosition,
             lightColor,
             lightPower,
-            lightRadius,
-            lightVolume
+            lightRadius
+            // lightVolume
         );
     vec3 l = lighting(light, position, normal, albedo.rgb, orm);
     #if S2D_LIGHTING_SHADOWS == 1

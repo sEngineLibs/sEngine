@@ -1,4 +1,4 @@
-package s2d.core.utils.extensions;
+package s2d.core.extensions;
 
 import kha.math.Vector2;
 import kha.math.Vector2;

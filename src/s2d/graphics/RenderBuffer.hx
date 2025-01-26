@@ -1,69 +1,53 @@
 package s2d.graphics;
 
-import kha.Image;
 import haxe.ds.Vector;
+import kha.Image;
 
 class RenderBuffer {
-	var buffer:Vector<Image>;
-
 	// ping-pong
 	var srcInd:Int = 0;
 	var tgtInd:Int = 1;
 
+	public var buffer:Vector<Image>;
+
 	public var src(get, never):Image;
 	public var tgt(get, never):Image;
 
-	public var depthMap(get, never):Image;
+	public var depthMap:Image;
 
 	#if (S2D_LIGHTING_DEFERRED == 1)
-	static inline final length = 7;
+	public var albedoMap:Image;
+	public var normalMap:Image;
+	public var emissionMap:Image;
+	public var ormMap:Image;
 
-	public var albedoMap(get, never):Image;
-	public var normalMap(get, never):Image;
-	public var emissionMap(get, never):Image;
-	public var ormMap(get, never):Image;
-
-	function get_albedoMap():Image {
-		return buffer[2];
-	}
-
-	function get_normalMap():Image {
-		return buffer[3];
-	}
-
-	function get_emissionMap():Image {
-		return buffer[4];
-	}
-
-	function get_ormMap():Image {
-		return buffer[5];
-	}
-
-	function get_depthMap():Image {
-		return buffer[6];
-	}
-	#else
-	static inline final length = 3;
-
-	function get_depthMap():Image {
-		return buffer[2];
-	}
+	#if (S2D_LIGHTING_SHADOWS == 1)
+	public var shadowMap:Image;
 	#end
-
+	#end
 	public function new(width:Int, heigth:Int) {
-		buffer = new Vector(length);
+		buffer = new Vector(2);
 		resize(width, heigth);
 	}
 
 	public function resize(width:Int, heigth:Int) {
 		// ping-pong
-		for (i in 0...2)
-			buffer[i] = Image.createRenderTarget(width, heigth, RGBA32);
+		buffer[0] = Image.createRenderTarget(width, heigth, RGBA128);
+		buffer[1] = Image.createRenderTarget(width, heigth, RGBA128);
+		#if (S2D_LIGHTING == 1)
+		#if (S2D_LIGHTING_DEFERRED == 1)
 		// gbuffer
-		for (i in 2...length - 1)
-			buffer[i] = Image.createRenderTarget(width, heigth, RGBA32);
+		albedoMap = Image.createRenderTarget(width, heigth, RGBA32);
+		normalMap = Image.createRenderTarget(width, heigth, RGBA32);
+		emissionMap = Image.createRenderTarget(width, heigth, RGBA32);
+		ormMap = Image.createRenderTarget(width, heigth, RGBA32);
+		#end
+		#if (S2D_LIGHTING_SHADOWS == 1)
+		shadowMap = Image.createRenderTarget(width, heigth, RGBA32);
+		#end
+		#end
 		// depth map
-		buffer[length - 1] = Image.createRenderTarget(width, heigth, L8, DepthOnly);
+		depthMap = Image.createRenderTarget(width, heigth, A32, DepthOnly);
 	}
 
 	public function swap() {

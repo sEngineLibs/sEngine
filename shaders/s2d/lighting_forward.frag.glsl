@@ -40,7 +40,7 @@ void main() {
     vec3 orm = texture(ormMap, fragUV).rgb;
 
     vec3 normal = texture(normalMap, fragUV).rgb * 2.0 - 1.0;
-    normal.xy = inverse(mat2(model)) * normal.xy;
+    normal.xy = mat2(model) * normal.xy;
     normal = normalize(vec3(normal.xy, normal.z));
 
     vec3 position = inverse(viewProjection) * vec3(fragCoord, 0.0);
@@ -57,8 +57,8 @@ void main() {
             lightPosition,
             lightColor,
             lightPower,
-            lightRadius,
-            0.0
+            lightRadius
+            // 0.0
         );
 
     fragColor = vec4(emission + lighting(light, position, normal, albedo.rgb, orm), albedo.a);

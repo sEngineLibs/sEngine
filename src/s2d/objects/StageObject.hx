@@ -6,6 +6,8 @@ import kha.math.FastMatrix3;
 // s2d
 import s2d.core.utils.MathUtils;
 
+using s2d.core.extensions.FastMatrix3Ext;
+
 @:autoBuild(s2d.core.macro.SMacro.build())
 abstract class StageObject {
 	@readonly public var layer:Layer;
@@ -280,67 +282,56 @@ abstract class StageObject {
 	}
 
 	function get_x():FastFloat {
-		return model._20;
+		return model.getTranslationX();
 	}
 
 	function set_x(value:FastFloat):FastFloat {
 		transform(() -> {
-			model._20 = value;
+			model.setTranslationX(value);
 		});
 		return value;
 	}
 
 	function get_y():FastFloat {
-		return model._21;
+		return model.getTranslationY();
 	}
 
 	function set_y(value:FastFloat):FastFloat {
 		transform(() -> {
-			model._21 = value;
+			model.setTranslationY(value);
 		});
 		return value;
 	}
 
 	function get_scaleX():FastFloat {
-		return Math.sqrt(model._00 * model._00 + model._10 * model._10);
+		return model.getScaleX();
 	}
 
 	function set_scaleX(value:FastFloat):FastFloat {
 		transform(() -> {
-			var xt = new FastVector2(model._00, model._10).normalized();
-			model._00 = xt.x * value;
-			model._10 = xt.y * value;
+			model.setScaleX(value);
 		});
 		return value;
 	}
 
 	function get_scaleY():FastFloat {
-		return Math.sqrt(model._01 * model._01 + model._11 * model._11);
+		return model.getScaleY();
 	}
 
 	function set_scaleY(value:FastFloat):FastFloat {
 		transform(() -> {
-			var yt = new FastVector2(model._01, model._11).normalized();
-			model._01 = yt.x * value;
-			model._11 = yt.y * value;
+			model.setScaleY(value);
 		});
 		return value;
 	}
 
 	function get_rotation():FastFloat {
-		return Math.atan2(model._10, model._00);
+		return model.getRotation();
 	}
 
 	function set_rotation(value:FastFloat):FastFloat {
 		transform(() -> {
-			var sx = scaleX;
-			var sy = scaleY;
-			var c = Math.cos(value);
-			var s = Math.sin(value);
-			model._00 = c * sx;
-			model._10 = s * sx;
-			model._01 = -s * sy;
-			model._11 = c * sy;
+			model.setRotation(value);
 		});
 		return value;
 	}

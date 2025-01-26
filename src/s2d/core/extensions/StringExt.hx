@@ -1,6 +1,6 @@
-package s2d.core.utils.extensions;
+package s2d.core.extensions;
 
-using s2d.core.utils.extensions.StringExt;
+using s2d.core.extensions.StringExt;
 
 class StringExt {
 	public static function startsWith(str:String, value:String):Bool {

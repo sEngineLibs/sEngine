@@ -5,8 +5,11 @@ import haxe.ds.Vector;
 import s2d.SpriteAtlas;
 import s2d.objects.Light;
 import s2d.objects.Sprite;
+#if (S2D_LIGHTING_SHADOWS == 1)
+import s2d.graphics.ShadowBuffer;
+#end
 
-using s2d.core.utils.extensions.VectorExt;
+using s2d.core.extensions.VectorExt;
 
 class Layer {
 	public var lights:Vector<Light> = new Vector(0);
@@ -14,12 +17,12 @@ class Layer {
 	public var spriteAtlases:Vector<SpriteAtlas> = new Vector(0);
 
 	#if (S2D_LIGHTING_SHADOWS == 1)
-	var shadowBuffers:ShadowBuffers;
+	var shadowBuffer:ShadowBuffer;
 	#end
 
 	public function new() {
 		#if (S2D_LIGHTING_SHADOWS == 1)
-		shadowBuffers = @:privateAccess new ShadowBuffers();
+		shadowBuffer = new ShadowBuffer();
 		#end
 	}
 

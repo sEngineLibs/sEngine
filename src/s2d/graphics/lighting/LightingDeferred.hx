@@ -76,16 +76,17 @@ class LightingDeferred {
 		envEmissionMapTU = envPipeline.getTextureUnit("emissionMap");
 	}
 
+	@:access(s2d.objects.Light)
 	@:access(s2d.graphics.Renderer)
 	public static function render():Void {
 		final g4 = Renderer.buffer.tgt.g4;
 
+		// emission + (environment)
 		g4.begin();
 		g4.clear(Black);
 		g4.setPipeline(envPipeline);
 		g4.setIndexBuffer(S2D.indices);
 		g4.setVertexBuffer(S2D.vertices);
-		// emission + (environment)
 		g4.setTexture(envEmissionMapTU, Renderer.buffer.emissionMap);
 		#if (S2D_LIGHTING_ENVIRONMENT == 1)
 		g4.setTexture(envMapTU, S2D.stage.environmentMap);
@@ -95,6 +96,7 @@ class LightingDeferred {
 		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
 		g4.drawIndexedVertices();
+
 		// stage lights
 		g4.setPipeline(pipeline);
 		g4.setMatrix3(viewProjectionCL, S2D.stage.viewProjection);
@@ -104,14 +106,17 @@ class LightingDeferred {
 		for (layer in S2D.stage.layers) {
 			for (light in layer.lights) {
 				#if (S2D_LIGHTING_SHADOWS == 1)
-				if (light.isMappingShadows)
-					g4.setTexture(shadowMapTU, @:privateAccess light.shadowBuffer.map);
-				else
-					g4.setTexture(shadowMapTU, Assets.images.white);
+				g4.end();
+				ShadowPass.render(light);
+				g4.begin();
+				g4.setPipeline(pipeline);
+				g4.setIndexBuffer(S2D.indices);
+				g4.setVertexBuffer(S2D.vertices);
+				g4.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
 				#end
-				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);
+				g4.setFloat3(lightPositionCL, light.finalModel._20, light.finalModel._21, light.z);
 				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);
-				g4.setFloat3(lightAttribCL, light.power, light.radius, light.volume);
+				g4.setFloat2(lightAttribCL, light.power, light.radius);
 				g4.drawIndexedVertices();
 			}
 		}

@@ -1,6 +1,5 @@
 package s2d.graphics;
 
-import kha.graphics4.Graphics;
 import kha.Image;
 #if (S2D_LIGHTING != 1)
 import kha.Shaders;
@@ -29,9 +28,6 @@ class Renderer {
 		#if (S2D_LIGHTING == 1)
 		#if (S2D_LIGHTING_DEFERRED == 1)
 		commands = [GeometryDeferred.render, LightingDeferred.render];
-		#if (S2D_LIGHTING_SHADOWS == 1)
-		commands.insert(1, ShadowPass.render);
-		#end
 		#else
 		commands = [LightingForward.render];
 		#end
@@ -62,10 +58,6 @@ class Renderer {
 
 	static function resize(width:Int, height:Int) {
 		buffer.resize(width, height);
-		#if (S2D_LIGHTING_SHADOWS == 1)
-		for (layer in S2D.stage.layers)
-			@:privateAccess layer.shadowBuffers.resize(width, height);
-		#end
 	}
 
 	static function set() {
@@ -100,8 +92,7 @@ class Renderer {
 	static function render():Image {
 		for (command in commands)
 			command();
-		// return buffer.depthMap;
-		return @:privateAccess S2D.stage.layers[0].shadowBuffers.buffers[0].map;
+		return buffer.shadowMap;
 	}
 
 	#if (S2D_LIGHTING != 1)

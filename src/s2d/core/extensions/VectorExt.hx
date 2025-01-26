@@ -1,4 +1,4 @@
-package s2d.core.utils.extensions;
+package s2d.core.extensions;
 
 import haxe.ds.Vector;
 import s2d.core.utils.MathUtils;

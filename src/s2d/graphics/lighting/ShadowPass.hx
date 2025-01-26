@@ -4,49 +4,55 @@ package s2d.graphics.lighting;
 import kha.Shaders;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
+import kha.graphics4.ConstantLocation;
+// s2d
+import s2d.objects.Light;
+
+using s2d.core.extensions.FastMatrix3Ext;
 
 class ShadowPass {
-	static var structure:VertexStructure;
+	public static var structure:VertexStructure;
 	static var pipeline:PipelineState;
+	static var vpCL:ConstantLocation;
+	static var lightDataCL:ConstantLocation;
 
 	public static function compile() {
 		structure = new VertexStructure();
 		structure.add("vertData", Float32_4X);
+		structure.add("opacity", Float32_1X);
 
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];
 		pipeline.vertexShader = Shaders.shadow_vert;
 		pipeline.fragmentShader = Shaders.shadow_frag;
-		pipeline.depthWrite = true;
+		pipeline.depthWrite = false;
 		pipeline.depthMode = Less;
+		pipeline.cullMode = CounterClockwise;
 		pipeline.depthStencilAttachment = DepthOnly;
 		pipeline.alphaBlendSource = SourceAlpha;
-		pipeline.alphaBlendDestination = InverseSourceAlpha;
-		pipeline.blendSource = SourceAlpha;
 		pipeline.blendDestination = InverseSourceAlpha;
 		pipeline.compile();
+
+		vpCL = pipeline.getConstantLocation("VP");
+		lightDataCL = pipeline.getConstantLocation("lightData");
 	}
 
-	@:access(s2d.Layer)
-	@:access(s2d.ShadowBuffers)
-	@:access(s2d.graphics.Renderer)
-	public static function render():Void {
-		for (layer in S2D.stage.layers) {
-			for (shadowBuffer in layer.shadowBuffers.buffers) {
-				final target = @:privateAccess shadowBuffer.map;
-				target.setDepthStencilFrom(Renderer.buffer.depthMap);
+	public static function render(light:Light):Void @:privateAccess {
+		final target = @:privateAccess Renderer.buffer.shadowMap;
+		target.setDepthStencilFrom(Renderer.buffer.depthMap);
 
-				final g4 = target.g4;
-
-				g4.begin();
-				g4.clear(White);
-				g4.setPipeline(pipeline);
-				g4.setIndexBuffer(layer.shadowBuffers.indices);
-				g4.setVertexBuffer(@:privateAccess shadowBuffer.vertices);
-				g4.drawIndexedVertices();
-				g4.end();
-			}
+		final g4 = target.g4;
+		g4.begin();
+		g4.clear(White);
+		if (light.isMappingShadows) {
+			g4.setPipeline(pipeline);
+			g4.setIndexBuffer(light.layer.shadowBuffer.indices);
+			g4.setVertexBuffer(light.layer.shadowBuffer.vertices);
+			g4.setMatrix3(vpCL, S2D.stage.viewProjection);
+			g4.setFloat3(lightDataCL, light.finalModel.getTranslationX(), light.finalModel.getTranslationY(), light.radius);
+			g4.drawIndexedVertices();
 		}
+		g4.end();
 	}
 }
 #end

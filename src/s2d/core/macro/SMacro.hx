@@ -5,7 +5,7 @@ import haxe.macro.Expr;
 import haxe.macro.Expr.Field;
 
 using s2d.core.macro.MacroExt;
-using s2d.core.utils.extensions.StringExt;
+using s2d.core.extensions.StringExt;
 
 class SMacro {
 	public static function build():Array<Field> {

@@ -1,4 +1,4 @@
-package s2d.core.utils.extensions;
+package s2d.core.extensions;
 
 class ArrayExt {
 	public static function last<T>(a:Array<T>):T {

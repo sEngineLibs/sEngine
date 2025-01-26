@@ -1,7 +1,7 @@
 package s2d;
 
 import kha.math.FastVector3;
-import s2d.core.utils.extensions.FastMatrix3Ext;
+import s2d.core.extensions.FastMatrix3Ext;
 import s2d.events.Dispatcher;
 import kha.Assets;
 import kha.Canvas;

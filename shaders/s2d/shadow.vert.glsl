@@ -1,9 +1,20 @@
 #version 450
 
+uniform mat3 VP;
+uniform vec3 lightData;
+#define lightPos lightData.xy
+#define lightRadius lightData.z
+
 layout(location = 0) in vec4 vertData;
-layout(location = 0) out float fragFactor;
+#define vertPos vertData.xy
+#define depth vertData.z
+#define factor vertData.w
+layout(location = 1) in float opacity;
+layout(location = 0) out float fragOpacity;
 
 void main() {
-    gl_Position = vec4(vertData.xyz, 1.0);
-    fragFactor = vertData.w;
+    vec2 dir = vertPos - lightPos;
+    vec2 pos = vertPos + dir * factor * 10;
+    gl_Position = vec4((VP * vec3(pos, 1.0)).xy, depth, 1.0);
+    fragOpacity = opacity;
 }

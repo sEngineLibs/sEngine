@@ -65,7 +65,6 @@ class GeometryDeferred {
 	@:access(s2d.graphics.Renderer)
 	public static function render():Void {
 		final g4 = Renderer.buffer.depthMap.g4;
-
 		g4.begin([
 			Renderer.buffer.albedoMap,
 			Renderer.buffer.normalMap,
@@ -80,6 +79,7 @@ class GeometryDeferred {
 		#end
 		g4.setMatrix3(viewProjectionCL, S2D.stage.viewProjection);
 		for (layer in S2D.stage.layers) {
+			@:privateAccess layer.shadowBuffer.updateBuffersData();
 			#if (S2D_SPRITE_INSTANCING == 1)
 			for (atlas in layer.spriteAtlases) {
 				g4.setVertexBuffers(atlas.vertices);

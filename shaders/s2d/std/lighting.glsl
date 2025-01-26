@@ -7,7 +7,7 @@ struct Light {
     vec3 color;
     float power;
     float radius;
-    float volume;
+    // float volume;
 };
 
 vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, vec3 orm) {
@@ -15,11 +15,8 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, vec3 orm) {
     float roughness = clamp(orm.g, 0.05, 1.0);
     float metalness = orm.b;
 
-    vec3 l = light.position - position;
-    float distSq = dot(l, l);
-    float dist = sqrt(distSq);
-    vec3 dir = l / dist;
-
+    vec3 dir = normalize(light.position - position);
+    float distSq = dot(dir, dir);
     float lightAttenuation = light.power / (4.0 * PI * distSq + light.radius * light.radius);
 
     vec3 V = normalize(viewDir);
@@ -39,7 +36,7 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, vec3 orm) {
     vec3 kD = (1.0 - F) * (1.0 - metalness);
     vec3 diffuseLight = kD * albedo * max(dot(normal, dir), 0.0) / PI;
 
-    return (occlusion * (diffuseLight + specularLight) + light.volume) * light.color * lightAttenuation;
+    return occlusion * (diffuseLight + specularLight) * light.color * lightAttenuation;
 }
 
 #if S2D_LIGHTING_ENVIRONMENT == 1

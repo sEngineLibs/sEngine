@@ -4,7 +4,7 @@ import kha.FastFloat;
 // s2d
 import kha.math.FastMatrix3;
 
-using s2d.core.utils.extensions.FastMatrix3Ext;
+using s2d.core.extensions.FastMatrix3Ext;
 
 abstract Camera(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 	public var x(get, set):FastFloat;
