@@ -15,11 +15,13 @@ class RenderBuffer {
 
 	public var depthMap:Image;
 
+	#if (S2D_LIGHTING == 1)
 	#if (S2D_LIGHTING_DEFERRED == 1)
 	public var albedoMap:Image;
 	public var normalMap:Image;
 	public var emissionMap:Image;
 	public var ormMap:Image;
+	#end
 
 	#if (S2D_LIGHTING_SHADOWS == 1)
 	public var shadowMap:Image;

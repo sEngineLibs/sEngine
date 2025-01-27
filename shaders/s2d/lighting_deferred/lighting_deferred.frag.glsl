@@ -36,12 +36,11 @@ void main() {
             lightColor,
             lightPower,
             lightRadius
-            // lightVolume
+        // lightVolume
         );
     vec3 l = lighting(light, position, normal, albedo.rgb, orm);
     #if S2D_LIGHTING_SHADOWS == 1
-    float shadow = texture(shadowMap, fragCoord).r;
-    fragColor = l * shadow;
+    fragColor = l * texture(shadowMap, fragCoord).r;
     #else
     fragColor = l;
     #endif

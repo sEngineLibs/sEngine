@@ -17,6 +17,9 @@ class LightingForward {
 	static var lightPositionCL:ConstantLocation;
 	static var lightColorCL:ConstantLocation;
 	static var lightAttribCL:ConstantLocation;
+	// #if (S2D_LIGHTING_SHADOWS == 1)
+	// static var shadowMapTU:TextureUnit;
+	// #end
 	#if (S2D_LIGHTING_ENVIRONMENT == 1) static var envMapTU:TextureUnit; #end // S2D_LIGHTING_ENVIRONMENT
 	static var albedoMapTU:TextureUnit;
 	static var normalMapTU:TextureUnit;
@@ -60,6 +63,9 @@ class LightingForward {
 		lightPositionCL = pipeline.getConstantLocation("lightPosition");
 		lightColorCL = pipeline.getConstantLocation("lightColor");
 		lightAttribCL = pipeline.getConstantLocation("lightAttrib");
+		// #if (S2D_LIGHTING_SHADOWS == 1)
+		// shadowMapTU = pipeline.getTextureUnit("shadowMap");
+		// #end
 		albedoMapTU = pipeline.getTextureUnit("albedoMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		emissionMapTU = pipeline.getTextureUnit("emissionMap");
@@ -73,8 +79,10 @@ class LightingForward {
 		#end // S2D_SPRITE_INSTANCING
 	}
 
+	@:access(s2d.objects.Light)
+	@:access(s2d.graphics.Renderer)
 	public static function render():Void {
-		final g4 = @:privateAccess Renderer.buffer.tgt.g4;
+		final g4 = Renderer.buffer.tgt.g4;
 		final viewProjection = S2D.stage.viewProjection;
 
 		g4.begin();
@@ -91,6 +99,15 @@ class LightingForward {
 		#end
 		for (layer in S2D.stage.layers) {
 			for (light in layer.lights) {
+				// #if (S2D_LIGHTING_SHADOWS == 1)
+				// g4.end();
+				// ShadowPass.render(light);
+				// g4.begin();
+				// g4.setPipeline(pipeline);
+				// g4.setIndexBuffer(S2D.indices);
+				// g4.setVertexBuffer(S2D.vertices);
+				// g4.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
+				// #end
 				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);
 				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);
 				g4.setFloat2(lightAttribCL, light.power, light.radius);

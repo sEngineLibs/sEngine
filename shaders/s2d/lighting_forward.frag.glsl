@@ -6,6 +6,9 @@
 uniform mat3 viewProjection;
 
 // light uniforms
+// #if S2D_LIGHTING_SHADOWS == 1
+// uniform sampler2D shadowMap;
+// #endif
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
 uniform vec2 lightAttrib;
@@ -58,8 +61,12 @@ void main() {
             lightColor,
             lightPower,
             lightRadius
-            // 0.0
+        // 0.0
         );
 
-    fragColor = vec4(emission + lighting(light, position, normal, albedo.rgb, orm), albedo.a);
+    vec3 l = lighting(light, position, normal, albedo.rgb, orm);
+    // #if S2D_LIGHTING_SHADOWS == 1
+    // l *= texture(shadowMap, fragCoord).r;
+    // #endif
+    fragColor = vec4(emission + l, albedo.a);
 }
