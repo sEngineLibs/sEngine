@@ -47,6 +47,10 @@ class FastMatrix3Ext {
 		m.setTranslationY(value.y);
 	}
 
+	public static function pushTranslation(m:FastMatrix3, value:FastVector2):Void {
+		m.setTranslation(m.getTranslation().add(value));
+	}
+
 	public static function getScaleX(m:FastMatrix3):FastFloat {
 		return Math.sqrt(m._00 * m._00 + m._10 * m._10);
 	}
@@ -79,6 +83,13 @@ class FastMatrix3Ext {
 		m.setScaleY(value.y);
 	}
 
+	public static function pushScale(m:FastMatrix3, value:FastVector2):Void {
+		m.setScale({
+			x: m.getScaleX() * value.x,
+			y: m.getScaleY() * value.y,
+		});
+	}
+
 	public static function getRotation(m:FastMatrix3):FastFloat {
 		return Math.atan2(m._10, m._00);
 	}
@@ -92,5 +103,9 @@ class FastMatrix3Ext {
 		m._10 = s * sx;
 		m._01 = -s * sy;
 		m._11 = c * sy;
+	}
+
+	public static function pushRotation(m:FastMatrix3, value:FastFloat):Void {
+		m.setRotation(m.getRotation() + value);
 	}
 }

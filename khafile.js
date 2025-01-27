@@ -131,15 +131,17 @@ project.addAssets("assets/**", {
 // S2D_SPRITE_INSTANCING -> enables atlas instancing
 // S2D_LIGHTING -> enables lighting
 // S2D_LIGHTING_PBR -> enables PBR lighting
-// S2D_LIGHTING_VOLUMETRIC -> enables volumetric lighting
 // S2D_LIGHTING_SHADOWS -> enables shadows
-// S2D_LIGHTING_SHADOWS_SOFT -> enables soft shadows
 // S2D_LIGHTING_DEFERRED -> enables deferred lighting
 // S2D_LIGHTING_ENVIRONMENT -> enables environment lighting
 // S2D_PP_BLOOM -> enables Bloom PP effect
 // S2D_PP_FISHEYE -> enables Fisheye PP effect
 // S2D_PP_FILTERS -> enables 3x3 image convolution multi-pass PP effects
 // S2D_PP_COMPOSITOR -> enables compositor / single-pass combination of various (AA, CC etc.) PP effects
+// - not yet implemented
+// S2D_LIGHTING_VOLUMETRIC -> enables volumetric lighting
+// S2D_LIGHTING_SHADOWS_SOFT -> enables soft shadows
+
 let defs = [];
 for (const def of process.defines) {
     let kv = def.split(" ");

@@ -1,11 +1,10 @@
-package sui.positioning;
+package s2d.ui.positioning;
 
 enum abstract Direction(Int) from Int to Int {
 	// horizontal
-	public inline static var LeftToRight:Int = 1;
-	public inline static var RightToLeft:Int = 2;
-
+	var LeftToRight:Int = 1 << 0;
+	var RightToLeft:Int = 1 << 1;
 	// vertical
-	public inline static var TopToBottom:Int = 4;
-	public inline static var BottomToTop:Int = 8;
+	var TopToBottom:Int = 1 << 2;
+	var BottomToTop:Int = 1 << 3;
 }

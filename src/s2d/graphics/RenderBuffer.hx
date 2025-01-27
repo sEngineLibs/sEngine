@@ -43,7 +43,7 @@ class RenderBuffer {
 		ormMap = Image.createRenderTarget(width, heigth, RGBA32);
 		#end
 		#if (S2D_LIGHTING_SHADOWS == 1)
-		shadowMap = Image.createRenderTarget(width, heigth, RGBA32);
+		shadowMap = Image.createRenderTarget(width, heigth, L8);
 		#end
 		#end
 		// depth map

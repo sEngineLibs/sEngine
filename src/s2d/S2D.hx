@@ -1,20 +1,22 @@
 package s2d;
 
-import kha.math.FastVector3;
-import s2d.core.extensions.FastMatrix3Ext;
-import s2d.events.Dispatcher;
 import kha.Assets;
 import kha.Canvas;
+import kha.math.FastVector2;
+import kha.math.FastMatrix3;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
 // s2d
 import s2d.Stage;
 import s2d.core.Time;
-import kha.math.FastVector2;
-import kha.math.FastMatrix3;
+import s2d.ui.UIScene;
+import s2d.events.Dispatcher;
 import s2d.graphics.Renderer;
+import s2d.ui.graphics.Drawers;
 import s2d.animation.Action;
+
+using s2d.core.extensions.FastMatrix3Ext;
 
 class S2D {
 	public static var indices:IndexBuffer;
@@ -31,6 +33,7 @@ class S2D {
 	@:isVar public static var aspectRatio(default, set):Float = 1.0;
 
 	public static var stage:Stage = new Stage();
+	public static var ui:UIScene = new UIScene();
 
 	static function get_realWidth():Int {
 		return Std.int(width / resolutionScale);
@@ -59,11 +62,14 @@ class S2D {
 	}
 
 	@:access(s2d.graphics.Renderer)
+	@:access(s2d.ui.graphics.Drawers)
 	public static function ready(w:Int, h:Int) {
 		realWidth = w;
 		realHeight = h;
 		aspectRatio = width / height;
+
 		Renderer.ready(width, height);
+		Drawers.ready();
 
 		// init structure
 		var structure = new VertexStructure();
@@ -102,8 +108,10 @@ class S2D {
 	}
 
 	@:access(s2d.graphics.Renderer)
+	@:access(s2d.ui.graphics.Drawers)
 	public static function set() {
 		Renderer.set();
+		Drawers.set();
 	}
 
 	@:access(s2d.graphics.Renderer)
@@ -172,6 +180,7 @@ class S2D {
 		var g2 = target.g2;
 		g2.begin();
 		g2.drawScaledImage(frame, 0, 0, target.width, target.height);
+		ui.render(target);
 		#if S2D_DEBUG_FPS
 		showFPS(g2);
 		#end

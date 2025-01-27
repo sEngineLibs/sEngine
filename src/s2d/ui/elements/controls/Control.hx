@@ -1,6 +1,6 @@
-package sui.elements.controls;
+package s2d.ui.elements.controls;
 
-import sui.elements.Element;
+import s2d.ui.elements.UIElement;
 
 @:structInit
-class Control extends Element {}
+class Control extends UIElement {}

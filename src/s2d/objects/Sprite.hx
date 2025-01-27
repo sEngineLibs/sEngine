@@ -34,15 +34,13 @@ class Sprite extends StageObject {
 
 	public function new(atlas:SpriteAtlas, ?polygons:Array<FastVector2>) {
 		super(atlas.layer);
-		this.atlas = atlas;
 		layer.addSprite(this);
-
+		this.atlas = atlas;
 		if (polygons != null)
 			this.mesh = polygons;
 	}
 
 	function onZChanged() {
-		// rearrange layer sprites
 		var i = 0;
 		for (sprite in layer.sprites) {
 			if (sprite.finalZ <= finalZ) {

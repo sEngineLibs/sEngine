@@ -14,7 +14,7 @@ class ShadowPass {
 	public static var structure:VertexStructure;
 	static var pipeline:PipelineState;
 	static var vpCL:ConstantLocation;
-	static var lightDataCL:ConstantLocation;
+	static var lightPosCL:ConstantLocation;
 
 	public static function compile() {
 		structure = new VertexStructure();
@@ -25,7 +25,7 @@ class ShadowPass {
 		pipeline.inputLayout = [structure];
 		pipeline.vertexShader = Shaders.shadow_vert;
 		pipeline.fragmentShader = Shaders.shadow_frag;
-		pipeline.depthWrite = false;
+		pipeline.depthWrite = true;
 		pipeline.depthMode = Less;
 		pipeline.cullMode = CounterClockwise;
 		pipeline.depthStencilAttachment = DepthOnly;
@@ -34,7 +34,7 @@ class ShadowPass {
 		pipeline.compile();
 
 		vpCL = pipeline.getConstantLocation("VP");
-		lightDataCL = pipeline.getConstantLocation("lightData");
+		lightPosCL = pipeline.getConstantLocation("lightPos");
 	}
 
 	public static function render(light:Light):Void @:privateAccess {
@@ -49,7 +49,7 @@ class ShadowPass {
 			g4.setIndexBuffer(light.layer.shadowBuffer.indices);
 			g4.setVertexBuffer(light.layer.shadowBuffer.vertices);
 			g4.setMatrix3(vpCL, S2D.stage.viewProjection);
-			g4.setFloat3(lightDataCL, light.finalModel.getTranslationX(), light.finalModel.getTranslationY(), light.radius);
+			g4.setVector2(lightPosCL, light.finalModel.getTranslation());
 			g4.drawIndexedVertices();
 		}
 		g4.end();

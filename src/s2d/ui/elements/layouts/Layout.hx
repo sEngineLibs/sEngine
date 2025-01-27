@@ -1,11 +1,11 @@
-package sui.elements.layouts;
+package s2d.ui.elements.layouts;
 
-import sui.elements.Element;
-import sui.positioning.Alignment;
+import s2d.ui.elements.UIElement;
+import s2d.ui.positioning.Alignment;
 
-using score.utils.ArrayExt;
+using s2d.core.extensions.ArrayExt;
 
-class Layout extends Element {
+class Layout extends UIElement {
 	public var alignment:Alignment;
 
 	public function new(?alignment:Alignment = Alignment.Center) {
@@ -13,7 +13,7 @@ class Layout extends Element {
 		this.alignment = alignment;
 	}
 
-	override function addChild(element:Element) {
+	override function addChild(element:UIElement) {
 		children.push(element);
 		element.parent = this;
 

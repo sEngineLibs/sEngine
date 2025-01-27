@@ -1,15 +1,14 @@
-package sui.positioning;
+package s2d.ui.positioning;
 
 enum abstract Alignment(Int) from Int to Int {
 	// horizontal
-	public static inline var Left:Int = 1;
-	public static inline var Right:Int = 2;
-	public static inline var HCenter:Int = 4;
-
+	var Left:Int = 1 << 0;
+	var Right:Int = 1 << 1;
+	var HCenter:Int = 1 << 2;
 	// vertical
-	public static inline var Top:Int = 8;
-	public static inline var Bottom:Int = 16;
-	public static inline var VCenter:Int = 32;
+	var Top:Int = 1 << 3;
+	var Bottom:Int = 1 << 4;
+	var VCenter:Int = 1 << 5;
 
-	public static inline var Center:Int = HCenter | VCenter;
+	var Center:Int = HCenter | VCenter;
 }

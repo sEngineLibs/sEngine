@@ -1,13 +1,13 @@
-package sui.elements.layouts;
+package s2d.ui.elements.layouts;
 
-// sui
-import sui.elements.Element;
-import sui.positioning.Alignment;
-import sui.positioning.Direction;
+// s2d.ui
+import s2d.ui.elements.UIElement;
+import s2d.ui.positioning.Alignment;
+import s2d.ui.positioning.Direction;
 
-using score.utils.ArrayExt;
+using s2d.core.extensions.ArrayExt;
 
-class RowLayout extends Element {
+class RowLayout extends UIElement {
 	@:isVar public var spacing(default, set):Float = 0.;
 	@:isVar public var direction(default, set):Direction = Direction.LeftToRight;
 	public var alignment:Alignment = Alignment.HCenter | Alignment.VCenter;

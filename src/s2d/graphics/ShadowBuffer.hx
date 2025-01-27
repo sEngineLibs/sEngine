@@ -4,7 +4,6 @@ package s2d.graphics;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 // s2d
-import s2d.objects.Light;
 import s2d.objects.Sprite;
 import s2d.graphics.lighting.ShadowPass;
 

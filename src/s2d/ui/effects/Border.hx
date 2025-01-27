@@ -1,4 +1,4 @@
-package sui.effects;
+package s2d.ui.effects;
 
 import kha.Color;
 

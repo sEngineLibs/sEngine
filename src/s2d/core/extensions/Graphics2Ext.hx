@@ -11,7 +11,7 @@ import kha.graphics2.HorTextAlignment;
  */
 /**
  * Static extension functions for Graphics2.
- * Usage: "using score.graphics.GraphicsExtension;"
+ * Usage: "using s2d.core.graphics.GraphicsExtension;"
 **/
 class Graphics2Ext {
 	/**
