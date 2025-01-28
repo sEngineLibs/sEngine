@@ -19,6 +19,7 @@ abstract class S2DObject<This:S2DObject<This>> {
 	@:isVar public var z(default, set):FastFloat = 0.0;
 	@:isVar public var model(default, set):FastMatrix3 = FastMatrix3.identity();
 
+	public var origin:FastVector2 = {};
 	public var translationX(get, set):FastFloat;
 	public var translationY(get, set):FastFloat;
 	public var scaleX(get, set):FastFloat;
@@ -44,7 +45,9 @@ abstract class S2DObject<This:S2DObject<This>> {
 	}
 
 	function invalidateTransformation():Void {
-		finalModel = parent == null ? model : parent.finalModel.multmat(model);
+		finalModel = FastMatrix3.translation(origin.x, origin.y).multmat(model).multmat(FastMatrix3.translation(-origin.x, -origin.y));
+		if (parent != null)
+			finalModel = parent.finalModel.multmat(finalModel);
 		onTransformationChanged();
 		for (c in children)
 			c.invalidateTransformation();

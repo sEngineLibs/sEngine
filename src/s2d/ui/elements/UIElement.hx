@@ -49,15 +49,21 @@ abstract class UIElement extends S2DObject<UIElement> {
 	}
 
 	public function render(target:Canvas) {
-		final g2 = target.g2;
+		if (visible) {
+			final g2 = target.g2;
 
-		g2.pushOpacity(opacity);
-		g2.pushTransformation(model);
-		draw(target);
-		for (child in children)
-			child.render(target);
-		g2.popOpacity();
-		g2.popTransformation();
+			g2.color = color;
+			g2.opacity *= opacity;
+			g2.transformation = finalModel;
+			draw(target);
+
+			if (clip)
+				g2.scissor(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
+			for (child in children)
+				child.render(target);
+			if (clip)
+				g2.disableScissor();
+		}
 	}
 
 	abstract function draw(target:Canvas):Void;

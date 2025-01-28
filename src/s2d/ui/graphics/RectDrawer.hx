@@ -1,11 +1,12 @@
 package s2d.ui.graphics;
 
-import kha.Shaders;
 import kha.Canvas;
+import kha.Shaders;
 import kha.graphics4.VertexData;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 // s2d
+import s2d.core.utils.MathUtils;
 import s2d.ui.elements.shapes.Rectangle;
 
 class RectDrawer extends ElementDrawer<Rectangle> {
@@ -31,8 +32,11 @@ class RectDrawer extends ElementDrawer<Rectangle> {
 	function draw(target:Canvas, rectangle:Rectangle) {
 		final g2 = target.g2, g4 = target.g4;
 
+		final softness = Math.max(rectangle.softness, 0.0);
+		final radius = clamp(rectangle.radius, 0.0, rectangle.width / 2);
+
 		g4.setFloat4(rectCL, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-		g4.setFloat2(dataCL, rectangle.radius, rectangle.softness);
-		g2.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+		g4.setFloat2(dataCL, radius, softness);
+		g2.fillRect(rectangle.x - softness, rectangle.y - softness, rectangle.width + softness * 2.0, rectangle.height + softness * 2.0);
 	}
 }

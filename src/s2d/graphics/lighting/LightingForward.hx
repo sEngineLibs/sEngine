@@ -1,6 +1,6 @@
 package s2d.graphics.lighting;
 
-#if (S2D_LIGHTING == 1)
+#if (S2D_LIGHTING && S2D_LIGHTING_DEFERRED != 1)
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;

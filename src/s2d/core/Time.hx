@@ -2,7 +2,7 @@ package s2d.core;
 
 import kha.System;
 
-@:allow(s2d.S2D)
+@:allow(s2d.App)
 @:build(s2d.core.macro.SMacro.build())
 class Time {
 	@readonly public static var realTime:Float = 0.0;

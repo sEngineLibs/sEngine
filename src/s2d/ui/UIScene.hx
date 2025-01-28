@@ -1,5 +1,6 @@
 package s2d.ui;
 
+import kha.math.FastMatrix3;
 import kha.Canvas;
 // s2d.ui
 import s2d.ui.elements.UIElement;
@@ -21,5 +22,9 @@ class UIScene {
 	public function render(target:Canvas) {
 		for (element in elements)
 			element.render(target);
+		
+		target.g2.color = White;
+		target.g2.opacity = 1.0;
+		target.g2.transformation = FastMatrix3.identity();
 	}
 }

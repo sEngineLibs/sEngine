@@ -1,5 +1,6 @@
 package s2d;
 
+import kha.Window;
 import kha.Assets;
 import kha.Canvas;
 import kha.math.FastVector2;
@@ -63,13 +64,14 @@ class S2D {
 
 	@:access(s2d.graphics.Renderer)
 	@:access(s2d.ui.graphics.Drawers)
-	public static function ready(w:Int, h:Int) {
-		realWidth = w;
-		realHeight = h;
+	public static function start(window:Window) {
+		realWidth = window.width;
+		realHeight = window.height;
 		aspectRatio = width / height;
+		window.notifyOnResize(resize);
 
-		Renderer.ready(width, height);
-		Drawers.ready();
+		Renderer.compile(width, height);
+		Drawers.compile();
 
 		// init structure
 		var structure = new VertexStructure();
@@ -96,7 +98,6 @@ class S2D {
 
 	@:access(s2d.SpriteAtlas)
 	static function update() {
-		Time.update();
 		Dispatcher.update();
 		Action.update(Time.time);
 		S2D.stage.updateViewProjection();
@@ -105,13 +106,6 @@ class S2D {
 			for (atlas in layer.spriteAtlases)
 				atlas.update();
 		#end
-	}
-
-	@:access(s2d.graphics.Renderer)
-	@:access(s2d.ui.graphics.Drawers)
-	public static function set() {
-		Renderer.set();
-		Drawers.set();
 	}
 
 	@:access(s2d.graphics.Renderer)

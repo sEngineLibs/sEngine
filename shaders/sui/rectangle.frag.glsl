@@ -20,7 +20,7 @@ void main() {
     float softness = rectData.y;
 
     float dist = roundedBoxSDF(fragCoord.xy - center, halfSize, radius);
-    float alpha = 1.0 - smoothstep(0.0, softness, dist);
+    float alpha = 1.0 - smoothstep(-softness, softness, dist);
 
     fragColor = vec4(color.rgb, color.a * alpha);
 }

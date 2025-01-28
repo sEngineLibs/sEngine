@@ -79,7 +79,9 @@ class GeometryDeferred {
 		#end
 		g4.setMatrix3(viewProjectionCL, S2D.stage.viewProjection);
 		for (layer in S2D.stage.layers) {
+			#if (S2D_LIGHTING_SHADOWS == 1)
 			@:privateAccess layer.shadowBuffer.updateBuffersData();
+			#end
 			#if (S2D_SPRITE_INSTANCING == 1)
 			for (atlas in layer.spriteAtlases) {
 				g4.setVertexBuffers(atlas.vertices);
