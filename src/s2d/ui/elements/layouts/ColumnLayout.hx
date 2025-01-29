@@ -15,7 +15,7 @@ class ColumnLayout extends UIElement {
 	function set_spacing(value:Float) {
 		spacing = value;
 		for (i in 1...children.length)
-			children[i].anchors.topMargin = spacing;
+			children[i].anchors.top.margin = spacing;
 		return value;
 	}
 
@@ -39,7 +39,7 @@ class ColumnLayout extends UIElement {
 
 		for (i in 1...children.length) {
 			children[i].anchors.top = children[i - 1].top;
-			children[i].anchors.topMargin = spacing;
+			children[i].anchors.top.margin = spacing;
 			children[i].height = h;
 			if ((alignment & Alignment.VCenter) != 0)
 				children[i].anchors.verticalCenter = verticalCenter;

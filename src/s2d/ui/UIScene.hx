@@ -6,20 +6,22 @@ import kha.math.FastMatrix3;
 import s2d.ui.elements.UIElement;
 
 @:structInit
+@:allow(s2d.S2D)
+@:allow(s2d.ui.elements.UIElement)
 class UIScene {
 	var elements:Array<UIElement> = [];
 
-	public function new() {}
+	function new() {}
 
-	public function addBaseElement(element:UIElement) {
+	function addBaseElement(element:UIElement) {
 		elements.push(element);
 	}
 
-	public function removeBaseElement(element:UIElement) {
+	function removeBaseElement(element:UIElement) {
 		elements.remove(element);
 	}
 
-	public function render(target:Canvas) {
+	function render(target:Canvas) {
 		for (element in elements)
 			element.render(target);
 		target.g2.color = White;

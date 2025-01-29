@@ -15,7 +15,7 @@ class RowLayout extends UIElement {
 	function set_spacing(value:Float) {
 		spacing = value;
 		for (i in 1...children.length)
-			children[i].anchors.leftMargin = spacing;
+			children[i].anchors.left.margin = spacing;
 		return value;
 	}
 
@@ -39,7 +39,7 @@ class RowLayout extends UIElement {
 
 		for (i in 1...children.length) {
 			children[i].anchors.left = children[i - 1].left;
-			children[i].anchors.leftMargin = spacing;
+			children[i].anchors.left.margin = spacing;
 			children[i].width = w;
 			if ((alignment & Alignment.HCenter) != 0)
 				children[i].anchors.horizontalCenter = horizontalCenter;

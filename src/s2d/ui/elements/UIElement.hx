@@ -7,7 +7,8 @@ import s2d.core.S2DObject;
 import s2d.core.utils.MathUtils;
 import s2d.ui.positioning.Anchors;
 
-abstract class UIElement extends S2DObject<UIElement> {
+@:allow(s2d.ui.UIScene)
+class UIElement extends S2DObject<UIElement> {
 	var scene:UIScene;
 
 	public var visible:Bool = true;
@@ -24,6 +25,7 @@ abstract class UIElement extends S2DObject<UIElement> {
 	@readonly public var bottom:AnchorLine = {};
 	@readonly public var horizontalCenter:AnchorLine = {};
 	@readonly public var verticalCenter:AnchorLine = {};
+	@:isVar public var padding(default, set):Float = 0.0;
 
 	// positioning
 	public var x(get, set):Float;
@@ -37,7 +39,7 @@ abstract class UIElement extends S2DObject<UIElement> {
 	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
 	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
 
-	public function new(scene:UIScene) {
+	public function new(?scene:UIScene) {
 		super();
 		if (scene != null)
 			this.scene = scene;
@@ -51,7 +53,11 @@ abstract class UIElement extends S2DObject<UIElement> {
 		height = h;
 	}
 
-	public function render(target:Canvas) {
+	public function setPadding(value:Float):Void {
+		padding = value;
+	}
+
+	function render(target:Canvas) {
 		if (visible) {
 			final g2 = target.g2;
 
@@ -93,72 +99,91 @@ abstract class UIElement extends S2DObject<UIElement> {
 	function onTransformationChanged() {}
 
 	function get_x():Float {
-		return left.position;
+		return anchors.left == null ? left.position : anchors.left.position + anchors.left.padding + anchors.leftMargin;
 	}
 
 	function set_x(value:Float):Float {
-		var d = value - x;
-		left.position = value;
-		horizontalCenter.position += d / 2;
-		right.position += d;
+		if (anchors.left == null) {
+			var d = value - x;
+			left.position = value;
+			horizontalCenter.position += d / 2;
+			right.position += d;
+		}
 		return value;
 	}
 
 	function get_y():Float {
-		return top.position;
+		return anchors.top == null ? top.position : anchors.top.position + anchors.top.padding + anchors.topMargin;
 	}
 
 	function set_y(value:Float):Float {
-		var d = value - y;
-		top.position = value;
-		verticalCenter.position += d / 2;
-		bottom.position += d;
+		if (anchors.top == null) {
+			var d = value - y;
+			top.position = value;
+			verticalCenter.position += d / 2;
+			bottom.position += d;
+		}
 		return value;
 	}
 
 	function get_centerX():Float {
-		return horizontalCenter.position;
+		return anchors.horizontalCenter == null ? horizontalCenter.position : anchors.horizontalCenter.position
+			+ anchors.horizontalCenter.padding
+			+ anchors.horizontalCenterOffset;
 	}
 
 	function set_centerX(value:Float):Float {
-		var d = value - centerX;
-		left.position += d;
-		horizontalCenter.position = value;
-		right.position += d;
+		if (anchors.horizontalCenter == null) {
+			var d = value - centerX;
+			left.position += d;
+			horizontalCenter.position = value;
+			right.position += d;
+		}
 		return value;
 	}
 
 	function get_centerY():Float {
-		return verticalCenter.position;
+		return anchors.verticalCenter == null ? verticalCenter.position : anchors.verticalCenter.position
+			+ anchors.verticalCenter.padding
+			+ anchors.verticalCenterOffset;
 	}
 
 	function set_centerY(value:Float):Float {
-		var d = value - centerY;
-		top.position += d;
-		verticalCenter.position = value;
-		bottom.position += d;
+		if (anchors.verticalCenter == null) {
+			var d = value - centerY;
+			top.position += d;
+			verticalCenter.position = value;
+			bottom.position += d;
+		}
 		return value;
 	}
 
 	function get_width():Float {
-		return right.position - x;
+		return anchors.right == null ? right.position - x : anchors.right.position + anchors.right.padding + anchors.rightMargin - x;
 	}
 
 	function set_width(value:Float):Float {
-		value = clamp(value, minWidth, maxWidth);
-		horizontalCenter.position = x + value / 2;
-		right.position = x + value;
+		if (anchors.right == null) {
+			value = clamp(value, minWidth, maxWidth);
+			horizontalCenter.position = x + value / 2;
+			right.position = x + value;
+		}
 		return value;
 	}
 
 	function get_height():Float {
-		return bottom.position - y;
+		return anchors.bottom == null ? bottom.position - y : anchors.bottom.position
+			+ anchors.bottom.padding
+			+ anchors.bottomMargin
+			- y;
 	}
 
 	function set_height(value:Float):Float {
-		value = clamp(value, minHeight, maxHeight);
-		verticalCenter.position = y + value / 2;
-		bottom.position = y + value;
+		if (anchors.bottom == null) {
+			value = clamp(value, minHeight, maxHeight);
+			verticalCenter.position = y + value / 2;
+			bottom.position = y + value;
+		}
 		return value;
 	}
 
@@ -183,6 +208,15 @@ abstract class UIElement extends S2DObject<UIElement> {
 	function set_maxHeight(value:Float):Float {
 		maxHeight = value;
 		height = height;
+		return value;
+	}
+
+	function set_padding(value:Float) {
+		padding = value;
+		left.padding = value;
+		top.padding = value;
+		right.padding = value;
+		bottom.padding = value;
 		return value;
 	}
 }

@@ -18,7 +18,7 @@ class Sprite extends StageObject {
 	public var atlas:SpriteAtlas;
 	#end
 
-	#if (S2D_LIGHTING_SHADOWS == 1)
+	#if (S2D_LIGHTING && S2D_LIGHTING_SHADOWS == 1)
 	@:isVar public var isCastingShadows(default, set):Bool = false;
 	public var shadowOpacity:Float = 1.0;
 

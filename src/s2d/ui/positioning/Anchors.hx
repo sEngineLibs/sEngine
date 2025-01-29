@@ -7,12 +7,16 @@ class Anchors {
 	public var top:AnchorLine = null;
 	public var right:AnchorLine = null;
 	public var bottom:AnchorLine = null;
-	@:isVar public var margins(default, set):Float = 0;
-	@:isVar public var padding(default, set):Float = 0;
+	public var leftMargin:Float = 0.0;
+	public var topMargin:Float = 0.0;
+	public var rightMargin:Float = 0.0;
+	public var bottomMargin:Float = 0.0;
 	public var verticalCenter:AnchorLine = null;
 	public var horizontalCenter:AnchorLine = null;
 	public var verticalCenterOffset:Float = 0;
 	public var horizontalCenterOffset:Float = 0;
+
+	@:isVar public var margins(default, set):Float = 0.0;
 
 	public function new() {}
 
@@ -32,25 +36,12 @@ class Anchors {
 		margins = value;
 	}
 
-	public function setPadding(value:Float):Void {
-		padding = value;
-	}
-
 	function set_margins(value:Float) {
 		margins = value;
-		left.margin = value;
-		top.margin = value;
-		right.margin = value;
-		bottom.margin = value;
-		return value;
-	}
-
-	function set_padding(value:Float) {
-		padding = value;
-		left.padding = value;
-		top.padding = value;
-		right.padding = value;
-		bottom.padding = value;
+		leftMargin = value;
+		topMargin = value;
+		rightMargin = value;
+		bottomMargin = value;
 		return value;
 	}
 }
@@ -58,12 +49,10 @@ class Anchors {
 @:structInit
 class AnchorLine {
 	public var position:Float;
-	public var margin:Float;
 	public var padding:Float;
 
-	public inline function new(?position:Float = 0, ?margin:Float = 0, ?padding:Float = 0) {
+	public inline function new(?position:Float = 0, ?padding:Float = 0) {
 		this.position = position;
-		this.margin = margin;
 		this.padding = padding;
 	}
 }
