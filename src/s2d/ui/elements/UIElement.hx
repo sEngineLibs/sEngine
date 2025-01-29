@@ -39,7 +39,10 @@ abstract class UIElement extends S2DObject<UIElement> {
 
 	public function new(scene:UIScene) {
 		super();
-		this.scene = scene;
+		if (scene != null)
+			this.scene = scene;
+		else
+			this.scene = S2D.ui;
 		this.scene.addBaseElement(this);
 	}
 
@@ -66,7 +69,7 @@ abstract class UIElement extends S2DObject<UIElement> {
 		}
 	}
 
-	abstract function draw(target:Canvas):Void;
+	function draw(target:Canvas) {}
 
 	function onParentChanged() {
 		if (parent == null)

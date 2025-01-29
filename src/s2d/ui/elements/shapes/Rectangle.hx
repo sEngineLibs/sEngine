@@ -5,10 +5,16 @@ import kha.Canvas;
 import s2d.ui.graphics.Drawers;
 
 class Rectangle extends UIElement {
-	public var softness:Float = 1.0;
-	public var radius:Float = 0.0;
+	public var radius:Float;
+	public var softness:Float;
 
-	function draw(target:Canvas) @:privateAccess {
+	public function new(?radius:Float = 0.0, ?softness:Float = 1.0, ?scene:UIScene) {
+		super(scene);
+		this.radius = radius;
+		this.softness = softness;
+	}
+
+	override function draw(target:Canvas) @:privateAccess {
 		Drawers.rectDrawer.render(target, this);
 	}
 }
