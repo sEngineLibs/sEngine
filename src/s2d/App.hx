@@ -7,6 +7,7 @@ import kha.Window;
 import s2d.core.Time;
 import s2d.input.Mouse;
 import s2d.input.Keyboard;
+import s2d.events.Dispatcher;
 
 class App {
 	public static var window:Window;
@@ -24,7 +25,7 @@ class App {
 			Assets.loadEverything(function() {
 				setup();
 				System.notifyOnFrames(function(frames) {
-					Time.update();
+					update();
 					S2D.render(frames[0]);
 				});
 			});
@@ -34,5 +35,11 @@ class App {
 	public static function stop() {
 		if (!System.stop())
 			trace("This application can't be stopped");
+	}
+
+	static function update() {
+		Time.update();
+		Dispatcher.update();
+		S2D.update();
 	}
 }

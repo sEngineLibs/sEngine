@@ -12,13 +12,13 @@ import kha.graphics4.VertexStructure;
 import s2d.Stage;
 import s2d.core.Time;
 import s2d.ui.UIScene;
-import s2d.events.Dispatcher;
 import s2d.graphics.Renderer;
 import s2d.ui.graphics.Drawers;
 import s2d.animation.Action;
 
 using s2d.core.extensions.FastMatrix3Ext;
 
+@:allow(s2d.App)
 class S2D {
 	public static var indices:IndexBuffer;
 	public static var vertices:VertexBuffer;
@@ -98,7 +98,6 @@ class S2D {
 
 	@:access(s2d.SpriteAtlas)
 	static function update() {
-		Dispatcher.update();
 		Action.update(Time.time);
 		S2D.stage.updateViewProjection();
 		#if (S2D_SPRITE_INSTANCING == 1)
@@ -168,8 +167,6 @@ class S2D {
 
 	@:access(s2d.graphics.Renderer)
 	public static function render(target:Canvas):Void {
-		update();
-
 		var frame = Renderer.render();
 		var g2 = target.g2;
 		g2.begin();

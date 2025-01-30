@@ -1,6 +1,6 @@
 package s2d.events;
 
-@:allow(s2d.S2D)
+@:allow(s2d.App)
 class Dispatcher {
 	static var listeners:Array<EventListener> = [];
 
@@ -8,6 +8,10 @@ class Dispatcher {
 		final listener = new EventListener(event, callback, breakable);
 		listeners.push(listener);
 		return listener;
+	}
+
+	public static function removeEventListener(listener:EventListener):Bool {
+		return listeners.remove(listener);
 	}
 
 	static function update() {
