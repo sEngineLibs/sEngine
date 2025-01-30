@@ -1,10 +1,12 @@
 package s2d.ui.elements;
 
-import kha.Canvas;
+import s2d.input.Mouse.MouseButton;
 
 class MouseArea extends UIElement {
 	@:isVar public var entered(default, set):Bool = false;
 	@:isVar public var pressed(default, set):Bool = false;
+
+	public var acceptedButtons:Array<MouseButton> = [MouseButton.Left];
 
 	var enterListeners:Array<Void->Void> = [];
 	var exitListeners:Array<Void->Void> = [];
@@ -14,25 +16,28 @@ class MouseArea extends UIElement {
 
 	public function new(?scene:UIScene) {
 		super(scene);
-		App.input.mouse.notifyOnMoved((dx, dy) -> {
-			final p = finalModel.inverse().multvec({x: App.input.mouse.x, y: App.input.mouse.y});
-			final mx = p.x - x;
-			final my = p.y - y;
-			if (0.0 <= mx && mx <= width && 0.0 <= my && my <= height)
+		App.input.mouse.notifyOnMoved((mx, my, dx, dy) -> {
+			final p = finalModel.inverse().multvec({x: mx, y: my});
+			final _x = p.x - x;
+			final _y = p.y - y;
+			if (0.0 <= _x && _x <= width && 0.0 <= _y && _y <= height)
 				entered = true;
 			else
 				entered = false;
 		});
 
-		App.input.mouse.notifyOnDown((button) -> {
-			if (entered)
-				press();
+		App.input.mouse.notifyOnDown((button, x, y) -> {
+			if (acceptedButtons.contains(button))
+				if (entered)
+					press();
 		});
 
-		App.input.mouse.notifyOnUp((button) -> {
-			release();
-			if (entered)
-				click();
+		App.input.mouse.notifyOnUp((button, x, y) -> {
+			if (acceptedButtons.contains(button)) {
+				release();
+				if (entered)
+					click();
+			}
 		});
 	}
 
@@ -45,39 +50,39 @@ class MouseArea extends UIElement {
 	}
 
 	public function click() {
-		for (f in clickListeners)
-			f();
+		for (callback in clickListeners)
+			callback();
 	}
 
-	public function notifyOnEntered(f:Void->Void) {
-		enterListeners.push(f);
+	public function notifyOnEntered(callback:Void->Void) {
+		enterListeners.push(callback);
 	}
 
-	public function notifyOnExited(f:Void->Void) {
-		exitListeners.push(f);
+	public function notifyOnExited(callback:Void->Void) {
+		exitListeners.push(callback);
 	}
 
-	public function notifyOnPressed(f:Void->Void) {
-		pressListeners.push(f);
+	public function notifyOnPressed(callback:Void->Void) {
+		pressListeners.push(callback);
 	}
 
-	public function notifyOnReleased(f:Void->Void) {
-		releaseListeners.push(f);
+	public function notifyOnReleased(callback:Void->Void) {
+		releaseListeners.push(callback);
 	}
 
-	public function notifyOnClicked(f:Void->Void) {
-		clickListeners.push(f);
+	public function notifyOnClicked(callback:Void->Void) {
+		clickListeners.push(callback);
 	}
 
 	function set_entered(value:Bool):Bool {
 		if (value != entered) {
 			entered = value;
 			if (entered)
-				for (f in enterListeners)
-					f();
+				for (callback in enterListeners)
+					callback();
 			else
-				for (f in exitListeners)
-					f();
+				for (callback in exitListeners)
+					callback();
 		}
 		return entered;
 	}
@@ -86,11 +91,11 @@ class MouseArea extends UIElement {
 		if (value != pressed) {
 			pressed = value;
 			if (pressed)
-				for (f in pressListeners)
-					f();
+				for (callback in pressListeners)
+					callback();
 			else
-				for (f in releaseListeners)
-					f();
+				for (callback in releaseListeners)
+					callback();
 		}
 		return pressed;
 	}

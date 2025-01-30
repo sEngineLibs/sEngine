@@ -45,12 +45,12 @@ class Text extends UIElement {
 	}
 
 	function updateTextWidth() {
-		if (font != null && text != null && fontSize != null)
+		if (font != null && text != null)
 			textWidth = font.widthOfCharacters(fontSize, text.toCharArray(), 0, text.length);
 	}
 
 	function updateTextHeight() {
-		if (font != null && fontSize != null)
+		if (font != null)
 			textHeight = font.height(fontSize);
 	}
 
