@@ -32,15 +32,15 @@ class Mouse {
 		@:privateAccess mouse.windowUpListeners[0].push((button, x, y) -> f(button));
 	}
 
-	public static function notifyOnMove(f:(dx:Int, dy:Int) -> Void) {
+	public static function notifyOnMoved(f:(dx:Int, dy:Int) -> Void) {
 		@:privateAccess mouse.windowMoveListeners[0].push((x, y, dx, dy) -> f(dx, dy));
 	}
 
-	public static function notifyOnScroll(f:(delta:Int) -> Void) {
+	public static function notifyOnScrolled(f:(delta:Int) -> Void) {
 		@:privateAccess mouse.windowWheelListeners[0].push(f);
 	}
 
-	public static function notifyOnLeave(f:Void->Void) {
+	public static function notifyOnLeft(f:Void->Void) {
 		@:privateAccess mouse.windowLeaveListeners[0].push(f);
 	}
 
