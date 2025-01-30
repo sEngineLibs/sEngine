@@ -3,16 +3,24 @@ package s2d.ui.elements;
 import kha.Font;
 import kha.Canvas;
 import kha.Assets;
+// s2d
+import s2d.ui.positioning.Alignment;
+
+using kha.StringExtensions;
 
 class Text extends UIElement {
-	public var text:String;
-	public var font:Font;
-	public var fontSize:Int = 14;
+	var textWidth:Float;
+	var textHeight:Float;
+
+	@:isVar public var text(default, set):String;
+	@:isVar public var font(default, set):Font;
+	@:isVar public var fontSize(default, set):Int = 14;
+	public var alignment:Alignment = Alignment.Left | Alignment.Top;
 
 	public function new(?text:String = "Text", ?scene:UIScene) {
 		super(scene);
-		this.text = text;
 		this.font = Assets.fonts.Roboto_Regular;
+		this.text = text;
 	}
 
 	override function draw(target:Canvas) {
@@ -20,6 +28,52 @@ class Text extends UIElement {
 
 		g2.font = font;
 		g2.fontSize = fontSize;
-		g2.drawString(text, x, y);
+
+		var drawX = x;
+		if ((alignment & Alignment.HCenter) != 0)
+			drawX += (width - textWidth) / 2.0;
+		else if ((alignment & Alignment.Right) != 0)
+			drawX += width - textWidth;
+
+		var drawY = y;
+		if ((alignment & Alignment.VCenter) != 0)
+			drawY += (height - textHeight) / 2.0;
+		else if ((alignment & Alignment.Bottom) != 0)
+			drawY += height - textHeight;
+
+		g2.drawString(text, drawX, drawY);
+	}
+
+	function updateTextWidth() {
+		if (font != null && text != null && fontSize != null)
+			textWidth = font.widthOfCharacters(fontSize, text.toCharArray(), 0, text.length);
+	}
+
+	function updateTextHeight() {
+		if (font != null && fontSize != null)
+			textHeight = font.height(fontSize);
+	}
+
+	function updateTextSize() {
+		updateTextWidth();
+		updateTextHeight();
+	}
+
+	function set_text(value:String) {
+		text = value;
+		updateTextWidth();
+		return value;
+	}
+
+	function set_font(value:Font) {
+		font = value;
+		updateTextSize();
+		return value;
+	}
+
+	function set_fontSize(value:Int) {
+		fontSize = value;
+		updateTextSize();
+		return value;
 	}
 }

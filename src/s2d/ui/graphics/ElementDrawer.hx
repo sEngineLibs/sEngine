@@ -36,7 +36,7 @@ abstract class ElementDrawer<T> {
 		draw(target, element);
 		g2.pipeline = null;
 	}
-
+ 
 	abstract function initStructure():Void;
 
 	abstract function setShaders():Void;

@@ -1,7 +1,8 @@
 #version 450
 
 uniform vec4 rect;
-uniform vec2 rectData;
+uniform vec4 rectData; // [radius, softness, border width, border softness]
+uniform vec4 bordColor;
 
 layout(location = 0) in vec4 color;
 layout(location = 1) in vec2 fragCoord;
@@ -18,9 +19,17 @@ void main() {
     vec2 center = rect.xy + halfSize;
     float radius = rectData.x;
     float softness = rectData.y;
+    float bordWidth = rectData.z;
+    float bordSoftness = rectData.w;
 
     float dist = roundedBoxSDF(fragCoord.xy - center, halfSize, radius);
     float alpha = 1.0 - smoothstep(-softness, softness, dist);
+    float bordAlpha = 1.0 - smoothstep(bordWidth - bordSoftness, bordWidth + bordSoftness, abs(dist));
 
-    fragColor = vec4(color.rgb, color.a * alpha);
+    fragColor = mix(
+            vec4(color.rgb, alpha),
+            vec4(bordColor.rgb, bordColor.a * bordAlpha),
+            bordAlpha
+        );
+    fragColor.a *= color.a;
 }

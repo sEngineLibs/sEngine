@@ -25,9 +25,5 @@ class Layout extends UIElement {
 			element.anchors.top = top;
 		if ((alignment & Alignment.Bottom) != 0)
 			element.anchors.bottom = bottom;
-		if ((alignment & Alignment.HCenter) != 0)
-			element.anchors.horizontalCenter = horizontalCenter;
-		if ((alignment & Alignment.VCenter) != 0)
-			element.anchors.verticalCenter = verticalCenter;
 	}
 }

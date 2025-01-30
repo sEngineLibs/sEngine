@@ -12,26 +12,22 @@ class UIElement extends S2DObject<UIElement> {
 	var scene:UIScene;
 
 	public var visible:Bool = true;
+	public var color:Color = White;
 	public var opacity:Float = 1.0;
 	public var enabled:Bool = true;
 	public var clip:Bool = false;
-	public var color:Color = White;
 
 	// anchors
-	@readonly public var anchors:Anchors = new Anchors();
-	@readonly public var left:AnchorLine = {};
-	@readonly public var top:AnchorLine = {};
-	@readonly public var right:AnchorLine = {};
-	@readonly public var bottom:AnchorLine = {};
-	@readonly public var horizontalCenter:AnchorLine = {};
-	@readonly public var verticalCenter:AnchorLine = {};
+	@readonly public var anchors:Anchors;
+	@readonly public var left:AnchorLine = {dir: 1.0};
+	@readonly public var top:AnchorLine = {dir: 1.0};
+	@readonly public var right:AnchorLine = {dir: -1.0};
+	@readonly public var bottom:AnchorLine = {dir: -1.0};
 	@:isVar public var padding(default, set):Float = 0.0;
 
 	// positioning
 	public var x(get, set):Float;
 	public var y(get, set):Float;
-	public var centerX(get, set):Float;
-	public var centerY(get, set):Float;
 	public var width(get, set):Float;
 	public var height(get, set):Float;
 	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
@@ -46,6 +42,7 @@ class UIElement extends S2DObject<UIElement> {
 		else
 			this.scene = S2D.ui;
 		this.scene.addBaseElement(this);
+		anchors = new Anchors(this);
 	}
 
 	public function resize(w:Int, h:Int) {
@@ -99,91 +96,40 @@ class UIElement extends S2DObject<UIElement> {
 	function onTransformationChanged() {}
 
 	function get_x():Float {
-		return anchors.left == null ? left.position : anchors.left.position + anchors.left.padding + anchors.leftMargin;
+		return left.position;
 	}
 
 	function set_x(value:Float):Float {
-		if (anchors.left == null) {
-			var d = value - x;
-			left.position = value;
-			horizontalCenter.position += d / 2;
-			right.position += d;
-		}
+		right.position += value - x;
+		left.position = value;
 		return value;
 	}
 
 	function get_y():Float {
-		return anchors.top == null ? top.position : anchors.top.position + anchors.top.padding + anchors.topMargin;
+		return top.position;
 	}
 
 	function set_y(value:Float):Float {
-		if (anchors.top == null) {
-			var d = value - y;
-			top.position = value;
-			verticalCenter.position += d / 2;
-			bottom.position += d;
-		}
-		return value;
-	}
-
-	function get_centerX():Float {
-		return anchors.horizontalCenter == null ? horizontalCenter.position : anchors.horizontalCenter.position
-			+ anchors.horizontalCenter.padding
-			+ anchors.horizontalCenterOffset;
-	}
-
-	function set_centerX(value:Float):Float {
-		if (anchors.horizontalCenter == null) {
-			var d = value - centerX;
-			left.position += d;
-			horizontalCenter.position = value;
-			right.position += d;
-		}
-		return value;
-	}
-
-	function get_centerY():Float {
-		return anchors.verticalCenter == null ? verticalCenter.position : anchors.verticalCenter.position
-			+ anchors.verticalCenter.padding
-			+ anchors.verticalCenterOffset;
-	}
-
-	function set_centerY(value:Float):Float {
-		if (anchors.verticalCenter == null) {
-			var d = value - centerY;
-			top.position += d;
-			verticalCenter.position = value;
-			bottom.position += d;
-		}
+		bottom.position += value - y;
+		top.position = value;
 		return value;
 	}
 
 	function get_width():Float {
-		return anchors.right == null ? right.position - x : anchors.right.position + anchors.right.padding + anchors.rightMargin - x;
+		return right.position - x;
 	}
 
 	function set_width(value:Float):Float {
-		if (anchors.right == null) {
-			value = clamp(value, minWidth, maxWidth);
-			horizontalCenter.position = x + value / 2;
-			right.position = x + value;
-		}
+		right.position = x + clamp(value, minWidth, maxWidth);
 		return value;
 	}
 
 	function get_height():Float {
-		return anchors.bottom == null ? bottom.position - y : anchors.bottom.position
-			+ anchors.bottom.padding
-			+ anchors.bottomMargin
-			- y;
+		return bottom.position - y;
 	}
 
 	function set_height(value:Float):Float {
-		if (anchors.bottom == null) {
-			value = clamp(value, minHeight, maxHeight);
-			verticalCenter.position = y + value / 2;
-			bottom.position = y + value;
-		}
+		bottom.position = y + clamp(value, minHeight, maxHeight);
 		return value;
 	}
 

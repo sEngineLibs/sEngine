@@ -2,11 +2,13 @@ package s2d.ui.elements.shapes;
 
 import kha.Canvas;
 // s2d
+import s2d.ui.effects.Border;
 import s2d.ui.graphics.Drawers;
 
 class Rectangle extends UIElement {
-	public var radius:Float;
-	public var softness:Float;
+	public var border:Border = {};
+	@:isVar public var radius(default, set):Float;
+	@:isVar public var softness(default, set):Float;
 
 	public function new(?radius:Float = 0.0, ?softness:Float = 1.0, ?scene:UIScene) {
 		super(scene);
@@ -16,5 +18,15 @@ class Rectangle extends UIElement {
 
 	override function draw(target:Canvas) @:privateAccess {
 		Drawers.rectDrawer.render(target, this);
+	}
+
+	function set_radius(value:Float):Float {
+		radius = Math.max(value, 0.0);
+		return value;
+	}
+
+	function set_softness(value:Float):Float {
+		softness = Math.max(value, 0.0);
+		return value;
 	}
 }

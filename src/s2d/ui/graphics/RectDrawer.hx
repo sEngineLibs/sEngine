@@ -11,7 +11,8 @@ import s2d.ui.elements.shapes.Rectangle;
 
 class RectDrawer extends ElementDrawer<Rectangle> {
 	var rectCL:ConstantLocation;
-	var dataCL:ConstantLocation;
+	var rectDataCL:ConstantLocation;
+	var bordColorCL:ConstantLocation;
 
 	function initStructure() {
 		structure = new VertexStructure();
@@ -26,17 +27,21 @@ class RectDrawer extends ElementDrawer<Rectangle> {
 
 	function getUniforms() {
 		rectCL = pipeline.getConstantLocation("rect");
-		dataCL = pipeline.getConstantLocation("rectData");
+		rectDataCL = pipeline.getConstantLocation("rectData");
+		bordColorCL = pipeline.getConstantLocation("bordColor");
 	}
 
 	function draw(target:Canvas, rectangle:Rectangle) {
 		final g2 = target.g2, g4 = target.g4;
 
-		final softness = Math.max(rectangle.softness, 0.0);
+		final border = rectangle.border;
 		final radius = clamp(rectangle.radius, 0.0, rectangle.width / 2);
 
 		g4.setFloat4(rectCL, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-		g4.setFloat2(dataCL, radius, softness);
-		g2.fillRect(rectangle.x - softness, rectangle.y - softness, rectangle.width + softness * 2.0, rectangle.height + softness * 2.0);
+		g4.setFloat4(rectDataCL, radius, rectangle.softness, border.width, border.softness);
+		g4.setFloat4(bordColorCL, border.color.R, border.color.G, border.color.B, border.color.A);
+
+		final offset = Math.max(rectangle.softness, border.width + border.softness);
+		g2.fillRect(rectangle.x - offset, rectangle.y - offset, rectangle.width + offset * 2.0, rectangle.height + offset * 2.0);
 	}
 }
