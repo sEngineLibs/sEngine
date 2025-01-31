@@ -1,18 +1,23 @@
 package s2d.ui.elements;
 
+import s2d.core.Time;
 import s2d.input.Mouse.MouseButton;
 
 class MouseArea extends UIElement {
-	@:isVar public var entered(default, set):Bool = false;
-	@:isVar public var pressed(default, set):Bool = false;
+	public var entered:Bool = false;
+	public var pressed:Bool = false;
 
 	public var acceptedButtons:Array<MouseButton> = [MouseButton.Left];
+	public var doubleClickInterval:Float = 0.5;
 
-	var enterListeners:Array<Void->Void> = [];
-	var exitListeners:Array<Void->Void> = [];
-	var pressListeners:Array<Void->Void> = [];
-	var releaseListeners:Array<Void->Void> = [];
-	var clickListeners:Array<Void->Void> = [];
+	var pressedButtons:Map<MouseButton, Float> = [];
+
+	var enterListeners:Array<(x:Int, y:Int) -> Void> = [];
+	var exitListeners:Array<(x:Int, y:Int) -> Void> = [];
+	var pressListeners:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
+	var releaseListeners:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
+	var clickListeners:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
+	var doubleClickListeners:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
 
 	public function new(?scene:UIScene) {
 		super(scene);
@@ -20,83 +25,86 @@ class MouseArea extends UIElement {
 			final p = finalModel.inverse().multvec({x: mx, y: my});
 			final _x = p.x - x;
 			final _y = p.y - y;
-			if (0.0 <= _x && _x <= width && 0.0 <= _y && _y <= height)
-				entered = true;
-			else
-				entered = false;
+			if (0.0 <= _x && _x <= width && 0.0 <= _y && _y <= height) {
+				if (!entered) {
+					entered = true;
+					for (callback in enterListeners)
+						callback(mx, my);
+				}
+			} else {
+				if (entered) {
+					entered = false;
+					for (callback in exitListeners)
+						callback(mx, my);
+				}
+			}
 		});
-
 		App.input.mouse.notifyOnDown((button, x, y) -> {
 			if (acceptedButtons.contains(button))
 				if (entered)
-					press();
+					press(button, x, y);
 		});
-
 		App.input.mouse.notifyOnUp((button, x, y) -> {
 			if (acceptedButtons.contains(button)) {
-				release();
+				release(button, x, y);
 				if (entered)
-					click();
+					click(button, x, y);
 			}
 		});
 	}
 
-	public function press() {
-		pressed = true;
+	public function press(button:MouseButton, x:Int, y:Int) {
+		if (!pressed) {
+			pressed = true;
+			for (callback in pressListeners)
+				callback(button, x, y);
+			var time = Time.realTime;
+			if (time - pressedButtons[button] <= doubleClickInterval)
+				for (doubleClickListener in doubleClickListeners)
+					doubleClickListener(button, x, y);
+			else
+				pressedButtons[button] = time;
+		}
 	}
 
-	public function release() {
-		pressed = false;
+	public function release(button:MouseButton, x:Int, y:Int) {
+		if (pressed) {
+			pressed = false;
+			for (callback in releaseListeners)
+				callback(button, x, y);
+		}
 	}
 
-	public function click() {
+	public function click(button:MouseButton, x:Int, y:Int) {
 		for (callback in clickListeners)
-			callback();
+			callback(button, x, y);
 	}
 
-	public function notifyOnEntered(callback:Void->Void) {
+	public function notifyOnEntered(callback:(x:Int, y:Int) -> Void) {
 		enterListeners.push(callback);
 	}
 
-	public function notifyOnExited(callback:Void->Void) {
+	public function notifyOnExited(callback:(x:Int, y:Int) -> Void) {
 		exitListeners.push(callback);
 	}
 
-	public function notifyOnPressed(callback:Void->Void) {
+	public function notifyOnPressed(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
 		pressListeners.push(callback);
 	}
 
-	public function notifyOnReleased(callback:Void->Void) {
+	public function notifyOnReleased(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
 		releaseListeners.push(callback);
 	}
 
-	public function notifyOnClicked(callback:Void->Void) {
+	public function notifyOnClicked(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
 		clickListeners.push(callback);
 	}
 
-	function set_entered(value:Bool):Bool {
-		if (value != entered) {
-			entered = value;
-			if (entered)
-				for (callback in enterListeners)
-					callback();
-			else
-				for (callback in exitListeners)
-					callback();
-		}
-		return entered;
+	public function notifyOnDoubleClicked(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
+		doubleClickListeners.push(callback);
 	}
 
-	function set_pressed(value:Bool):Bool {
-		if (value != pressed) {
-			pressed = value;
-			if (pressed)
-				for (callback in pressListeners)
-					callback();
-			else
-				for (callback in releaseListeners)
-					callback();
-		}
-		return pressed;
+	public function removeCallbackOnDoubleClicked(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
+		doubleClickListeners.remove(callback);
 	}
 }

@@ -12,13 +12,13 @@ class Keyboard {
 	static var keyboard:kha.input.Keyboard;
 	static var keysPressed:Array<KeyCode> = [];
 
-	static var keyDownListeners:Array<{key:KeyCode, callback:Void->Void}> = [];
-	static var keyUpListeners:Array<{key:KeyCode, callback:Void->Void}> = [];
-	static var charPressListeners:Array<{char:String, callback:Void->Void}> = [];
-	static var hotkeyListeners:Array<{hotkey:Array<KeyCode>, callback:Void->Void}> = [];
+	static var keyDownHandlers:Array<{key:KeyCode, callback:Void->Void}> = [];
+	static var keyUpHandlers:Array<{key:KeyCode, callback:Void->Void}> = [];
+	static var charPressHandlers:Array<{char:String, callback:Void->Void}> = [];
+	static var hotkeyHandlers:Array<{hotkey:Array<KeyCode>, callback:Void->Void}> = [];
 
-	static var keyHoldEventListeners:Array<{key:KeyCode, listener:EventListener}> = [];
-	static var holdListeners:Array<(key:KeyCode) -> Void> = [];
+	static var keyHoldEventHandlers:Array<{key:KeyCode, listener:EventListener}> = [];
+	static var holdHandlers:Array<(key:KeyCode) -> Void> = [];
 
 	public static var holdInterval:Float = 0.8;
 
@@ -27,10 +27,10 @@ class Keyboard {
 		notifyOnDown(key -> {
 			if (!keysPressed.contains(key)) {
 				keysPressed.push(key);
-				for (keyDownListener in keyDownListeners)
+				for (keyDownListener in keyDownHandlers)
 					if (keyDownListener.key == key)
 						keyDownListener.callback();
-				for (hotkeyListener in hotkeyListeners) {
+				for (hotkeyListener in hotkeyHandlers) {
 					var flag = true;
 					for (key in hotkeyListener.hotkey)
 						if (!keysPressed.contains(key)) {
@@ -41,12 +41,12 @@ class Keyboard {
 						hotkeyListener.callback();
 				}
 				var time = Time.realTime;
-				keyHoldEventListeners.push({
+				keyHoldEventHandlers.push({
 					key: key,
 					listener: Dispatcher.addEventListener(() -> {
 						return keysPressed.contains(key) && Time.realTime >= time + holdInterval;
 					}, () -> {
-						for (holdListener in holdListeners)
+						for (holdListener in holdHandlers)
 							holdListener(key);
 					})
 				});
@@ -54,18 +54,18 @@ class Keyboard {
 		});
 		notifyOnUp(key -> {
 			keysPressed.remove(key);
-			for (keyUpListener in keyUpListeners)
+			for (keyUpListener in keyUpHandlers)
 				if (keyUpListener.key == key)
 					keyUpListener.callback();
-			for (keyHoldEventListener in keyHoldEventListeners) {
+			for (keyHoldEventListener in keyHoldEventHandlers) {
 				if (keyHoldEventListener.key == key) {
 					Dispatcher.removeEventListener(keyHoldEventListener.listener);
-					keyHoldEventListeners.remove(keyHoldEventListener);
+					keyHoldEventHandlers.remove(keyHoldEventListener);
 				}
 			}
 		});
-		notifyOnPress(char -> {
-			for (charPressListener in charPressListeners)
+		notifyOnPressed(char -> {
+			for (charPressListener in charPressHandlers)
 				if (charPressListener.char == char)
 					charPressListener.callback();
 		});
@@ -87,43 +87,43 @@ class Keyboard {
 		keyboard.upListeners.remove(callback);
 	}
 
-	public static function notifyOnPress(callback:String->Void) {
+	public static function notifyOnPressed(callback:String->Void) {
 		keyboard.pressListeners.push(callback);
 	}
 
-	public static function removeCallbackOnPress(callback:String->Void) {
+	public static function removeCallbackOnPressed(callback:String->Void) {
 		keyboard.pressListeners.remove(callback);
 	}
 
 	public static function notifyOnKeyDown(listener:{key:KeyCode, callback:Void->Void}) {
-		keyDownListeners.push(listener);
+		keyDownHandlers.push(listener);
 	}
 
 	public static function removeCallbackOnKeyDown(listener:{key:KeyCode, callback:Void->Void}) {
-		keyDownListeners.remove(listener);
+		keyDownHandlers.remove(listener);
 	}
 
-	public static function notifyOnCharPress(listener:{char:String, callback:Void->Void}) {
-		charPressListeners.push(listener);
+	public static function notifyOnCharPressed(listener:{char:String, callback:Void->Void}) {
+		charPressHandlers.push(listener);
 	}
 
-	public static function removeCallbackOnCharPress(listener:{char:String, callback:Void->Void}) {
-		charPressListeners.remove(listener);
+	public static function removeCallbackOnCharPressed(listener:{char:String, callback:Void->Void}) {
+		charPressHandlers.remove(listener);
 	}
 
-	public static function notifyOnHotKey(listener:{hotkey:Array<KeyCode>, callback:Void->Void}) {
-		hotkeyListeners.push(listener);
+	public static function notifyOnHotKeyPressed(listener:{hotkey:Array<KeyCode>, callback:Void->Void}) {
+		hotkeyHandlers.push(listener);
 	}
 
-	public static function removeCallbackOnHotKey(listener:{hotkey:Array<KeyCode>, callback:Void->Void}) {
-		hotkeyListeners.remove(listener);
+	public static function removeCallbackOnHotKeyPressed(listener:{hotkey:Array<KeyCode>, callback:Void->Void}) {
+		hotkeyHandlers.remove(listener);
 	}
 
 	public static function notifyOnHold(callback:(key:KeyCode) -> Void) {
-		holdListeners.push(callback);
+		holdHandlers.push(callback);
 	}
 
 	public static function removeCallbackOnHold(callback:(key:KeyCode) -> Void) {
-		holdListeners.remove(callback);
+		holdHandlers.remove(callback);
 	}
 }

@@ -21,14 +21,16 @@ class Mouse {
 	static var mouse:kha.input.Mouse;
 
 	static var buttonsPressed:Array<MouseButton> = [];
-
 	static var buttonHoldEventListeners:Array<{button:MouseButton, listener:EventListener}> = [];
-	static var holdListeners:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
+
+	static var buttonHoldEventHandlers:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
+	static var doubleClickHandlers:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
 
 	public static var holdInterval:Float = 0.8;
-	@:isVar public static var x(default, null):Int;
-	@:isVar public static var y(default, null):Int;
-	@:isVar public static var cursor(default, set):MouseCursor;
+	@:isVar public static var x(default, null):Int = 0;
+	@:isVar public static var y(default, null):Int = 0;
+	@:isVar public static var cursor(default, set):MouseCursor = MouseCursor.Default;
+	@:isVar public static var locked(default, set):Bool = false;
 
 	static function set(?mouseID:Int = 0, ?windowID:Int = 0) {
 		mouse = kha.input.Mouse.get(mouseID);
@@ -59,8 +61,8 @@ class Mouse {
 					listener: Dispatcher.addEventListener(() -> {
 						return buttonsPressed.contains(button) && Time.realTime >= time + holdInterval;
 					}, () -> {
-						for (holdListener in holdListeners)
-							holdListener(button, x, y);
+						for (buttonHoldEventHandler in buttonHoldEventHandlers)
+							buttonHoldEventHandler(button, x, y);
 					})
 				});
 			}
@@ -117,11 +119,19 @@ class Mouse {
 	}
 
 	public static function notifyOnHold(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
-		holdListeners.push(callback);
+		buttonHoldEventHandlers.push(callback);
 	}
 
 	public static function removeCallbackOnHold(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
-		holdListeners.remove(callback);
+		buttonHoldEventHandlers.remove(callback);
+	}
+
+	public static function notifyOnLockChanged(callback:Void->Void) {
+		mouse.notifyOnLockChange(callback, () -> {});
+	}
+
+	public static function removeCallbackOnLockChanged(callback:Void->Void) {
+		mouse.removeFromLockChange(callback, () -> {});
 	}
 
 	static function set_windowID(value:Int):Int {
@@ -142,6 +152,17 @@ class Mouse {
 	static function set_cursor(value:MouseCursor):MouseCursor {
 		cursor = value;
 		mouse.setSystemCursor(value);
+		return value;
+	}
+
+	static function set_locked(value:Bool):Bool {
+		if (locked != value) {
+			locked = value;
+			if (locked)
+				mouse.lock();
+			else
+				mouse.unlock();
+		}
 		return value;
 	}
 }
