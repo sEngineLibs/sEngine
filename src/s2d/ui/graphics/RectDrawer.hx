@@ -35,7 +35,7 @@ class RectDrawer extends ElementDrawer<Rectangle> {
 		final g2 = target.g2, g4 = target.g4;
 
 		final border = rectangle.border;
-		final radius = clamp(rectangle.radius, 0.0, rectangle.width / 2);
+		final radius = clamp(rectangle.radius, 0.0, Math.min(rectangle.width, rectangle.height) / 2);
 
 		g4.setFloat4(rectCL, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 		g4.setFloat4(rectDataCL, radius, rectangle.softness, border.width, border.softness);

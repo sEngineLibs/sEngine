@@ -138,7 +138,11 @@ project.addAssets("assets/**", {
 // S2D_PP_FISHEYE -> enables Fisheye PP effect
 // S2D_PP_FILTERS -> enables 3x3 image convolution multi-pass PP effects
 // S2D_PP_COMPOSITOR -> enables compositor / single-pass combination of various (AA, CC etc.) PP effects
-// - not yet implemented
+
+// UI:
+// S2D_UI_DEBUG_ELEMENT_BOUNDS -> enables ui element bounds debugging
+
+// Not yet implemented:
 // S2D_LIGHTING_VOLUMETRIC -> enables volumetric lighting
 // S2D_LIGHTING_SHADOWS_SOFT -> enables soft shadows
 

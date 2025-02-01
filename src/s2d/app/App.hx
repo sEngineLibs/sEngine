@@ -1,26 +1,28 @@
-package s2d;
+package s2d.app;
 
 import kha.Assets;
 import kha.System;
 import kha.Window;
 // s2d
 import s2d.core.Time;
-import s2d.input.Mouse;
-import s2d.input.Keyboard;
+import s2d.app.input.Mouse;
+import s2d.app.input.Keyboard;
 import s2d.events.Dispatcher;
 
 class App {
 	public static var window:Window;
 	public static var input = {
-		mouse: Mouse,
-		keyboard: Keyboard
+		mouse: null,
+		keyboard: null
 	};
 
 	public static function start(options:SystemOptions, setup:Void->Void) {
 		System.start(options, function(window) {
 			App.window = window;
-			App.input.mouse.set();
-			App.input.keyboard.set();
+
+			input.mouse = new Mouse();
+			input.keyboard = new Keyboard();
+
 			S2D.start(window);
 			Assets.loadEverything(function() {
 				setup();
@@ -37,7 +39,7 @@ class App {
 			trace("This application can't be stopped");
 	}
 
-	static function update() {
+	static function update() @:privateAccess {
 		Time.update();
 		Dispatcher.update();
 		S2D.update();

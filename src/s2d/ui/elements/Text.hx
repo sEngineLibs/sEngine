@@ -72,7 +72,7 @@ class Text extends UIElement {
 	}
 
 	function set_fontSize(value:Int) {
-		fontSize = value;
+		fontSize = value < 0 ? 0 : value;
 		updateTextSize();
 		return value;
 	}

@@ -1,7 +1,8 @@
 package s2d.ui.elements;
 
 import s2d.core.Time;
-import s2d.input.Mouse.MouseButton;
+import s2d.app.App;
+import s2d.app.input.Mouse;
 
 class MouseArea extends UIElement {
 	public var entered:Bool = false;

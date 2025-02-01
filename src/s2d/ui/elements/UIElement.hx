@@ -62,7 +62,9 @@ class UIElement extends S2DObject<UIElement> {
 			g2.opacity *= opacity;
 			g2.transformation = finalModel;
 			draw(target);
-
+			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
+			drawBounds(target);
+			#end
 			if (clip)
 				g2.scissor(Std.int(x), Std.int(y), Std.int(width), Std.int(height));
 			for (child in children)
@@ -73,6 +75,37 @@ class UIElement extends S2DObject<UIElement> {
 	}
 
 	function draw(target:Canvas) {}
+
+	function drawBounds(target:Canvas) {
+		final g2 = target.g2;
+		final opacity = 1.5;
+
+		// margins
+		g2.color = Color.fromFloats(0.85, 0.15, 0.85, opacity);
+		final lm = anchors.left == null ? 0.0 : anchors.left.margin;
+		final tm = anchors.top == null ? 0.0 : anchors.top.margin;
+		final rm = anchors.right == null ? 0.0 : anchors.right.margin;
+		final bm = anchors.bottom == null ? 0.0 : anchors.bottom.margin;
+		g2.fillRect(x - lm, y, lm, height);
+		g2.fillRect(x - lm, y - tm, lm + width + rm, tm);
+		g2.fillRect(x + width, y, rm, height);
+		g2.fillRect(x - lm, y + height, lm + width + rm, bm);
+
+		// padding
+		g2.color = Color.fromFloats(0.85, 0.85, 0.15, opacity);
+		final lp = left.padding;
+		final tp = top.padding;
+		final rp = right.padding;
+		final bp = bottom.padding;
+		g2.fillRect(x, y, lp, height);
+		g2.fillRect(x + lp, y, width - lp - rp, tp);
+		g2.fillRect(x + width - rp, y, rp, height);
+		g2.fillRect(x + lp, y + height - bp, width - lp - rp, bp);
+
+		// content
+		g2.color = Color.fromFloats(0.15, 0.85, 0.85, opacity);
+		g2.fillRect(x + lp, y + tp, width - lp - rp, height - tp - bp);
+	}
 
 	function onParentChanged() {
 		if (parent == null)

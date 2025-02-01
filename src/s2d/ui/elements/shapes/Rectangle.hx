@@ -7,7 +7,7 @@ import s2d.ui.graphics.Drawers;
 
 class Rectangle extends UIElement {
 	public var border:Border = {};
-	@:isVar public var radius(default, set):Float;
+	public var radius:Float;
 	@:isVar public var softness(default, set):Float;
 
 	public function new(?radius:Float = 0.0, ?softness:Float = 1.0, ?scene:UIScene) {
@@ -18,11 +18,6 @@ class Rectangle extends UIElement {
 
 	override function draw(target:Canvas) @:privateAccess {
 		Drawers.rectDrawer.render(target, this);
-	}
-
-	function set_radius(value:Float):Float {
-		radius = Math.max(value, 0.0);
-		return value;
 	}
 
 	function set_softness(value:Float):Float {
