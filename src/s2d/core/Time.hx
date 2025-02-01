@@ -3,11 +3,10 @@ package s2d.core;
 import kha.System;
 
 @:allow(s2d.App)
-@:build(s2d.core.macro.SMacro.build())
 class Time {
-	@readonly public static var realTime:Float = 0.0;
-	@readonly public static var time:Float = 0.0;
-	@readonly public static var delta:Float = 0.0;
+	public static var realTime:Float = 0.0;
+	public static var time:Float = 0.0;
+	public static var delta:Float = 0.0;
 	public static var scale:Float = 1.0;
 
 	static var timeListeners:Array<TimeListener> = [];

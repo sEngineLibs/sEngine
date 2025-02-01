@@ -1,13 +1,12 @@
 package s2d.animation;
 
-@:autoBuild(s2d.core.macro.SMacro.build())
 class SpriteSheet {
 	@:isVar public var colsNum(default, set):Int = 1;
 	@:isVar public var rowsNum(default, set):Int = 1;
-	@readonly public var length:Int = 1;
-	@readonly public var tileSize = vec2(1.0);
+	public var length:Int = 1;
+	public var tileSize = vec2(1.0);
 
-	@readonly public var curTile = vec4(0.0, 0.0, 1.0, 1.0);
+	public var curTile = vec4(0.0, 0.0, 1.0, 1.0);
 	@:isVar public var curTileID(default, set):Int = 0;
 	@:isVar public var curTilePosition(default, set) = vec2(0.0);
 

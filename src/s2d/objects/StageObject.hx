@@ -6,7 +6,6 @@ import s2d.core.S2DObject;
 
 using s2d.core.extensions.FastMatrix3Ext;
 
-@:autoBuild(s2d.core.macro.SMacro.build())
 abstract class StageObject extends S2DObject<StageObject> {
 	var layer:Layer;
 

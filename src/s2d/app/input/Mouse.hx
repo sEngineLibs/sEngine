@@ -20,10 +20,13 @@ class Mouse {
 	@:isVar var windowID(default, set):Int;
 	var mouse:kha.input.Mouse;
 
-	var buttonsPressed:Array<MouseButton> = [];
+	var buttonsDown:Array<MouseButton> = [];
 	var buttonHoldEventListeners:Array<{button:MouseButton, listener:EventListener}> = [];
 
-	var buttonHoldEventHandlers:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
+	var buttonDownHandlers:Array<{button:MouseButton, callback:(x:Int, y:Int) -> Void}> = [];
+	var buttonUpHandlers:Array<{button:MouseButton, callback:(x:Int, y:Int) -> Void}> = [];
+	var holdHandlers:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
+	var buttonHoldHandlers:Array<{button:MouseButton, callback:(x:Int, y:Int) -> Void}> = [];
 	var doubleClickHandlers:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
 
 	public var holdInterval:Float = 0.8;
@@ -53,28 +56,41 @@ class Mouse {
 			this.y = y;
 		});
 		notifyOnDown((button, x, y) -> {
-			if (!buttonsPressed.contains(button)) {
-				buttonsPressed.push(button);
+			for (buttonDownHandler in buttonDownHandlers)
+				if (buttonDownHandler.button == button)
+					buttonDownHandler.callback(x, y);
+
+			if (!buttonsDown.contains(button)) {
+				buttonsDown.push(button);
 				var time = Time.realTime;
 				buttonHoldEventListeners.push({
 					button: button,
 					listener: Dispatcher.addEventListener(() -> {
-						return buttonsPressed.contains(button) && Time.realTime >= time + holdInterval;
+						return buttonsDown.contains(button) && Time.realTime >= time + holdInterval;
 					}, () -> {
-						for (buttonHoldEventHandler in buttonHoldEventHandlers)
-							buttonHoldEventHandler(button, x, y);
+						for (holdHandler in holdHandlers)
+							holdHandler(button, x, y);
 					})
 				});
 			}
 		});
 		notifyOnUp((button, x, y) -> {
-			buttonsPressed.remove(button);
+			for (buttonUpHandler in buttonUpHandlers)
+				if (buttonUpHandler.button == button)
+					buttonUpHandler.callback(x, y);
+
+			buttonsDown.remove(button);
 			for (buttonHoldEventListener in buttonHoldEventListeners) {
 				if (buttonHoldEventListener.button == button) {
 					Dispatcher.removeEventListener(buttonHoldEventListener.listener);
 					buttonHoldEventListeners.remove(buttonHoldEventListener);
 				}
 			}
+		});
+		notifyOnHold((button, x, y) -> {
+			for (buttonHoldHandler in buttonHoldHandlers)
+				if (buttonHoldHandler.button == button)
+					buttonHoldHandler.callback(x, y);
 		});
 	}
 
@@ -86,12 +102,34 @@ class Mouse {
 		}
 	}
 
+	public function notifyOnButtonDown(button:MouseButton, callback:(x:Int, y:Int) -> Void) {
+		var handler = {
+			button: button,
+			callback: callback,
+			remove: null
+		}
+		buttonDownHandlers.push(handler);
+		handler.remove = buttonDownHandlers.remove(handler);
+		return handler;
+	}
+
 	public function notifyOnUp(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
 		mouse.windowUpListeners[windowID].push(callback);
 		return {
 			callback: callback,
 			remove: () -> mouse.windowUpListeners[windowID].remove(callback)
 		}
+	}
+
+	public function notifyOnButtonUp(button:MouseButton, callback:(x:Int, y:Int) -> Void) {
+		var handler = {
+			button: button,
+			callback: callback,
+			remove: null
+		}
+		buttonUpHandlers.push(handler);
+		handler.remove = buttonUpHandlers.remove(handler);
+		return handler;
 	}
 
 	public function notifyOnMoved(callback:(x:Int, y:Int, dx:Int, dy:Int) -> Void) {
@@ -119,11 +157,22 @@ class Mouse {
 	}
 
 	public function notifyOnHold(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
-		buttonHoldEventHandlers.push(callback);
+		holdHandlers.push(callback);
 		return {
 			callback: callback,
-			remove: () -> buttonHoldEventHandlers.remove(callback)
+			remove: () -> holdHandlers.remove(callback)
 		}
+	}
+
+	public function notifyOnButtonHold(button:MouseButton, callback:(x:Int, y:Int) -> Void) {
+		var handler = {
+			button: button,
+			callback: callback,
+			remove: null
+		}
+		buttonHoldHandlers.push(handler);
+		handler.remove = buttonHoldHandlers.remove(handler);
+		return handler;
 	}
 
 	public function notifyOnLockChanged(callback:Void->Void) {

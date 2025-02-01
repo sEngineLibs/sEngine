@@ -1,5 +1,6 @@
 package s2d.app;
 
+import s2d.ui.elements.MouseArea;
 import kha.Assets;
 import kha.System;
 import kha.Window;
@@ -11,17 +12,15 @@ import s2d.events.Dispatcher;
 
 class App {
 	public static var window:Window;
-	public static var input = {
-		mouse: null,
-		keyboard: null
-	};
+	public static var input:AppInput;
 
 	public static function start(options:SystemOptions, setup:Void->Void) {
 		System.start(options, function(window) {
 			App.window = window;
-
-			input.mouse = new Mouse();
-			input.keyboard = new Keyboard();
+			App.input = {
+				mouse: new Mouse(),
+				keyboard: new Keyboard()
+			}
 
 			S2D.start(window);
 			Assets.loadEverything(function() {
@@ -44,4 +43,9 @@ class App {
 		Dispatcher.update();
 		S2D.update();
 	}
+}
+
+private typedef AppInput = {
+	var mouse:Mouse;
+	var keyboard:Keyboard;
 }

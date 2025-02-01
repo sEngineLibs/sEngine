@@ -33,8 +33,8 @@ class S2D {
 	@:isVar public static var scale(default, set):Float = 1.0;
 	@:isVar public static var aspectRatio(default, set):Float = 1.0;
 
-	public static var stage:Stage = new Stage();
-	public static var ui:UIScene = new UIScene();
+	public static var stage:Stage;
+	public static var ui:UIScene;
 
 	static function get_realWidth():Int {
 		return Std.int(width / resolutionScale);
@@ -65,6 +65,9 @@ class S2D {
 	@:access(s2d.graphics.Renderer)
 	@:access(s2d.ui.graphics.Drawers)
 	public static function start(window:Window) {
+		stage = new Stage();
+		ui = new UIScene();
+		
 		realWidth = window.width;
 		realHeight = window.height;
 		aspectRatio = width / height;
@@ -168,10 +171,11 @@ class S2D {
 	@:access(s2d.graphics.Renderer)
 	public static function render(target:Canvas):Void {
 		var frame = Renderer.render();
+		ui.render(frame);
+
 		var g2 = target.g2;
 		g2.begin();
 		g2.drawScaledImage(frame, 0, 0, target.width, target.height);
-		ui.render(target);
 		#if S2D_DEBUG_FPS
 		showFPS(g2);
 		#end

@@ -42,6 +42,7 @@ class RectDrawer extends ElementDrawer<Rectangle> {
 		g4.setFloat4(bordColorCL, border.color.R, border.color.G, border.color.B, border.color.A);
 
 		final offset = Math.max(rectangle.softness, border.width + border.softness);
+
 		g2.fillRect(rectangle.x - offset, rectangle.y - offset, rectangle.width + offset * 2.0, rectangle.height + offset * 2.0);
 	}
 }

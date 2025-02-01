@@ -8,7 +8,7 @@ import s2d.ui.positioning.Alignment;
 
 using kha.StringExtensions;
 
-class Text extends UIElement {
+class TextElement extends UIElement {
 	var textWidth:Float;
 	var textHeight:Float;
 

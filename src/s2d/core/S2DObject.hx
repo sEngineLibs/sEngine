@@ -6,12 +6,11 @@ import kha.math.FastMatrix3;
 
 using s2d.core.extensions.FastMatrix3Ext;
 
-@:autoBuild(s2d.core.macro.SMacro.build())
 abstract class S2DObject<This:S2DObject<This>> {
 	var _parent:This = null;
 
 	public var parent(get, set):This;
-	@readonly public var children:Array<This> = [];
+	public var children:Array<This> = [];
 
 	var finalZ:FastFloat;
 	var finalModel:FastMatrix3;
@@ -29,6 +28,10 @@ abstract class S2DObject<This:S2DObject<This>> {
 	public function new() {
 		finalZ = 0.0;
 		finalModel = model;
+	}
+
+	function toString():String {
+		return Type.getClassName(Type.getClass(this));
 	}
 
 	abstract function onParentChanged():Void;
@@ -61,7 +64,7 @@ abstract class S2DObject<This:S2DObject<This>> {
 		}
 	}
 
-	public function removeChild(value:This):Void {
+	public function retranslateChild(value:This):Void {
 		if (value != null || value != this || children.contains(value)) {
 			value._parent = null;
 			children.remove(value);
@@ -74,9 +77,9 @@ abstract class S2DObject<This:S2DObject<This>> {
 		}
 	}
 
-	public function removeParent():Void {
+	public function retranslateParent():Void {
 		if (_parent != null) {
-			_parent.removeChild(cast this);
+			_parent.retranslateChild(cast this);
 		}
 	}
 
@@ -85,13 +88,13 @@ abstract class S2DObject<This:S2DObject<This>> {
 		invalidateTransformation();
 	}
 
-	overload extern public inline function moveG(value:FastVector2) {
+	overload extern public inline function translateG(value:FastVector2) {
 		transform(() -> {
 			model.pushTranslation(value);
 		});
 	}
 
-	overload extern public inline function moveToG(value:FastVector2) {
+	overload extern public inline function translateToG(value:FastVector2) {
 		transform(() -> {
 			model.setTranslation(value);
 		});
@@ -121,13 +124,13 @@ abstract class S2DObject<This:S2DObject<This>> {
 		});
 	}
 
-	overload extern public inline function moveL(x:FastFloat, y:FastFloat) {
+	overload extern public inline function translateL(x:FastFloat, y:FastFloat) {
 		transform(() -> {
 			model = model.multmat(FastMatrix3.translation(x, y));
 		});
 	}
 
-	overload extern public inline function moveToL(x:FastFloat, y:FastFloat) {
+	overload extern public inline function translateToL(x:FastFloat, y:FastFloat) {
 		transform(() -> {
 			model = model.multmat(FastMatrix3.translation(x - this.translationX, y - this.translationY));
 		});
@@ -157,20 +160,20 @@ abstract class S2DObject<This:S2DObject<This>> {
 		});
 	}
 
-	overload extern public inline function moveG(x:FastFloat, y:FastFloat) {
-		moveG({x: x, y: y});
+	overload extern public inline function translateG(x:FastFloat, y:FastFloat) {
+		translateG({x: x, y: y});
 	}
 
-	overload extern public inline function moveG(value:FastFloat) {
-		moveG(value, value);
+	overload extern public inline function translateG(value:FastFloat) {
+		translateG(value, value);
 	}
 
-	overload extern public inline function moveToG(x:FastFloat, y:FastFloat) {
-		moveToG({x: x, y: y});
+	overload extern public inline function translateToG(x:FastFloat, y:FastFloat) {
+		translateToG({x: x, y: y});
 	}
 
-	overload extern public inline function moveToG(value:FastFloat) {
-		moveToG(value, value);
+	overload extern public inline function translateToG(value:FastFloat) {
+		translateToG(value, value);
 	}
 
 	overload extern public inline function scaleG(x:FastFloat, y:FastFloat) {
@@ -189,20 +192,20 @@ abstract class S2DObject<This:S2DObject<This>> {
 		scaleToG(value, value);
 	}
 
-	overload extern public inline function moveL(value:FastVector2) {
-		moveL(value.x, value.y);
+	overload extern public inline function translateL(value:FastVector2) {
+		translateL(value.x, value.y);
 	}
 
-	overload extern public inline function moveL(value:FastFloat) {
-		moveL(value, value);
+	overload extern public inline function translateL(value:FastFloat) {
+		translateL(value, value);
 	}
 
-	overload extern public inline function moveToL(value:FastVector2) {
-		moveToL(value.x, value.y);
+	overload extern public inline function translateToL(value:FastVector2) {
+		translateToL(value.x, value.y);
 	}
 
-	overload extern public inline function moveToL(value:FastFloat) {
-		moveToL(value, value);
+	overload extern public inline function translateToL(value:FastFloat) {
+		translateToL(value, value);
 	}
 
 	overload extern public inline function scaleL(value:FastVector2) {

@@ -23,7 +23,7 @@ class MouseArea extends UIElement {
 	public function new(?scene:UIScene) {
 		super(scene);
 		App.input.mouse.notifyOnMoved((mx, my, dx, dy) -> {
-			final p = finalModel.inverse().multvec({x: mx, y: my});
+			final p = mapToGlobal(mx, my);
 			final _x = p.x - x;
 			final _y = p.y - y;
 			if (0.0 <= _x && _x <= width && 0.0 <= _y && _y <= height) {
