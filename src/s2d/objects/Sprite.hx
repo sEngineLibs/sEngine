@@ -1,8 +1,7 @@
 package s2d.objects;
 
-import kha.math.FastVector2;
-import kha.math.FastVector4;
-// s2d
+import s2d.math.Vec2;
+import s2d.math.Vec4;
 import s2d.geometry.Mesh;
 
 using s2d.core.extensions.VectorExt;
@@ -11,7 +10,7 @@ class Sprite extends StageObject {
 	var index:UInt;
 
 	public var mesh:Mesh;
-	public var cropRect:FastVector4 = new FastVector4(0.0, 0.0, 1.0, 1.0);
+	public var cropRect:Vec4 = new Vec4(0.0, 0.0, 1.0, 1.0);
 	#if (S2D_SPRITE_INSTANCING == 1)
 	@:isVar public var atlas(default, set):SpriteAtlas;
 	#else
@@ -32,7 +31,7 @@ class Sprite extends StageObject {
 	}
 	#end
 
-	public function new(atlas:SpriteAtlas, ?polygons:Array<FastVector2>) {
+	public function new(atlas:SpriteAtlas, ?polygons:Array<Vec2>) {
 		super(atlas.layer);
 		layer.addSprite(this);
 		this.atlas = atlas;

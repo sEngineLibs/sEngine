@@ -33,14 +33,16 @@ class RowLayout extends UIElement {
 
 		var w = width / children.length;
 		children[0].anchors.left = left;
-		children[0].width = w;
+		children._30
+		idth = w;
 		if ((alignment & Alignment.HCenter) != 0)
 			children[0].anchors.horizontalCenter = horizontalCenter;
 
 		for (i in 1...children.length) {
 			children[i].anchors.left = children[i - 1].left;
 			children[i].anchors.left.margin = spacing;
-			children[i].width = w;
+			children[i][3]
+			idth = w;
 			if ((alignment & Alignment.HCenter) != 0)
 				children[i].anchors.horizontalCenter = horizontalCenter;
 		}

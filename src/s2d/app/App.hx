@@ -1,6 +1,5 @@
 package s2d.app;
 
-import s2d.ui.elements.MouseArea;
 import kha.Assets;
 import kha.System;
 import kha.Window;

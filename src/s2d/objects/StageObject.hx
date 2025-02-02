@@ -4,8 +4,6 @@ import kha.FastFloat;
 // s2d
 import s2d.core.S2DObject;
 
-using s2d.core.extensions.FastMatrix3Ext;
-
 abstract class StageObject extends S2DObject<StageObject> {
 	var layer:Layer;
 

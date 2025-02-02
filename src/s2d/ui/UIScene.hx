@@ -2,9 +2,9 @@ package s2d.ui;
 
 import kha.Assets;
 import kha.Canvas;
-import kha.math.FastMatrix3;
 // s2d
 import s2d.app.App;
+import s2d.math.Mat3;
 import s2d.ui.elements.UIElement;
 
 using kha.StringExtensions;
@@ -50,7 +50,7 @@ class UIScene {
 			element.render(target);
 		g2.color = White;
 		g2.opacity = 0.85;
-		g2.transformation = FastMatrix3.identity();
+		g2.transformation = Mat3.identity();
 		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 		final e = elementAt(App.input.mouse.x, App.input.mouse.y);
 		if (e != null)

@@ -3,18 +3,18 @@ package s2d;
 #if (S2D_LIGHTING_ENVIRONMENT == 1)
 import kha.Image;
 #end
-import kha.math.FastMatrix3;
+import s2d.math.Mat3;
 
 @:access(s2d.objects.Object)
 class Stage {
 	public var layers:Array<Layer> = [];
 	public var camera:Camera = new Camera();
-	public var viewProjection:FastMatrix3;
+	public var viewProjection:Mat3;
 
 	public function new() {}
 
 	public function updateViewProjection() {
-		viewProjection = S2D.projection.multmat(camera);
+		viewProjection = S2D.projection * camera;
 	}
 
 	#if (S2D_LIGHTING_ENVIRONMENT == 1)

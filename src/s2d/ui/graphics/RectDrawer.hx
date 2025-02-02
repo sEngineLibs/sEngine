@@ -6,7 +6,7 @@ import kha.graphics4.VertexData;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 // s2d
-import s2d.core.utils.MathUtils;
+import s2d.math.VectorMath;
 import s2d.ui.elements.shapes.Rectangle;
 
 class RectDrawer extends ElementDrawer<Rectangle> {

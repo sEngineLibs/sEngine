@@ -1,7 +1,7 @@
 package s2d.core.extensions;
 
 import haxe.ds.Vector;
-import s2d.core.utils.MathUtils;
+import s2d.math.VectorMath;
 
 class VectorExt {
 	/**
@@ -48,8 +48,8 @@ class VectorExt {
 	public static function rearrange<T>(a:Vector<T>, from:Int, to:Int):Void {
 		if (from == to)
 			return;
-		from = clamp(from, 0, a.length);
-		to = clamp(to, 0, a.length);
+		from = from < 0 ? 0 : (from > a.length ? a.length : from);
+		to = to < 0 ? 0 : (to > a.length ? a.length : to);
 
 		final t = a[from];
 		if (from < to)

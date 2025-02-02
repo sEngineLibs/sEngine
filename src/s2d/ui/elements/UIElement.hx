@@ -1,22 +1,22 @@
 package s2d.ui.elements;
 
-import kha.Color;
 import kha.Canvas;
-import kha.math.FastVector2;
 // s2d
 import s2d.core.S2DObject;
-import s2d.core.utils.MathUtils;
+import s2d.Color;
+import s2d.math.Vec2;
+import s2d.math.VectorMath;
 import s2d.geometry.Rect;
 import s2d.geometry.Size;
 import s2d.ui.positioning.Anchors;
 
 @:allow(s2d.ui.UIScene)
 class UIElement extends S2DObject<UIElement> {
-	overload extern public static inline function mapToElement(element:UIElement, x:Float, y:Float):FastVector2 {
+	overload extern public static inline function mapToElement(element:UIElement, x:Float, y:Float):Vec2 {
 		return element.mapFromGlobal(x, y);
 	}
 
-	overload extern public static inline function mapFromElement(element:UIElement, x:Float, y:Float):FastVector2 {
+	overload extern public static inline function mapFromElement(element:UIElement, x:Float, y:Float):Vec2 {
 		return element.mapToGlobal(x, y);
 	}
 
@@ -24,7 +24,7 @@ class UIElement extends S2DObject<UIElement> {
 
 	public var focused:Bool = false;
 	public var visible:Bool = true;
-	public var color:Color = White;
+	public var color:Color = white;
 	public var opacity:Float = 1.0;
 	public var enabled:Bool = true;
 	public var clip:Bool = false;
@@ -71,12 +71,14 @@ class UIElement extends S2DObject<UIElement> {
 		padding = value;
 	}
 
-	public function mapFromGlobal(x:Float, y:Float):FastVector2 {
-		return finalModel.multvec({x: x, y: y});
+	public function mapFromGlobal(x:Float, y:Float):Vec2 {
+		var p:Vec2 = (finalModel * vec3(x, y, 1.0)).xy;
+		return p;
 	}
 
-	public function mapToGlobal(x:Float, y:Float):FastVector2 {
-		return finalModel.inverse().multvec({x: x, y: y});
+	public function mapToGlobal(x:Float, y:Float):Vec2 {
+		var p:Vec2 = (inverse(finalModel) * vec3(x, y, 1.0)).xy;
+		return p;
 	}
 
 	public function childAt(x:Float, y:Float):UIElement {

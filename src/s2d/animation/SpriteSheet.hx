@@ -1,5 +1,7 @@
 package s2d.animation;
 
+import s2d.math.VectorMath;
+
 class SpriteSheet {
 	@:isVar public var colsNum(default, set):Int = 1;
 	@:isVar public var rowsNum(default, set):Int = 1;

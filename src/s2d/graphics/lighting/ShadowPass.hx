@@ -8,7 +8,7 @@ import kha.graphics4.ConstantLocation;
 // s2d
 import s2d.objects.Light;
 
-using s2d.core.extensions.FastMatrix3Ext;
+using s2d.core.extensions.Mat3;
 
 class ShadowPass {
 	public static var structure:VertexStructure;

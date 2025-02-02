@@ -5,14 +5,14 @@ import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
 // s2d
-import kha.math.FastVector2;
+import s2d.math.Vec2;
 
 class Fisheye extends PPEffect {
 	var textureMapTU:TextureUnit;
 	var positionCL:ConstantLocation;
 	var strengthCL:ConstantLocation;
 
-	public var position:FastVector2 = new FastVector2(0.5, 0.5);
+	public var position:Vec2 = new Vec2(0.5, 0.5);
 	public var strength:Float = 0.0;
 
 	function setPipeline() {
