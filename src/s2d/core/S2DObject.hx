@@ -30,7 +30,7 @@ abstract class S2DObject<This:S2DObject<This>> {
 		finalModel = model;
 	}
 
-	function toString():String {
+	public function toString():String {
 		return Type.getClassName(Type.getClass(this));
 	}
 

@@ -2,17 +2,13 @@ package s2d.ui.elements;
 
 import kha.Color;
 import kha.Canvas;
-import kha.Assets;
 import kha.math.FastVector2;
-import kha.math.FastMatrix3;
 // s2d
 import s2d.core.S2DObject;
 import s2d.core.utils.MathUtils;
 import s2d.geometry.Rect;
 import s2d.geometry.Size;
 import s2d.ui.positioning.Anchors;
-
-using kha.StringExtensions;
 
 @:allow(s2d.ui.UIScene)
 class UIElement extends S2DObject<UIElement> {
@@ -26,7 +22,6 @@ class UIElement extends S2DObject<UIElement> {
 
 	var scene:UIScene;
 
-	public var prefocused:Bool = false;
 	public var focused:Bool = false;
 	public var visible:Bool = true;
 	public var color:Color = White;
@@ -93,7 +88,7 @@ class UIElement extends S2DObject<UIElement> {
 			if (e != null) {
 				c = e;
 				break;
-			} else if (child.isOverlapping(x, y)) {
+			} else if (child.contains(x, y)) {
 				c = child;
 				break;
 			}
@@ -101,7 +96,7 @@ class UIElement extends S2DObject<UIElement> {
 		return c;
 	}
 
-	public function isOverlapping(x:Float, y:Float):Bool {
+	public function contains(x:Float, y:Float):Bool {
 		final _p = mapToGlobal(x, y);
 		final _x = _p.x - this.x;
 		final _y = _p.y - this.y;
@@ -111,92 +106,22 @@ class UIElement extends S2DObject<UIElement> {
 	function render(target:Canvas) {
 		if (visible) {
 			final g2 = target.g2;
-			final o = finalOpacity;
-			final m = finalModel;
 
 			g2.color = color;
-			g2.opacity = o;
-			g2.transformation = m;
+			g2.opacity = finalOpacity;
+			g2.transformation = finalModel;
 			draw(target);
+			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
+			g2.color = White;
+			g2.opacity = 0.75;
+			g2.drawRect(x, y, width, height, 2.0);
+			#end
 			for (child in children)
 				child.render(target);
-			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-			g2.transformation = FastMatrix3.identity();
-			drawBounds(target);
-			g2.color = color;
-			g2.opacity = o;
-			g2.transformation = m;
-			#end
 		}
 	}
 
 	function draw(target:Canvas) {}
-
-	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-	function drawBounds(target:Canvas) {
-		if (prefocused) {
-			final g2 = target.g2;
-			g2.font = Assets.fonts.Roboto_Regular;
-			g2.fontSize = 14;
-
-			// margins
-			g2.color = Color.fromFloats(0.75, 0.25, 0.75);
-			final lm = anchors.left == null ? 0.0 : anchors.left.margin;
-			final tm = anchors.top == null ? 0.0 : anchors.top.margin;
-			final rm = anchors.right == null ? 0.0 : anchors.right.margin;
-			final bm = anchors.bottom == null ? 0.0 : anchors.bottom.margin;
-			g2.fillRect(x - lm, y, lm, height);
-			g2.fillRect(x - lm, y - tm, lm + width + rm, tm);
-			g2.fillRect(x + width, y, rm, height);
-			g2.fillRect(x - lm, y + height, lm + width + rm, bm);
-
-			// padding
-			g2.color = Color.fromFloats(0.75, 0.75, 0.25);
-			final lp = left.padding;
-			final tp = top.padding;
-			final rp = right.padding;
-			final bp = bottom.padding;
-			g2.fillRect(x, y, lp, height);
-			g2.fillRect(x + lp, y, width - lp - rp, tp);
-			g2.fillRect(x + width - rp, y, rp, height);
-			g2.fillRect(x + lp, y + height - bp, width - lp - rp, bp);
-
-			// content
-			g2.color = Color.fromFloats(0.25, 0.75, 0.75);
-			g2.fillRect(x + lp, y + tp, width - lp - rp, height - tp - bp);
-
-			// labels
-			g2.color = White;
-			final fs = g2.fontSize + 5;
-			if (tm >= fs)
-				g2.drawString("margins", x - lm + 5, y - tm + 5);
-			if (tp >= fs)
-				g2.drawString("padding", x + 5, y + 5);
-			if (height >= fs)
-				g2.drawString("content", x + lp + 5, y + tp + 5);
-
-			g2.fontSize = 22;
-			final name = this.toString();
-			g2.drawString(name, x
-				+ width / 2
-				- g2.font.widthOfCharacters(g2.fontSize, name.toCharArray(), 0, name.length) / 2,
-				y
-				+ height / 2
-				- g2.font.height(g2.fontSize) / 2
-				- g2.fontSize / 2);
-
-			g2.fontSize = 16;
-			final rect = '${this.rect}';
-			g2.drawString(rect, x
-				+ width / 2
-				- g2.font.widthOfCharacters(g2.fontSize, rect.toCharArray(), 0, rect.length) / 2,
-				y
-				+ height / 2
-				- g2.font.height(g2.fontSize) / 2
-				+ g2.fontSize / 2);
-		}
-	}
-	#end
 
 	function onParentChanged() {
 		if (parent == null)

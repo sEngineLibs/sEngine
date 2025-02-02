@@ -27,7 +27,12 @@ abstract Rect(Vector4) from Vector4 to Vector4 {
 	}
 
 	@:to
-	function toString():String {
+	public function toString():String {
 		return '$width × $height at (${this.x}, ${this.y})';
+	}
+
+	@:to
+	public function toStringRounded():String {
+		return '${Std.int(width)} × ${Std.int(height)} at (${Std.int(this.x)}, ${Std.int(this.y)})';
 	}
 }
