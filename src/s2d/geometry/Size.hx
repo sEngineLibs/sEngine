@@ -1,9 +1,9 @@
 package s2d.geometry;
 
-import kha.math.Vector2;
+import s2d.math.Vec2;
 
 @:forward.new
-abstract Size(Vector2) from Vector2 to Vector2 {
+abstract Size(Vec2) from Vec2 to Vec2 {
 	public var width(get, set):Float;
 	public var height(get, set):Float;
 

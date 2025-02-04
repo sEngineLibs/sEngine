@@ -7,7 +7,6 @@ import s2d.Color;
 import s2d.math.Vec2;
 import s2d.math.VectorMath;
 import s2d.geometry.Rect;
-import s2d.geometry.Size;
 import s2d.ui.positioning.Anchors;
 
 @:allow(s2d.ui.UIScene)
@@ -21,6 +20,7 @@ class UIElement extends S2DObject<UIElement> {
 	}
 
 	var scene:UIScene;
+	var finalOpacity(get, never):Float;
 
 	public var focused:Bool = false;
 	public var visible:Bool = true;
@@ -29,7 +29,7 @@ class UIElement extends S2DObject<UIElement> {
 	public var enabled:Bool = true;
 	public var clip:Bool = false;
 
-	var finalOpacity(get, never):Float;
+	public var layout:Layout = {};
 
 	// anchors
 	public var anchors:Anchors;
@@ -49,26 +49,46 @@ class UIElement extends S2DObject<UIElement> {
 	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
 	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
 
-	public var rect(get, never):Rect;
-	public var size(get, never):Size;
+	public var rect(get, set):Rect;
 
 	public function new(?scene:UIScene) {
 		super();
 		if (scene != null)
 			this.scene = scene;
 		else
-			this.scene = S2D.ui;
+			this.scene = UIScene.current;
 		this.scene.addBaseElement(this);
 		anchors = new Anchors(this);
 	}
 
-	public function resize(w:Int, h:Int) {
-		width = w;
-		height = h;
-	}
-
 	public function setPadding(value:Float):Void {
 		padding = value;
+	}
+
+	overload extern public inline function setPosition(x:Float, y:Float):Void {
+		this.x = x;
+		this.y = y;
+	}
+
+	overload extern public inline function setPosition(value:Vec2):Void {
+		setPosition(value.x, value.y);
+	}
+
+	overload extern public inline function setSize(width:Float, height:Float) {
+		this.width = width;
+		this.height = height;
+	}
+
+	overload extern public inline function setSize(value:Vec2) {
+		setSize(value.x, value.y);
+	}
+
+	overload extern public inline function setRect(value:Rect) {
+		rect = value;
+	}
+
+	overload extern public inline function setRect(x:Float, y:Float, width:Float, height:Float) {
+		rect = new Rect(x, y, width, height);
 	}
 
 	public function mapFromGlobal(x:Float, y:Float):Vec2 {
@@ -106,21 +126,20 @@ class UIElement extends S2DObject<UIElement> {
 	}
 
 	function render(target:Canvas) {
-		if (visible) {
-			final g2 = target.g2;
+		final g2 = target.g2;
 
-			g2.color = color;
-			g2.opacity = finalOpacity;
-			g2.transformation = finalModel;
-			draw(target);
-			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-			g2.color = White;
-			g2.opacity = 0.75;
-			g2.drawRect(x, y, width, height, 2.0);
-			#end
-			for (child in children)
+		g2.color = color;
+		g2.opacity = finalOpacity;
+		g2.transformation = finalModel;
+		draw(target);
+		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
+		g2.color = White;
+		g2.opacity = 0.75;
+		g2.drawRect(x, y, width, height, 2.0);
+		#end
+		for (child in children)
+			if (child.visible)
 				child.render(target);
-		}
 	}
 
 	function draw(target:Canvas) {}
@@ -147,19 +166,15 @@ class UIElement extends S2DObject<UIElement> {
 	function onTransformationChanged() {}
 
 	function get_rect():Rect {
-		return {
-			x: x,
-			y: y,
-			z: width,
-			w: height
-		};
+		return new Rect(x, y, width, height);
 	}
 
-	function get_size():Size {
-		return {
-			x: width,
-			y: height
-		};
+	function set_rect(value:Rect):Rect {
+		x = value.x;
+		y = value.y;
+		width = value.width;
+		height = value.height;
+		return value;
 	}
 
 	function get_finalOpacity():Float {

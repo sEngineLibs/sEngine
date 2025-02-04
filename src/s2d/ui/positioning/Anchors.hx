@@ -48,6 +48,12 @@ class AnchorLine {
 	public var padding:Float = 0.0;
 	public var margin:Float = 0.0;
 
+	function new(?bind:AnchorLine, dir:Float, ?position:Float) {
+		this.bind = bind;
+		this.dir = dir;
+		this.position = position;
+	}
+
 	function get_position():Float {
 		return bind == null ? position : bind.position + (bind.padding + margin) * dir;
 	}

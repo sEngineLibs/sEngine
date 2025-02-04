@@ -13,6 +13,8 @@ using kha.StringExtensions;
 @:allow(s2d.S2D)
 @:allow(s2d.ui.elements.UIElement)
 class UIScene {
+	public static var current:UIScene;
+
 	var elements:Array<UIElement> = [];
 
 	function new() {}
@@ -152,23 +154,13 @@ class UIScene {
 
 		g2.fontSize = 22;
 		final name = e.toString();
-		g2.drawString(name, e.x
-			+ e.width / 2
-			- g2.font.widthOfCharacters(g2.fontSize, name.toCharArray(), 0, name.length) / 2,
-			e.y
-			+ e.height / 2
-			- g2.font.height(g2.fontSize) / 2
-			- g2.fontSize / 2);
+		g2.drawString(name, App.input.mouse.x - g2.font.widthOfCharacters(g2.fontSize, name.toCharArray(), 0, name.length),
+			App.input.mouse.y - g2.font.height(g2.fontSize));
 
 		g2.fontSize = 16;
 		final rect = e.rect.toStringRounded();
-		g2.drawString(rect, e.x
-			+ e.width / 2
-			- g2.font.widthOfCharacters(g2.fontSize, rect.toCharArray(), 0, rect.length) / 2,
-			e.y
-			+ e.height / 2
-			- g2.font.height(g2.fontSize) / 2
-			+ g2.fontSize / 2);
+		g2.drawString(rect, App.input.mouse.x - g2.font.widthOfCharacters(g2.fontSize, rect.toCharArray(), 0, rect.length),
+			App.input.mouse.y - g2.font.height(g2.fontSize) + g2.fontSize);
 	}
 	#end
 }

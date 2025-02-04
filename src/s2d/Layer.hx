@@ -13,12 +13,16 @@ import s2d.graphics.ShadowBuffer;
 using s2d.core.extensions.VectorExt;
 
 class Layer {
-	@:isVar public var stage(default, set):Stage;
+	var stage:Stage;
 	public var sprites:Vector<Sprite> = new Vector(0);
 	public var spriteAtlases:Vector<SpriteAtlas> = new Vector(0);
 
-	public function new(stage:Stage) {
-		stage.layers.push(this);
+	public function new(?stage:Stage) {
+		if (stage != null)
+			this.stage = stage;
+		else
+			this.stage = Stage.current;
+		this.stage.layers.push(this);
 		#if (S2D_LIGHTING && S2D_LIGHTING_SHADOWS == 1)
 		shadowBuffer = new ShadowBuffer();
 		#end
@@ -44,11 +48,4 @@ class Layer {
 	var shadowBuffer:ShadowBuffer;
 	#end
 	#end
-	function set_stage(value:Stage) {
-		if (stage != null && stage != value && !stage.layers.contains(this)) {
-			stage = value;
-			stage.layers.push(this);
-		}
-		return value;
-	}
 }

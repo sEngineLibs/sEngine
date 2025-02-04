@@ -89,7 +89,7 @@ class LightingDeferred {
 		g4.setVertexBuffer(S2D.vertices);
 		g4.setTexture(envEmissionMapTU, Renderer.buffer.emissionMap);
 		#if (S2D_LIGHTING_ENVIRONMENT == 1)
-		g4.setTexture(envMapTU, S2D.stage.environmentMap);
+		g4.setTexture(envMapTU, Stage.current.environmentMap);
 		g4.setTexture(envAlbedoMapTU, Renderer.buffer.albedoMap);
 		g4.setTexture(envNormalMapTU, Renderer.buffer.normalMap);
 		g4.setTexture(envORMMapTU, Renderer.buffer.ormMap);
@@ -99,11 +99,11 @@ class LightingDeferred {
 
 		// stage lights
 		g4.setPipeline(pipeline);
-		g4.setMatrix3(viewProjectionCL, S2D.stage.viewProjection);
+		g4.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
 		g4.setTexture(albedoMapTU, Renderer.buffer.albedoMap);
 		g4.setTexture(normalMapTU, Renderer.buffer.normalMap);
 		g4.setTexture(ormMapTU, Renderer.buffer.ormMap);
-		for (layer in S2D.stage.layers) {
+		for (layer in Stage.current.layers) {
 			for (light in layer.lights) {
 				#if (S2D_LIGHTING_SHADOWS == 1)
 				g4.end();

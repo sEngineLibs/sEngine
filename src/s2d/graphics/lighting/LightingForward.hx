@@ -83,7 +83,7 @@ class LightingForward {
 	@:access(s2d.graphics.Renderer)
 	public static function render():Void {
 		final g4 = Renderer.buffer.tgt.g4;
-		final viewProjection = S2D.stage.viewProjection;
+		final viewProjection = Stage.current.viewProjection;
 
 		g4.begin();
 		g4.clear(Black);
@@ -94,10 +94,10 @@ class LightingForward {
 		g4.setVertexBuffer(S2D.vertices);
 		#end
 		#if (S2D_LIGHTING_ENVIRONMENT == 1)
-		g4.setTexture(envMapTU, S2D.stage.environmentMap);
+		g4.setTexture(envMapTU, Stage.current.environmentMap);
 		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
-		for (layer in S2D.stage.layers) {
+		for (layer in Stage.current.layers) {
 			for (light in layer.lights) {
 				// #if (S2D_LIGHTING_SHADOWS == 1)
 				// g4.end();

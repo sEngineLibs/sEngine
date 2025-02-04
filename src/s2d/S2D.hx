@@ -1,5 +1,6 @@
 package s2d;
 
+import s2d.ui.graphics.ElementDrawer;
 import kha.Window;
 import kha.Assets;
 import kha.Canvas;
@@ -9,9 +10,7 @@ import kha.graphics4.VertexStructure;
 // s2d
 import s2d.Stage;
 import s2d.core.Time;
-import s2d.math.Vec2;
 import s2d.math.Mat3;
-import s2d.math.VectorMath;
 import s2d.animation.Action;
 import s2d.ui.UIScene;
 import s2d.ui.graphics.Drawers;
@@ -31,9 +30,6 @@ class S2D {
 
 	@:isVar public static var scale(default, set):Float = 1.0;
 	@:isVar public static var aspectRatio(default, set):Float = 1.0;
-
-	public static var stage:Stage;
-	public static var ui:UIScene;
 
 	static function get_realWidth():Int {
 		return Std.int(width / resolutionScale);
@@ -64,8 +60,8 @@ class S2D {
 	@:access(s2d.graphics.Renderer)
 	@:access(s2d.ui.graphics.Drawers)
 	public static function start(window:Window) {
-		stage = new Stage();
-		ui = new UIScene();
+		Stage.current = new Stage();
+		UIScene.current = new UIScene();
 
 		realWidth = window.width;
 		realHeight = window.height;
@@ -101,9 +97,9 @@ class S2D {
 	@:access(s2d.SpriteAtlas)
 	static function update() {
 		Action.update(Time.time);
-		S2D.stage.updateViewProjection();
+		Stage.current.updateViewProjection();
 		#if (S2D_SPRITE_INSTANCING == 1)
-		for (layer in S2D.stage.layers)
+		for (layer in Stage.current.layers)
 			for (atlas in layer.spriteAtlases)
 				atlas.update();
 		#end
@@ -134,39 +130,13 @@ class S2D {
 			projection = Mat3.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale);
 		else
 			projection = Mat3.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio);
-		stage.updateViewProjection();
-	}
-
-	public static function local2WorldSpace(point:Vec2):Vec2 {
-		var p:Vec2 = (inverse(stage.viewProjection) * vec3(point, 1.0)).xy;
-		return p;
-	}
-
-	public static function world2LocalSpace(point:Vec2):Vec2 {
-		var p:Vec2 = (stage.viewProjection * vec3(point, 1.0)).xy;
-		return p;
-	}
-
-	public static function screen2LocalSpace(point:Vec2):Vec2 {
-		return vec2(point.x / realWidth, point.y / realHeight) * 2.0 - 1.0;
-	}
-
-	public static function local2ScreenSpace(point:Vec2):Vec2 {
-		return vec2(point.x * realWidth, point.y * realHeight) * 0.5 - 0.5;
-	}
-
-	public static function screen2WorldSpace(point:Vec2):Vec2 {
-		return local2WorldSpace(screen2LocalSpace(point));
-	}
-
-	public static function world2ScreenSpace(point:Vec2):Vec2 {
-		return local2ScreenSpace(world2LocalSpace(point));
+		Stage.current.updateViewProjection();
 	}
 
 	@:access(s2d.graphics.Renderer)
 	public static function render(target:Canvas):Void {
 		var frame = Renderer.render();
-		ui.render(frame);
+		UIScene.current.render(frame);
 
 		var g2 = target.g2;
 		g2.begin();

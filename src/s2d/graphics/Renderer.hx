@@ -131,8 +131,8 @@ class Renderer {
 		#if (S2D_SPRITE_INSTANCING != 1)
 		g4.setVertexBuffer(S2D.vertices);
 		#end
-		g4.setMatrix3(viewProjectionCL, S2D.stage.viewProjection);
-		for (layer in S2D.stage.layers) {
+		g4.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
+		for (layer in Stage.current.layers) {
 			#if (S2D_SPRITE_INSTANCING == 1)
 			for (atlas in layer.spriteAtlases) {
 				@:privateAccess g4.setVertexBuffers(atlas.vertices);
