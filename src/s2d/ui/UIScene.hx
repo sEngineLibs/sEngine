@@ -158,9 +158,12 @@ class UIScene {
 			App.input.mouse.y - g2.font.height(g2.fontSize));
 
 		g2.fontSize = 16;
-		final rect = e.rect.toStringRounded();
-		g2.drawString(rect, App.input.mouse.x - g2.font.widthOfCharacters(g2.fontSize, rect.toCharArray(), 0, rect.length),
-			App.input.mouse.y - g2.font.height(g2.fontSize) + g2.fontSize);
+		final rect = '${Std.int(e.width)} × ${Std.int(e.height)} at (${Std.int(e.x)}, ${Std.int(e.y)})';
+		g2.drawString(rect, App.input.mouse.x
+			- g2.font.widthOfCharacters(g2.fontSize, rect.toCharArray(), 0, rect.length),
+			App.input.mouse.y
+			- g2.font.height(g2.fontSize)
+			+ g2.fontSize);
 	}
 	#end
 }

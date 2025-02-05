@@ -5,7 +5,7 @@ import kha.Canvas;
 import s2d.math.VectorMath;
 import s2d.ui.positioning.Alignment;
 
-class ColumnLayout extends UIElement {
+class RowLayout extends UIElement {
 	public var spacing:Float = 0.0;
 
 	override function render(target:Canvas) {
@@ -20,58 +20,58 @@ class ColumnLayout extends UIElement {
 		g2.opacity = finalOpacity;
 
 		var cells = [];
-		var cellsHeight = 0.0;
+		var cellsWidth = 0.0;
 		var fillCellCount = 0;
 		for (child in children) {
 			if (child.visible) {
 				var cell = {
 					element: child,
-					height: null
+					width: null
 				}
-				if (child.layout.fillHeight)
+				if (child.layout.fillWidth)
 					++fillCellCount;
 				else {
-					var h = child.height - child.layout.topMargin - child.layout.bottomMargin;
-					cell.height = h;
-					cellsHeight += h;
+					var w = child.width - child.layout.leftMargin - child.layout.rightMargin;
+					cell.width = w;
+					cellsWidth += w;
 				}
 				cells.push(cell);
 			}
 		}
 
-		var fillCellHeight = 1 / fillCellCount * (availableHeight - (cells.length - 1) * spacing - cellsHeight);
+		var fillCellWidth = 1 / fillCellCount * (availableWidth - (cells.length - 1) * spacing - cellsWidth);
 
-		var _y = y + top.padding;
+		var _x = x + left.padding;
 		for (c in cells) {
 			final e = c.element;
 
-			var _x = x + left.padding;
+			var _y = y + top.padding;
 			var _w, _h;
 
 			// x offset
 			var xo = e.layout.leftMargin;
 			// y offset
 			var yo = e.layout.topMargin;
-			// cell width
-			if (!e.layout.fillWidth) {
-				_w = clamp(e.width, 0.0, availableWidth);
-				if (e.layout.alignment & Alignment.HCenter != 0)
-					xo += (availableWidth - _w) / 2;
-				else if (e.layout.alignment & Alignment.Right != 0)
-					xo += availableWidth - _w;
-			} else
-				_w = availableWidth - e.layout.leftMargin - e.layout.rightMargin;
 			// cell height
-			if (e.layout.fillHeight)
-				_h = fillCellHeight;
+			if (!e.layout.fillHeight) {
+				_h = clamp(e.height, 0.0, availableHeight);
+				if (e.layout.alignment & Alignment.VCenter != 0)
+					yo += (availableHeight - _h) / 2;
+				else if (e.layout.alignment & Alignment.Bottom != 0)
+					yo += availableHeight - _h;
+			} else
+				_h = availableHeight - e.layout.topMargin - e.layout.bottomMargin;
+			// cell width
+			if (e.layout.fillWidth)
+				_w = fillCellWidth;
 			else
-				_h = c.height;
+				_w = c.width;
 
 			e.setPosition(_x + xo, _y + yo);
 			e.setSize(_w, _h);
 			e.render(target);
 
-			_y += _h + spacing;
+			_x += _w + spacing;
 		}
 	}
 }

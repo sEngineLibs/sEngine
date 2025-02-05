@@ -6,7 +6,6 @@ import s2d.core.S2DObject;
 import s2d.Color;
 import s2d.math.Vec2;
 import s2d.math.VectorMath;
-import s2d.geometry.Rect;
 import s2d.ui.positioning.Anchors;
 
 @:allow(s2d.ui.UIScene)
@@ -44,12 +43,12 @@ class UIElement extends S2DObject<UIElement> {
 	public var y(get, set):Float;
 	public var width(get, set):Float;
 	public var height(get, set):Float;
+	public var availableWidth(get, never):Float;
+	public var availableHeight(get, never):Float;
 	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
 	@:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
 	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
 	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
-
-	public var rect(get, set):Rect;
 
 	public function new(?scene:UIScene) {
 		super();
@@ -81,14 +80,6 @@ class UIElement extends S2DObject<UIElement> {
 
 	overload extern public inline function setSize(value:Vec2) {
 		setSize(value.x, value.y);
-	}
-
-	overload extern public inline function setRect(value:Rect) {
-		rect = value;
-	}
-
-	overload extern public inline function setRect(x:Float, y:Float, width:Float, height:Float) {
-		rect = new Rect(x, y, width, height);
 	}
 
 	public function mapFromGlobal(x:Float, y:Float):Vec2 {
@@ -136,6 +127,7 @@ class UIElement extends S2DObject<UIElement> {
 		g2.color = White;
 		g2.opacity = 0.75;
 		g2.drawRect(x, y, width, height, 2.0);
+		g2.opacity = finalOpacity;
 		#end
 		for (child in children)
 			if (child.visible)
@@ -164,18 +156,6 @@ class UIElement extends S2DObject<UIElement> {
 	}
 
 	function onTransformationChanged() {}
-
-	function get_rect():Rect {
-		return new Rect(x, y, width, height);
-	}
-
-	function set_rect(value:Rect):Rect {
-		x = value.x;
-		y = value.y;
-		width = value.width;
-		height = value.height;
-		return value;
-	}
 
 	function get_finalOpacity():Float {
 		return parent == null ? opacity : parent.finalOpacity * opacity;
@@ -217,6 +197,14 @@ class UIElement extends S2DObject<UIElement> {
 	function set_height(value:Float):Float {
 		bottom.position = y + clamp(value, minHeight, maxHeight);
 		return value;
+	}
+
+	function get_availableWidth():Float {
+		return width - left.padding - right.padding;
+	}
+
+	function get_availableHeight():Float {
+		return height - top.padding - bottom.padding;
 	}
 
 	function set_minWidth(value:Float):Float {
