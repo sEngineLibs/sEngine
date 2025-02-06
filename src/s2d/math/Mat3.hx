@@ -396,6 +396,11 @@ abstract Mat3(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 	}
 
 	@:op(a * b)
+	static inline function postMulVec2(m:Mat3, v:Vec2):Vec2 {
+		return (m : FastMatrix3).multvec(v);
+	}
+
+	@:op(a * b)
 	static inline function postMulVec3(m:Mat3, v:Vec3):Vec3 {
 		var m:FastMatrix3 = m;
 		return new Vec3(m._00 * v.x

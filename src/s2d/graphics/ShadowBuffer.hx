@@ -4,6 +4,8 @@ package s2d.graphics;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 // s2d
+import s2d.math.Vec2;
+import s2d.math.VectorMath;
 import s2d.objects.Sprite;
 import s2d.graphics.lighting.ShadowPass;
 
@@ -37,17 +39,17 @@ class ShadowBuffer {
 		var offset = 0;
 		for (sprite in sprites) {
 			for (v in sprite.mesh) {
-				v = sprite.finalModel.multvec(v);
+				var p:Vec2 = (sprite.finalModel * vec3(v, 1.0)).xy;
 				// start
-				vert[offset + 0] = v.x;
-				vert[offset + 1] = v.y;
+				vert[offset + 0] = p.x;
+				vert[offset + 1] = p.y;
 				vert[offset + 2] = sprite.finalZ;
 				vert[offset + 3] = 0.0;
 				vert[offset + 4] = sprite.shadowOpacity;
 				offset += structSize;
 				// end
-				vert[offset + 0] = v.x;
-				vert[offset + 1] = v.y;
+				vert[offset + 0] = p.x;
+				vert[offset + 1] = p.y;
 				vert[offset + 2] = sprite.finalZ;
 				vert[offset + 3] = 1.0;
 				vert[offset + 4] = sprite.shadowOpacity;

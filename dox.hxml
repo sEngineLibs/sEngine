@@ -1,0 +1,5 @@
+-cp src
+-D doc-gen
+--macro include('s2d')
+--no-output
+-xml docs/docs.xml

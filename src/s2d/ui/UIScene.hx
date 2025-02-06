@@ -67,10 +67,10 @@ class UIScene {
 		g2.font = Assets.fonts.Roboto_Regular;
 		g2.fontSize = 16;
 
-		final lm = e.anchors.left == null ? 0.0 : e.anchors.left.margin;
-		final tm = e.anchors.top == null ? 0.0 : e.anchors.top.margin;
-		final rm = e.anchors.right == null ? 0.0 : e.anchors.right.margin;
-		final bm = e.anchors.bottom == null ? 0.0 : e.anchors.bottom.margin;
+		final lm = e.anchors.left == null ? 0.0 : e.anchors.leftMargin;
+		final tm = e.anchors.top == null ? 0.0 : e.anchors.topMargin;
+		final rm = e.anchors.right == null ? 0.0 : e.anchors.rightMargin;
+		final bm = e.anchors.bottom == null ? 0.0 : e.anchors.bottomMargin;
 		final lp = e.left.padding;
 		final tp = e.top.padding;
 		final rp = e.right.padding;

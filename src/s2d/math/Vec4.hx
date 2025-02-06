@@ -8,7 +8,7 @@ import haxe.macro.Expr.ExprOf;
 
 @:nullSafety
 #if !macro @:build(s2d.math.VectorMath.Swizzle.generateFields(4)) #end
-abstract Vec4(FastVector4) to FastVector4 from FastVector4 {
+abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	#if !macro
 	public var x(get, set):FastFloat;
 
@@ -44,6 +44,11 @@ abstract Vec4(FastVector4) to FastVector4 from FastVector4 {
 
 	public inline function new(x:FastFloat, y:FastFloat, z:FastFloat, w:FastFloat) {
 		this = new FastVector4(x, y, z, w);
+	}
+
+	@:to
+	public inline function toVec4I():Vec4I {
+		return Vec4I.fromVec4(this);
 	}
 
 	public inline function set(x:FastFloat, y:FastFloat, z:FastFloat, w:FastFloat) {

@@ -2,22 +2,18 @@ package s2d.ui.elements;
 
 import kha.Canvas;
 // s2d
-import s2d.core.S2DObject;
 import s2d.Color;
 import s2d.math.Vec2;
+import s2d.math.Vec4;
 import s2d.math.VectorMath;
+import s2d.geometry.Rect;
+import s2d.geometry.Bounds;
+import s2d.geometry.Position;
+import s2d.core.S2DObject;
 import s2d.ui.positioning.Anchors;
 
 @:allow(s2d.ui.UIScene)
 class UIElement extends S2DObject<UIElement> {
-	overload extern public static inline function mapToElement(element:UIElement, x:Float, y:Float):Vec2 {
-		return element.mapFromGlobal(x, y);
-	}
-
-	overload extern public static inline function mapFromElement(element:UIElement, x:Float, y:Float):Vec2 {
-		return element.mapToGlobal(x, y);
-	}
-
 	var scene:UIScene;
 	var finalOpacity(get, never):Float;
 
@@ -27,18 +23,23 @@ class UIElement extends S2DObject<UIElement> {
 	public var opacity:Float = 1.0;
 	public var enabled:Bool = true;
 	public var clip:Bool = false;
-
 	public var layout:Layout = {};
+	public var childrenRect(get, never):Rect;
+	public var childrenBounds(get, never):Bounds;
+	public var layer:UILayer = new UILayer();
 
 	// anchors
-	public var anchors:Anchors;
-	public var left:AnchorLine = {dir: 1.0};
-	public var top:AnchorLine = {dir: 1.0};
-	public var right:AnchorLine = {dir: -1.0};
-	public var bottom:AnchorLine = {dir: -1.0};
+	public var anchors:Anchors = new Anchors();
+	public var left:AnchorLine = {};
+	public var top:AnchorLine = {};
+	public var right:AnchorLine = {};
+	public var bottom:AnchorLine = {};
 	@:isVar public var padding(default, set):Float = 0.0;
 
 	// positioning
+	var _x:Float = 0.0;
+	var _y:Float = 0.0;
+
 	public var x(get, set):Float;
 	public var y(get, set):Float;
 	public var width(get, set):Float;
@@ -50,6 +51,9 @@ class UIElement extends S2DObject<UIElement> {
 	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
 	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
 
+	public var rect(get, set):Rect;
+	public var bounds(get, set):Bounds;
+
 	public function new(?scene:UIScene) {
 		super();
 		if (scene != null)
@@ -57,7 +61,22 @@ class UIElement extends S2DObject<UIElement> {
 		else
 			this.scene = UIScene.current;
 		this.scene.addBaseElement(this);
-		anchors = new Anchors(this);
+	}
+
+	overload extern public static inline function mapToElement(element:UIElement, x:Float, y:Float):Position {
+		return element.mapFromGlobal(x, y);
+	}
+
+	overload extern public static inline function mapToElement(element:UIElement, p:Position):Position {
+		return element.mapFromGlobal(p);
+	}
+
+	overload extern public static inline function mapFromElement(element:UIElement, x:Float, y:Float):Position {
+		return element.mapToGlobal(x, y);
+	}
+
+	overload extern public static inline function mapFromElement(element:UIElement, p:Position):Position {
+		return element.mapToGlobal(p);
 	}
 
 	public function setPadding(value:Float):Void {
@@ -82,14 +101,29 @@ class UIElement extends S2DObject<UIElement> {
 		setSize(value.x, value.y);
 	}
 
-	public function mapFromGlobal(x:Float, y:Float):Vec2 {
-		var p:Vec2 = (finalModel * vec3(x, y, 1.0)).xy;
-		return p;
+	public function setRect(value:Rect):Void {
+		setPosition(rect.position);
+		setSize(rect.size);
 	}
 
-	public function mapToGlobal(x:Float, y:Float):Vec2 {
-		var p:Vec2 = (inverse(finalModel) * vec3(x, y, 1.0)).xy;
-		return p;
+	public function setBounds(value:Bounds):Void {
+		setRect(value.toRect());
+	}
+
+	overload extern public inline function mapFromGlobal(p:Position):Position {
+		return finalModel * p;
+	}
+
+	overload extern public inline function mapFromGlobal(x:Float, y:Float):Position {
+		return mapFromGlobal(vec2(x, y));
+	}
+
+	overload extern public inline function mapToGlobal(p:Position):Position {
+		return inverse(finalModel) * p;
+	}
+
+	overload extern public inline function mapToGlobal(x:Float, y:Float):Position {
+		return mapToGlobal(vec2(x, y));
 	}
 
 	public function childAt(x:Float, y:Float):UIElement {
@@ -119,22 +153,72 @@ class UIElement extends S2DObject<UIElement> {
 	function render(target:Canvas) {
 		final g2 = target.g2;
 
-		g2.color = color;
-		g2.opacity = finalOpacity;
-		g2.transformation = finalModel;
-		draw(target);
+		if (!layer.enabled) {
+			g2.color = color;
+			g2.opacity = finalOpacity;
+			g2.transformation = finalModel;
+			renderTree(target);
+		} else {
+			g2.end();
+			final _g2 = layer.texture.g2;
+			final sr = layer.sourceRect;
+			// to layer texture
+			_g2.begin();
+			_g2.color = color;
+			_g2.opacity = finalOpacity;
+			_g2.transformation = finalModel;
+			if (sr != null)
+				_g2.scissor(sr.x, sr.y, sr.width, sr.height);
+			renderTree(layer.texture);
+			_g2.disableScissor();
+			_g2.end();
+			// to target
+			g2.begin(false);
+			if (layer.effect != null)
+				@:privateAccess layer.effect.apply(layer.texture, target);
+			else
+				g2.drawScaledImage(layer.texture, 0, 0, target.width, target.height);
+			g2.end();
+		}
+
 		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 		g2.color = White;
 		g2.opacity = 0.75;
+		g2.transformation = finalModel;
 		g2.drawRect(x, y, width, height, 2.0);
-		g2.opacity = finalOpacity;
 		#end
-		for (child in children)
+	}
+
+	function renderTree(target:Canvas) {
+		draw(target);
+		for (child in children) {
+			child.updateBounds();
 			if (child.visible)
 				child.render(target);
+		}
 	}
 
 	function draw(target:Canvas) {}
+
+	function updateBounds() {
+		// position
+		if (anchors.left != null)
+			left.position = anchors.left.position + anchors.left.padding + anchors.leftMargin;
+		else if (parent != null)
+			left.position = _x + parent.left.position + parent.left.padding;
+
+		if (anchors.top != null)
+			top.position = anchors.top.position + anchors.top.padding + anchors.topMargin;
+		else if (parent != null)
+			top.position = _y + parent.top.position + parent.top.padding;
+
+		// size
+		if (anchors.right != null)
+			right.position = anchors.right.position - anchors.right.padding - anchors.rightMargin;
+
+		if (anchors.bottom != null)
+			bottom.position = anchors.bottom.position - anchors.bottom.padding - anchors.bottomMargin;
+	}
 
 	function onParentChanged() {
 		if (parent == null)
@@ -157,6 +241,39 @@ class UIElement extends S2DObject<UIElement> {
 
 	function onTransformationChanged() {}
 
+	function get_rect():Rect {
+		return new Rect(x, y, width, height);
+	}
+
+	function set_rect(value:Rect):Rect {
+		setRect(value);
+		return value;
+	}
+
+	function get_bounds():Bounds {
+		return rect.toBounds();
+	}
+
+	function set_bounds(value:Bounds):Bounds {
+		setBounds(value);
+		return value;
+	}
+
+	function get_childrenBounds():Vec4 {
+		var b = bounds;
+		for (child in children) {
+			b.left = Math.min(b.left, child.left.position);
+			b.top = Math.min(b.top, child.top.position);
+			b.right = Math.max(b.right, child.right.position);
+			b.bottom = Math.max(b.bottom, child.bottom.position);
+		}
+		return b;
+	}
+
+	function get_childrenRect():Vec4 {
+		return childrenBounds.toRect();
+	}
+
 	function get_finalOpacity():Float {
 		return parent == null ? opacity : parent.finalOpacity * opacity;
 	}
@@ -166,6 +283,7 @@ class UIElement extends S2DObject<UIElement> {
 	}
 
 	function set_x(value:Float):Float {
+		_x = value;
 		right.position += value - x;
 		left.position = value;
 		return value;
@@ -176,6 +294,7 @@ class UIElement extends S2DObject<UIElement> {
 	}
 
 	function set_y(value:Float):Float {
+		_y = value;
 		bottom.position += value - y;
 		top.position = value;
 		return value;

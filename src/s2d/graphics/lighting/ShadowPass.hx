@@ -8,8 +8,6 @@ import kha.graphics4.ConstantLocation;
 // s2d
 import s2d.objects.Light;
 
-using s2d.core.extensions.Mat3;
-
 class ShadowPass {
 	public static var structure:VertexStructure;
 	static var pipeline:PipelineState;
@@ -49,7 +47,7 @@ class ShadowPass {
 			g4.setIndexBuffer(light.layer.shadowBuffer.indices);
 			g4.setVertexBuffer(light.layer.shadowBuffer.vertices);
 			g4.setMatrix3(vpCL, Stage.current.viewProjection);
-			g4.setVector2(lightPosCL, light.finalModel.getTranslation());
+			g4.setVector2(lightPosCL, light.finalModel.translation);
 			g4.drawIndexedVertices();
 		}
 		g4.end();

@@ -8,67 +8,57 @@ import s2d.ui.positioning.Alignment;
 class ColumnLayout extends UIElement {
 	public var spacing:Float = 0.0;
 
-	override function render(target:Canvas) {
-		final g2 = target.g2;
-
-		g2.transformation = finalModel;
-		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-		g2.color = White;
-		g2.opacity = 0.75;
-		g2.drawRect(x, y, width, height, 2.0);
-		#end
-		g2.opacity = finalOpacity;
-
-		var cells = [];
+	override function renderTree(target:Canvas) {
+		var elements = [];
+		var heights = [];
 		var cellsHeight = 0.0;
 		var fillCellCount = 0;
+
+		final avwidth = availableWidth;
+		final avheight = availableHeight;
+
 		for (child in children) {
 			if (child.visible) {
-				var cell = {
-					element: child,
-					height: null
-				}
-				if (child.layout.fillHeight)
+				if (child.layout.fillHeight) {
 					++fillCellCount;
-				else {
+				} else {
 					var h = child.height - child.layout.topMargin - child.layout.bottomMargin;
-					cell.height = h;
+					heights.push(h);
 					cellsHeight += h;
 				}
-				cells.push(cell);
+				elements.push(child);
 			}
 		}
 
-		var fillCellHeight = 1 / fillCellCount * (availableHeight - (cells.length - 1) * spacing - cellsHeight);
+		final fillCellHeight = fillCellCount > 0 ? (avheight - (elements.length - 1) * spacing - cellsHeight) / fillCellCount : 0;
 
 		var _y = y + top.padding;
-		for (c in cells) {
-			final e = c.element;
+		for (i in 0...elements.length) {
+			final e = elements[i];
+			final _h = e.layout.fillHeight ? fillCellHeight : heights[i];
 
 			var _x = x + left.padding;
-			var _w, _h;
+			var _w;
 
 			// x offset
 			var xo = e.layout.leftMargin;
 			// y offset
-			var yo = e.layout.topMargin;
+			final yo = e.layout.topMargin;
 			// cell width
 			if (!e.layout.fillWidth) {
-				_w = clamp(e.width, 0.0, availableWidth);
+				_w = clamp(e.width, 0.0, avwidth);
 				if (e.layout.alignment & Alignment.HCenter != 0)
-					xo += (availableWidth - _w) / 2;
+					xo += (avwidth - _w) / 2;
 				else if (e.layout.alignment & Alignment.Right != 0)
-					xo += availableWidth - _w;
-			} else
-				_w = availableWidth - e.layout.leftMargin - e.layout.rightMargin;
-			// cell height
-			if (e.layout.fillHeight)
-				_h = fillCellHeight;
-			else
-				_h = c.height;
+					xo += avwidth - _w;
+			} else {
+				_w = avwidth - e.layout.leftMargin - e.layout.rightMargin;
+			}
 
-			e.setPosition(_x + xo, _y + yo);
-			e.setSize(_w, _h);
+			e.x = _x + xo;
+			e.y = _y + yo;
+			e.width = _w;
+			e.height = _h;
 			e.render(target);
 
 			_y += _h + spacing;
