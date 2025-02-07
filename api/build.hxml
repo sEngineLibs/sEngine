@@ -1,9 +1,9 @@
 # xml generation
 -cp ../Kha/Sources
 -cp ../Kha/Backends/HTML5
--cp ../src
---macro include('s2d')
-# s2d flags
+-cp ../Sources
+--macro include('se')
+# sengine flags
 -D S2D_DEBUG_FPS -> enables FPS debugging
 -D S2D_SPRITE_INSTANCING
 -D S2D_LIGHTING
@@ -44,4 +44,4 @@
 
 # html generation
 --next
---cmd haxelib run dox -i build -o build/pages
+--cmd haxelib run dox -i build -o build/pages --title "sEngine API"

@@ -109,14 +109,14 @@ function assembleShaders(shaderDir, outputDir) {
     });
 }
 
-const shaderInputDir = path.join(__dirname, "shaders");
+const shaderInputDir = path.join(__dirname, "Shaders");
 const shaderOutputDir = path.join(cwd, "build", "shaders_assembled");
 assembleShaders(shaderInputDir, shaderOutputDir);
 
 let project = new Project("s2D");
 
-project.addSources("src");
-project.addAssets("assets/**", {
+project.addSources("Sources");
+project.addAssets("Assets/**", {
     nameBaseDir: "assets",
     destination: "assets/{dir}/{name}",
     name: "{name}",
