@@ -3,4 +3,4 @@
 	url = https://github.com/sEngineLibs/Kha
 [submodule "pages"]
 	path = api/build/pages
-	url = https://github.com/sEngineLibs/s2D-API
+	url = https://github.com/sEngineLibs/api
