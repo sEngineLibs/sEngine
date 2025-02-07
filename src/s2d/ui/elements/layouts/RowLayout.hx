@@ -14,8 +14,7 @@ class RowLayout extends UIElement {
 		var cellsWidth = 0.0;
 		var fillCellCount = 0;
 
-		final avwidth = availableWidth;
-		final avheight = availableHeight;
+		final crect = contentRect;
 
 		for (child in children) {
 			if (child.visible) {
@@ -30,7 +29,11 @@ class RowLayout extends UIElement {
 			}
 		}
 
-		final fillCellWidth = fillCellCount > 0 ? (avwidth - (elements.length - 1) * spacing - cellsWidth) / fillCellCount : 0;
+		final fillCellWidth = fillCellCount > 0 ? (crect.width - (elements.length - 1) * spacing - cellsWidth) / fillCellCount : 0;
+
+		target.g2.color = color;
+		target.g2.opacity = finalOpacity;
+		target.g2.transformation = finalModel;
 
 		var _x = x + left.padding;
 		for (i in 0...elements.length) {
@@ -46,13 +49,13 @@ class RowLayout extends UIElement {
 			var yo = e.layout.topMargin;
 			// cell height
 			if (!e.layout.fillHeight) {
-				_h = clamp(e.height, 0.0, avheight);
+				_h = clamp(e.height, 0.0, crect.height);
 				if (e.layout.alignment & Alignment.VCenter != 0)
-					yo += (avheight - _h) / 2;
+					yo += (crect.height - _h) / 2;
 				else if (e.layout.alignment & Alignment.Bottom != 0)
-					yo += avheight - _h;
+					yo += crect.height - _h;
 			} else {
-				_h = avheight - e.layout.topMargin - e.layout.bottomMargin;
+				_h = crect.height - e.layout.topMargin - e.layout.bottomMargin;
 			}
 
 			e.x = _x + xo;

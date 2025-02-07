@@ -10,7 +10,7 @@ class Rectangle extends UIElement {
 	public var radius:Float;
 	@:isVar public var softness(default, set):Float;
 
-	public function new(?radius:Float = 0.0, ?softness:Float = 1.0, ?scene:UIScene) {
+	public function new(?radius:Float = 0.0, ?softness:Float = 0.2, ?scene:UIScene) {
 		super(scene);
 		this.radius = radius;
 		this.softness = softness;

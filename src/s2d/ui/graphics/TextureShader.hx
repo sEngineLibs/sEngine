@@ -1,17 +1,14 @@
 package s2d.ui.graphics;
 
 import kha.Shaders;
-import kha.graphics4.CullMode;
 import kha.graphics4.PipelineState;
-import kha.graphics4.BlendingFactor;
+import kha.graphics4.BlendingOperation;
 import kha.graphics4.VertexStructure;
 
 class TextureShader {
 	var pipeline:PipelineState;
 
-	public var blending:BlendingFactor = BlendOne;
-	public var cullMode:CullMode = None;
-
+	public var blending:BlendingOperation = Add;
 	public var vertexShader:String;
 	public var fragmentShader:String;
 
@@ -30,6 +27,11 @@ class TextureShader {
 		pipeline.inputLayout = [structure];
 		pipeline.vertexShader = Reflect.field(Shaders, vertexShader);
 		pipeline.fragmentShader = Reflect.field(Shaders, fragmentShader);
+		pipeline.alphaBlendSource = SourceAlpha;
+		pipeline.alphaBlendDestination = InverseSourceAlpha;
+		pipeline.blendSource = SourceAlpha;
+		pipeline.blendDestination = InverseSourceAlpha;
+		pipeline.blendOperation = blending;
 		pipeline.compile();
 	}
 }

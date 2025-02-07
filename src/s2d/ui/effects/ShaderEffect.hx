@@ -11,7 +11,7 @@ abstract class ShaderEffect {
 
 	abstract function draw(source:Image, target:Canvas):Void;
 
-	function apply(source:Image, target:Canvas) {
+	public function apply(source:Image, target:Canvas) {
 		final g2 = target.g2;
 
 		g2.pipeline = @:privateAccess shader.pipeline;

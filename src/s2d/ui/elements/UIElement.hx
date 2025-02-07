@@ -24,8 +24,6 @@ class UIElement extends S2DObject<UIElement> {
 	public var enabled:Bool = true;
 	public var clip:Bool = false;
 	public var layout:Layout = {};
-	public var childrenRect(get, never):Rect;
-	public var childrenBounds(get, never):Bounds;
 	public var layer:UILayer = new UILayer();
 
 	// anchors
@@ -44,8 +42,6 @@ class UIElement extends S2DObject<UIElement> {
 	public var y(get, set):Float;
 	public var width(get, set):Float;
 	public var height(get, set):Float;
-	public var availableWidth(get, never):Float;
-	public var availableHeight(get, never):Float;
 	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
 	@:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
 	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
@@ -53,6 +49,10 @@ class UIElement extends S2DObject<UIElement> {
 
 	public var rect(get, set):Rect;
 	public var bounds(get, set):Bounds;
+	public var contentRect(get, set):Rect;
+	public var contentBounds(get, set):Bounds;
+	public var childrenRect(get, never):Rect;
+	public var childrenBounds(get, never):Bounds;
 
 	public function new(?scene:UIScene) {
 		super();
@@ -106,8 +106,19 @@ class UIElement extends S2DObject<UIElement> {
 		setSize(rect.size);
 	}
 
+	public function setContentRect(value:Rect):Void {
+		left.padding = value.x - x;
+		top.padding = value.y - y;
+		right.padding = width - left.padding - value.width;
+		bottom.padding = height - top.padding - value.height;
+	}
+
 	public function setBounds(value:Bounds):Void {
 		setRect(value.toRect());
+	}
+
+	public function setContentBounds(value:Bounds):Void {
+		setContentRect(value.toRect());
 	}
 
 	overload extern public inline function mapFromGlobal(p:Position):Position {
@@ -154,19 +165,14 @@ class UIElement extends S2DObject<UIElement> {
 		final g2 = target.g2;
 
 		if (!layer.enabled) {
-			g2.color = color;
-			g2.opacity = finalOpacity;
-			g2.transformation = finalModel;
 			renderTree(target);
 		} else {
-			g2.end();
 			final _g2 = layer.texture.g2;
 			final sr = layer.sourceRect;
+
+			g2.end();
 			// to layer texture
-			_g2.begin();
-			_g2.color = color;
-			_g2.opacity = finalOpacity;
-			_g2.transformation = finalModel;
+			_g2.begin(true, Transparent);
 			if (sr != null)
 				_g2.scissor(sr.x, sr.y, sr.width, sr.height);
 			renderTree(layer.texture);
@@ -175,21 +181,16 @@ class UIElement extends S2DObject<UIElement> {
 			// to target
 			g2.begin(false);
 			if (layer.effect != null)
-				@:privateAccess layer.effect.apply(layer.texture, target);
+				layer.effect.apply(layer.texture, target);
 			else
 				g2.drawScaledImage(layer.texture, 0, 0, target.width, target.height);
-			g2.end();
 		}
-
-		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-		g2.color = White;
-		g2.opacity = 0.75;
-		g2.transformation = finalModel;
-		g2.drawRect(x, y, width, height, 2.0);
-		#end
 	}
 
 	function renderTree(target:Canvas) {
+		target.g2.color = color;
+		target.g2.opacity = finalOpacity;
+		target.g2.transformation = finalModel;
 		draw(target);
 		for (child in children) {
 			child.updateBounds();
@@ -259,6 +260,24 @@ class UIElement extends S2DObject<UIElement> {
 		return value;
 	}
 
+	function get_contentRect():Rect {
+		return new Rect(x + left.padding, y + top.padding, width - left.padding - right.padding, height - top.padding - bottom.padding);
+	}
+
+	function set_contentRect(value:Rect):Rect {
+		setContentRect(value);
+		return value;
+	}
+
+	function get_contentBounds():Bounds {
+		return contentRect.toBounds();
+	}
+
+	function set_contentBounds(value:Bounds):Bounds {
+		setContentBounds(value);
+		return value;
+	}
+
 	function get_childrenBounds():Vec4 {
 		var b = bounds;
 		for (child in children) {
@@ -316,14 +335,6 @@ class UIElement extends S2DObject<UIElement> {
 	function set_height(value:Float):Float {
 		bottom.position = y + clamp(value, minHeight, maxHeight);
 		return value;
-	}
-
-	function get_availableWidth():Float {
-		return width - left.padding - right.padding;
-	}
-
-	function get_availableHeight():Float {
-		return height - top.padding - bottom.padding;
 	}
 
 	function set_minWidth(value:Float):Float {
