@@ -1,6 +1,5 @@
 package s2d.graphics.lighting;
 
-import kha.Assets;
 #if (S2D_LIGHTING && S2D_LIGHTING_DEFERRED == 1)
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
@@ -115,7 +114,7 @@ class LightingDeferred {
 				g4.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
 				#end
 				g4.setFloat3(lightPositionCL, light.finalModel._20, light.finalModel._21, light.z);
-				g4.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);
+				g4.setVector3(lightColorCL, light.color.RGB);
 				g4.setFloat2(lightAttribCL, light.power, light.radius);
 				g4.drawIndexedVertices();
 			}

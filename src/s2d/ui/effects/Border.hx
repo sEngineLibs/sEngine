@@ -1,10 +1,10 @@
 package s2d.ui.effects;
 
-import kha.Color;
+import s2d.Color;
 
 @:structInit
 class Border {
-	public var color:Color = Black;
+	public var color:Color = "black";
 	@:isVar public var width(default, set):Float = -1.0;
 	@:isVar public var softness(default, set):Float = 1.0;
 

@@ -8,18 +8,18 @@ import s2d.math.VectorMath;
 
 @:forward.new
 enum abstract Color(kha.Color) from kha.Color to kha.Color {
-	var black = 0xff000000;
-	var white = 0xffffffff;
-	var red = 0xffff0000;
-	var blue = 0xff0000ff;
-	var green = 0xff00ff00;
-	var magenta = 0xffff00ff;
-	var yellow = 0xffffff00;
-	var cyan = 0xff00ffff;
-	var purple = 0xff800080;
-	var pink = 0xffffc0cb;
-	var orange = 0xffffa500;
-	var transparent = 0x00000000;
+	var black = kha.Color.Black;
+	var white = kha.Color.White;
+	var red = kha.Color.Red;
+	var blue = kha.Color.Blue;
+	var green = kha.Color.Green;
+	var magenta = kha.Color.Magenta;
+	var yellow = kha.Color.Yellow;
+	var cyan = kha.Color.Cyan;
+	var purple = kha.Color.Purple;
+	var pink = kha.Color.Pink;
+	var orange = kha.Color.Orange;
+	var transparent = kha.Color.Transparent;
 
 	public var r(get, set):FastFloat;
 	public var g(get, set):FastFloat;
@@ -28,6 +28,36 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 	public var h(get, set):FastFloat;
 	public var s(get, set):FastFloat;
 	public var v(get, set):FastFloat;
+	public var RGB(get, set):Vec3;
+	public var RGBA(get, set):Vec4;
+	public var HSV(get, set):Vec3;
+	public var HSVA(get, set):Vec4;
+	public var HSL(get, set):Vec3;
+	public var HSLA(get, set):Vec4;
+
+	public static inline function rgb(r:FastFloat, g:FastFloat, b:FastFloat):Color {
+		return kha.Color.fromFloats(r, g, b);
+	}
+
+	public static inline function rgba(r:FastFloat, g:FastFloat, b:FastFloat, a:FastFloat = 1.0):Color {
+		return kha.Color.fromFloats(r, g, b, a);
+	}
+
+	public static inline function hsv(h:FastFloat, s:FastFloat, v:FastFloat):Color {
+		return rgb2hsv(rgb(h, s, v));
+	}
+
+	public static inline function hsva(h:FastFloat, s:FastFloat, v:FastFloat, a:FastFloat = 1.0):Color {
+		return rgb2hsv(rgba(h, s, v, a));
+	}
+
+	public static inline function hsl(h:FastFloat, s:FastFloat, l:FastFloat):Color {
+		return rgb2hsl(rgb(h, s, l));
+	}
+
+	public static inline function hsla(h:FastFloat, s:FastFloat, l:FastFloat, a:FastFloat = 1.0):Color {
+		return rgb2hsl(rgba(h, s, l, a));
+	}
 
 	public static inline function hue2rgb(hue:FastFloat):Color {
 		var rgb = abs(hue * 6.0 - vec3(3, 2, 4)) * vec3(1, -1, -1) + vec3(-1, 2, 2);
@@ -78,32 +108,59 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 	}
 
 	@:from
-	static inline function fromString(value:String):Color {
-		return kha.Color.fromString(value);
+	public static inline function fromString(value:String):Color {
+		switch (value.toLowerCase()) {
+			case "black":
+				return black;
+			case "white":
+				return white;
+			case "red":
+				return red;
+			case "blue":
+				return blue;
+			case "green":
+				return green;
+			case "magenta":
+				return magenta;
+			case "yellow":
+				return yellow;
+			case "cyan":
+				return cyan;
+			case "purple":
+				return purple;
+			case "pink":
+				return pink;
+			case "orange":
+				return orange;
+			case "transparent":
+				return transparent;
+			default:
+				return kha.Color.fromString(value);
+		}
 	}
 
 	@:to
-	inline function toString():String {
+	public inline function toString():String {
 		return '#${StringTools.hex(this, 8)}';
 	}
 
 	@:from
-	static inline function fromVec3(value:Vec3):Color {
-		return kha.Color.fromFloats(value.r, value.g, value.b);
+	public static inline function fromVec3(value:Vec3):Color {
+		return rgb(value.r, value.g, value.b);
 	}
 
 	@:from
-	static inline function fromVec4(value:Vec4):Color {
-		return kha.Color.fromFloats(value.r, value.g, value.b, value.a);
+	public static inline function fromVec4(value:Vec4):Color {
+		return rgba(value.r, value.g, value.b, value.a);
 	}
 
 	@:to
-	inline function toVec3():Vec3 {
+	public inline function toVec3():Vec3 {
 		return vec3(r, g, b);
 	}
 
 	@:to
-	inline function toVec4():Vec4 {
+	public inline function toVec4():Vec4 {
 		return vec4(r, g, b, a);
 	}
 
@@ -176,6 +233,60 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 		r = c.r;
 		g = c.g;
 		b = c.b;
+		return value;
+	}
+
+	inline function get_RGB():Vec3 {
+		return toVec3();
+	}
+
+	inline function set_RGB(value:Vec3):Vec3 {
+		fromVec3(value);
+		return value;
+	}
+
+	inline function get_RGBA():Vec4 {
+		return toVec4();
+	}
+
+	inline function set_RGBA(value:Vec4):Vec4 {
+		fromVec4(value);
+		return value;
+	}
+
+	inline function get_HSV():Vec3 {
+		return rgb2hsv(toVec3());
+	}
+
+	inline function set_HSV(value:Vec3):Vec3 {
+		fromVec3(rgb2hsv(value));
+		return value;
+	}
+
+	inline function get_HSVA():Vec4 {
+		return rgb2hsv(toVec3());
+	}
+
+	inline function set_HSVA(value:Vec4):Vec4 {
+		fromVec4(rgb2hsv(value));
+		return value;
+	}
+
+	inline function get_HSL():Vec3 {
+		return rgb2hsv(toVec3());
+	}
+
+	inline function set_HSL(value:Vec3):Vec3 {
+		fromVec3(rgb2hsl(value));
+		return value;
+	}
+
+	inline function get_HSLA():Vec4 {
+		return rgb2hsl(toVec3());
+	}
+
+	inline function set_HSLA(value:Vec4):Vec4 {
+		fromVec4(rgb2hsl(value));
 		return value;
 	}
 }

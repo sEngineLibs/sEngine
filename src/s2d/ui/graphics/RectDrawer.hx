@@ -39,7 +39,7 @@ class RectDrawer extends ElementDrawer<Rectangle> {
 
 		g4.setFloat4(rectCL, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 		g4.setFloat4(rectDataCL, radius, rectangle.softness, border.width, border.softness);
-		g4.setFloat4(bordColorCL, border.color.R, border.color.G, border.color.B, border.color.A);
+		g4.setVector4(bordColorCL, border.color.RGBA);
 
 		final offset = Math.max(rectangle.softness, border.width + border.softness);
 

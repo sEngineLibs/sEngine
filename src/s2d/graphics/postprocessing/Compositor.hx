@@ -1,6 +1,6 @@
 package s2d.graphics.postprocessing;
 
-import kha.Color;
+import s2d.Color;
 import kha.Canvas;
 import kha.Shaders;
 import kha.arrays.Float32Array;
@@ -14,7 +14,7 @@ class Compositor extends PPEffect {
 	var params:Float32Array;
 
 	public var letterBoxHeight:Int = 0;
-	public var letterBoxColor:Color = Black;
+	public var letterBoxColor:Color = "black";
 	public var vignetteStrength(get, set):Float;
 	public var vignetteColor(get, set):Color;
 	public var posterizeGamma(get, set):Float;
@@ -27,7 +27,7 @@ class Compositor extends PPEffect {
 		posterizeGamma = 1.0;
 		posterizeSteps = 255.0;
 		vignetteStrength = 0.0;
-		vignetteColor = Black;
+		vignetteColor = "black";
 	}
 
 	function setPipeline() {
@@ -85,14 +85,14 @@ class Compositor extends PPEffect {
 	}
 
 	function get_vignetteColor():Color {
-		return Color.fromFloats(params[3], params[4], params[5], params[6]);
+		return Color.rgba(params[3], params[4], params[5], params[6]);
 	}
 
 	function set_vignetteColor(value:Color):Color {
-		params[3] = value.R;
-		params[4] = value.G;
-		params[5] = value.B;
-		params[6] = value.A;
+		params[3] = value.r;
+		params[4] = value.g;
+		params[5] = value.b;
+		params[6] = value.a;
 		return value;
 	}
 }

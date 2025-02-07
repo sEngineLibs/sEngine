@@ -1,10 +1,10 @@
 package s2d.objects;
 
 #if (S2D_LIGHTING == 1)
-import kha.Color;
+import s2d.Color;
 
 class Light extends StageObject {
-	public var color:Color = Color.White;
+	public var color:Color = "white";
 	public var power:Float = 15.0;
 	public var radius:Float = 1.0;
 	// #if (S2D_LIGHTING_VOLUMETRIC == 1)
