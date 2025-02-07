@@ -18,8 +18,8 @@ class Filter extends PPEffect {
 	}
 
 	function setPipeline() {
-		pipeline.vertexShader = Shaders.s2d_2d_vert;
-		pipeline.fragmentShader = Shaders.filter_frag;
+		pipeline.vertexShader = Reflect.field(Shaders, "s2d_2d_vert");
+		pipeline.fragmentShader = Reflect.field(Shaders, "filter_frag");
 	}
 
 	function getUniforms() {

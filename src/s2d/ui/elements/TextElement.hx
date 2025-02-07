@@ -19,7 +19,7 @@ class TextElement extends UIElement {
 
 	public function new(?text:String = "Text", ?scene:UIScene) {
 		super(scene);
-		this.font = Assets.fonts.Roboto_Regular;
+		this.font = Assets.fonts.get("Roboto_Regular");
 		this.text = text;
 	}
 

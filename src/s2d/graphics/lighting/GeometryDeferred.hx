@@ -43,8 +43,8 @@ class GeometryDeferred {
 
 		pipeline = new PipelineState();
 		pipeline.inputLayout = structures;
-		pipeline.vertexShader = Shaders.sprite_vert;
-		pipeline.fragmentShader = Shaders.geometry_frag;
+		pipeline.vertexShader = Reflect.field(Shaders, "sprite_vert");
+		pipeline.fragmentShader = Reflect.field(Shaders, "geometry_frag");
 		pipeline.depthWrite = true;
 		pipeline.depthMode = Less;
 		pipeline.depthStencilAttachment = DepthOnly;

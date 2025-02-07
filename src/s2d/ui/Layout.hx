@@ -2,7 +2,6 @@ package s2d.ui;
 
 import s2d.ui.positioning.Alignment;
 
-@:structInit
 class Layout {
 	public var alignment:Alignment = Center;
 	public var leftMargin:Float = 0.0;
@@ -16,6 +15,8 @@ class Layout {
 	public var columnSpan:Int = 1;
 	public var fillHeight:Bool = false;
 	public var fillWidth:Bool = false;
+
+	public function new() {}
 
 	public function setMargins(value:Float):Void {
 		leftMargin = value;

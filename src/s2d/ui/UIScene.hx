@@ -64,7 +64,7 @@ class UIScene {
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 	function drawBounds(e:UIElement, target:Canvas) {
 		final g2 = target.g2;
-		g2.font = Assets.fonts.Roboto_Regular;
+		g2.font = Assets.fonts.get("Roboto_Regular");
 		g2.fontSize = 16;
 
 		final lm = e.anchors.left == null ? 0.0 : e.anchors.leftMargin;

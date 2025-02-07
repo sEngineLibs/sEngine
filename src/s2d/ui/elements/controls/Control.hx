@@ -23,12 +23,12 @@ abstract class Control extends UIElement {
 	}
 
 	public function notifyOnHoveredChanged(f:Bool->Void):Void {
-		mouseArea.notifyOnEntered(() -> f(true));
-		mouseArea.notifyOnExited(() -> f(false));
+		// mouseArea.notifyOnEntered(() -> f(true));
+		// mouseArea.notifyOnExited(() -> f(false));
 	}
 
 	public function notifyOnClicked(f:Bool->Void):Void {
-		mouseArea.notifyOnClicked(() -> f(true));
+		// mouseArea.notifyOnClicked(() -> f(true));
 	}
 
 	function get_hovered():Bool {

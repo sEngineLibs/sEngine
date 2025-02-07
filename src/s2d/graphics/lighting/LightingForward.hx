@@ -51,8 +51,8 @@ class LightingForward {
 
 		pipeline = new PipelineState();
 		pipeline.inputLayout = structures;
-		pipeline.vertexShader = Shaders.sprite_vert;
-		pipeline.fragmentShader = Shaders.lighting_forward_frag;
+		pipeline.vertexShader = Reflect.field(Shaders, "sprite_vert");
+		pipeline.fragmentShader = Reflect.field(Shaders, "lighting_forward_frag");
 		pipeline.alphaBlendSource = SourceAlpha;
 		pipeline.blendSource = BlendOne;
 		pipeline.blendDestination = BlendOne;

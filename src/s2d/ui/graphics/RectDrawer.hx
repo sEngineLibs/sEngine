@@ -21,8 +21,8 @@ class RectDrawer extends ElementDrawer<Rectangle> {
 	}
 
 	function setShaders() {
-		pipeline.vertexShader = Shaders.drawer_colored_vert;
-		pipeline.fragmentShader = Shaders.rectangle_frag;
+		pipeline.vertexShader = Reflect.field(Shaders, "drawer_colored_vert");
+		pipeline.fragmentShader = Reflect.field(Shaders, "rectangle_frag");
 	}
 
 	function getUniforms() {

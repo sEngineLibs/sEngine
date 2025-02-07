@@ -16,8 +16,8 @@ class Fisheye extends PPEffect {
 	public var strength:Float = 0.0;
 
 	function setPipeline() {
-		pipeline.vertexShader = Shaders.s2d_2d_vert;
-		pipeline.fragmentShader = Shaders.fisheye_frag;
+		pipeline.vertexShader = Reflect.field(Shaders, "s2d_2d_vert");
+		pipeline.fragmentShader = Reflect.field(Shaders, "fisheye_frag");
 	}
 
 	function getUniforms() {

@@ -23,7 +23,7 @@ class UIElement extends S2DObject<UIElement> {
 	public var opacity:Float = 1.0;
 	public var enabled:Bool = true;
 	public var clip:Bool = false;
-	public var layout:Layout = {};
+	public var layout:Layout = new Layout();
 	public var layer:UILayer = new UILayer();
 
 	// anchors

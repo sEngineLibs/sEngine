@@ -21,8 +21,8 @@ class ShadowPass {
 
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];
-		pipeline.vertexShader = Shaders.shadow_vert;
-		pipeline.fragmentShader = Shaders.shadow_frag;
+		pipeline.vertexShader = Reflect.field(Shaders, "shadow_vert");
+		pipeline.fragmentShader = Reflect.field(Shaders, "shadow_frag");
 		pipeline.depthWrite = true;
 		pipeline.depthMode = Less;
 		pipeline.cullMode = CounterClockwise;

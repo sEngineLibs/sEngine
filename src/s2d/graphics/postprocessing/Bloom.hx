@@ -14,8 +14,8 @@ class Bloom extends PPEffect {
 	public var intensity:Float = 0.75;
 
 	function setPipeline() {
-		pipeline.vertexShader = Shaders.s2d_2d_vert;
-		pipeline.fragmentShader = Shaders.bloom_frag;
+		pipeline.vertexShader = Reflect.field(Shaders, "s2d_2d_vert");
+		pipeline.fragmentShader = Reflect.field(Shaders, "bloom_frag");
 	}
 
 	function getUniforms() {

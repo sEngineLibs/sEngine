@@ -38,8 +38,8 @@ class LightingDeferred {
 		// LIGHTING PASS
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];
-		pipeline.vertexShader = Shaders.s2d_2d_vert;
-		pipeline.fragmentShader = Shaders.lighting_deferred_frag;
+		pipeline.vertexShader = Reflect.field(Shaders, "s2d_2d_vert");
+		pipeline.fragmentShader = Reflect.field(Shaders, "lighting_deferred_frag");
 		pipeline.blendSource = BlendOne;
 		pipeline.blendDestination = BlendOne;
 		pipeline.blendOperation = Add;
@@ -59,8 +59,8 @@ class LightingDeferred {
 		// ENVIRONMENT PASS
 		envPipeline = new PipelineState();
 		envPipeline.inputLayout = [structure];
-		envPipeline.vertexShader = Shaders.s2d_2d_vert;
-		envPipeline.fragmentShader = Shaders.env_lighting_deferred_frag;
+		envPipeline.vertexShader = Reflect.field(Shaders, "s2d_2d_vert");
+		envPipeline.fragmentShader = Reflect.field(Shaders, "env_lighting_deferred_frag");
 		envPipeline.blendSource = BlendOne;
 		envPipeline.blendDestination = BlendOne;
 		envPipeline.blendOperation = Add;
