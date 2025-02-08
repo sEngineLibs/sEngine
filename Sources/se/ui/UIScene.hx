@@ -2,7 +2,7 @@ package se.ui;
 
 import kha.Assets;
 import kha.Canvas;
-import se.system.App;
+import se.system.Application;
 import se.math.Mat3;
 import se.ui.elements.UIElement;
 
@@ -53,7 +53,7 @@ class UIScene {
 		g2.opacity = 0.85;
 		g2.transformation = Mat3.identity();
 		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-		final e = elementAt(App.input.mouse.x, App.input.mouse.y);
+		final e = elementAt(Application.input.mouse.x, Application.input.mouse.y);
 		if (e != null)
 			drawBounds(e, target);
 		#end
@@ -153,14 +153,14 @@ class UIScene {
 
 		g2.fontSize = 22;
 		final name = e.toString();
-		g2.drawString(name, App.input.mouse.x - g2.font.widthOfCharacters(g2.fontSize, name.toCharArray(), 0, name.length),
-			App.input.mouse.y - g2.font.height(g2.fontSize));
+		g2.drawString(name, Application.input.mouse.x - g2.font.widthOfCharacters(g2.fontSize, name.toCharArray(), 0, name.length),
+			Application.input.mouse.y - g2.font.height(g2.fontSize));
 
 		g2.fontSize = 16;
 		final rect = '${Std.int(e.width)} × ${Std.int(e.height)} at (${Std.int(e.x)}, ${Std.int(e.y)})';
-		g2.drawString(rect, App.input.mouse.x
+		g2.drawString(rect, Application.input.mouse.x
 			- g2.font.widthOfCharacters(g2.fontSize, rect.toCharArray(), 0, rect.length),
-			App.input.mouse.y
+			Application.input.mouse.y
 			- g2.font.height(g2.fontSize)
 			+ g2.fontSize);
 	}

@@ -147,6 +147,8 @@ project.addAssets("Assets/**", {
 // S2D_LIGHTING_SHADOWS_SOFT -> enables soft shadows
 
 let defs = [];
+if (process.defines == null)
+    process.defines = [];
 for (const def of process.defines) {
     let kv = def.split(" ");
     if (kv.length === 2) {

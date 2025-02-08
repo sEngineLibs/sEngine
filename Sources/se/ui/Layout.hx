@@ -1,6 +1,6 @@
 package se.ui;
 
-import se.ui.positioning.Alignment;
+import se.ui.Alignment;
 
 class Layout {
 	public var alignment:Alignment = Center;

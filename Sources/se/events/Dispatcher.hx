@@ -1,5 +1,7 @@
 package se.events;
 
+import se.system.Application;
+
 /**
 	The Dispatcher class manages event listeners and their execution.
 
@@ -7,7 +9,7 @@ package se.events;
 
 	@see `EventListener`
  */
-@:allow(se.system.App)
+@:allow(se.system.Application)
 class Dispatcher {
 	static var listeners:Array<EventListener> = [];
 
@@ -33,6 +35,10 @@ class Dispatcher {
 	 */
 	public static function removeEventListener(listener:EventListener):Bool {
 		return listeners.remove(listener);
+	}
+
+	static function init() {
+		Application.notifyOnUpdate(update);
 	}
 
 	static function update() {

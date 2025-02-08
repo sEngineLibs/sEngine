@@ -1,7 +1,7 @@
 package se.ui.elements.positioners;
 
 import se.math.Vec4;
-import se.ui.positioning.Alignment;
+import se.ui.Alignment;
 
 class Row extends Positioner {
 	public var spacing:Float = 0.0;

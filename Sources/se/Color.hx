@@ -74,15 +74,15 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 
 	public static inline function hsv2rgb(color:Color):Color {
 		var hsv:Vec3 = color;
-		var rgb = hue2rgb(hsv.x);
-		return ((rgb - vec3(1.0)) * vec3(hsv.y) + vec3(1.0)) * hsv.z;
+		var rgb:Vec3 = hue2rgb(hsv.x);
+		return ((rgb - 1.0) * hsv.y + 1.0) * hsv.z;
 	}
 
 	public static inline function hsl2rgb(color:Color):Color {
 		var hsl:Vec3 = color;
-		var rgb = hue2rgb(hsl.x);
+		var rgb:Vec3 = hue2rgb(hsl.x);
 		var c = (1.0 - abs(2.0 * hsl.z - 1.0)) * hsl.y;
-		return (rgb - vec3(0.5)) * vec3(c) + vec3(hsl.z);
+		return (rgb - 0.5) * c + hsl.z;
 	}
 
 	public static inline function rgb2hsv(color:Color):Color {

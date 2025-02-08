@@ -1,4 +1,4 @@
-package se.ui.positioning;
+package se.ui;
 
 enum abstract Alignment(Int) from Int to Int {
 	// horizontal

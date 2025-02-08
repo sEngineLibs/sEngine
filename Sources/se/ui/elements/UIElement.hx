@@ -9,7 +9,7 @@ import se.math.VectorMath;
 import se.s2d.geometry.Rect;
 import se.s2d.geometry.Bounds;
 import se.s2d.geometry.Position;
-import se.ui.positioning.Anchors;
+import se.ui.Anchors;
 
 @:allow(se.ui.UIScene)
 class UIElement extends SObject<UIElement> {

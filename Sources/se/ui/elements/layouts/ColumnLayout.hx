@@ -2,7 +2,7 @@ package se.ui.elements.layouts;
 
 import kha.Canvas;
 import se.math.VectorMath;
-import se.ui.positioning.Alignment;
+import se.ui.Alignment;
 
 class ColumnLayout extends UIElement {
 	public var spacing:Float = 0.0;

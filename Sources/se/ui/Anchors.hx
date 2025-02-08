@@ -1,4 +1,4 @@
-package se.ui.positioning;
+package se.ui;
 
 import se.ui.elements.UIElement;
 

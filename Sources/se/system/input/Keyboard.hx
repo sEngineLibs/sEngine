@@ -5,7 +5,7 @@ import se.system.Time;
 import se.events.Dispatcher;
 import se.events.EventListener;
 
-@:allow(se.system.App)
+@:allow(se.system.Application)
 @:access(kha.input.Keyboard)
 class Keyboard {
 	var keyboard:kha.input.Keyboard;

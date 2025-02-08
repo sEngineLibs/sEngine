@@ -3,7 +3,7 @@ package se.ui.elements;
 import kha.Font;
 import kha.Canvas;
 import kha.Assets;
-import se.ui.positioning.Alignment;
+import se.ui.Alignment;
 
 using kha.StringExtensions;
 

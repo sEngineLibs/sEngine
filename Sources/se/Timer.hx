@@ -1,8 +1,13 @@
-package se.system;
+package se;
+
+import se.system.Time;
 
 @:access(se.system.Time)
 class Timer {
-	var listener:se.system.Time.TimeListener;
+	var listener:{
+		f:Void->Void,
+		time:Float
+	};
 
 	var callback:Void->Void;
 	var delay:Float;
@@ -57,27 +62,33 @@ class Timer {
 
 	/**
 	 * Starts the timer repeatedly.
-	 * @param count How many times to start the timer
+	 * @param count How many times to start the timer. 0 for infinity
 	 * @param lock Whether to skip if the timer is already started
 	 * @return Returns true if the timer was started
 	 */
 	public function repeat(count:Int = 1, ?lock:Bool = true):Bool {
-		if (count <= 0)
+		if (count < 0)
 			return false;
 
 		if (!lock || !started) {
 			started = true;
 			final f = callback;
-			callback = function() {
-				f();
-				count--;
-				if (count > 0) {
+			if (count == 0)
+				callback = function() {
+					f();
 					listener = Time.notifyOnTime(callback, Time.time + delay);
-				} else {
-					started = false;
-					callback = f;
-				}
-			};
+				};
+			else
+				callback = function() {
+					f();
+					count--;
+					if (count > 0) {
+						listener = Time.notifyOnTime(callback, Time.time + delay);
+					} else {
+						started = false;
+						callback = f;
+					}
+				};
 			listener = Time.notifyOnTime(callback, Time.time + delay);
 			return true;
 		}

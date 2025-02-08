@@ -1,7 +1,7 @@
 package se.ui.elements;
 
 import se.system.Time;
-import se.system.App;
+import se.system.Application;
 import se.system.input.Mouse;
 
 class MouseArea extends UIElement {
@@ -22,7 +22,7 @@ class MouseArea extends UIElement {
 
 	public function new(?scene:UIScene) {
 		super(scene);
-		App.input.mouse.notifyOnMoved((mx, my, dx, dy) -> {
+		Application.input.mouse.notifyOnMoved((mx, my, dx, dy) -> {
 			final p = mapToGlobal(mx, my);
 			final _x = p.x - x;
 			final _y = p.y - y;
@@ -40,12 +40,12 @@ class MouseArea extends UIElement {
 				}
 			}
 		});
-		App.input.mouse.notifyOnDown((button, x, y) -> {
+		Application.input.mouse.notifyOnDown((button, x, y) -> {
 			if (acceptedButtons.contains(button))
 				if (entered)
 					press(button, x, y);
 		});
-		App.input.mouse.notifyOnUp((button, x, y) -> {
+		Application.input.mouse.notifyOnUp((button, x, y) -> {
 			if (acceptedButtons.contains(button)) {
 				release(button, x, y);
 				if (entered)

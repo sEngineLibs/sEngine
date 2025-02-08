@@ -2,15 +2,21 @@ package se.system;
 
 import kha.System;
 
-@:allow(se.system.App)
+@:allow(se.system.Application)
 class Time {
 	public static var realTime:Float = 0.0;
 	public static var time:Float = 0.0;
 	public static var delta:Float = 0.0;
 	public static var scale:Float = 1.0;
 
-	static var timeListeners:Array<TimeListener> = [];
-	static var realTimeListeners:Array<TimeListener> = [];
+	static var timeListeners:Array<{
+		f:Void->Void,
+		time:Float
+	}> = [];
+	static var realTimeListeners:Array<{
+		f:Void->Void,
+		time:Float
+	}> = [];
 
 	/**
 	 * Adds a time listener
@@ -36,6 +42,10 @@ class Time {
 		return listener;
 	}
 
+	static function init() {
+		Application.notifyOnUpdate(update);
+	}
+
 	static function update() {
 		final rt = System.time;
 		delta = (rt - realTime) * scale;
@@ -54,9 +64,4 @@ class Time {
 			}
 		}
 	}
-}
-
-typedef TimeListener = {
-	f:Void->Void,
-	time:Float
 }

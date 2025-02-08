@@ -8,18 +8,26 @@ import se.system.input.Mouse;
 import se.system.input.Keyboard;
 import se.events.Dispatcher;
 
-class App {
+class Application {
+	static var updateListeners:Array<Void->Void> = [];
+
 	public static var window:Window;
-	public static var input:AppInput;
+	public static var input:{
+		var mouse:Mouse;
+		var keyboard:Keyboard;
+	};
 
 	public static function start(options:SystemOptions, setup:Void->Void) {
 		System.start(options, function(window) {
-			App.window = window;
-			App.input = {
+			Application.window = window;
+			Application.input = {
 				mouse: new Mouse(),
 				keyboard: new Keyboard()
 			}
 
+			System.loadUrl("https://doc.qt.io/qt-6/qml-qtquick-shadereffect.html");
+			Time.init();
+			Dispatcher.init();
 			SEngine.start(window);
 			Assets.loadEverything(function() {
 				setup();
@@ -31,19 +39,21 @@ class App {
 		});
 	}
 
+	public static function notifyOnUpdate(f:Void->Void) {
+		updateListeners.push(f);
+		return {
+			f: f,
+			remove: () -> updateListeners.remove(f)
+		}
+	}
+
 	public static function stop() {
 		if (!System.stop())
-			trace("This application can't be stopped");
+			trace("This application can't be stopped!");
 	}
 
 	static function update() @:privateAccess {
-		Time.update();
-		Dispatcher.update();
-		SEngine.update();
+		for (listener in updateListeners)
+			listener();
 	}
-}
-
-private typedef AppInput = {
-	var mouse:Mouse;
-	var keyboard:Keyboard;
 }

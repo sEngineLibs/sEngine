@@ -2,7 +2,7 @@ package se.ui;
 
 import kha.Image;
 import kha.graphics4.TextureFormat;
-import se.system.App;
+import se.system.Application;
 import se.s2d.geometry.RectI;
 import se.s2d.geometry.SizeI;
 import se.ui.effects.ShaderEffect;
@@ -27,7 +27,7 @@ class UILayer {
 			if (textureSize.width > 0 && textureSize.height > 0)
 				texture = Image.createRenderTarget(textureSize.width, textureSize.height, format, NoDepthAndStencil, samples);
 			else
-				texture = Image.createRenderTarget(App.window.width, App.window.height, format, NoDepthAndStencil, samples);
+				texture = Image.createRenderTarget(Application.window.width, Application.window.height, format, NoDepthAndStencil, samples);
 		} else {
 			texture.unload();
 			texture = null;

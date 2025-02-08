@@ -13,7 +13,7 @@ enum abstract MouseButton(Int) from Int to Int {
 	var Forward;
 }
 
-@:allow(se.system.App)
+@:allow(se.system.Application)
 @:access(kha.input.Mouse)
 class Mouse {
 	@:isVar var windowID(default, set):Int;

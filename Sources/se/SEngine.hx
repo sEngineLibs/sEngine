@@ -6,15 +6,16 @@ import kha.Canvas;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
-import se.s2d.Stage;
+import se.system.Application;
 import se.system.Time;
 import se.math.Mat3;
 import se.animation.Action;
+import se.s2d.Stage;
+import se.s2d.graphics.Renderer;
 import se.ui.UIScene;
 import se.ui.graphics.Drawers;
-import se.s2d.graphics.Renderer;
 
-@:allow(se.system.App)
+@:allow(se.system.Application)
 class SEngine {
 	public static var indices:IndexBuffer;
 	public static var vertices:VertexBuffer;
@@ -90,6 +91,8 @@ class SEngine {
 		ind[4] = 2;
 		ind[5] = 0;
 		indices.unlock();
+
+		Application.notifyOnUpdate(update);
 	}
 
 	@:access(se.s2d.SpriteAtlas)
