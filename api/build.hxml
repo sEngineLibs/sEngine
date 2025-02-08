@@ -44,4 +44,4 @@
 
 # html generation
 --next
---cmd haxelib run dox -i build -o build/pages --title "sEngine API"
+--cmd haxelib run dox -i build -o build/html/pages --title "sEngine API"

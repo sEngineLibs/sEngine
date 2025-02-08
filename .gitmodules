@@ -1,6 +1,6 @@
 [submodule "Kha"]
 	path = Kha
 	url = https://github.com/sEngineLibs/Kha
-[submodule "pages"]
-	path = api/build/pages
+[submodule "sEngine-APIs"]
+	path = api/build/html
 	url = https://github.com/sEngineLibs/api
