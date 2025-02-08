@@ -44,4 +44,6 @@
 
 # html generation
 --next
---cmd haxelib run dox -i build -o build/html/.github/workspace/docs --title "sEngine API"
+--cmd rmdir build/html/pages
+--next
+--cmd haxelib run dox -i build -o build/html/pages --title "sEngine API"
