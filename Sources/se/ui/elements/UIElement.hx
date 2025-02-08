@@ -55,11 +55,10 @@ class UIElement extends SObject<UIElement> {
 
 	public function new(?scene:UIScene) {
 		super();
-		if (scene != null)
+		if (scene != null) {
 			this.scene = scene;
-		else
-			this.scene = UIScene.current;
-		this.scene.addBaseElement(this);
+			this.scene.addBaseElement(this);
+		}
 	}
 
 	overload extern public static inline function mapToElement(element:UIElement, x:Float, y:Float):Position {

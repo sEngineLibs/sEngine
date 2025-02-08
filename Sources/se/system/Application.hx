@@ -25,7 +25,6 @@ class Application {
 				keyboard: new Keyboard()
 			}
 
-			System.loadUrl("https://doc.qt.io/qt-6/qml-qtquick-shadereffect.html");
 			Time.init();
 			Dispatcher.init();
 			SEngine.start(window);
@@ -52,7 +51,7 @@ class Application {
 			trace("This application can't be stopped!");
 	}
 
-	static function update() @:privateAccess {
+	static function update() {
 		for (listener in updateListeners)
 			listener();
 	}

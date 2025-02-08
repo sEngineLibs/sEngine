@@ -11,12 +11,15 @@ using kha.StringExtensions;
 @:structInit
 @:allow(se.SEngine)
 @:allow(se.ui.elements.UIElement)
-class UIScene {
+class UIScene extends UIElement {
 	public static var current:UIScene;
 
 	var elements:Array<UIElement> = [];
 
-	function new() {}
+	function new() {
+		super();
+		Application.window.notifyOnResize((w, h) -> setSize(w, h));
+	}
 
 	function addBaseElement(element:UIElement) {
 		elements.push(element);
@@ -43,12 +46,15 @@ class UIScene {
 		return c;
 	}
 
-	function render(target:Canvas) {
+	override function render(target:Canvas) {
 		final g2 = target.g2;
 
+		updateBounds();
 		g2.begin(false);
-		for (element in elements)
+		for (element in elements) {
+			element.updateBounds();
 			element.render(target);
+		}
 		g2.color = White;
 		g2.opacity = 0.85;
 		g2.transformation = Mat3.identity();
