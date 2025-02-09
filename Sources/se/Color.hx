@@ -258,7 +258,7 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 	}
 
 	inline function set_HSV(value:Vec3):Vec3 {
-		fromVec3(rgb2hsv(value));
+		fromVec3(hsv2rgb(value));
 		return value;
 	}
 
@@ -267,7 +267,7 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 	}
 
 	inline function set_HSVA(value:Vec4):Vec4 {
-		fromVec4(rgb2hsv(value));
+		fromVec4(hsv2rgb(value));
 		return value;
 	}
 
@@ -276,7 +276,7 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 	}
 
 	inline function set_HSL(value:Vec3):Vec3 {
-		fromVec3(rgb2hsl(value));
+		fromVec3(hsl2rgb(value));
 		return value;
 	}
 
@@ -285,7 +285,7 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 	}
 
 	inline function set_HSLA(value:Vec4):Vec4 {
-		fromVec4(rgb2hsl(value));
+		fromVec4(hsl2rgb(value));
 		return value;
 	}
 }
