@@ -127,9 +127,9 @@ class Renderer {
 		g4.begin();
 		g4.clear(Black);
 		g4.setPipeline(pipeline);
-		g4.setIndexBuffer(SEngine.indices);
+		g4.setIndexBuffer(@:privateAccess SEngine.indices);
 		#if (S2D_SPRITE_INSTANCING != 1)
-		g4.setVertexBuffer(SEngine.vertices);
+		g4.setVertexBuffer(@:privateAccess SEngine.vertices);
 		#end
 		g4.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
 		for (layer in Stage.current.layers) {

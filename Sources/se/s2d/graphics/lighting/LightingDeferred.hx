@@ -84,8 +84,8 @@ class LightingDeferred {
 		g4.begin();
 		g4.clear(Black);
 		g4.setPipeline(envPipeline);
-		g4.setIndexBuffer(SEngine.indices);
-		g4.setVertexBuffer(SEngine.vertices);
+		g4.setIndexBuffer(@:privateAccess SEngine.indices);
+		g4.setVertexBuffer(@:privateAccess SEngine.vertices);
 		g4.setTexture(envEmissionMapTU, Renderer.buffer.emissionMap);
 		#if (S2D_LIGHTING_ENVIRONMENT == 1)
 		g4.setTexture(envMapTU, Stage.current.environmentMap);
@@ -109,8 +109,8 @@ class LightingDeferred {
 				ShadowPass.render(light);
 				g4.begin();
 				g4.setPipeline(pipeline);
-				g4.setIndexBuffer(SEngine.indices);
-				g4.setVertexBuffer(SEngine.vertices);
+				g4.setIndexBuffer(@:privateAccess SEngine.indices);
+				g4.setVertexBuffer(@:privateAccess SEngine.vertices);
 				g4.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
 				#end
 				g4.setFloat3(lightPositionCL, light.finalModel._20, light.finalModel._21, light.z);

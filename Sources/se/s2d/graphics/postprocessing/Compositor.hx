@@ -48,8 +48,8 @@ class Compositor extends PPEffect {
 		g2.begin();
 		g4.scissor(0, letterBoxHeight, SEngine.width, SEngine.height - letterBoxHeight * 2);
 		g4.setPipeline(pipeline);
-		g4.setIndexBuffer(SEngine.indices);
-		g4.setVertexBuffer(SEngine.vertices);
+		g4.setIndexBuffer(@:privateAccess SEngine.indices);
+		g4.setVertexBuffer(@:privateAccess SEngine.vertices);
 		g4.setTexture(textureMapTU, Renderer.buffer.src);
 		g4.setFloats(paramsCL, params);
 		g4.drawIndexedVertices();

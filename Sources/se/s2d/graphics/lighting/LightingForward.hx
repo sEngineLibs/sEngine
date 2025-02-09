@@ -88,10 +88,10 @@ class LightingForward {
 		g4.begin();
 		g4.clear(Black);
 		g4.setPipeline(pipeline);
-		g4.setIndexBuffer(SEngine.indices);
+		g4.setIndexBuffer(@:privateAccess SEngine.indices);
 		g4.setMatrix3(viewProjectionCL, viewProjection);
 		#if (S2D_SPRITE_INSTANCING != 1)
-		g4.setVertexBuffer(SEngine.vertices);
+		g4.setVertexBuffer(@:privateAccess SEngine.vertices);
 		#end
 		#if (S2D_LIGHTING_ENVIRONMENT == 1)
 		g4.setTexture(envMapTU, Stage.current.environmentMap);
@@ -104,8 +104,8 @@ class LightingForward {
 				// ShadowPass.render(light);
 				// g4.begin();
 				// g4.setPipeline(pipeline);
-				// g4.setIndexBuffer(SEngine.indices);
-				// g4.setVertexBuffer(SEngine.vertices);
+				// g4.setIndexBuffer(@:privateAccess SEngine.indices);
+				// g4.setVertexBuffer(@:privateAccess SEngine.vertices);
 				// g4.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
 				// #end
 				g4.setFloat3(lightPositionCL, light.x, light.y, light.z);

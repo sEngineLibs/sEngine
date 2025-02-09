@@ -17,8 +17,8 @@ import se.ui.graphics.Drawers;
 
 @:allow(se.system.Application)
 class SEngine {
-	public static var indices:IndexBuffer;
-	public static var vertices:VertexBuffer;
+	static var indices:IndexBuffer;
+	static var vertices:VertexBuffer;
 	public static var projection:Mat3;
 
 	public static var width:Int;

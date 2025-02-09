@@ -48,7 +48,7 @@ class SpriteAtlas {
 	var vertices:Array<VertexBuffer>;
 
 	function init() {
-		vertices = [
+		vertices = [@:privateAccess
 			SEngine.vertices,
 			#if (S2D_LIGHTING == 1)
 			#if (S2D_LIGHTING_DEFERRED == 1)

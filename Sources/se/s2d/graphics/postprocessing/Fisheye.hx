@@ -32,8 +32,8 @@ class Fisheye extends PPEffect {
 
 		g2.begin();
 		g4.setPipeline(pipeline);
-		g4.setIndexBuffer(SEngine.indices);
-		g4.setVertexBuffer(SEngine.vertices);
+		g4.setIndexBuffer(@:privateAccess SEngine.indices);
+		g4.setVertexBuffer(@:privateAccess SEngine.vertices);
 		g4.setTexture(textureMapTU, Renderer.buffer.src);
 		g4.setVector2(positionCL, position);
 		g4.setFloat(strengthCL, strength);
