@@ -1,32 +1,32 @@
 package se;
 
-import kha.FastFloat;
+import kha.Color as KhaColor;
 import se.math.Vec3;
 import se.math.Vec4;
 import se.math.VectorMath;
 
 @:forward.new
-enum abstract Color(kha.Color) from kha.Color to kha.Color {
-	var black = kha.Color.Black;
-	var white = kha.Color.White;
-	var red = kha.Color.Red;
-	var blue = kha.Color.Blue;
-	var green = kha.Color.Green;
-	var magenta = kha.Color.Magenta;
-	var yellow = kha.Color.Yellow;
-	var cyan = kha.Color.Cyan;
-	var purple = kha.Color.Purple;
-	var pink = kha.Color.Pink;
-	var orange = kha.Color.Orange;
-	var transparent = kha.Color.Transparent;
+enum abstract Color(KhaColor) from KhaColor to KhaColor {
+	var black = KhaColor.Black;
+	var white = KhaColor.White;
+	var red = KhaColor.Red;
+	var blue = KhaColor.Blue;
+	var green = KhaColor.Green;
+	var magenta = KhaColor.Magenta;
+	var yellow = KhaColor.Yellow;
+	var cyan = KhaColor.Cyan;
+	var purple = KhaColor.Purple;
+	var pink = KhaColor.Pink;
+	var orange = KhaColor.Orange;
+	var transparent = KhaColor.Transparent;
 
-	public var r(get, set):FastFloat;
-	public var g(get, set):FastFloat;
-	public var b(get, set):FastFloat;
-	public var a(get, set):FastFloat;
-	public var h(get, set):FastFloat;
-	public var s(get, set):FastFloat;
-	public var v(get, set):FastFloat;
+	public var r(get, set):Float;
+	public var g(get, set):Float;
+	public var b(get, set):Float;
+	public var a(get, set):Float;
+	public var h(get, set):Float;
+	public var s(get, set):Float;
+	public var v(get, set):Float;
 	public var RGB(get, set):Vec3;
 	public var RGBA(get, set):Vec4;
 	public var HSV(get, set):Vec3;
@@ -34,31 +34,31 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 	public var HSL(get, set):Vec3;
 	public var HSLA(get, set):Vec4;
 
-	public static inline function rgb(r:FastFloat, g:FastFloat, b:FastFloat):Color {
-		return kha.Color.fromFloats(r, g, b);
+	public static inline function rgb(r:Float, g:Float, b:Float):Color {
+		return KhaColor.fromFloats(r, g, b);
 	}
 
-	public static inline function rgba(r:FastFloat, g:FastFloat, b:FastFloat, a:FastFloat = 1.0):Color {
-		return kha.Color.fromFloats(r, g, b, a);
+	public static inline function rgba(r:Float, g:Float, b:Float, a:Float = 1.0):Color {
+		return KhaColor.fromFloats(r, g, b, a);
 	}
 
-	public static inline function hsv(h:FastFloat, s:FastFloat, v:FastFloat):Color {
+	public static inline function hsv(h:Float, s:Float, v:Float):Color {
 		return rgb2hsv(rgb(h, s, v));
 	}
 
-	public static inline function hsva(h:FastFloat, s:FastFloat, v:FastFloat, a:FastFloat = 1.0):Color {
+	public static inline function hsva(h:Float, s:Float, v:Float, a:Float = 1.0):Color {
 		return rgb2hsv(rgba(h, s, v, a));
 	}
 
-	public static inline function hsl(h:FastFloat, s:FastFloat, l:FastFloat):Color {
+	public static inline function hsl(h:Float, s:Float, l:Float):Color {
 		return rgb2hsl(rgb(h, s, l));
 	}
 
-	public static inline function hsla(h:FastFloat, s:FastFloat, l:FastFloat, a:FastFloat = 1.0):Color {
+	public static inline function hsla(h:Float, s:Float, l:Float, a:Float = 1.0):Color {
 		return rgb2hsl(rgba(h, s, l, a));
 	}
 
-	public static inline function hue2rgb(hue:FastFloat):Color {
+	public static inline function hue2rgb(hue:Float):Color {
 		var rgb = abs(hue * 6.0 - vec3(3, 2, 4)) * vec3(1, -1, -1) + vec3(-1, 2, 2);
 		return clamp(rgb, 0.0, 1.0);
 	}
@@ -134,7 +134,7 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 			case "transparent":
 				return transparent;
 			default:
-				return kha.Color.fromString(value);
+				return KhaColor.fromString(value);
 		}
 	}
 
@@ -163,47 +163,47 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 		return vec4(r, g, b, a);
 	}
 
-	inline function get_r():FastFloat {
+	inline function get_r():Float {
 		return this.R;
 	}
 
-	inline function set_r(value:FastFloat):FastFloat {
+	inline function set_r(value:Float):Float {
 		this.R = value;
 		return value;
 	}
 
-	inline function get_g():FastFloat {
+	inline function get_g():Float {
 		return this.G;
 	}
 
-	inline function set_g(value:FastFloat):FastFloat {
+	inline function set_g(value:Float):Float {
 		this.G = value;
 		return value;
 	}
 
-	inline function get_b():FastFloat {
+	inline function get_b():Float {
 		return this.B;
 	}
 
-	inline function set_b(value:FastFloat):FastFloat {
+	inline function set_b(value:Float):Float {
 		this.B = value;
 		return value;
 	}
 
-	inline function get_a():FastFloat {
+	inline function get_a():Float {
 		return this.A;
 	}
 
-	inline function set_a(value:FastFloat):FastFloat {
+	inline function set_a(value:Float):Float {
 		this.A = value;
 		return value;
 	}
 
-	inline function get_h():FastFloat {
+	inline function get_h():Float {
 		return Color.rgb2hsv(this).r;
 	}
 
-	inline function set_h(value:FastFloat):FastFloat {
+	inline function set_h(value:Float):Float {
 		var c = Color.hsv2rgb(vec3(value, s, v));
 		r = c.r;
 		g = c.g;
@@ -211,11 +211,11 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 		return value;
 	}
 
-	inline function get_s():FastFloat {
+	inline function get_s():Float {
 		return Color.rgb2hsv(this).g;
 	}
 
-	inline function set_s(value:FastFloat):FastFloat {
+	inline function set_s(value:Float):Float {
 		var c = Color.hsv2rgb(vec3(h, value, v));
 		r = c.r;
 		g = c.g;
@@ -223,11 +223,11 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 		return value;
 	}
 
-	inline function get_v():FastFloat {
+	inline function get_v():Float {
 		return Color.rgb2hsv(this).b;
 	}
 
-	inline function set_v(value:FastFloat):FastFloat {
+	inline function set_v(value:Float):Float {
 		var c = Color.hsv2rgb(vec3(h, s, value));
 		r = c.r;
 		g = c.g;
