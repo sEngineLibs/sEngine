@@ -4,7 +4,7 @@ import se.math.Mat3;
 import se.math.VectorMath;
 
 @:forward(rotation)
-abstract Camera(Transform) from Transform to Transform {
+abstract Camera(Transform2D) from Transform2D to Transform2D {
 	public var x(get, set):Float;
 	public var y(get, set):Float;
 

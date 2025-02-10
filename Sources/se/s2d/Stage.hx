@@ -18,7 +18,7 @@ class Stage {
 	public function new() {}
 
 	public function updateViewProjection() {
-		viewProjection = SEngine.projection * (camera : Transform);
+		viewProjection = SEngine.projection * (camera : Transform2D);
 	}
 
 	public static function local2WorldSpace(point:Vec2):Vec2 {

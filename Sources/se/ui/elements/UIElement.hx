@@ -12,7 +12,7 @@ import se.s2d.geometry.Position;
 import se.ui.Anchors;
 
 @:allow(se.ui.UIScene)
-class UIElement extends PhysicalObject<UIElement> {
+class UIElement extends PhysicalObject2D<UIElement> {
 	var scene:UIScene;
 	var finalOpacity(get, never):Float;
 

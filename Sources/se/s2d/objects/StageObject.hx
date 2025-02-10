@@ -1,9 +1,9 @@
 package se.s2d.objects;
 
 import kha.FastFloat;
-import se.PhysicalObject;
+import se.PhysicalObject2D;
 
-abstract class StageObject extends PhysicalObject<StageObject> {
+abstract class StageObject extends PhysicalObject2D<StageObject> {
 	var layer:Layer;
 
 	public var x(get, set):FastFloat;
