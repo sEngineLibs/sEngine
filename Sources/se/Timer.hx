@@ -62,33 +62,27 @@ class Timer {
 
 	/**
 	 * Starts the timer repeatedly.
-	 * @param count How many times to start the timer. 0 for infinity
+	 * @param count How many times to start the timer.
 	 * @param lock Whether to skip if the timer is already started
 	 * @return Returns true if the timer was started
 	 */
 	public function repeat(count:Int = 1, ?lock:Bool = true):Bool {
-		if (count < 0)
+		if (count <= 0)
 			return false;
 
 		if (!lock || !started) {
 			started = true;
 			final f = callback;
-			if (count == 0)
-				callback = function() {
-					f();
+			callback = function() {
+				f();
+				count--;
+				if (count > 0) {
 					listener = Time.notifyOnTime(callback, Time.time + delay);
-				};
-			else
-				callback = function() {
-					f();
-					count--;
-					if (count > 0) {
-						listener = Time.notifyOnTime(callback, Time.time + delay);
-					} else {
-						started = false;
-						callback = f;
-					}
-				};
+				} else {
+					started = false;
+					callback = f;
+				}
+			};
 			listener = Time.notifyOnTime(callback, Time.time + delay);
 			return true;
 		}

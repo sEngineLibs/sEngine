@@ -31,7 +31,7 @@ class Action {
 			if (t < 1.0) {
 				a.tick(a.easing(t));
 			} else {
-				a.done();
+				a.completed();
 				actuators.remove(a);
 			}
 		}
@@ -48,16 +48,15 @@ class Action {
 @:allow(se.animation.Action)
 @:access(se.animation.Action)
 class Actuator {
-	var start:Float;
+	var start:Float = 0.0;
 	var duration:Float;
-	var easing:Float->Float;
+	var easing:Float->Float = Easing.Linear;
 	var tick:Float->Void;
-	var done:Void->Void = () -> {};
+	var completed:Void->Void = () -> {};
 
 	function new(duration:Float = 1.0, onTick:Float->Void) {
 		this.duration = duration;
 		this.tick = onTick;
-		easing = Easing.Linear;
 	}
 
 	/**
@@ -83,10 +82,10 @@ class Actuator {
 	/**
 		Sets a callback function to execute when the animation is complete.
 
-		@param f The function to call when done.
+		@param f The function to call when completed.
 	 */
-	public function onDone(f:Void->Void):Actuator {
-		done = f;
+	public function onCompleted(f:Void->Void):Actuator {
+		completed = f;
 		return this;
 	}
 
@@ -95,5 +94,14 @@ class Actuator {
 	 */
 	public function stop() {
 		Action.actuators.remove(this);
+	}
+
+	/**
+		Jumps to the final value and stops the animation.
+	 */
+	public function complete() {
+		tick(1.0);
+		Action.actuators.remove(this);
+		completed();
 	}
 }
