@@ -39,7 +39,7 @@ class Layer {
 	public var lights:Array<Light> = [];
 
 	public function addLight(light:Light) {
-		lights = lights.push(light);
+		lights.push(light);
 	}
 
 	#if (S2D_LIGHTING_SHADOWS == 1)

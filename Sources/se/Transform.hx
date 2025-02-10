@@ -9,7 +9,7 @@ using se.extensions.Mat3Ext;
 
 @:nullSafety
 @:forward.new
-@:forward(mul)
+@:forward(_00, _10, _20, _01, _11, _21, _02, _12, _22)
 abstract Transform(Mat3) from Mat3 to Mat3 {
 	public var translationX(get, set):Float;
 	public var translationY(get, set):Float;

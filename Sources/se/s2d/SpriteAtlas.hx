@@ -138,7 +138,7 @@ class SpriteAtlas {
 			mData[mi + 8] = m._22;
 			// depth
 			final di = i * dStructSize;
-			dData[di] = sprite.finalZ;
+			dData[di] = sprite.z;
 			++i;
 		}
 		vertices[1].unlock();

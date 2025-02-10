@@ -1,6 +1,6 @@
 package se.ui.elements.positioners;
 
-import se.math.VectorMath;
+import se.math.Vec4;
 import se.ui.Alignment;
 
 class Row extends Positioner {

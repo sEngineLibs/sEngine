@@ -8,6 +8,7 @@ using se.extensions.Mat3Ext;
 abstract class PhysicalObject<This:PhysicalObject<This>> extends VirtualObject<This> {
 	var _transform:Transform = Mat3.identity();
 
+	public var z:Float = 0.0;
 	public var transform:Transform = Mat3.identity();
 	public var transformOrigin:Vec2 = new Vec2(0.0, 0.0);
 

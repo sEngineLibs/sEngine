@@ -1,7 +1,7 @@
 package se.ui.elements.positioners;
 
 import kha.Canvas;
-import se.math.VectorMath;
+import se.math.Vec4;
 
 abstract class Positioner extends UIElement {
 	var prevRect:Vec4;

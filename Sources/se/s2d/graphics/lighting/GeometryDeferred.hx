@@ -93,7 +93,7 @@ class GeometryDeferred {
 			}
 			#else
 			for (sprite in layer.sprites) {
-				g4.setFloat(depthCL, sprite.finalZ);
+				g4.setFloat(depthCL, sprite.z);
 				g4.setMatrix3(modelCL, sprite.finalModel);
 				g4.setVector4(cropRectCL, sprite.cropRect);
 				g4.setTexture(albedoMapTU, sprite.atlas.albedoMap);
