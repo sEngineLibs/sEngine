@@ -1,6 +1,6 @@
 package se.ui.elements.positioners;
 
-import se.math.Vec4;
+import se.math.VectorMath;
 import se.ui.Alignment;
 
 class Column extends Positioner {

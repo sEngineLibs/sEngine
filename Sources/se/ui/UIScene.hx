@@ -14,36 +14,9 @@ using kha.StringExtensions;
 class UIScene extends UIElement {
 	public static var current:UIScene;
 
-	var elements:Array<UIElement> = [];
-
 	function new() {
 		super();
 		Application.window.notifyOnResize((w, h) -> setSize(w, h));
-	}
-
-	function addBaseElement(element:UIElement) {
-		elements.push(element);
-	}
-
-	function removeBaseElement(element:UIElement) {
-		elements.remove(element);
-	}
-
-	public function elementAt(x:Float, y:Float):UIElement {
-		var c:UIElement = null;
-		for (i in 1...elements.length + 1) {
-			final element = elements[elements.length - i];
-			final e = element.childAt(x, y);
-
-			if (e != null) {
-				c = e;
-				break;
-			} else if (element.contains(x, y)) {
-				c = element;
-				break;
-			}
-		}
-		return c;
 	}
 
 	override function render(target:Canvas) {
@@ -51,15 +24,15 @@ class UIScene extends UIElement {
 
 		updateBounds();
 		g2.begin(false);
-		for (element in elements) {
-			element.updateBounds();
-			element.render(target);
+		for (child in children) {
+			child.updateBounds();
+			child.render(target);
 		}
-		g2.color = White;
+		g2.color = Color.rgb(1.0, 1.0, 1.0);
 		g2.opacity = 0.85;
 		g2.transformation = Mat3.identity();
 		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-		final e = elementAt(Application.input.mouse.x, Application.input.mouse.y);
+		final e = childAt(Application.input.mouse.x, Application.input.mouse.y);
 		if (e != null)
 			drawBounds(e, target);
 		#end
@@ -81,29 +54,29 @@ class UIScene extends UIElement {
 		final rp = e.right.padding;
 		final bp = e.bottom.padding;
 
-		g2.color = Black;
+		g2.color = Color.rgb(0.0, 0.0, 0.0);
 		g2.fillRect(e.x - lm, e.y - tm, e.width + rm, e.height + bm);
 
 		// margins
-		g2.color = Color.fromFloats(0.75, 0.25, 0.75);
+		g2.color = Color.rgb(0.75, 0.25, 0.75);
 		g2.fillRect(e.x - lm, e.y, lm, e.height);
 		g2.fillRect(e.x - lm, e.y - tm, lm + e.width + rm, tm);
 		g2.fillRect(e.x + e.width, e.y, rm, e.height);
 		g2.fillRect(e.x - lm, e.y + e.height, lm + e.width + rm, bm);
 
 		// padding
-		g2.color = Color.fromFloats(0.75, 0.75, 0.25);
+		g2.color = Color.rgb(0.75, 0.75, 0.25);
 		g2.fillRect(e.x, e.y, lp, e.height);
 		g2.fillRect(e.x + lp, e.y, e.width - lp - rp, tp);
 		g2.fillRect(e.x + e.width - rp, e.y, rp, e.height);
 		g2.fillRect(e.x + lp, e.y + e.height - bp, e.width - lp - rp, bp);
 
 		// content
-		g2.color = Color.fromFloats(0.25, 0.75, 0.75);
+		g2.color = Color.rgb(0.25, 0.75, 0.75);
 		g2.fillRect(e.x + lp, e.y + tp, e.width - lp - rp, e.height - tp - bp);
 
 		// labels
-		g2.color = White;
+		g2.color = Color.rgb(1.0, 1.0, 1.0);
 		final fs = g2.fontSize + 5;
 
 		// labels - titles

@@ -118,7 +118,7 @@ class SpriteAtlas {
 		var i = 0;
 		for (sprite in sprites) {
 			final c = sprite.cropRect;
-			final m = sprite.finalModel;
+			final m = sprite._transform;
 			// crop rect
 			final ci = i * cStructSize;
 			cData[ci + 0] = c.x;

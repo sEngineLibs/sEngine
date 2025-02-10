@@ -1,9 +1,9 @@
 package se.s2d.objects;
 
 import kha.FastFloat;
-import se.SObject;
+import se.PhysicalObject;
 
-abstract class StageObject extends SObject<StageObject> {
+abstract class StageObject extends PhysicalObject<StageObject> {
 	var layer:Layer;
 
 	public var x(get, set):FastFloat;
@@ -17,20 +17,20 @@ abstract class StageObject extends SObject<StageObject> {
 	function onParentChanged() {}
 
 	function get_x():FastFloat {
-		return translationX;
+		return this.transform.translationX;
 	}
 
 	function set_x(value:FastFloat):FastFloat {
-		translationX = value;
+		this.transform.translationX = value;
 		return value;
 	}
 
 	function get_y():FastFloat {
-		return translationY;
+		return this.transform.translationY;
 	}
 
 	function set_y(value:FastFloat):FastFloat {
-		translationY = value;
+		this.transform.translationY = value;
 		return value;
 	}
 }

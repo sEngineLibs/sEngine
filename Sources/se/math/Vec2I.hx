@@ -1,28 +1,10 @@
 package se.math;
 
+@:nullSafety
 @:forward.new
+@:forward(x, y)
 abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 	#if !macro
-	public var x(get, set):Int;
-
-	inline function get_x()
-		return this.x;
-
-	inline function set_x(v:Int)
-		return this.x = v;
-
-	public var y(get, set):Int;
-
-	inline function get_y()
-		return this.y;
-
-	inline function set_y(v:Int)
-		return this.y = v;
-
-	public inline function new(x:Int, y:Int) {
-		this = new Vec2IData(x, y);
-	}
-
 	@:from
 	public static inline function fromVec2(value:Vec2):Vec2I {
 		return new Vec2I(Std.int(value.x), Std.int(value.y));
@@ -34,26 +16,26 @@ abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 	}
 
 	public inline function clone() {
-		return new Vec2I(x, y);
+		return new Vec2I(this.x, this.y);
 	}
 
 	public inline function toString() {
-		return 'vec2(${x}, ${y})';
+		return 'vec2(${this.x}, ${this.y})';
 	}
 
 	@:op([])
 	inline function arrayRead(i:Int)
 		return switch i {
-			case 0: x;
-			case 1: y;
+			case 0: this.x;
+			case 1: this.y;
 			default: null;
 		}
 
 	@:op([])
 	inline function arrayWrite(i:Int, v:Int)
 		return switch i {
-			case 0: x = v;
-			case 1: y = v;
+			case 0: this.x = v;
+			case 1: this.y = v;
 			default: null;
 		}
 
@@ -146,7 +128,7 @@ abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 	 * Copy from any object with .x .y fields
 	 */
 	@:overload(function(source:{x:Int, y:Int}):Vec2I {})
-	public macro function copyFrom(self:ExprOf<Vec2>, source:ExprOf<{x:Int, y:Int}>):ExprOf<Vec2> {
+	public macro function copyFrom(self:ExprOf<Vec2I>, source:ExprOf<{x:Int, y:Int}>):ExprOf<Vec2I> {
 		return macro {
 			var self = $self;
 			var source = $source;
@@ -160,7 +142,7 @@ abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 	 * Copy into any object with .x .y fields
 	 */
 	@:overload(function(target:{x:Int, y:Int}):{x:Int, y:Int} {})
-	public macro function copyInto(self:ExprOf<Vec2>, target:ExprOf<{x:Int, y:Int}>):ExprOf<{x:Int, y:Int}> {
+	public macro function copyInto(self:ExprOf<Vec2I>, target:ExprOf<{x:Int, y:Int}>):ExprOf<{x:Int, y:Int}> {
 		return macro {
 			var self = $self;
 			var target = $target;
@@ -171,7 +153,7 @@ abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 	}
 
 	@:overload(function<T>(arrayLike:T, index:Int):T {})
-	public macro function copyIntoArray(self:ExprOf<Vec2>, array:ExprOf<ArrayAccess<Int>>, index:ExprOf<Int>) {
+	public macro function copyIntoArray(self:ExprOf<Vec2I>, array:ExprOf<ArrayAccess<Int>>, index:ExprOf<Int>) {
 		return macro {
 			var self = $self;
 			var array = $array;
@@ -183,7 +165,7 @@ abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 	}
 
 	@:overload(function<T>(arrayLike:T, index:Int):T {})
-	public macro function copyFromArray(self:ExprOf<Vec2>, array:ExprOf<ArrayAccess<Int>>, index:ExprOf<Int>) {
+	public macro function copyFromArray(self:ExprOf<Vec2I>, array:ExprOf<ArrayAccess<Int>>, index:ExprOf<Int>) {
 		return macro {
 			var self = $self;
 			var array = $array;
@@ -200,19 +182,19 @@ abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 	 * Create from any object with .x .y fields
 	 */
 	@:overload(function(source:{x:Int, y:Int}):Vec2I {})
-	public static macro function from(xy:ExprOf<{x:Int, y:Int}>):ExprOf<Vec2> {
+	public static macro function from(xy:ExprOf<{x:Int, y:Int}>):ExprOf<Vec2I> {
 		return macro {
 			var source = $xy;
-			new Vec2(source.x, source.y);
+			new Vec2I(source.x, source.y);
 		}
 	}
 
 	@:overload(function<T>(arrayLike:T, index:Int):T {})
-	public static macro function fromArray(array:ExprOf<ArrayAccess<Int>>, index:ExprOf<Int>):ExprOf<Vec2> {
+	public static macro function fromArray(array:ExprOf<ArrayAccess<Int>>, index:ExprOf<Int>):ExprOf<Vec2I> {
 		return macro {
 			var array = $array;
 			var i:Int = $index;
-			new Vec2(array[0 + i], array[1 + i]);
+			new Vec2I(array[0 + i], array[1 + i]);
 		}
 	}
 }

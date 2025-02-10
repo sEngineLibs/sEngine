@@ -32,7 +32,7 @@ class RowLayout extends UIElement {
 
 		target.g2.color = color;
 		target.g2.opacity = finalOpacity;
-		target.g2.transformation = finalModel;
+		target.g2.transformation = _transform;
 
 		var _x = x + left.padding;
 		for (i in 0...elements.length) {

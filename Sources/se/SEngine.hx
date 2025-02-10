@@ -9,6 +9,7 @@ import kha.graphics4.VertexStructure;
 import se.system.Application;
 import se.system.Time;
 import se.math.Mat3;
+import se.math.VectorMath;
 import se.animation.Action;
 import se.s2d.Stage;
 import se.s2d.graphics.Renderer;

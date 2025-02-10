@@ -2,9 +2,9 @@ package se.ui.elements;
 
 import kha.Canvas;
 import se.Color;
-import se.SObject;
 import se.math.Vec2;
 import se.math.Vec4;
+import se.math.Mat3;
 import se.math.VectorMath;
 import se.s2d.geometry.Rect;
 import se.s2d.geometry.Bounds;
@@ -12,7 +12,7 @@ import se.s2d.geometry.Position;
 import se.ui.Anchors;
 
 @:allow(se.ui.UIScene)
-class UIElement extends SObject<UIElement> {
+class UIElement extends PhysicalObject<UIElement> {
 	var scene:UIScene;
 	var finalOpacity(get, never):Float;
 
@@ -52,14 +52,6 @@ class UIElement extends SObject<UIElement> {
 	public var contentBounds(get, set):Bounds;
 	public var childrenRect(get, never):Rect;
 	public var childrenBounds(get, never):Bounds;
-
-	public function new(?scene:UIScene) {
-		super();
-		if (scene != null) {
-			this.scene = scene;
-			this.scene.addBaseElement(this);
-		}
-	}
 
 	overload extern public static inline function mapToElement(element:UIElement, x:Float, y:Float):Position {
 		return element.mapFromGlobal(x, y);
@@ -120,7 +112,7 @@ class UIElement extends SObject<UIElement> {
 	}
 
 	overload extern public inline function mapFromGlobal(p:Position):Position {
-		return finalModel * p;
+		return (_transform : Mat3) * p;
 	}
 
 	overload extern public inline function mapFromGlobal(x:Float, y:Float):Position {
@@ -128,7 +120,7 @@ class UIElement extends SObject<UIElement> {
 	}
 
 	overload extern public inline function mapToGlobal(p:Position):Position {
-		return inverse(finalModel) * p;
+		return inverse(_transform) * p;
 	}
 
 	overload extern public inline function mapToGlobal(x:Float, y:Float):Position {
@@ -186,9 +178,11 @@ class UIElement extends SObject<UIElement> {
 	}
 
 	function renderTree(target:Canvas) {
+		updateTransform();
+
 		target.g2.color = color;
 		target.g2.opacity = finalOpacity;
-		target.g2.transformation = finalModel;
+		target.g2.transformation = _transform;
 		draw(target);
 		for (child in children) {
 			child.updateBounds();
@@ -218,27 +212,6 @@ class UIElement extends SObject<UIElement> {
 		if (anchors.bottom != null)
 			bottom.position = anchors.bottom.position - anchors.bottom.padding - anchors.bottomMargin;
 	}
-
-	function onParentChanged() {
-		if (parent == null)
-			scene.addBaseElement(this);
-		else
-			scene.removeBaseElement(this);
-	}
-
-	function onZChanged() {
-		var i = 0;
-		parent.children.remove(this);
-		for (element in parent.children) {
-			if (element.finalZ >= finalZ) {
-				parent.children.insert(i, this);
-				break;
-			}
-			++i;
-		}
-	}
-
-	function onTransformationChanged() {}
 
 	function get_rect():Rect {
 		return new Rect(x, y, width, height);

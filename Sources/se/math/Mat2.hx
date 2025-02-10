@@ -1,16 +1,12 @@
 package se.math;
 
-import kha.FastFloat;
-import kha.math.FastMatrix2;
+import kha.math.FastMatrix2 as KhaMat2;
 
+@:forward.new
 @:forward(_00, _10, _01, _11)
-abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
+abstract Mat2(KhaMat2) from KhaMat2 to KhaMat2 {
 	#if !macro
-	public inline function new(a00:FastFloat, a01:FastFloat, a10:FastFloat, a11:FastFloat) {
-		this = new FastMatrix2(a00, a01, a10, a11);
-	}
-
-	public inline function set(a00:FastFloat, a10:FastFloat, a01:FastFloat, a11:FastFloat) {
+	public inline function set(a00:Float, a10:Float, a01:Float, a11:Float) {
 		this._00 = a00;
 		this._10 = a10;
 		this._01 = a01;
@@ -27,7 +23,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 	}
 
 	public inline function matrixCompMult(n:Mat2):Mat2 {
-		var n:FastMatrix2 = n;
+		var n:KhaMat2 = n;
 		return new Mat2(this._00 * n._00, this._10 * n._10, this._01 * n._01, this._11 * n._11);
 	}
 
@@ -37,7 +33,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 		return new Mat2(this._00, this._01, this._10, this._11);
 	}
 
-	public inline function determinant():FastFloat {
+	public inline function determinant():Float {
 		var m = this;
 		return m._00 * m._11 - m._01 * m._10;
 	}
@@ -59,13 +55,13 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 
 	@:op(-a)
 	static inline function neg(m:Mat2) {
-		var m:FastMatrix2 = m;
+		var m:KhaMat2 = m;
 		return new Mat2(-m._00, -m._10, -m._01, -m._11);
 	}
 
 	@:op(++a)
 	static inline function prefixIncrement(m:Mat2) {
-		var _m:FastMatrix2 = m;
+		var _m:KhaMat2 = m;
 		++_m._00;
 		++_m._10;
 		++_m._01;
@@ -75,7 +71,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 
 	@:op(--a)
 	static inline function prefixDecrement(m:Mat2) {
-		var _m:FastMatrix2 = m;
+		var _m:KhaMat2 = m;
 		--_m._00;
 		--_m._10;
 		--_m._01;
@@ -86,7 +82,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 	@:op(a++)
 	static inline function postfixIncrement(m:Mat2) {
 		var ret = m.clone();
-		var m:FastMatrix2 = m;
+		var m:KhaMat2 = m;
 		++m._00;
 		++m._10;
 		++m._01;
@@ -97,7 +93,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 	@:op(a--)
 	static inline function postfixDecrement(m:Mat2) {
 		var ret = m.clone();
-		var m:FastMatrix2 = m;
+		var m:KhaMat2 = m;
 		--m._00;
 		--m._10;
 		--m._01;
@@ -112,7 +108,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 		return a.copyFrom(a * b);
 
 	@:op(a *= b)
-	static inline function mulEqScalar(a:Mat2, f:FastFloat):Mat2
+	static inline function mulEqScalar(a:Mat2, f:Float):Mat2
 		return a.copyFrom(a * f);
 
 	@:op(a /= b)
@@ -120,7 +116,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 		return a.copyFrom(a / b);
 
 	@:op(a /= b)
-	static inline function divEqScalar(a:Mat2, f:FastFloat):Mat2
+	static inline function divEqScalar(a:Mat2, f:Float):Mat2
 		return a.copyFrom(a / f);
 
 	@:op(a += b)
@@ -128,7 +124,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 		return a.copyFrom(a + b);
 
 	@:op(a += b)
-	static inline function addEqScalar(a:Mat2, f:FastFloat):Mat2
+	static inline function addEqScalar(a:Mat2, f:Float):Mat2
 		return a.copyFrom(a + f);
 
 	@:op(a -= b)
@@ -136,45 +132,45 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 		return a.copyFrom(a - b);
 
 	@:op(a -= b)
-	static inline function subEqScalar(a:Mat2, f:FastFloat):Mat2
+	static inline function subEqScalar(a:Mat2, f:Float):Mat2
 		return a.copyFrom(a - f);
 
 	@:op(a + b)
 	static inline function add(m:Mat2, n:Mat2):Mat2 {
-		var m:FastMatrix2 = m;
-		var n:FastMatrix2 = n;
+		var m:KhaMat2 = m;
+		var n:KhaMat2 = n;
 		return new Mat2(m._00 + n._00, m._10 + n._10, m._01 + n._01, m._11 + n._11);
 	}
 
 	@:op(a + b) @:commutative
-	static inline function addScalar(m:Mat2, f:FastFloat):Mat2 {
-		var m:FastMatrix2 = m;
+	static inline function addScalar(m:Mat2, f:Float):Mat2 {
+		var m:KhaMat2 = m;
 		return new Mat2(m._00 + f, m._10 + f, m._01 + f, m._11 + f);
 	}
 
 	@:op(a - b)
 	static inline function sub(m:Mat2, n:Mat2):Mat2 {
-		var m:FastMatrix2 = m;
-		var n:FastMatrix2 = n;
+		var m:KhaMat2 = m;
+		var n:KhaMat2 = n;
 		return new Mat2(m._00 - n._00, m._10 - n._10, m._01 - n._01, m._11 - n._11);
 	}
 
 	@:op(a - b)
-	static inline function subScalar(m:Mat2, f:FastFloat):Mat2 {
-		var m:FastMatrix2 = m;
+	static inline function subScalar(m:Mat2, f:Float):Mat2 {
+		var m:KhaMat2 = m;
 		return new Mat2(m._00 - f, m._10 - f, m._01 - f, m._11 - f);
 	}
 
 	@:op(a - b)
-	static inline function subScalarInv(f:FastFloat, m:Mat2):Mat2 {
-		var m:FastMatrix2 = m;
+	static inline function subScalarInv(f:Float, m:Mat2):Mat2 {
+		var m:KhaMat2 = m;
 		return new Mat2(f - m._00, f - m._10, f - m._01, f - m._11);
 	}
 
 	@:op(a * b)
 	static inline function mul(m:Mat2, n:Mat2):Mat2 {
-		var m:FastMatrix2 = m;
-		var n:FastMatrix2 = n;
+		var m:KhaMat2 = m;
+		var n:KhaMat2 = n;
 		return new Mat2(m._00 * n._00
 			+ m._01 * n._10, m._10 * n._00
 			+ m._11 * n._10, m._00 * n._01
@@ -184,19 +180,19 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 
 	@:op(a * b)
 	static inline function postMulVec2(m:Mat2, v:Vec2):Vec2 {
-		var m:FastMatrix2 = m;
+		var m:KhaMat2 = m;
 		return new Vec2(m._00 * v[0] + m._01 * v[1], m._10 * v[0] + m._11 * v[1]);
 	}
 
 	@:op(a * b)
 	static inline function preMulVec2(v:Vec2, m:Mat2):Vec2 {
-		var m:FastMatrix2 = m;
+		var m:KhaMat2 = m;
 		return new Vec2(v.dot(new Vec2(m._00, m._10)), v.dot(new Vec2(m._01, m._11)));
 	}
 
 	@:op(a * b) @:commutative
-	static inline function mulScalar(m:Mat2, f:FastFloat):Mat2 {
-		var m:FastMatrix2 = m;
+	static inline function mulScalar(m:Mat2, f:Float):Mat2 {
+		var m:KhaMat2 = m;
 		return new Mat2(m._00 * f, m._10 * f, m._01 * f, m._11 * f);
 	}
 
@@ -206,21 +202,21 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 	}
 
 	@:op(a / b)
-	static inline function divScalar(m:Mat2, f:FastFloat):Mat2 {
-		var m:FastMatrix2 = m;
+	static inline function divScalar(m:Mat2, f:Float):Mat2 {
+		var m:KhaMat2 = m;
 		return new Mat2(m._00 / f, m._10 / f, m._01 / f, m._11 / f);
 	}
 
 	@:op(a / b)
-	static inline function divScalarInv(f:FastFloat, m:Mat2):Mat2 {
-		var m:FastMatrix2 = m;
+	static inline function divScalarInv(f:Float, m:Mat2):Mat2 {
+		var m:KhaMat2 = m;
 		return new Mat2(f / m._00, f / m._10, f / m._01, f / m._11);
 	}
 
 	@:op(a == b)
 	static inline function equal(m:Mat2, n:Mat2):Bool {
-		var m:FastMatrix2 = m;
-		var n:FastMatrix2 = n;
+		var m:KhaMat2 = m;
+		var n:KhaMat2 = n;
 		return m._00 == n._00 && m._10 == n._10 && m._01 == n._01 && m._11 == n._11;
 	}
 
@@ -233,7 +229,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 		Copies matrix elements in column-major order into a type that supports array-write access
 	**/
 	@:overload(function<T>(arrayLike:T, index:Int):T {})
-	public macro function copyIntoArray(self:haxe.macro.Expr.ExprOf<Mat2>, array:haxe.macro.Expr.ExprOf<ArrayAccess<FastFloat>>,
+	public macro function copyIntoArray(self:haxe.macro.Expr.ExprOf<Mat2>, array:haxe.macro.Expr.ExprOf<ArrayAccess<Float>>,
 			index:haxe.macro.Expr.ExprOf<Int>) {
 		return macro {
 			var self = $self;
@@ -249,7 +245,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 		Copies matrix elements in column-major order from a type that supports array-read access
 	**/
 	@:overload(function<T>(arrayLike:T, index:Int):Mat2 {})
-	public macro function copyFromArray(self:haxe.macro.Expr.ExprOf<Mat2>, array:haxe.macro.Expr.ExprOf<ArrayAccess<FastFloat>>,
+	public macro function copyFromArray(self:haxe.macro.Expr.ExprOf<Mat2>, array:haxe.macro.Expr.ExprOf<ArrayAccess<Float>>,
 			index:haxe.macro.Expr.ExprOf<Int>) {
 		return macro {
 			var self = $self;
@@ -264,7 +260,7 @@ abstract Mat2(FastMatrix2) from FastMatrix2 to FastMatrix2 {
 	// static macros
 
 	@:overload(function<T>(arrayLike:T, index:Int):T {})
-	public static macro function fromArray(array:ExprOf<ArrayAccess<FastFloat>>, index:ExprOf<Int>):ExprOf<Mat2> {
+	public static macro function fromArray(array:ExprOf<ArrayAccess<Float>>, index:ExprOf<Int>):ExprOf<Mat2> {
 		return macro {
 			var array = $array;
 			var i:Int = $index;

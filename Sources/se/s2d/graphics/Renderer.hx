@@ -141,7 +141,7 @@ class Renderer {
 			}
 			#else
 			for (sprite in layer.sprites) {
-				g4.setMatrix3(modelCL, sprite.finalModel);
+				g4.setMatrix3(modelCL, sprite._transform);
 				g4.setVector4(cropRectCL, sprite.cropRect);
 				g4.setTexture(textureMapTU, sprite.atlas.textureMap);
 				g4.drawIndexedVertices();

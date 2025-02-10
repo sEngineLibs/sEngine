@@ -4,7 +4,7 @@ import kha.Canvas;
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
-import se.math.Vec2;
+import se.math.VectorMath;
 
 class Fisheye extends PPEffect {
 	var textureMapTU:TextureUnit;

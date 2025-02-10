@@ -5,44 +5,10 @@ import haxe.macro.Expr.ExprOf;
 #end
 
 @:nullSafety
+@:forward.new
+@:forward(x, y, z, w)
 abstract Vec4I(Vec4IData) from Vec4IData to Vec4IData {
 	#if !macro
-	public var x(get, set):Int;
-
-	inline function get_x()
-		return this.x;
-
-	inline function set_x(v:Int)
-		return this.x = v;
-
-	public var y(get, set):Int;
-
-	inline function get_y()
-		return this.y;
-
-	inline function set_y(v:Int)
-		return this.y = v;
-
-	public var z(get, set):Int;
-
-	inline function get_z()
-		return this.z;
-
-	inline function set_z(v:Int)
-		return this.z = v;
-
-	public var w(get, set):Int;
-
-	inline function get_w()
-		return this.w;
-
-	inline function set_w(v:Int)
-		return this.w = v;
-
-	public inline function new(x:Int, y:Int, z:Int, w:Int) {
-		this = new Vec4IData(x, y, z, w);
-	}
-
 	@:from
 	public static inline function fromVec4(value:Vec4):Vec4I {
 		return new Vec4I(Std.int(value.x), Std.int(value.y), Std.int(value.z), Std.int(value.w));
@@ -56,30 +22,30 @@ abstract Vec4I(Vec4IData) from Vec4IData to Vec4IData {
 	}
 
 	public inline function clone() {
-		return new Vec4I(x, y, z, w);
+		return new Vec4I(this.x, this.y, this.z, this.w);
 	}
 
 	public inline function toString() {
-		return 'vec4(${x}, ${y}, ${z}, ${w})';
+		return 'vec4(${this.x}, ${this.y}, ${this.z}, ${this.w})';
 	}
 
 	@:op([])
 	inline function arrayRead(i:Int)
 		return switch i {
-			case 0: x;
-			case 1: y;
-			case 2: z;
-			case 3: w;
+			case 0: this.x;
+			case 1: this.y;
+			case 2: this.z;
+			case 3: this.w;
 			default: null;
 		}
 
 	@:op([])
 	inline function arrayWrite(i:Int, v:Int)
 		return switch i {
-			case 0: x = v;
-			case 1: y = v;
-			case 2: z = v;
-			case 3: w = v;
+			case 0: this.x = v;
+			case 1: this.y = v;
+			case 2: this.z = v;
+			case 3: this.w = v;
 			default: null;
 		}
 

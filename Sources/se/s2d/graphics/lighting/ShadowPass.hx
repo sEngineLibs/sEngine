@@ -46,7 +46,7 @@ class ShadowPass {
 			g4.setIndexBuffer(light.layer.shadowBuffer.indices);
 			g4.setVertexBuffer(light.layer.shadowBuffer.vertices);
 			g4.setMatrix3(vpCL, Stage.current.viewProjection);
-			g4.setVector2(lightPosCL, light.finalModel.translation);
+			g4.setVector2(lightPosCL, light._transform.translation);
 			g4.drawIndexedVertices();
 		}
 		g4.end();

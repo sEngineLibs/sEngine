@@ -7,7 +7,7 @@ import se.s2d.geometry.Mesh;
 using se.extensions.VectorExt;
 
 class Sprite extends StageObject {
-	var index:UInt;
+	var _id:UInt;
 
 	public var mesh:Mesh;
 	public var cropRect:Vec4 = new Vec4(0.0, 0.0, 1.0, 1.0);
@@ -38,20 +38,6 @@ class Sprite extends StageObject {
 		if (polygons != null)
 			this.mesh = polygons;
 	}
-
-	function onZChanged() {
-		var i = 0;
-		for (sprite in layer.sprites) {
-			if (sprite.finalZ <= finalZ) {
-				layer.sprites.rearrange(index, i);
-				index = i;
-				break;
-			}
-			++i;
-		}
-	}
-
-	function onTransformationChanged() {}
 
 	#if (S2D_SPRITE_INSTANCING == 1)
 	function set_atlas(value:SpriteAtlas) {

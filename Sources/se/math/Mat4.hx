@@ -1,18 +1,41 @@
 package se.math;
 
-import kha.FastFloat;
-import kha.math.FastMatrix4;
+import kha.math.FastMatrix4 as KhaMat4;
 
+@:forward.new
 @:forward(_00, _10, _20, _30, _01, _11, _21, _31, _02, _12, _22, _32, _03, _13, _23, _33)
-abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
+abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	#if !macro
-	public inline function new(a00:FastFloat, a10:FastFloat, a20:FastFloat, a30:FastFloat, a01:FastFloat, a11:FastFloat, a21:FastFloat, a31:FastFloat,
-			a02:FastFloat, a12:FastFloat, a22:FastFloat, a32:FastFloat, a03:FastFloat, a13:FastFloat, a23:FastFloat, a33:FastFloat) {
-		this = new FastMatrix4(a00, a10, a20, a30, a01, a11, a21, a31, a02, a12, a22, a32, a03, a13, a23, a33);
+	public static inline function identity():Mat4 {
+		return KhaMat4.identity();
 	}
 
-	public inline function set(a00:FastFloat, a10:FastFloat, a20:FastFloat, a30:FastFloat, a01:FastFloat, a11:FastFloat, a21:FastFloat, a31:FastFloat,
-			a02:FastFloat, a12:FastFloat, a22:FastFloat, a32:FastFloat, a03:FastFloat, a13:FastFloat, a23:FastFloat, a33:FastFloat) {
+	public static inline function empty():Mat4 {
+		return KhaMat4.empty();
+	}
+
+	public static inline function translation(x:Float, y:Float, z:Float):Mat4 {
+		return KhaMat4.translation(x, y, z);
+	}
+
+	public static inline function scale(x:Float, y:Float, z:Float):Mat4 {
+		return KhaMat4.scale(x, y, z);
+	}
+
+	public static inline function rotation(yaw:Float, pitch:Float, roll:Float):Mat4 {
+		return KhaMat4.rotation(yaw, pitch, roll);
+	}
+
+	public static inline function orthogonalProjection(left:Float, right:Float, bottom:Float, top:Float, zn:Float, zf:Float):Mat4 {
+		return KhaMat4.orthogonalProjection(left, right, bottom, top, zn, zf);
+	}
+
+	public static inline function perspectiveProjection(fovY:Float, aspect:Float, zn:Float, zf:Float):Mat4 {
+		return KhaMat4.perspectiveProjection(fovY, aspect, zn, zf);
+	}
+
+	public inline function set(a00:Float, a10:Float, a20:Float, a30:Float, a01:Float, a11:Float, a21:Float, a31:Float, a02:Float, a12:Float, a22:Float,
+			a32:Float, a03:Float, a13:Float, a23:Float, a33:Float) {
 		this._00 = a00;
 		this._10 = a10;
 		this._20 = a20;
@@ -43,7 +66,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 
 	public inline function matrixCompMult(n:Mat4):Mat4 {
 		var m = this;
-		var n:FastMatrix4 = n;
+		var n:KhaMat4 = n;
 		return new Mat4(m._00 * n._00, m._10 * n._10, m._20 * n._20, m._30 * n._30, m._01 * n._01, m._11 * n._11, m._21 * n._21, m._31 * n._31, m._02 * n._02,
 			m._12 * n._12, m._22 * n._22, m._32 * n._32, m._03 * n._03, m._13 * n._13, m._23 * n._23, m._33 * n._33);
 	}
@@ -55,7 +78,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 		return new Mat4(m._00, m._01, m._02, m._03, m._10, m._11, m._12, m._13, m._20, m._21, m._22, m._23, m._30, m._31, m._32, m._33);
 	}
 
-	public inline function determinant():FastFloat {
+	public inline function determinant():Float {
 		var m = this;
 		var b0 = m._00 * m._11 - m._10 * m._01;
 		var b1 = m._00 * m._21 - m._20 * m._01;
@@ -159,7 +182,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 
 	@:op(-a)
 	static inline function neg(m:Mat4) {
-		var m:FastMatrix4 = m;
+		var m:KhaMat4 = m;
 		return new Mat4(-m._00,
 			-m._10,
 			-m._20,
@@ -180,7 +203,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 
 	@:op(++a)
 	static inline function prefixIncrement(m:Mat4) {
-		var _m:FastMatrix4 = m;
+		var _m:KhaMat4 = m;
 		++_m._00;
 		++_m._10;
 		++_m._20;
@@ -202,7 +225,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 
 	@:op(--a)
 	static inline function prefixDecrement(m:Mat4) {
-		var _m:FastMatrix4 = m;
+		var _m:KhaMat4 = m;
 		--_m._00;
 		--_m._10;
 		--_m._20;
@@ -225,7 +248,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 	@:op(a++)
 	static inline function postfixIncrement(m:Mat4) {
 		var ret = m.clone();
-		var m:FastMatrix4 = m;
+		var m:KhaMat4 = m;
 		++m._00;
 		++m._10;
 		++m._20;
@@ -248,7 +271,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 	@:op(a--)
 	static inline function postfixDecrement(m:Mat4) {
 		var ret = m.clone();
-		var m:FastMatrix4 = m;
+		var m:KhaMat4 = m;
 		--m._00;
 		--m._10;
 		--m._20;
@@ -275,7 +298,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 		return a.copyFrom(a * b);
 
 	@:op(a *= b)
-	static inline function mulEqScalar(a:Mat4, f:FastFloat):Mat4
+	static inline function mulEqScalar(a:Mat4, f:Float):Mat4
 		return a.copyFrom(a * f);
 
 	@:op(a /= b)
@@ -283,7 +306,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 		return a.copyFrom(a / b);
 
 	@:op(a /= b)
-	static inline function divEqScalar(a:Mat4, f:FastFloat):Mat4
+	static inline function divEqScalar(a:Mat4, f:Float):Mat4
 		return a.copyFrom(a / f);
 
 	@:op(a += b)
@@ -291,7 +314,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 		return a.copyFrom(a + b);
 
 	@:op(a += b)
-	static inline function addEqScalar(a:Mat4, f:FastFloat):Mat4
+	static inline function addEqScalar(a:Mat4, f:Float):Mat4
 		return a.copyFrom(a + f);
 
 	@:op(a -= b)
@@ -299,13 +322,13 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 		return a.copyFrom(a - b);
 
 	@:op(a -= b)
-	static inline function subEqScalar(a:Mat4, f:FastFloat):Mat4
+	static inline function subEqScalar(a:Mat4, f:Float):Mat4
 		return a.copyFrom(a - f);
 
 	@:op(a + b)
 	static inline function add(m:Mat4, n:Mat4):Mat4 {
-		var m:FastMatrix4 = m;
-		var n:FastMatrix4 = n;
+		var m:KhaMat4 = m;
+		var n:KhaMat4 = n;
 		return new Mat4(m._00
 			+ n._00, m._10
 			+ n._10, m._20
@@ -327,8 +350,8 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 	}
 
 	@:op(a + b) @:commutative
-	static inline function addScalar(m:Mat4, f:FastFloat):Mat4 {
-		var m:FastMatrix4 = m;
+	static inline function addScalar(m:Mat4, f:Float):Mat4 {
+		var m:KhaMat4 = m;
 		return new Mat4(m._00
 			+ f, m._10
 			+ f, m._20
@@ -351,8 +374,8 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 
 	@:op(a - b)
 	static inline function sub(m:Mat4, n:Mat4):Mat4 {
-		var m:FastMatrix4 = m;
-		var n:FastMatrix4 = n;
+		var m:KhaMat4 = m;
+		var n:KhaMat4 = n;
 		return new Mat4(m._00
 			- n._00, m._10
 			- n._10, m._20
@@ -374,8 +397,8 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 	}
 
 	@:op(a - b)
-	static inline function subScalar(m:Mat4, f:FastFloat):Mat4 {
-		var m:FastMatrix4 = m;
+	static inline function subScalar(m:Mat4, f:Float):Mat4 {
+		var m:KhaMat4 = m;
 		return new Mat4(m._00
 			- f, m._10
 			- f, m._20
@@ -397,8 +420,8 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 	}
 
 	@:op(a - b)
-	static inline function subScalarInv(f:FastFloat, m:Mat4):Mat4 {
-		var m:FastMatrix4 = m;
+	static inline function subScalarInv(f:Float, m:Mat4):Mat4 {
+		var m:KhaMat4 = m;
 		return new Mat4(f
 			- m._00, f
 			- m._10, f
@@ -421,8 +444,8 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 
 	@:op(a * b)
 	static inline function mul(m:Mat4, n:Mat4):Mat4 {
-		var m:FastMatrix4 = m;
-		var n:FastMatrix4 = n;
+		var m:KhaMat4 = m;
+		var n:KhaMat4 = n;
 		return new Mat4(m._00 * n._00
 			+ m._01 * n._10
 			+ m._02 * n._20
@@ -483,7 +506,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 
 	@:op(a * b)
 	static inline function postMulVec4(m:Mat4, v:Vec4):Vec4 {
-		var m:FastMatrix4 = m;
+		var m:KhaMat4 = m;
 		return new Vec4(m._00 * v.x
 			+ m._01 * v.y
 			+ m._02 * v.z
@@ -502,14 +525,14 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 
 	@:op(a * b)
 	static inline function preMulVec4(v:Vec4, m:Mat4):Vec4 {
-		var m:FastMatrix4 = m;
+		var m:KhaMat4 = m;
 		return new Vec4(v.dot(new Vec4(m._00, m._10, m._20, m._30)), v.dot(new Vec4(m._01, m._11, m._21, m._31)), v.dot(new Vec4(m._02, m._12, m._22, m._32)),
 			v.dot(new Vec4(m._03, m._13, m._23, m._33)));
 	}
 
 	@:op(a * b) @:commutative
-	static inline function mulScalar(m:Mat4, f:FastFloat):Mat4 {
-		var m:FastMatrix4 = m;
+	static inline function mulScalar(m:Mat4, f:Float):Mat4 {
+		var m:KhaMat4 = m;
 		return new Mat4(m._00 * f, m._10 * f, m._20 * f, m._30 * f, m._01 * f, m._11 * f, m._21 * f, m._31 * f, m._02 * f, m._12 * f, m._22 * f, m._32 * f,
 			m._03 * f, m._13 * f, m._23 * f, m._33 * f);
 	}
@@ -519,23 +542,23 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 		return m.matrixCompMult(1.0 / n);
 
 	@:op(a / b)
-	static inline function divScalar(m:Mat4, f:FastFloat):Mat4 {
-		var m:FastMatrix4 = m;
+	static inline function divScalar(m:Mat4, f:Float):Mat4 {
+		var m:KhaMat4 = m;
 		return new Mat4(m._00 / f, m._10 / f, m._20 / f, m._30 / f, m._01 / f, m._11 / f, m._21 / f, m._31 / f, m._02 / f, m._12 / f, m._22 / f, m._32 / f,
 			m._03 / f, m._13 / f, m._23 / f, m._33 / f);
 	}
 
 	@:op(a / b)
-	static inline function divScalarInv(f:FastFloat, m:Mat4):Mat4 {
-		var m:FastMatrix4 = m;
+	static inline function divScalarInv(f:Float, m:Mat4):Mat4 {
+		var m:KhaMat4 = m;
 		return new Mat4(f / m._00, f / m._10, f / m._20, f / m._30, f / m._01, f / m._11, f / m._21, f / m._31, f / m._02, f / m._12, f / m._22, f / m._32,
 			f / m._03, f / m._13, f / m._23, f / m._33);
 	}
 
 	@:op(a == b)
 	static inline function equal(m:Mat4, n:Mat4):Bool {
-		var m:FastMatrix4 = m;
-		var n:FastMatrix4 = n;
+		var m:KhaMat4 = m;
+		var n:KhaMat4 = n;
 		return m._00 == n._00 && m._10 == n._10 && m._20 == n._20 && m._30 == n._30 && m._01 == n._01 && m._11 == n._11 && m._21 == n._21 && m._31 == n._31
 			&& m._02 == n._02 && m._12 == n._12 && m._22 == n._22 && m._32 == n._32 && m._03 == n._03 && m._13 == n._13 && m._23 == n._23 && m._33 == n._33;
 	}
@@ -549,7 +572,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 		Copies matrix elements in column-major order into a type that supports array-write access
 	**/
 	@:overload(function<T>(arrayLike:T, index:Int):T {})
-	public macro function copyIntoArray(self:haxe.macro.Expr.ExprOf<Mat4>, array:haxe.macro.Expr.ExprOf<ArrayAccess<FastFloat>>,
+	public macro function copyIntoArray(self:haxe.macro.Expr.ExprOf<Mat4>, array:haxe.macro.Expr.ExprOf<ArrayAccess<Float>>,
 			index:haxe.macro.Expr.ExprOf<Int>) {
 		return macro {
 			var self = $self;
@@ -567,7 +590,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 		Copies matrix elements in column-major order from a type that supports array-read access
 	**/
 	@:overload(function<T>(arrayLike:T, index:Int):Mat4 {})
-	public macro function copyFromArray(self:haxe.macro.Expr.ExprOf<Mat4>, array:haxe.macro.Expr.ExprOf<ArrayAccess<FastFloat>>,
+	public macro function copyFromArray(self:haxe.macro.Expr.ExprOf<Mat4>, array:haxe.macro.Expr.ExprOf<ArrayAccess<Float>>,
 			index:haxe.macro.Expr.ExprOf<Int>) {
 		return macro {
 			var self = $self;
@@ -584,7 +607,7 @@ abstract Mat4(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 	// static macros
 
 	@:overload(function<T>(arrayLike:T, index:Int):T {})
-	public static macro function fromArray(array:ExprOf<ArrayAccess<FastFloat>>, index:ExprOf<Int>):ExprOf<Mat4> {
+	public static macro function fromArray(array:ExprOf<ArrayAccess<Float>>, index:ExprOf<Int>):ExprOf<Mat4> {
 		return macro {
 			var array = $array;
 			var i:Int = $index;

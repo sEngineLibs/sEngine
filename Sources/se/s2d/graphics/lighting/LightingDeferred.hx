@@ -113,7 +113,7 @@ class LightingDeferred {
 				g4.setVertexBuffer(@:privateAccess SEngine.vertices);
 				g4.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
 				#end
-				g4.setFloat3(lightPositionCL, light.finalModel._20, light.finalModel._21, light.z);
+				g4.setFloat3(lightPositionCL, light._transform._20, light._transform._21, light.z);
 				g4.setVector3(lightColorCL, light.color.RGB);
 				g4.setFloat2(lightAttribCL, light.power, light.radius);
 				g4.drawIndexedVertices();

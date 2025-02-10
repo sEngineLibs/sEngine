@@ -5,36 +5,10 @@ import haxe.macro.Expr.ExprOf;
 #end
 
 @:nullSafety
+@:forward.new
+@:forward(x, y, z)
 abstract Vec3I(Vec3IData) from Vec3IData to Vec3IData {
 	#if !macro
-	public var x(get, set):Int;
-
-	inline function get_x()
-		return this.x;
-
-	inline function set_x(v:Int)
-		return this.x = v;
-
-	public var y(get, set):Int;
-
-	inline function get_y()
-		return this.y;
-
-	inline function set_y(v:Int)
-		return this.y = v;
-
-	public var z(get, set):Int;
-
-	inline function get_z()
-		return this.z;
-
-	inline function set_z(v:Int)
-		return this.z = v;
-
-	public inline function new(x:Int, y:Int, z:Int) {
-		this = new Vec3IData(x, y, z);
-	}
-
 	@:from
 	public static inline function fromVec3(value:Vec3):Vec3I {
 		return new Vec3I(Std.int(value.x), Std.int(value.y), Std.int(value.z));
@@ -47,28 +21,28 @@ abstract Vec3I(Vec3IData) from Vec3IData to Vec3IData {
 	}
 
 	public inline function clone() {
-		return new Vec3I(x, y, z);
+		return new Vec3I(this.x, this.y, this.z);
 	}
 
 	public inline function toString() {
-		return 'vec3(${x}, ${y}, ${z})';
+		return 'vec3(${this.x}, ${this.y}, ${this.z})';
 	}
 
 	@:op([])
 	inline function arrayRead(i:Int)
 		return switch i {
-			case 0: x;
-			case 1: y;
-			case 2: z;
+			case 0: this.x;
+			case 1: this.y;
+			case 2: this.z;
 			default: null;
 		}
 
 	@:op([])
 	inline function arrayWrite(i:Int, v:Int)
 		return switch i {
-			case 0: x = v;
-			case 1: y = v;
-			case 2: z = v;
+			case 0: this.x = v;
+			case 1: this.y = v;
+			case 2: this.z = v;
 			default: null;
 		}
 

@@ -1,6 +1,5 @@
 package se.s2d;
 
-import haxe.ds.Vector;
 import se.s2d.SpriteAtlas;
 import se.s2d.objects.Sprite;
 #if (S2D_LIGHTING == 1)
@@ -9,13 +8,12 @@ import se.s2d.objects.Light;
 import se.s2d.graphics.ShadowBuffer;
 #end
 #end
-using se.extensions.VectorExt;
 
 class Layer {
 	var stage:Stage;
 
-	public var sprites:Vector<Sprite> = new Vector(0);
-	public var spriteAtlases:Vector<SpriteAtlas> = new Vector(0);
+	public var sprites:Array<Sprite> = [];
+	public var spriteAtlases:Array<SpriteAtlas> = [];
 
 	public function new(?stage:Stage) {
 		if (stage != null)
@@ -29,16 +27,16 @@ class Layer {
 	}
 
 	public function addSprite(sprite:Sprite) {
-		@:privateAccess sprite.index = sprites.length;
-		sprites = sprites.push(sprite);
+		@:privateAccess sprite._id = sprites.length;
+		sprites.push(sprite);
 	}
 
 	public function addSpriteAtlas(atlas:SpriteAtlas) {
-		spriteAtlases = spriteAtlases.push(atlas);
+		spriteAtlases.push(atlas);
 	}
 
 	#if (S2D_LIGHTING == 1)
-	public var lights:Vector<Light> = new Vector(0);
+	public var lights:Array<Light> = [];
 
 	public function addLight(light:Light) {
 		lights = lights.push(light);

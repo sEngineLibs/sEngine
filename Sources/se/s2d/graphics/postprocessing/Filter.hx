@@ -4,7 +4,7 @@ import kha.Canvas;
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
-import se.math.Mat3;
+import se.math.VectorMath;
 
 class Filter extends PPEffect {
 	var textureMapTU:TextureUnit;

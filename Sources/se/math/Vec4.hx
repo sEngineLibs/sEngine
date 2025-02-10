@@ -1,57 +1,21 @@
 package se.math;
 
-import kha.FastFloat;
-import kha.math.FastVector4;
 #if macro
 import haxe.macro.Expr.ExprOf;
 #end
+import kha.math.FastVector4 as KhaVec4;
 
 @:nullSafety
-#if !macro @:build(se.math.VectorMath.Swizzle.generateFields(4)) #end
-abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
+@:forward.new
+@:forward(x, y, z, w) #if !macro @:build(se.math.VectorMath.Swizzle.generateFields(4)) #end
+abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 	#if !macro
-	public var x(get, set):FastFloat;
-
-	inline function get_x()
-		return this.x;
-
-	inline function set_x(v:FastFloat)
-		return this.x = v;
-
-	public var y(get, set):FastFloat;
-
-	inline function get_y()
-		return this.y;
-
-	inline function set_y(v:FastFloat)
-		return this.y = v;
-
-	public var z(get, set):FastFloat;
-
-	inline function get_z()
-		return this.z;
-
-	inline function set_z(v:FastFloat)
-		return this.z = v;
-
-	public var w(get, set):FastFloat;
-
-	inline function get_w()
-		return this.w;
-
-	inline function set_w(v:FastFloat)
-		return this.w = v;
-
-	public inline function new(x:FastFloat, y:FastFloat, z:FastFloat, w:FastFloat) {
-		this = new FastVector4(x, y, z, w);
-	}
-
 	@:to
 	public inline function toVec4I():Vec4I {
 		return Vec4I.fromVec4(this);
 	}
 
-	public inline function set(x:FastFloat, y:FastFloat, z:FastFloat, w:FastFloat) {
+	public inline function set(x:Float, y:Float, z:Float, w:Float) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -59,7 +23,7 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	}
 
 	public inline function clone() {
-		return new Vec4(x, y, z, w);
+		return new Vec4(this.x, this.y, this.z, this.w);
 	}
 
 	// Trigonometric
@@ -72,56 +36,56 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	}
 
 	public inline function sin():Vec4 {
-		return new Vec4(Math.sin(x), Math.sin(y), Math.sin(z), Math.sin(w));
+		return new Vec4(Math.sin(this.x), Math.sin(this.y), Math.sin(this.z), Math.sin(this.w));
 	}
 
 	public inline function cos():Vec4 {
-		return new Vec4(Math.cos(x), Math.cos(y), Math.cos(z), Math.cos(w));
+		return new Vec4(Math.cos(this.x), Math.cos(this.y), Math.cos(this.z), Math.cos(this.w));
 	}
 
 	public inline function tan():Vec4 {
-		return new Vec4(Math.tan(x), Math.tan(y), Math.tan(z), Math.tan(w));
+		return new Vec4(Math.tan(this.x), Math.tan(this.y), Math.tan(this.z), Math.tan(this.w));
 	}
 
 	public inline function asin():Vec4 {
-		return new Vec4(Math.asin(x), Math.asin(y), Math.asin(z), Math.asin(w));
+		return new Vec4(Math.asin(this.x), Math.asin(this.y), Math.asin(this.z), Math.asin(this.w));
 	}
 
 	public inline function acos():Vec4 {
-		return new Vec4(Math.acos(x), Math.acos(y), Math.acos(z), Math.acos(w));
+		return new Vec4(Math.acos(this.x), Math.acos(this.y), Math.acos(this.z), Math.acos(this.w));
 	}
 
 	public inline function atan():Vec4 {
-		return new Vec4(Math.atan(x), Math.atan(y), Math.atan(z), Math.atan(w));
+		return new Vec4(Math.atan(this.x), Math.atan(this.y), Math.atan(this.z), Math.atan(this.w));
 	}
 
 	public inline function atan2(b:Vec4):Vec4 {
-		return new Vec4(Math.atan2(x, b.x), Math.atan2(y, b.y), Math.atan2(z, b.z), Math.atan2(w, b.w));
+		return new Vec4(Math.atan2(this.x, b.x), Math.atan2(this.y, b.y), Math.atan2(this.z, b.z), Math.atan2(this.w, b.w));
 	}
 
 	// Exponential
 	public inline function pow(e:Vec4):Vec4 {
-		return new Vec4(Math.pow(x, e.x), Math.pow(y, e.y), Math.pow(z, e.z), Math.pow(w, e.w));
+		return new Vec4(Math.pow(this.x, e.x), Math.pow(this.y, e.y), Math.pow(this.z, e.z), Math.pow(this.w, e.w));
 	}
 
 	public inline function exp():Vec4 {
-		return new Vec4(Math.exp(x), Math.exp(y), Math.exp(z), Math.exp(w));
+		return new Vec4(Math.exp(this.x), Math.exp(this.y), Math.exp(this.z), Math.exp(this.w));
 	}
 
 	public inline function log():Vec4 {
-		return new Vec4(Math.log(x), Math.log(y), Math.log(z), Math.log(w));
+		return new Vec4(Math.log(this.x), Math.log(this.y), Math.log(this.z), Math.log(this.w));
 	}
 
 	public inline function exp2():Vec4 {
-		return new Vec4(Math.pow(2, x), Math.pow(2, y), Math.pow(2, z), Math.pow(2, w));
+		return new Vec4(Math.pow(2, this.x), Math.pow(2, this.y), Math.pow(2, this.z), Math.pow(2, this.w));
 	}
 
 	public inline function log2():Vec4 @:privateAccess {
-		return new Vec4(VectorMath.log2f(x), VectorMath.log2f(y), VectorMath.log2f(z), VectorMath.log2f(w));
+		return new Vec4(VectorMath.log2f(this.x), VectorMath.log2f(this.y), VectorMath.log2f(this.z), VectorMath.log2f(this.w));
 	}
 
 	public inline function sqrt():Vec4 {
-		return new Vec4(Math.sqrt(x), Math.sqrt(y), Math.sqrt(z), Math.sqrt(w));
+		return new Vec4(Math.sqrt(this.x), Math.sqrt(this.y), Math.sqrt(this.z), Math.sqrt(this.w));
 	}
 
 	public inline function inverseSqrt():Vec4 {
@@ -130,26 +94,26 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 
 	// Common
 	public inline function abs():Vec4 {
-		return new Vec4(Math.abs(x), Math.abs(y), Math.abs(z), Math.abs(w));
+		return new Vec4(Math.abs(this.x), Math.abs(this.y), Math.abs(this.z), Math.abs(this.w));
 	}
 
 	public inline function sign():Vec4 {
-		return new Vec4(x > 0.?1.:(x < 0.? -1.:0.), y > 0.?1.:(y < 0.? -1.:0.), z > 0.?1.:(z < 0.? -1.:0.), w > 0.?1.:(w < 0.? -1.:0.));
+		return new Vec4(this.x > 0.?1.:(this.x < 0.? -1.:0.), this.y > 0.?1.:(this.y < 0.? -1.:0.), this.z > 0.?1.:(this.z < 0.? -1.:0.), this.w > 0.?1.:(this.w < 0.? -1.:0.));
 	}
 
 	public inline function floor():Vec4 {
-		return new Vec4(Math.floor(x), Math.floor(y), Math.floor(z), Math.floor(w));
+		return new Vec4(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z), Math.floor(this.w));
 	}
 
 	public inline function ceil():Vec4 {
-		return new Vec4(Math.ceil(x), Math.ceil(y), Math.ceil(z), Math.ceil(w));
+		return new Vec4(Math.ceil(this.x), Math.ceil(this.y), Math.ceil(this.z), Math.ceil(this.w));
 	}
 
 	public inline function fract():Vec4 {
 		return (this : Vec4) - floor();
 	}
 
-	public extern overload inline function mod(d:FastFloat):Vec4 {
+	public extern overload inline function mod(d:Float):Vec4 {
 		return (this : Vec4) - d * ((this : Vec4) / d).floor();
 	}
 
@@ -158,26 +122,26 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	}
 
 	public extern overload inline function min(b:Vec4):Vec4 {
-		return new Vec4(b.x < x ? b.x : x, b.y < y ? b.y : y, b.z < z ? b.z : z, b.w < w ? b.w : w);
+		return new Vec4(b.x < this.x ? b.x : this.x, b.y < this.y ? b.y : this.y, b.z < this.z ? b.z : this.z, b.w < this.w ? b.w : this.w);
 	}
 
-	public extern overload inline function min(b:FastFloat):Vec4 {
-		return new Vec4(b < x ? b : x, b < y ? b : y, b < z ? b : z, b < w ? b : w);
+	public extern overload inline function min(b:Float):Vec4 {
+		return new Vec4(b < this.x ? b : this.x, b < this.y ? b : this.y, b < this.z ? b : this.z, b < this.w ? b : this.w);
 	}
 
 	public extern overload inline function max(b:Vec4):Vec4 {
-		return new Vec4(x < b.x ? b.x : x, y < b.y ? b.y : y, z < b.z ? b.z : z, w < b.w ? b.w : w);
+		return new Vec4(this.x < b.x ? b.x : this.x, this.y < b.y ? b.y : this.y, this.z < b.z ? b.z : this.z, this.w < b.w ? b.w : this.w);
 	}
 
-	public extern overload inline function max(b:FastFloat):Vec4 {
-		return new Vec4(x < b ? b : x, y < b ? b : y, z < b ? b : z, w < b ? b : w);
+	public extern overload inline function max(b:Float):Vec4 {
+		return new Vec4(this.x < b ? b : this.x, this.y < b ? b : this.y, this.z < b ? b : this.z, this.w < b ? b : this.w);
 	}
 
 	public extern overload inline function clamp(minLimit:Vec4, maxLimit:Vec4) {
 		return max(minLimit).min(maxLimit);
 	}
 
-	public extern overload inline function clamp(minLimit:FastFloat, maxLimit:FastFloat) {
+	public extern overload inline function clamp(minLimit:Float, maxLimit:Float) {
 		return max(minLimit).min(maxLimit);
 	}
 
@@ -185,16 +149,16 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 		return (this : Vec4) * (1.0 - t) + b * t;
 	}
 
-	public extern overload inline function mix(b:Vec4, t:FastFloat):Vec4 {
+	public extern overload inline function mix(b:Vec4, t:Float):Vec4 {
 		return (this : Vec4) * (1.0 - t) + b * t;
 	}
 
 	public extern overload inline function step(edge:Vec4):Vec4 {
-		return new Vec4(x < edge.x ? 0.0 : 1.0, y < edge.y ? 0.0 : 1.0, z < edge.z ? 0.0 : 1.0, w < edge.w ? 0.0 : 1.0);
+		return new Vec4(this.x < edge.x ? 0.0 : 1.0, this.y < edge.y ? 0.0 : 1.0, this.z < edge.z ? 0.0 : 1.0, this.w < edge.w ? 0.0 : 1.0);
 	}
 
-	public extern overload inline function step(edge:FastFloat):Vec4 {
-		return new Vec4(x < edge ? 0.0 : 1.0, y < edge ? 0.0 : 1.0, z < edge ? 0.0 : 1.0, w < edge ? 0.0 : 1.0);
+	public extern overload inline function step(edge:Float):Vec4 {
+		return new Vec4(this.x < edge ? 0.0 : 1.0, this.y < edge ? 0.0 : 1.0, this.z < edge ? 0.0 : 1.0, this.w < edge ? 0.0 : 1.0);
 	}
 
 	public extern overload inline function smoothstep(edge0:Vec4, edge1:Vec4):Vec4 {
@@ -202,22 +166,22 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 		return t * t * (3.0 - 2.0 * t);
 	}
 
-	public extern overload inline function smoothstep(edge0:FastFloat, edge1:FastFloat):Vec4 {
+	public extern overload inline function smoothstep(edge0:Float, edge1:Float):Vec4 {
 		var t = (((this : Vec4) - edge0) / (edge1 - edge0)).clamp(0, 1);
 		return t * t * (3.0 - 2.0 * t);
 	}
 
 	// Geometric
-	public inline function length():FastFloat {
-		return Math.sqrt(x * x + y * y + z * z + w * w);
+	public inline function length():Float {
+		return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
 	}
 
-	public inline function distance(b:Vec4):FastFloat {
+	public inline function distance(b:Vec4):Float {
 		return (b - this).length();
 	}
 
-	public inline function dot(b:Vec4):FastFloat {
-		return x * b.x + y * b.y + z * b.z + w * b.w;
+	public inline function dot(b:Vec4):Float {
+		return this.x * b.x + this.y * b.y + this.z * b.z + this.w * b.w;
 	}
 
 	public inline function normalize():Vec4 {
@@ -228,7 +192,7 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	}
 
 	public inline function faceforward(I:Vec4, Nref:Vec4):Vec4 {
-		return new Vec4(x, y, z, w) * (Nref.dot(I) < 0 ? 1 : -1);
+		return new Vec4(this.x, this.y, this.z, this.w) * (Nref.dot(I) < 0 ? 1 : -1);
 	}
 
 	public inline function reflect(N:Vec4):Vec4 {
@@ -236,7 +200,7 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 		return I - 2 * N.dot(I) * N;
 	}
 
-	public inline function refract(N:Vec4, eta:FastFloat):Vec4 {
+	public inline function refract(N:Vec4, eta:Float):Vec4 {
 		var I = (this : Vec4);
 		var nDotI = N.dot(I);
 		var k = 1.0 - eta * eta * (1.0 - nDotI * nDotI);
@@ -244,26 +208,26 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	}
 
 	public inline function toString() {
-		return 'vec4(${x}, ${y}, ${z}, ${w})';
+		return 'vec4(${this.x}, ${this.y}, ${this.z}, ${this.w})';
 	}
 
 	@:op([])
 	inline function arrayRead(i:Int)
 		return switch i {
-			case 0: x;
-			case 1: y;
-			case 2: z;
-			case 3: w;
+			case 0: this.x;
+			case 1: this.y;
+			case 2: this.z;
+			case 3: this.w;
 			default: null;
 		}
 
 	@:op([])
-	inline function arrayWrite(i:Int, v:FastFloat)
+	inline function arrayWrite(i:Int, v:Float)
 		return switch i {
-			case 0: x = v;
-			case 1: y = v;
-			case 2: z = v;
-			case 3: w = v;
+			case 0: this.x = v;
+			case 1: this.y = v;
+			case 2: this.z = v;
+			case 3: this.w = v;
 			default: null;
 		}
 
@@ -314,7 +278,7 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 		return new Vec4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
 
 	@:op(a * b) @:commutative
-	static inline function mulScalar(a:Vec4, b:FastFloat):Vec4
+	static inline function mulScalar(a:Vec4, b:Float):Vec4
 		return new Vec4(a.x * b, a.y * b, a.z * b, a.w * b);
 
 	@:op(a / b)
@@ -322,11 +286,11 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 		return new Vec4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
 
 	@:op(a / b)
-	static inline function divScalar(a:Vec4, b:FastFloat):Vec4
+	static inline function divScalar(a:Vec4, b:Float):Vec4
 		return new Vec4(a.x / b, a.y / b, a.z / b, a.w / b);
 
 	@:op(a / b)
-	static inline function divScalarInv(a:FastFloat, b:Vec4):Vec4
+	static inline function divScalarInv(a:Float, b:Vec4):Vec4
 		return new Vec4(a / b.x, a / b.y, a / b.z, a / b.w);
 
 	@:op(a + b)
@@ -334,7 +298,7 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 		return new Vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 
 	@:op(a + b) @:commutative
-	static inline function addScalar(a:Vec4, b:FastFloat):Vec4
+	static inline function addScalar(a:Vec4, b:Float):Vec4
 		return new Vec4(a.x + b, a.y + b, a.z + b, a.w + b);
 
 	@:op(a - b)
@@ -342,11 +306,11 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 		return new Vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 
 	@:op(a - b)
-	static inline function subScalar(a:Vec4, b:FastFloat):Vec4
+	static inline function subScalar(a:Vec4, b:Float):Vec4
 		return new Vec4(a.x - b, a.y - b, a.z - b, a.w - b);
 
 	@:op(b - a)
-	static inline function subScalarInv(a:FastFloat, b:Vec4):Vec4
+	static inline function subScalarInv(a:Float, b:Vec4):Vec4
 		return new Vec4(a - b.x, a - b.y, a - b.z, a - b.w);
 
 	@:op(a == b)
@@ -364,16 +328,16 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	 * Copy from any object with .x .y .z .w fields
 	 */
 	@:overload(function(source:{
-		x:FastFloat,
-		y:FastFloat,
-		z:FastFloat,
-		w:FastFloat
+		x:Float,
+		y:Float,
+		z:Float,
+		w:Float
 	}):Vec4 {})
 	public macro function copyFrom(self:ExprOf<Vec4>, source:ExprOf<{
-		x:FastFloat,
-		y:FastFloat,
-		z:FastFloat,
-		w:FastFloat
+		x:Float,
+		y:Float,
+		z:Float,
+		w:Float
 	}>):ExprOf<Vec4> {
 		return macro {
 			var self = $self;
@@ -390,17 +354,17 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	 * Copy into any object with .x .y .z .w fields
 	 */
 	@:overload(function(target:{
-		x:FastFloat,
-		y:FastFloat,
-		z:FastFloat,
-		w:FastFloat
+		x:Float,
+		y:Float,
+		z:Float,
+		w:Float
 	}):{
-		x:FastFloat,
-		y:FastFloat,
-		z:FastFloat,
-		w:FastFloat
+		x:Float,
+		y:Float,
+		z:Float,
+		w:Float
 	} {})
-	public macro function copyInto(self:ExprOf<Vec4>, target:ExprOf<{x:FastFloat, y:FastFloat, z:FastFloat}>):ExprOf<{x:FastFloat, y:FastFloat, z:FastFloat}> {
+	public macro function copyInto(self:ExprOf<Vec4>, target:ExprOf<{x:Float, y:Float, z:Float}>):ExprOf<{x:Float, y:Float, z:Float}> {
 		return macro {
 			var self = $self;
 			var target = $target;
@@ -413,7 +377,7 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	}
 
 	@:overload(function<T>(arrayLike:T, index:Int):T {})
-	public macro function copyIntoArray(self:ExprOf<Vec4>, array:ExprOf<ArrayAccess<FastFloat>>, index:ExprOf<Int>) {
+	public macro function copyIntoArray(self:ExprOf<Vec4>, array:ExprOf<ArrayAccess<Float>>, index:ExprOf<Int>) {
 		return macro {
 			var self = $self;
 			var array = $array;
@@ -427,7 +391,7 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	}
 
 	@:overload(function<T>(arrayLike:T, index:Int):T {})
-	public macro function copyFromArray(self:ExprOf<Vec4>, array:ExprOf<ArrayAccess<FastFloat>>, index:ExprOf<Int>) {
+	public macro function copyFromArray(self:ExprOf<Vec4>, array:ExprOf<ArrayAccess<Float>>, index:ExprOf<Int>) {
 		return macro {
 			var self = $self;
 			var array = $array;
@@ -446,16 +410,16 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	 * Create from any object with .x .y .z .w fields
 	 */
 	@:overload(function(source:{
-		x:FastFloat,
-		y:FastFloat,
-		z:FastFloat,
-		w:FastFloat
+		x:Float,
+		y:Float,
+		z:Float,
+		w:Float
 	}):Vec4 {})
 	public static macro function from(xyzw:ExprOf<{
-		x:FastFloat,
-		y:FastFloat,
-		z:FastFloat,
-		w:FastFloat
+		x:Float,
+		y:Float,
+		z:Float,
+		w:Float
 	}>):ExprOf<Vec4> {
 		return macro {
 			var source = $xyzw;
@@ -464,7 +428,7 @@ abstract Vec4(FastVector4) from FastVector4 to FastVector4 {
 	}
 
 	@:overload(function<T>(arrayLike:T, index:Int):T {})
-	public static macro function fromArray(array:ExprOf<ArrayAccess<FastFloat>>, index:ExprOf<Int>):ExprOf<Vec4> {
+	public static macro function fromArray(array:ExprOf<ArrayAccess<Float>>, index:ExprOf<Int>):ExprOf<Vec4> {
 		return macro {
 			var array = $array;
 			var i:Int = $index;
