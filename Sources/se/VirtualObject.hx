@@ -7,6 +7,8 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 	public var parent(get, set):This;
 	public var index(get, set):Int;
 
+	public var siblings(get, never):Array<This>;
+
 	public function new(?parent:This) {
 		this.parent = parent;
 	}
@@ -58,5 +60,14 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 		_parent.children.remove(cast this);
 		_parent.children.insert(value, cast this);
 		return value;
+	}
+
+	inline function get_siblings() {
+		if (parent != null) {
+			var s = parent.children.copy();
+			s.remove(cast this);
+			return s;
+		}
+		return [];
 	}
 }

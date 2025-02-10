@@ -39,7 +39,7 @@ class ShadowBuffer {
 		var offset = 0;
 		for (sprite in sprites) {
 			for (v in sprite.mesh) {
-				var p:Vec2 = ((sprite._transform : Mat3) * vec3(v, 1.0)).xy;
+				var p:Vec2 = (sprite._transform : Mat3) * v;
 				// start
 				vert[offset + 0] = p.x;
 				vert[offset + 1] = p.y;
