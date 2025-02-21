@@ -67,22 +67,28 @@ class Timer {
 	 * @return Returns true if the timer was started
 	 */
 	public function repeat(count:Int = 1, ?lock:Bool = true):Bool {
-		if (count <= 0)
+		if (count < 0)
 			return false;
 
 		if (!lock || !started) {
 			started = true;
 			final f = callback;
-			callback = function() {
-				f();
-				count--;
-				if (count > 0) {
+			if (count > 0)
+				callback = function() {
+					f();
+					count--;
+					if (count > 0) {
+						listener = Time.notifyOnTime(callback, Time.time + delay);
+					} else {
+						started = false;
+						callback = f;
+					}
+				};
+			else
+				callback = function() {
+					f();
 					listener = Time.notifyOnTime(callback, Time.time + delay);
-				} else {
-					started = false;
-					callback = f;
-				}
-			};
+				};
 			listener = Time.notifyOnTime(callback, Time.time + delay);
 			return true;
 		}
