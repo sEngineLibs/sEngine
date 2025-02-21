@@ -13,8 +13,8 @@ import se.math.VectorMath;
 import se.animation.Action;
 import se.s2d.Stage;
 import se.s2d.graphics.Renderer;
-import se.sui.UIScene;
-import se.sui.graphics.Drawers;
+import se.s2d.ui.UIScene;
+import se.s2d.ui.graphics.Drawers;
 
 @:allow(se.system.Application)
 class SEngine {
@@ -57,7 +57,7 @@ class SEngine {
 		return value;
 	}
 
-	@:access(se.sui.graphics.Drawers)
+	@:access(se.s2d.ui.graphics.Drawers)
 	@:access(se.s2d.graphics.Renderer)
 	public static function start(window:Window) {
 		Stage.current = new Stage();

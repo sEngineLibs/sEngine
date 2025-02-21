@@ -57,6 +57,7 @@ class Timer {
 	 * Stops the timer
 	 */
 	public function stop() {
+		started = false;
 		Time.timeListeners.remove(listener);
 	}
 
