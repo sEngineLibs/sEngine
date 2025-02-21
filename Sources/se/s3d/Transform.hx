@@ -1,4 +1,4 @@
-package se;
+package se.s3d;
 
 import kha.math.FastMatrix4 as KhaMat4;
 import se.math.Vec3;
@@ -10,7 +10,7 @@ using se.extensions.Mat4Ext;
 @:nullSafety
 @:forward.new
 @:forward(_00, _10, _20, _30, _01, _11, _21, _31, _02, _12, _22, _32, _03, _13, _23, _33)
-abstract Transform3D(Mat4) from Mat4 to Mat4 {
+abstract Transform(Mat4) from Mat4 to Mat4 {
 	public var translationX(get, set):Float;
 	public var translationY(get, set):Float;
 	public var translationZ(get, set):Float;
@@ -22,7 +22,7 @@ abstract Transform3D(Mat4) from Mat4 to Mat4 {
 	public var rotation(get, set):Vec3;
 
 	@:from
-	public static inline function fromKhaMat4(value:KhaMat4):Transform3D {
+	public static inline function fromKhaMat4(value:KhaMat4):Transform {
 		return (value : Mat4);
 	}
 
@@ -70,23 +70,18 @@ abstract Transform3D(Mat4) from Mat4 to Mat4 {
 	// overload extern public inline function translateL(x:Float, y:Float, z:Float) {
 	// 	this.translateL(x, y, z);
 	// }
-
 	// overload extern public inline function translateToL(x:Float, y:Float, z:Float) {
 	// 	this.translateToL(x, y, z);
 	// }
-
 	// overload extern public inline function scaleL(x:Float, y:Float, z:Float) {
 	// 	this.scaleL(x, y, z);
 	// }
-
 	// overload extern public inline function scaleToL(x:Float, y:Float, z:Float) {
 	// 	this.scaleToL(x, y, z);
 	// }
-
 	// public inline function rotateL(x:Float, y:Float, z:Float) {
 	// 	this.rotateL(x, y, z);
 	// }
-
 	// public inline function rotateToL(x:Float, y:Float, z:Float) {
 	// 	this.rotateToL(x, y, z);
 	// }
@@ -126,31 +121,24 @@ abstract Transform3D(Mat4) from Mat4 to Mat4 {
 	// overload extern public inline function translateL(value:Vec3) {
 	// 	this.translateL(value.x, value.y, value.z);
 	// }
-
 	// overload extern public inline function translateL(value:Float) {
 	// 	this.translateL(value, value, value);
 	// }
-
 	// overload extern public inline function translateToL(value:Vec3) {
 	// 	this.translateToL(value.x, value.y, value.z);
 	// }
-
 	// overload extern public inline function translateToL(value:Float) {
 	// 	this.translateToL(value, value, value);
 	// }
-
 	// overload extern public inline function scaleL(value:Vec3) {
 	// 	this.scaleL(value.x, value.y, value.z);
 	// }
-
 	// overload extern public inline function scaleL(value:Float) {
 	// 	this.scaleL(value, value, value);
 	// }
-
 	// overload extern public inline function scaleToL(value:Vec3) {
 	// 	this.scaleToL(value.x, value.y, value.z);
 	// }
-
 	// overload extern public inline function scaleToL(value:Float) {
 	// 	this.scaleToL(value, value, value);
 	// }

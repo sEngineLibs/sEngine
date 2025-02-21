@@ -8,7 +8,6 @@ import se.s2d.objects.Light;
 import se.s2d.graphics.ShadowBuffer;
 #end
 #end
-
 class Layer {
 	var stage:Stage;
 

@@ -1,15 +1,15 @@
-package se;
+package se.s2d;
 
 import se.math.Vec2;
 import se.math.Mat3;
 
 using se.extensions.Mat3Ext;
 
-abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends VirtualObject<This> {
-	var _transform:Transform2D = Mat3.identity();
+abstract class PhysicalObject<This:PhysicalObject<This>> extends VirtualObject<This> {
+	var _transform:Transform = Mat3.identity();
 
 	@:isVar public var z(default, set):Float = 0.0;
-	public var transform:Transform2D = Mat3.identity();
+	public var transform:Transform = Mat3.identity();
 	public var transformOrigin:Vec2 = new Vec2(0.0, 0.0);
 
 	inline function updateTransform():Void {

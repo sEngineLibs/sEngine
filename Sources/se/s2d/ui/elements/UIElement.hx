@@ -12,7 +12,7 @@ import se.s2d.geometry.Position;
 import se.s2d.ui.Anchors;
 
 @:allow(se.s2d.ui.UIScene)
-class UIElement extends PhysicalObject2D<UIElement> {
+class UIElement extends PhysicalObject<UIElement> {
 	var scene:UIScene;
 	var finalOpacity(get, never):Float;
 
@@ -67,6 +67,10 @@ class UIElement extends PhysicalObject2D<UIElement> {
 
 	overload extern public static inline function mapFromElement(element:UIElement, p:Position):Position {
 		return element.mapToGlobal(p);
+	}
+
+	public function new(?parent:UIElement) {
+		super(parent);
 	}
 
 	public function setPadding(value:Float):Void {
