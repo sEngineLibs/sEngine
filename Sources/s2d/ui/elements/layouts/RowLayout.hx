@@ -35,9 +35,17 @@ class RowLayout extends UISceneElement {
 		target.g2.transformation = _transform;
 
 		var _x = x + left.padding;
+		var widthsIndex = 0;
 		for (i in 0...elements.length) {
 			final e = elements[i];
-			final _w = e.layout.fillWidth ? fillCellWidth : widths[i];
+			var _w;
+
+			if (e.layout.fillWidth) {
+				_w = fillCellWidth;
+			} else {
+				_w = widths[widthsIndex];
+				widthsIndex++;
+			}
 
 			var _y = y + top.padding;
 			var _h;

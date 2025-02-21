@@ -35,9 +35,17 @@ class ColumnLayout extends UISceneElement {
 		target.g2.transformation = _transform;
 
 		var _y = y + top.padding;
+		var heightsIndex = 0;
 		for (i in 0...elements.length) {
 			final e = elements[i];
-			final _h = e.layout.fillHeight ? fillCellHeight : heights[i];
+			var _h;
+
+			if (e.layout.fillHeight) {
+				_h = fillCellHeight;
+			} else {
+				_h = heights[heightsIndex];
+				heightsIndex++;
+			}
 
 			var _x = x + left.padding;
 			var _w;

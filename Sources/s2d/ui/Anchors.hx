@@ -17,8 +17,16 @@ class Anchors {
 	public function new() {}
 
 	public function fill(element:UIElement) {
+		fillWidth(element);
+		fillHeight(element);
+	}
+
+	public function fillWidth(element:UIElement) {
 		left = element.left;
 		top = element.top;
+	}
+
+	public function fillHeight(element:UIElement) {
 		right = element.right;
 		bottom = element.bottom;
 	}
