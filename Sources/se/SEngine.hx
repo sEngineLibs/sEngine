@@ -11,10 +11,10 @@ import se.system.Time;
 import se.math.Mat3;
 import se.math.VectorMath;
 import se.animation.Action;
-import se.s2d.Stage;
-import se.s2d.graphics.Renderer;
-import se.s2d.ui.UIScene;
-import se.s2d.ui.graphics.Drawers;
+import s2d.stage.Stage;
+import s2d.stage.graphics.Renderer;
+import s2d.ui.UIScene;
+import s2d.ui.graphics.Drawers;
 
 @:allow(se.system.Application)
 class SEngine {
@@ -57,8 +57,8 @@ class SEngine {
 		return value;
 	}
 
-	@:access(se.s2d.ui.graphics.Drawers)
-	@:access(se.s2d.graphics.Renderer)
+	@:access(s2d.ui.graphics.Drawers)
+	@:access(s2d.stage.graphics.Renderer)
 	public static function start(window:Window) {
 		Stage.current = new Stage();
 		UIScene.current = new UIScene();
@@ -96,7 +96,7 @@ class SEngine {
 		Application.notifyOnUpdate(update);
 	}
 
-	@:access(se.s2d.SpriteAtlas)
+	@:access(s2d.stage.SpriteAtlas)
 	static function update() {
 		Action.update(Time.time);
 		Stage.current.updateViewProjection();
@@ -107,7 +107,7 @@ class SEngine {
 		#end
 	}
 
-	@:access(se.s2d.graphics.Renderer)
+	@:access(s2d.stage.graphics.Renderer)
 	public static function resize(w:Int, h:Int) {
 		realWidth = w;
 		realHeight = h;
@@ -135,7 +135,7 @@ class SEngine {
 		Stage.current.updateViewProjection();
 	}
 
-	@:access(se.s2d.graphics.Renderer)
+	@:access(s2d.stage.graphics.Renderer)
 	public static function render(target:Canvas):Void {
 		var frame = Renderer.render();
 		UIScene.current.render(frame);

@@ -10,7 +10,7 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 	public var siblings(get, never):Array<This>;
 
 	public function new(?parent:This) {
-		this.parent = parent;
+		parent?.addChild(cast this);
 	}
 
 	public function addChild(value:This):Void {
@@ -28,15 +28,11 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 	}
 
 	public function setParent(value:This):Void {
-		if (value != null) {
-			value.addChild(cast this);
-		}
+		value?.addChild(cast this);
 	}
 
 	public function removeParent():Void {
-		if (parent != null) {
-			parent.removeChild(cast this);
-		}
+		parent?.removeChild(cast this);
 	}
 
 	public function toString():String {
