@@ -1,6 +1,6 @@
 package s2d.ui.graphics;
 
-import kha.Canvas;
+import se.Texture;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
@@ -27,14 +27,14 @@ abstract class ElementDrawer<T> {
 		getUniforms();
 	}
 
-	function render(target:Canvas, element:T) {
-		final g2 = target.g2, g4 = target.g4;
+	function render(target:Texture, element:T) {
+		final ctx = target.context2D, ctx3d = target.context3D;
 
-		g2.pipeline = pipeline;
-		g4.setPipeline(pipeline);
-		g4.setMatrix3(modelCL, g2.transformation);
+		ctx.pipeline = pipeline;
+		ctx3d.setPipeline(pipeline);
+		ctx3d.setMatrix3(modelCL, ctx.transformation);
 		draw(target, element);
-		g2.pipeline = null;
+		ctx.pipeline = null;
 	}
 
 	abstract function initStructure():Void;
@@ -43,5 +43,5 @@ abstract class ElementDrawer<T> {
 
 	abstract function getUniforms():Void;
 
-	abstract function draw(target:Canvas, element:T):Void;
+	abstract function draw(target:Texture, element:T):Void;
 }

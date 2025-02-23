@@ -1,7 +1,7 @@
 package s2d.ui;
 
 import kha.Assets;
-import kha.Canvas;
+import se.Texture;
 import se.system.Application;
 import se.math.Mat3;
 
@@ -18,31 +18,31 @@ class UIScene extends UIElement {
 		Application.window.notifyOnResize((w, h) -> setSize(w, h));
 	}
 
-	override function render(target:Canvas) {
-		final g2 = target.g2;
+	override function render(target:Texture) {
+		final ctx = target.context2D;
 
 		updateBounds();
-		g2.begin(false);
+		ctx.begin();
 		for (child in children) {
 			child.updateBounds();
 			child.render(target);
 		}
-		g2.color = se.Color.rgb(1.0, 1.0, 1.0);
-		g2.opacity = 0.85;
-		g2.transformation = Mat3.identity();
+		ctx.color = se.Color.rgb(1.0, 1.0, 1.0);
+		ctx.opacity = 0.85;
+		ctx.transformation = Mat3.identity();
 		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 		final e = childAt(Application.input.mouse.x, Application.input.mouse.y);
 		if (e != null)
 			drawBounds(e, target);
 		#end
-		g2.end();
+		ctx.end();
 	}
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-	function drawBounds(e:UIElement, target:Canvas) {
-		final g2 = target.g2;
-		g2.font = Assets.fonts.get("Roboto_Regular");
-		g2.fontSize = 16;
+	function drawBounds(e:UIElement, target:Texture) {
+		final ctx = target.context2D;
+		ctx.font = Assets.fonts.get("Roboto_Regular");
+		ctx.fontSize = 16;
 
 		final lm = e.anchors.left == null ? 0.0 : e.anchors.leftMargin;
 		final tm = e.anchors.top == null ? 0.0 : e.anchors.topMargin;
@@ -53,58 +53,58 @@ class UIScene extends UIElement {
 		final rp = e.right.padding;
 		final bp = e.bottom.padding;
 
-		g2.color = se.Color.rgb(0.0, 0.0, 0.0);
-		g2.fillRect(e.x - lm, e.y - tm, e.width + rm, e.height + bm);
+		ctx.color = se.Color.rgb(0.0, 0.0, 0.0);
+		ctx.fillRect(e.x - lm, e.y - tm, e.width + rm, e.height + bm);
 
 		// margins
-		g2.color = se.Color.rgb(0.75, 0.25, 0.75);
-		g2.fillRect(e.x - lm, e.y, lm, e.height);
-		g2.fillRect(e.x - lm, e.y - tm, lm + e.width + rm, tm);
-		g2.fillRect(e.x + e.width, e.y, rm, e.height);
-		g2.fillRect(e.x - lm, e.y + e.height, lm + e.width + rm, bm);
+		ctx.color = se.Color.rgb(0.75, 0.25, 0.75);
+		ctx.fillRect(e.x - lm, e.y, lm, e.height);
+		ctx.fillRect(e.x - lm, e.y - tm, lm + e.width + rm, tm);
+		ctx.fillRect(e.x + e.width, e.y, rm, e.height);
+		ctx.fillRect(e.x - lm, e.y + e.height, lm + e.width + rm, bm);
 
 		// padding
-		g2.color = se.Color.rgb(0.75, 0.75, 0.25);
-		g2.fillRect(e.x, e.y, lp, e.height);
-		g2.fillRect(e.x + lp, e.y, e.width - lp - rp, tp);
-		g2.fillRect(e.x + e.width - rp, e.y, rp, e.height);
-		g2.fillRect(e.x + lp, e.y + e.height - bp, e.width - lp - rp, bp);
+		ctx.color = se.Color.rgb(0.75, 0.75, 0.25);
+		ctx.fillRect(e.x, e.y, lp, e.height);
+		ctx.fillRect(e.x + lp, e.y, e.width - lp - rp, tp);
+		ctx.fillRect(e.x + e.width - rp, e.y, rp, e.height);
+		ctx.fillRect(e.x + lp, e.y + e.height - bp, e.width - lp - rp, bp);
 
 		// content
-		g2.color = se.Color.rgb(0.25, 0.75, 0.75);
-		g2.fillRect(e.x + lp, e.y + tp, e.width - lp - rp, e.height - tp - bp);
+		ctx.color = se.Color.rgb(0.25, 0.75, 0.75);
+		ctx.fillRect(e.x + lp, e.y + tp, e.width - lp - rp, e.height - tp - bp);
 
 		// labels
-		g2.color = se.Color.rgb(1.0, 1.0, 1.0);
-		final fs = g2.fontSize + 5;
+		ctx.color = se.Color.rgb(1.0, 1.0, 1.0);
+		final fs = ctx.fontSize + 5;
 
 		// labels - titles
 		if (tm >= fs)
-			g2.drawString("margins", e.x - lm + 5, e.y - tm + 5);
+			ctx.drawString("margins", e.x - lm + 5, e.y - tm + 5);
 		if (tp >= fs)
-			g2.drawString("padding", e.x + 5, e.y + 5);
+			ctx.drawString("padding", e.x + 5, e.y + 5);
 		if (e.height >= fs)
-			g2.drawString("content", e.x + lp + 5, e.y + tp + 5);
+			ctx.drawString("content", e.x + lp + 5, e.y + tp + 5);
 
 		// labels - values
-		g2.fontSize = 14;
+		ctx.fontSize = 14;
 		// margins
 		var i = 0;
 		for (m in [lm, tm, rm, bm]) {
 			final str = '${Std.int(m)}px';
-			final strWidth = g2.font.widthOfCharacters(g2.fontSize, str.toCharArray(), 0, str.length);
-			final strheight = g2.font.height(g2.fontSize);
+			final strWidth = ctx.font.widthOfCharacters(ctx.fontSize, str.toCharArray(), 0, str.length);
+			final strheight = ctx.font.height(ctx.fontSize);
 			if (m >= strWidth) {
 				if (i == 0)
-					g2.drawString(str, e.x - (m + strWidth) / 2, e.y + e.height / 2);
+					ctx.drawString(str, e.x - (m + strWidth) / 2, e.y + e.height / 2);
 				else if (i == 2)
-					g2.drawString(str, e.x + e.width + (m - strWidth) / 2, e.y + e.height / 2);
+					ctx.drawString(str, e.x + e.width + (m - strWidth) / 2, e.y + e.height / 2);
 			}
 			if (m >= strheight) {
 				if (i == 1)
-					g2.drawString(str, e.x + e.width / 2, e.y - (m + strheight) / 2);
+					ctx.drawString(str, e.x + e.width / 2, e.y - (m + strheight) / 2);
 				else if (i == 3)
-					g2.drawString(str, e.x + e.width / 2, e.y + e.height + (m - strheight) / 2);
+					ctx.drawString(str, e.x + e.width / 2, e.y + e.height + (m - strheight) / 2);
 			}
 			++i;
 		}
@@ -112,35 +112,35 @@ class UIScene extends UIElement {
 		var i = 0;
 		for (p in [lp, tp, rp, bp]) {
 			final str = '${Std.int(p)}px';
-			final strWidth = g2.font.widthOfCharacters(g2.fontSize, str.toCharArray(), 0, str.length);
-			final strheight = g2.font.height(g2.fontSize);
+			final strWidth = ctx.font.widthOfCharacters(ctx.fontSize, str.toCharArray(), 0, str.length);
+			final strheight = ctx.font.height(ctx.fontSize);
 			if (p >= strWidth) {
 				if (i == 0)
-					g2.drawString(str, e.x + (p - strWidth) / 2, e.y + e.height / 2);
+					ctx.drawString(str, e.x + (p - strWidth) / 2, e.y + e.height / 2);
 				else if (i == 2)
-					g2.drawString(str, e.x + e.width - (p + strWidth) / 2, e.y + e.height / 2);
+					ctx.drawString(str, e.x + e.width - (p + strWidth) / 2, e.y + e.height / 2);
 			}
 			if (p >= strheight) {
 				if (i == 1)
-					g2.drawString(str, e.x + e.width / 2, e.y + (p - strheight) / 2);
+					ctx.drawString(str, e.x + e.width / 2, e.y + (p - strheight) / 2);
 				else if (i == 3)
-					g2.drawString(str, e.x + e.width / 2, e.y + e.height - (p + strheight) / 2);
+					ctx.drawString(str, e.x + e.width / 2, e.y + e.height - (p + strheight) / 2);
 			}
 			++i;
 		}
 
-		g2.fontSize = 22;
+		ctx.fontSize = 22;
 		final name = e.toString();
-		g2.drawString(name, Application.input.mouse.x - g2.font.widthOfCharacters(g2.fontSize, name.toCharArray(), 0, name.length),
-			Application.input.mouse.y - g2.font.height(g2.fontSize));
+		ctx.drawString(name, Application.input.mouse.x - ctx.font.widthOfCharacters(ctx.fontSize, name.toCharArray(), 0, name.length),
+			Application.input.mouse.y - ctx.font.height(ctx.fontSize));
 
-		g2.fontSize = 16;
+		ctx.fontSize = 16;
 		final rect = '${Std.int(e.width)} × ${Std.int(e.height)} at (${Std.int(e.x)}, ${Std.int(e.y)})';
-		g2.drawString(rect, Application.input.mouse.x
-			- g2.font.widthOfCharacters(g2.fontSize, rect.toCharArray(), 0, rect.length),
+		ctx.drawString(rect, Application.input.mouse.x
+			- ctx.font.widthOfCharacters(ctx.fontSize, rect.toCharArray(), 0, rect.length),
 			Application.input.mouse.y
-			- g2.font.height(g2.fontSize)
-			+ g2.fontSize);
+			- ctx.font.height(ctx.fontSize)
+			+ ctx.fontSize);
 	}
 	#end
 }

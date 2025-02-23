@@ -1,6 +1,6 @@
 package s2d.ui;
 
-import s2d.ui.Alignment;
+import s2d.Alignment;
 
 class Layout {
 	public var alignment:Alignment = Center;

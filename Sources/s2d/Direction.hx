@@ -1,4 +1,4 @@
-package s2d.ui;
+package s2d;
 
 enum abstract Direction(Int) from Int to Int {
 	// horizontal

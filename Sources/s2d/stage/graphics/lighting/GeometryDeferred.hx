@@ -64,47 +64,47 @@ class GeometryDeferred {
 
 	@:access(s2d.stage.graphics.Renderer)
 	public static function render():Void {
-		final g4 = Renderer.buffer.depthMap.g4;
-		g4.begin([
+		final ctx = Renderer.buffer.depthMap.context3D;
+		ctx.begin([
 			Renderer.buffer.albedoMap,
 			Renderer.buffer.normalMap,
 			Renderer.buffer.emissionMap,
 			Renderer.buffer.ormMap
 		]);
-		g4.clear(Black, 1.0);
-		g4.setPipeline(pipeline);
-		g4.setIndexBuffer(@:privateAccess se.SEngine.indices);
+		ctx.clear(Black, 1.0);
+		ctx.setPipeline(pipeline);
+		ctx.setIndexBuffer(@:privateAccess se.SEngine.indices);
 		#if (S2D_SPRITE_INSTANCING != 1)
-		g4.setVertexBuffer(@:privateAccess se.SEngine.vertices);
+		ctx.setVertexBuffer(@:privateAccess se.SEngine.vertices);
 		#end
-		g4.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
+		ctx.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
 		for (layer in Stage.current.layers) {
 			#if (S2D_LIGHTING_SHADOWS == 1)
 			@:privateAccess layer.shadowBuffer.updateBuffersData();
 			#end
 			#if (S2D_SPRITE_INSTANCING == 1)
 			for (atlas in layer.spriteAtlases) {
-				g4.setVertexBuffers(atlas.vertices);
-				g4.setTexture(albedoMapTU, atlas.albedoMap);
-				g4.setTexture(normalMapTU, atlas.normalMap);
-				g4.setTexture(ormMapTU, atlas.ormMap);
-				g4.setTexture(emissionMapTU, atlas.emissionMap);
-				g4.drawIndexedVerticesInstanced(atlas.sprites.length);
+				ctx.setVertexBuffers(atlas.vertices);
+				ctx.setTexture(albedoMapTU, atlas.albedoMap);
+				ctx.setTexture(normalMapTU, atlas.normalMap);
+				ctx.setTexture(ormMapTU, atlas.ormMap);
+				ctx.setTexture(emissionMapTU, atlas.emissionMap);
+				ctx.drawIndexedVerticesInstanced(atlas.sprites.length);
 			}
 			#else
 			for (sprite in layer.sprites) {
-				g4.setFloat(depthCL, sprite.z);
-				g4.setMatrix3(modelCL, sprite.finalModel);
-				g4.setVector4(cropRectCL, sprite.cropRect);
-				g4.setTexture(albedoMapTU, sprite.atlas.albedoMap);
-				g4.setTexture(normalMapTU, sprite.atlas.normalMap);
-				g4.setTexture(ormMapTU, sprite.atlas.ormMap);
-				g4.setTexture(emissionMapTU, sprite.atlas.emissionMap);
-				g4.drawIndexedVertices();
+				ctx.setFloat(depthCL, sprite.z);
+				ctx.setMatrix3(modelCL, sprite.finalModel);
+				ctx.setVector4(cropRectCL, sprite.cropRect);
+				ctx.setTexture(albedoMapTU, sprite.atlas.albedoMap);
+				ctx.setTexture(normalMapTU, sprite.atlas.normalMap);
+				ctx.setTexture(ormMapTU, sprite.atlas.ormMap);
+				ctx.setTexture(emissionMapTU, sprite.atlas.emissionMap);
+				ctx.drawIndexedVertices();
 			}
 			#end
 		}
-		g4.end();
+		ctx.end();
 	}
 }
 #end

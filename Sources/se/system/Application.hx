@@ -32,7 +32,12 @@ class Application {
 				setup();
 				System.notifyOnFrames(function(frames) {
 					update();
-					SEngine.render(frames[0]);
+					var frame = SEngine.render();
+
+					final g2 = frames[0].g2;
+					g2.begin();
+					g2.drawImage(frame, 0, 0);
+					g2.end();
 				});
 			});
 		});

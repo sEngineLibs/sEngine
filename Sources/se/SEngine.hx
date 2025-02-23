@@ -1,5 +1,6 @@
 package se;
 
+import se.graphics.Context2D;
 import kha.Window;
 import kha.Assets;
 import kha.Canvas;
@@ -20,7 +21,7 @@ import s2d.ui.graphics.Drawers;
 class SEngine {
 	static var indices:IndexBuffer;
 	static var vertices:VertexBuffer;
-	public static var projection:Mat3;
+	public static var projection:Mat3 = Mat3.identity();
 
 	public static var width:Int;
 	public static var height:Int;
@@ -63,9 +64,6 @@ class SEngine {
 		Stage.current = new Stage();
 		UIScene.current = new UIScene();
 
-		realWidth = window.width;
-		realHeight = window.height;
-		aspectRatio = width / height;
 		window.notifyOnResize(resize);
 
 		Renderer.compile(width, height);
@@ -136,29 +134,27 @@ class SEngine {
 	}
 
 	@:access(s2d.stage.graphics.Renderer)
-	public static function render(target:Canvas):Void {
+	public static function render():Texture {
 		var frame = Renderer.render();
 		UIScene.current.render(frame);
-
-		var g2 = target.g2;
-		g2.begin();
-		g2.drawScaledImage(frame, 0, 0, target.width, target.height);
 		#if S2D_DEBUG_FPS
-		showFPS(g2);
+		showFPS(frame.context2D);
 		#end
-		g2.end();
+		return frame;
 	}
 
 	#if S2D_DEBUG_FPS
-	static function showFPS(g:kha.graphics2.Graphics) {
+	static function showFPS(ctx:Context2D) {
 		final fps = Std.int(1.0 / Time.delta);
 
-		g.font = Assets.fonts.Roboto_Regular;
-		g.fontSize = 14;
-		g.color = Black;
-		g.drawString('FPS: ${fps}', 6, 6);
-		g.color = White;
-		g.drawString('FPS: ${fps}', 5, 5);
+		ctx.begin();
+		ctx.style.font = Assets.fonts.Roboto_Regular;
+		ctx.fontSize = 14;
+		ctx.style.color = black;
+		ctx.drawString('FPS: ${fps}', 6, 6);
+		ctx.style.color = white;
+		ctx.drawString('FPS: ${fps}', 5, 5);
+		ctx.end();
 	}
 	#end
 }

@@ -1,30 +1,37 @@
 package se;
 
-import kha.graphics1.Graphics as G1;
-import kha.graphics4.Graphics as G4;
 import kha.graphics4.TextureFormat;
 import kha.graphics4.DepthStencilFormat;
-import se.graphics.G2;
+import se.graphics.Context1D;
+import se.graphics.Context2D;
+import se.graphics.Context3D;
 
-@:forward(width, height, format)
-abstract Texture(Image) from Image to Image {
-	public var g1(get, never):G1;
-	public var g2(get, never):G2;
-	public var g4(get, never):G4;
+@:forward(width, height, format, unload)
+extern abstract Texture(Image) from Image to Image {
+	var self(get, never):kha.Image;
 
-	public inline function new(width:Int, height:Int, ?format:TextureFormat, ?depthStencil:DepthStencilFormat, ?antiAliasingSamples:Int) {
-		this = kha.Image.createRenderTarget(width, height, format, depthStencil, antiAliasingSamples);
+	public var context1D(get, never):Context1D;
+	public var context2D(get, never):Context2D;
+	public var context3D(get, never):Context3D;
+
+	public inline function new(width:Int, height:Int, ?format:TextureFormat, ?depthStencil:DepthStencilFormat, ?aaSamples:Int) {
+		this = kha.Image.createRenderTarget(width, height, format, depthStencil, aaSamples);
 	}
 
-	inline function get_g1():G1 {
-		return (this : kha.Image).g1;
+	@:to
+	inline function get_self():kha.Image {
+		return this;
 	}
 
-	inline function get_g2():G2 {
-		return (this : kha.Image).g2;
+	inline function get_context1D():Context1D {
+		return self.g1;
 	}
 
-	inline function get_g4():G4 {
-		return (this : kha.Image).g4;
+	inline function get_context2D():Context2D {
+		return self.g2;
+	}
+
+	inline function get_context3D():Context3D {
+		return self.g4;
 	}
 }

@@ -1,18 +1,20 @@
 package s2d.ui.elements.positioners;
 
-import kha.Canvas;
+import se.Texture;
 import se.math.Vec4;
+import s2d.geometry.Bounds;
 
 abstract class Positioner extends UISceneElement {
-	var prevRect:Vec4;
+	var prevBounds:Bounds;
 
-	abstract function position(element:UIElement):Vec4;
+	abstract function position(element:UIElement):Void;
 
-	override function renderTree(target:Canvas) {
-		prevRect = new Vec4(0.0, 0.0, 0.0, 0.0);
+	override function renderTree(target:Texture) {
+		prevBounds = new Vec4(0.0, 0.0, left.padding, top.padding);
 		for (child in children) {
 			if (child.visible) {
-				prevRect = position(child);
+				position(child);
+				prevBounds = child.bounds;
 				child.render(target);
 			}
 		}

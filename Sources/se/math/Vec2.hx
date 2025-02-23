@@ -7,8 +7,7 @@ import kha.math.FastVector2 as KhaVec2;
 
 @:nullSafety
 @:forward.new
-@:forward(x, y)
-#if !macro @:build(se.math.VectorMath.Swizzle.generateFields(2)) #end
+@:forward(x, y) #if !macro @:build(se.math.VectorMath.Swizzle.generateFields(2)) #end
 abstract Vec2(KhaVec2) from KhaVec2 to KhaVec2 {
 	#if !macro
 	@:to
@@ -23,6 +22,16 @@ abstract Vec2(KhaVec2) from KhaVec2 to KhaVec2 {
 
 	public inline function clone() {
 		return new Vec2(this.x, this.y);
+	}
+
+	public inline function setLength(value:Float):Float {
+		var l = length();
+		if (l == 0)
+			return 0;
+		var mul = value / l;
+		this.x *= mul;
+		this.y *= mul;
+		return value;
 	}
 
 	// Trigonometric

@@ -1,6 +1,6 @@
 package s2d.stage.graphics;
 
-import kha.Image;
+import se.Texture;
 #if (S2D_LIGHTING != 1)
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
@@ -72,7 +72,7 @@ class Renderer {
 		buffer.resize(width, height);
 	}
 
-	static function render():Image {
+	static function render():Texture {
 		for (command in commands)
 			command();
 		return buffer.tgt;
@@ -122,33 +122,33 @@ class Renderer {
 
 	@:access(s2d.stage.objects.Sprite)
 	static function _render():Void {
-		final g4 = Renderer.buffer.tgt.g4;
+		final ctx = Renderer.buffer.tgt.context3D;
 
-		g4.begin();
-		g4.clear(Black);
-		g4.setPipeline(pipeline);
-		g4.setIndexBuffer(@:privateAccess se.SEngine.indices);
+		ctx.begin();
+		ctx.clear(Black);
+		ctx.setPipeline(pipeline);
+		ctx.setIndexBuffer(@:privateAccess se.SEngine.indices);
 		#if (S2D_SPRITE_INSTANCING != 1)
-		g4.setVertexBuffer(@:privateAccess se.SEngine.vertices);
+		ctx.setVertexBuffer(@:privateAccess se.SEngine.vertices);
 		#end
-		g4.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
+		ctx.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
 		for (layer in Stage.current.layers) {
 			#if (S2D_SPRITE_INSTANCING == 1)
 			for (atlas in layer.spriteAtlases) {
-				@:privateAccess g4.setVertexBuffers(atlas.vertices);
-				g4.setTexture(textureMapTU, atlas.textureMap);
-				g4.drawIndexedVerticesInstanced(atlas.sprites.length);
+				@:privateAccess ctx.setVertexBuffers(atlas.vertices);
+				ctx.setTexture(textureMapTU, atlas.textureMap);
+				ctx.drawIndexedVerticesInstanced(atlas.sprites.length);
 			}
 			#else
 			for (sprite in layer.sprites) {
-				g4.setMatrix3(modelCL, sprite._transform);
-				g4.setVector4(cropRectCL, sprite.cropRect);
-				g4.setTexture(textureMapTU, sprite.atlas.textureMap);
-				g4.drawIndexedVertices();
+				ctx.setMatrix3(modelCL, sprite._transform);
+				ctx.setVector4(cropRectCL, sprite.cropRect);
+				ctx.setTexture(textureMapTU, sprite.atlas.textureMap);
+				ctx.drawIndexedVertices();
 			}
 			#end
 		}
-		g4.end();
+		ctx.end();
 	}
 	#end
 }

@@ -1,7 +1,7 @@
 package s2d.ui;
 
-import kha.Image;
 import kha.graphics4.TextureFormat;
+import se.Texture;
 import se.system.Application;
 import s2d.geometry.RectI;
 import s2d.geometry.SizeI;
@@ -10,7 +10,7 @@ import s2d.ui.effects.ShaderEffect;
 @:structInit
 @:allow(s2d.ui.UIElement)
 class UILayer {
-	var texture:Image;
+	var texture:Texture;
 
 	@:isVar public var enabled(default, set):Bool = false;
 	@:isVar public var textureSize(default, set):SizeI = new SizeI(-1, -1);
@@ -25,9 +25,9 @@ class UILayer {
 	function updateTexture() {
 		if (enabled) {
 			if (textureSize.width > 0 && textureSize.height > 0)
-				texture = Image.createRenderTarget(textureSize.width, textureSize.height, format, NoDepthAndStencil, samples);
+				texture = new Texture(textureSize.width, textureSize.height, format, NoDepthAndStencil, samples);
 			else
-				texture = Image.createRenderTarget(Application.window.width, Application.window.height, format, NoDepthAndStencil, samples);
+				texture = new Texture(Application.window.width, Application.window.height, format, NoDepthAndStencil, samples);
 		} else {
 			texture.unload();
 			texture = null;

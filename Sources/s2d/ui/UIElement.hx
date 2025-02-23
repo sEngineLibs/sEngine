@@ -1,5 +1,6 @@
 package s2d.ui;
 
+import se.Texture;
 import kha.Canvas;
 import se.Color;
 import se.math.Vec2;
@@ -150,38 +151,40 @@ class UIElement extends PhysicalObject<UIElement> {
 		return 0.0 <= _x && _x <= width && 0.0 <= _y && _y <= height;
 	}
 
-	function render(target:Canvas) {
-		final g2 = target.g2;
+	function render(target:Texture) {
+		final ctx = target.context2D;
 
 		if (!layer.enabled) {
 			renderTree(target);
 		} else {
-			final _g2 = layer.texture.g2;
+			final _ctx = layer.texture.context2D;
 			final sr = layer.sourceRect;
 
-			g2.end();
+			ctx.end();
 			// to layer texture
-			_g2.begin(true, Transparent);
+			_ctx.begin();
 			if (sr != null)
-				_g2.scissor(sr.x, sr.y, sr.width, sr.height);
+				_ctx.scissor(sr.x, sr.y, sr.width, sr.height);
 			renderTree(layer.texture);
-			_g2.disableScissor();
-			_g2.end();
+			_ctx.disableScissor();
+			_ctx.end();
 			// to target
-			g2.begin(false);
+			ctx.begin();
 			if (layer.effect != null)
 				layer.effect.apply(layer.texture, target);
 			else
-				g2.drawScaledImage(layer.texture, 0, 0, target.width, target.height);
+				ctx.drawScaledImage(layer.texture, 0, 0, target.width, target.height);
 		}
 	}
 
-	function renderTree(target:Canvas) {
+	function renderTree(target:Texture) {
 		updateTransform();
+		final ctx = target.context2D;
 
-		target.g2.color = color;
-		target.g2.opacity = finalOpacity;
-		target.g2.transformation = _transform;
+		ctx.transformation = _transform;
+		ctx.style.color = color;
+		ctx.style.opacity = finalOpacity;
+
 		draw(target);
 		for (child in children) {
 			child.updateBounds();
@@ -190,7 +193,7 @@ class UIElement extends PhysicalObject<UIElement> {
 		}
 	}
 
-	function draw(target:Canvas) {}
+	function draw(target:Texture) {}
 
 	function updateBounds() {
 		// position

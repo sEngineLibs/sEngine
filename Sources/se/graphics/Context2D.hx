@@ -1,29 +1,53 @@
-package se.extensions;
+package se.graphics;
 
-import kha.math.Vector2;
-import kha.math.Vector2;
 import kha.graphics2.Graphics;
-import kha.graphics2.VerTextAlignment;
-import kha.graphics2.HorTextAlignment;
+import s2d.Transform;
+import se.math.Vec2;
+import se.math.VectorMath.vec2;
+import s2d.Alignment;
 
-/**
- * Copied directly from kha.graphics2.GraphicsExtension.
- */
-/**
- * Static extension functions for Graphics2.
- * Usage: "using s2d.core.graphics.GraphicsExtension;"
-**/
-class Graphics2Ext {
+@:forward()
+extern abstract Context2D(Graphics) from Graphics {
+	public var style(get, never):Context2DStyle;
+	public var transform(get, never):Transform;
+
+	inline function get_style():Context2DStyle {
+		return this;
+	}
+
+	inline function get_transform():Transform {
+		return this.transformation;
+	}
+
+	public inline function begin() {
+		this.begin(false);
+	}
+
+	public inline function drawImage(img:Image, x:Int, y:Int) {
+		this.drawImage(img, x, y);
+	}
+
+	public inline function drawSubImage(img:Image, x:Float, y:Float, sx:Float, sy:Float, sw:Float, sh:Float) {
+		this.drawSubImage(img, x, y, sx, sy, sw, sh);
+	}
+
+	public inline function drawScaledImage(img:Image, dx:Float, dy:Float, dw:Float, dh:Float) {
+		this.drawScaledImage(img, dx, dy, dw, dh);
+	}
+
+	public inline function drawScaledSubImage(img:Image, sx:Float, sy:Float, sw:Float, sh:Float, dx:Float, dy:Float, dw:Float, dh:Float) {
+		this.drawScaledSubImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+	}
+
 	/**
 	 * Draws a arc.
 	 * @param	ccw (optional) Specifies whether the drawing should be counterclockwise.
 	 * @param	segments (optional) The amount of lines that should be used to render the arc.
 	 */
-	public static function drawArc(g2:Graphics, cx:Float, cy:Float, radius:Float, sAngle:Float, eAngle:Float, strength:Float = 1, ccw:Bool = false,
-			segments:Int = 0):Void {
+	public inline function drawArc(cx:Float, cy:Float, radius:Float, sAngle:Float, eAngle:Float, strength:Float = 1, ccw:Bool = false, segments:Int = 0):Void {
 		#if kha_html5
 		if (kha.SystemImpl.gl == null) {
-			var g:kha.js.CanvasGraphics = cast g2;
+			var g:kha.js.CanvasGraphics = cast this;
 			radius -= strength / 2; // reduce radius to fit the line thickness within image width/height
 			g.drawArc(cx, cy, radius, sAngle, eAngle, strength, ccw);
 			return;
@@ -58,7 +82,7 @@ class Graphics2Ext {
 			x = c * x - s * y;
 			y = c * y + s * t;
 
-			drawInnerLine(g2, x + cx, y + cy, px, py, strength);
+			drawInnerLine(x + cx, y + cy, px, py, strength);
 		}
 	}
 
@@ -67,10 +91,10 @@ class Graphics2Ext {
 	 * @param	ccw (optional) Specifies whether the drawing should be counterclockwise.
 	 * @param	segments (optional) The amount of lines that should be used to render the arc.
 	 */
-	public static function fillArc(g2:Graphics, cx:Float, cy:Float, radius:Float, sAngle:Float, eAngle:Float, ccw:Bool = false, segments:Int = 0):Void {
+	public inline function fillArc(cx:Float, cy:Float, radius:Float, sAngle:Float, eAngle:Float, ccw:Bool = false, segments:Int = 0):Void {
 		#if kha_html5
 		if (kha.SystemImpl.gl == null) {
-			var g:kha.js.CanvasGraphics = cast g2;
+			var g:kha.js.CanvasGraphics = cast this;
 			g.fillArc(cx, cy, radius, sAngle, eAngle, ccw);
 			return;
 		}
@@ -105,7 +129,7 @@ class Graphics2Ext {
 			x = c * x - s * y;
 			y = c * y + s * t;
 
-			g2.fillTriangle(px, py, x + cx, y + cy, sx, sy);
+			this.fillTriangle(px, py, x + cx, y + cy, sx, sy);
 		}
 	}
 
@@ -113,10 +137,10 @@ class Graphics2Ext {
 	 * Draws a circle.
 	 * @param	segments (optional) The amount of lines that should be used to render the circle.
 	 */
-	public static function drawCircle(g2:Graphics, cx:Float, cy:Float, radius:Float, strength:Float = 1, segments:Int = 0):Void {
+	public inline function drawCircle(cx:Float, cy:Float, radius:Float, strength:Float = 1, segments:Int = 0):Void {
 		#if kha_html5
 		if (kha.SystemImpl.gl == null) {
-			var g:kha.js.CanvasGraphics = cast g2;
+			var g:kha.js.CanvasGraphics = cast this;
 			radius -= strength / 2; // reduce radius to fit the line thickness within image width/height
 			g.drawCircle(cx, cy, radius, strength);
 			return;
@@ -141,37 +165,37 @@ class Graphics2Ext {
 			var t = x;
 			x = c * x - s * y;
 			y = c * y + s * t;
-			drawInnerLine(g2, x + cx, y + cy, px, py, strength);
+			drawInnerLine(x + cx, y + cy, px, py, strength);
 		}
 	}
 
-	static function drawInnerLine(g2:Graphics, x1:Float, y1:Float, x2:Float, y2:Float, strength:Float):Void {
+	inline function drawInnerLine(x1:Float, y1:Float, x2:Float, y2:Float, strength:Float):Void {
 		var side = y2 > y1 ? 1 : 0;
 		if (y2 == y1)
 			side = x2 - x1 > 0 ? 1 : 0;
 
-		var vec = new Vector2();
+		var vec:Vec2;
 		if (y2 == y1)
-			vec.setFrom(new Vector2(0, -1));
+			vec = vec2(0, -1);
 		else
-			vec.setFrom(new Vector2(1, -(x2 - x1) / (y2 - y1)));
-		vec.length = strength;
-		var p1 = new Vector2(x1 + side * vec.x, y1 + side * vec.y);
-		var p2 = new Vector2(x2 + side * vec.x, y2 + side * vec.y);
-		var p3 = p1.sub(vec);
-		var p4 = p2.sub(vec);
-		g2.fillTriangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-		g2.fillTriangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
+			vec = vec2(1, -(x2 - x1) / (y2 - y1));
+		vec.setLength(strength);
+		var p1 = vec2(x1 + side * vec.x, y1 + side * vec.y);
+		var p2 = vec2(x2 + side * vec.x, y2 + side * vec.y);
+		var p3 = p1 - vec;
+		var p4 = p2 - vec;
+		this.fillTriangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+		this.fillTriangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
 	}
 
 	/**
 	 * Draws a filled circle.
 	 * @param	segments (optional) The amount of lines that should be used to render the circle.
 	 */
-	public static function fillCircle(g2:Graphics, cx:Float, cy:Float, radius:Float, segments:Int = 0):Void {
+	public inline function fillCircle(cx:Float, cy:Float, radius:Float, segments:Int = 0):Void {
 		#if kha_html5
 		if (kha.SystemImpl.gl == null) {
-			var g:kha.js.CanvasGraphics = cast g2;
+			var g:kha.js.CanvasGraphics = cast this;
 			g.fillCircle(cx, cy, radius);
 			return;
 		}
@@ -196,30 +220,30 @@ class Graphics2Ext {
 			x = c * x - s * y;
 			y = c * y + s * t;
 
-			g2.fillTriangle(px, py, x + cx, y + cy, cx, cy);
+			this.fillTriangle(px, py, x + cx, y + cy, cx, cy);
 		}
 	}
 
 	/**
 	 * Draws a convex polygon.
 	 */
-	public static function drawPolygon(g2:Graphics, x:Float, y:Float, vertices:Array<Vector2>, strength:Float = 1) {
+	public inline function drawPolygon(x:Float, y:Float, vertices:Array<Vec2>, strength:Float = 1) {
 		var iterator = vertices.iterator();
 		var v0 = iterator.next();
 		var v1 = v0;
 
 		while (iterator.hasNext()) {
 			var v2 = iterator.next();
-			g2.drawLine(v1.x + x, v1.y + y, v2.x + x, v2.y + y, strength);
+			this.drawLine(v1.x + x, v1.y + y, v2.x + x, v2.y + y, strength);
 			v1 = v2;
 		}
-		g2.drawLine(v1.x + x, v1.y + y, v0.x + x, v0.y + y, strength);
+		this.drawLine(v1.x + x, v1.y + y, v0.x + x, v0.y + y, strength);
 	}
 
 	/**
 	 * Draws a filled convex polygon.
 	 */
-	public static function fillPolygon(g2:Graphics, x:Float, y:Float, vertices:Array<Vector2>) {
+	public inline function fillPolygon(x:Float, y:Float, vertices:Array<Vec2>) {
 		var iterator = vertices.iterator();
 
 		if (!iterator.hasNext())
@@ -232,7 +256,7 @@ class Graphics2Ext {
 
 		while (iterator.hasNext()) {
 			var v2 = iterator.next();
-			g2.fillTriangle(v0.x + x, v0.y + y, v1.x + x, v1.y + y, v2.x + x, v2.y + y);
+			this.fillTriangle(v0.x + x, v0.y + y, v1.x + x, v1.y + y, v2.x + x, v2.y + y);
 			v1 = v2;
 		}
 	}
@@ -244,7 +268,7 @@ class Graphics2Ext {
 	 * Provide x and y in the following order: startPoint, controlPoint1, controlPoint2, endPoint
 	 * Reference: http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
 	 */
-	public static function drawCubicBezier(g2:Graphics, x:Array<Float>, y:Array<Float>, segments:Int = 20, strength:Float = 1.0):Void {
+	public inline function drawCubicBezier(x:Array<Float>, y:Array<Float>, segments:Int = 20, strength:Float = 1.0):Void {
 		var t:Float;
 
 		var q0 = calculateCubicBezierPoint(0, x, y);
@@ -253,7 +277,7 @@ class Graphics2Ext {
 		for (i in 1...(segments + 1)) {
 			t = i / segments;
 			q1 = calculateCubicBezierPoint(t, x, y);
-			g2.drawLine(q0[0], q0[1], q1[0], q1[1], strength);
+			this.drawLine(q0[0], q0[1], q1[0], q1[1], strength);
 			q0 = q1;
 		}
 	}
@@ -261,7 +285,7 @@ class Graphics2Ext {
 	/**
 	 * Draws multiple cubic beziers joined by the end point. The minimum size is 4 pairs of points (a single curve).
 	 */
-	public static function drawCubicBezierPath(g2:Graphics, x:Array<Float>, y:Array<Float>, segments:Int = 20, strength:Float = 1.0):Void {
+	public inline function drawCubicBezierPath(x:Array<Float>, y:Array<Float>, segments:Int = 20, strength:Float = 1.0):Void {
 		var i = 0;
 		var t:Float;
 		var q0:Array<Float> = null;
@@ -274,7 +298,7 @@ class Graphics2Ext {
 			for (j in 1...(segments + 1)) {
 				t = j / segments;
 				q1 = calculateCubicBezierPoint(t, [x[i], x[i + 1], x[i + 2], x[i + 3]], [y[i], y[i + 1], y[i + 2], y[i + 3]]);
-				g2.drawLine(q0[0], q0[1], q1[0], q1[1], strength);
+				this.drawLine(q0[0], q0[1], q1[0], q1[1], strength);
 				q0 = q1;
 			}
 
@@ -282,7 +306,7 @@ class Graphics2Ext {
 		}
 	}
 
-	static function calculateCubicBezierPoint(t:Float, x:Array<Float>, y:Array<Float>):Array<Float> {
+	inline function calculateCubicBezierPoint(t:Float, x:Array<Float>, y:Array<Float>):Array<Float> {
 		var u:Float = 1 - t;
 		var tt:Float = t * t;
 		var uu:Float = u * u;
@@ -311,7 +335,7 @@ class Graphics2Ext {
 	 * Draws a quadratic bezier using 3 pairs of points. 
 	 * Provide x and y in the following order: startPoint, controlPoint, endPoint
 	 */
-	public static function drawQuadraticBezier(g2:Graphics, x:Array<Float>, y:Array<Float>, segments:Int = 20, strength:Float = 1.0):Void {
+	public inline function drawQuadraticBezier(x:Array<Float>, y:Array<Float>, segments:Int = 20, strength:Float = 1.0):Void {
 		var t:Float;
 
 		var q0 = calculateQuadraticBezierPoint(0, x, y);
@@ -320,7 +344,7 @@ class Graphics2Ext {
 		for (i in 1...(segments + 1)) {
 			t = i / segments;
 			q1 = calculateQuadraticBezierPoint(t, x, y);
-			g2.drawLine(q0[0], q0[1], q1[0], q1[1], strength);
+			this.drawLine(q0[0], q0[1], q1[0], q1[1], strength);
 			q0 = q1;
 		}
 	}
@@ -328,7 +352,7 @@ class Graphics2Ext {
 	/**
 	 * Draws multiple quadratic beziers joined by the end point. The minimum size is 3 pairs of points (a single curve).
 	 */
-	public static function drawQuadraticBezierPath(g2:Graphics, x:Array<Float>, y:Array<Float>, segments:Int = 20, strength:Float = 1.0):Void {
+	public inline function drawQuadraticBezierPath(x:Array<Float>, y:Array<Float>, segments:Int = 20, strength:Float = 1.0):Void {
 		var i = 0;
 		var t:Float;
 		var q0:Array<Float> = null;
@@ -341,7 +365,7 @@ class Graphics2Ext {
 			for (j in 1...(segments + 1)) {
 				t = j / segments;
 				q1 = calculateQuadraticBezierPoint(t, [x[i], x[i + 1], x[i + 2]], [y[i], y[i + 1], y[i + 2]]);
-				g2.drawLine(q0[0], q0[1], q1[0], q1[1], strength);
+				this.drawLine(q0[0], q0[1], q1[0], q1[1], strength);
 				q0 = q1;
 			}
 
@@ -349,7 +373,7 @@ class Graphics2Ext {
 		}
 	}
 
-	static function calculateQuadraticBezierPoint(t:Float, x:Array<Float>, y:Array<Float>):Array<Float> {
+	inline function calculateQuadraticBezierPoint(t:Float, x:Array<Float>, y:Array<Float>):Array<Float> {
 		var u:Float = 1 - t;
 		var tt:Float = t * t;
 		var uu:Float = u * u;
@@ -368,48 +392,57 @@ class Graphics2Ext {
 		return p;
 	}
 
-	static public function drawAlignedString(g2:Graphics, text:String, x:Float, y:Float, horAlign:HorTextAlignment, verAlign:VerTextAlignment):Void {
+	public inline function drawAlignedString(text:String, x:Float, y:Float, alignment:Alignment):Void {
 		var xoffset = 0.0;
-		if (horAlign == TextCenter || horAlign == TextRight) {
-			var width = g2.font.width(g2.fontSize, text);
-			if (horAlign == TextCenter) {
+		if (alignment & HCenter != 0 || alignment & Right != 0) {
+			var width = this.font.width(this.fontSize, text);
+			if (alignment & HCenter != 0)
 				xoffset = -width * 0.5;
-			} else {
+			else
 				xoffset = -width;
-			}
 		}
 		var yoffset = 0.0;
-		if (verAlign == TextMiddle || verAlign == TextBottom) {
-			var height = g2.font.height(g2.fontSize);
-			if (verAlign == TextMiddle) {
+		if (alignment & VCenter != 0 || alignment & Bottom != 0) {
+			var height = this.font.height(this.fontSize);
+			if (alignment & VCenter != 0)
 				yoffset = -height * 0.5;
-			} else {
+			else
 				yoffset = -height;
-			}
 		}
-		g2.drawString(text, x + xoffset, y + yoffset);
+		this.drawString(text, x + xoffset, y + yoffset);
 	}
 
-	static public function drawAlignedCharacters(g2:Graphics, text:Array<Int>, start:Int, length:Int, x:Float, y:Float, horAlign:HorTextAlignment,
-			verAlign:VerTextAlignment):Void {
+	public inline function drawAlignedCharacters(text:Array<Int>, start:Int, length:Int, x:Float, y:Float, alignment:Alignment):Void {
 		var xoffset = 0.0;
-		if (horAlign == TextCenter || horAlign == TextRight) {
-			var width = g2.font.widthOfCharacters(g2.fontSize, text, start, length);
-			if (horAlign == TextCenter) {
+		if (alignment & HCenter != 0 || alignment & Right != 0) {
+			var width = this.font.widthOfCharacters(this.fontSize, text, start, length);
+			if (alignment & HCenter != 0)
 				xoffset = -width * 0.5;
-			} else {
+			else
 				xoffset = -width;
-			}
 		}
 		var yoffset = 0.0;
-		if (verAlign == TextMiddle || verAlign == TextBottom) {
-			var height = g2.font.height(g2.fontSize);
-			if (verAlign == TextMiddle) {
+		if (alignment & VCenter != 0 || alignment & Bottom != 0) {
+			var height = this.font.height(this.fontSize);
+			if (alignment & VCenter != 0)
 				yoffset = -height * 0.5;
-			} else {
+			else
 				yoffset = -height;
-			}
 		}
-		g2.drawCharacters(text, start, length, x + xoffset, y + yoffset);
+		this.drawCharacters(text, start, length, x + xoffset, y + yoffset);
+	}
+}
+
+@:dox(show)
+@:forward(opacity, font, fontsize)
+extern private abstract Context2DStyle(Graphics) from Graphics {
+	public var color(get, set):Color;
+
+	inline function get_color():Color {
+		return this.color;
+	}
+
+	inline function set_color(value:Color):Color {
+		return this.color = value;
 	}
 }

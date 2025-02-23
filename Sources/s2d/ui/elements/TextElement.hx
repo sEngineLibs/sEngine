@@ -1,9 +1,9 @@
 package s2d.ui.elements;
 
 import kha.Font;
-import kha.Canvas;
 import kha.Assets;
-import s2d.ui.Alignment;
+import se.Texture;
+import s2d.Alignment;
 
 using kha.StringExtensions;
 
@@ -22,11 +22,11 @@ class TextElement extends UISceneElement {
 		this.text = text;
 	}
 
-	override function draw(target:Canvas) {
-		final g2 = target.g2;
+	override function draw(target:Texture) {
+		final ctx = target.context2D;
 
-		g2.font = font;
-		g2.fontSize = fontSize;
+		ctx.font = font;
+		ctx.fontSize = fontSize;
 
 		var drawX = x;
 		if ((alignment & Alignment.HCenter) != 0)
@@ -40,7 +40,7 @@ class TextElement extends UISceneElement {
 		else if ((alignment & Alignment.Bottom) != 0)
 			drawY += height - textHeight;
 
-		g2.drawString(text, drawX, drawY);
+		ctx.drawString(text, drawX, drawY);
 	}
 
 	function updateTextWidth() {

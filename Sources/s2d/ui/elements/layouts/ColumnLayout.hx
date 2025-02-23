@@ -1,13 +1,13 @@
 package s2d.ui.elements.layouts;
 
-import kha.Canvas;
+import se.Texture;
 import se.math.VectorMath;
-import s2d.ui.Alignment;
+import s2d.Alignment;
 
 class ColumnLayout extends UISceneElement {
 	public var spacing:Float = 0.0;
 
-	override function renderTree(target:Canvas) {
+	override function renderTree(target:Texture) {
 		var elements = [];
 		var heights = [];
 		var cellsHeight = 0.0;
@@ -30,9 +30,9 @@ class ColumnLayout extends UISceneElement {
 
 		final fillCellHeight = fillCellCount > 0 ? (crect.height - (elements.length - 1) * spacing - cellsHeight) / fillCellCount : 0;
 
-		target.g2.color = color;
-		target.g2.opacity = finalOpacity;
-		target.g2.transformation = _transform;
+		target.context2D.color = color;
+		target.context2D.opacity = finalOpacity;
+		target.context2D.transformation = _transform;
 
 		var _y = y + top.padding;
 		var heightsIndex = 0;
