@@ -38,18 +38,18 @@ class ShadowPass {
 		final target = @:privateAccess Renderer.buffer.shadowMap;
 		target.setDepthStencilFrom(Renderer.buffer.depthMap);
 
-		final g4 = target.g4;
-		g4.begin();
-		g4.clear(White);
+		final ctx = target.context3D;
+		ctx.begin();
+		ctx.clear(White);
 		if (light.isMappingShadows) {
-			g4.setPipeline(pipeline);
-			g4.setIndexBuffer(light.layer.shadowBuffer.indices);
-			g4.setVertexBuffer(light.layer.shadowBuffer.vertices);
-			g4.setMatrix3(vpCL, Stage.current.viewProjection);
-			g4.setVector2(lightPosCL, light._transform.translation);
-			g4.drawIndexedVertices();
+			ctx.setPipeline(pipeline);
+			ctx.setIndexBuffer(light.layer.shadowBuffer.indices);
+			ctx.setVertexBuffer(light.layer.shadowBuffer.vertices);
+			ctx.setMatrix3(vpCL, Stage.current.viewProjection);
+			ctx.setVector2(lightPosCL, light._transform.translation);
+			ctx.drawIndexedVertices();
 		}
-		g4.end();
+		ctx.end();
 	}
 }
 #end

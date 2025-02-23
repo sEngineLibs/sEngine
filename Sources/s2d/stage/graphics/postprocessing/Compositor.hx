@@ -6,6 +6,7 @@ import kha.Shaders;
 import kha.arrays.Float32Array;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
+import se.Texture;
 
 class Compositor extends PPEffect {
 	var textureMapTU:TextureUnit;
@@ -41,20 +42,20 @@ class Compositor extends PPEffect {
 	}
 
 	@:access(s2d.stage.graphics.Renderer)
-	function render(target:Canvas) {
-		final g2 = target.g2;
-		final g4 = target.g4;
+	function render(target:Texture) {
+		final ctx = target.context2D;
+		final ctx3d = target.context3D;
 
-		g2.begin();
-		g4.scissor(0, letterBoxHeight, se.SEngine.width, se.SEngine.height - letterBoxHeight * 2);
-		g4.setPipeline(pipeline);
-		g4.setIndexBuffer(@:privateAccess se.SEngine.indices);
-		g4.setVertexBuffer(@:privateAccess se.SEngine.vertices);
-		g4.setTexture(textureMapTU, Renderer.buffer.src);
-		g4.setFloats(paramsCL, params);
-		g4.drawIndexedVertices();
-		g4.disableScissor();
-		g2.end();
+		ctx.begin();
+		ctx3d.scissor(0, letterBoxHeight, se.SEngine.width, se.SEngine.height - letterBoxHeight * 2);
+		ctx3d.setPipeline(pipeline);
+		ctx3d.setIndexBuffer(@:privateAccess se.SEngine.indices);
+		ctx3d.setVertexBuffer(@:privateAccess se.SEngine.vertices);
+		ctx3d.setTexture(textureMapTU, Renderer.buffer.src);
+		ctx3d.setFloats(paramsCL, params);
+		ctx3d.drawIndexedVertices();
+		ctx3d.disableScissor();
+		ctx.end();
 	}
 
 	function get_posterizeGamma():Float {

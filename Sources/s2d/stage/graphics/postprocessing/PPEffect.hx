@@ -1,8 +1,8 @@
 package s2d.stage.graphics.postprocessing;
 
-import kha.Canvas;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
+import se.Texture;
 
 @:access(s2d.stage.graphics.Renderer)
 abstract class PPEffect {
@@ -45,7 +45,7 @@ abstract class PPEffect {
 		getUniforms();
 	}
 
-	abstract public function render(target:Canvas):Void;
+	abstract public function render(target:Texture):Void;
 
 	public function command():Void {
 		Renderer.buffer.swap();

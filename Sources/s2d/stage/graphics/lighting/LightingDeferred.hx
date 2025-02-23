@@ -78,48 +78,48 @@ class LightingDeferred {
 	@:access(s2d.stage.objects.Light)
 	@:access(s2d.stage.graphics.Renderer)
 	public static function render():Void {
-		final g4 = Renderer.buffer.tgt.g4;
+		final ctx = Renderer.buffer.tgt.context3D;
 
 		// emission + (environment)
-		g4.begin();
-		g4.clear(Black);
-		g4.setPipeline(envPipeline);
-		g4.setIndexBuffer(@:privateAccess se.SEngine.indices);
-		g4.setVertexBuffer(@:privateAccess se.SEngine.vertices);
-		g4.setTexture(envEmissionMapTU, Renderer.buffer.emissionMap);
+		ctx.begin();
+		ctx.clear(Black);
+		ctx.setPipeline(envPipeline);
+		ctx.setIndexBuffer(@:privateAccess se.SEngine.indices);
+		ctx.setVertexBuffer(@:privateAccess se.SEngine.vertices);
+		ctx.setTexture(envEmissionMapTU, Renderer.buffer.emissionMap);
 		#if (S2D_LIGHTING_ENVIRONMENT == 1)
-		g4.setTexture(envMapTU, Stage.current.environmentMap);
-		g4.setTexture(envAlbedoMapTU, Renderer.buffer.albedoMap);
-		g4.setTexture(envNormalMapTU, Renderer.buffer.normalMap);
-		g4.setTexture(envORMMapTU, Renderer.buffer.ormMap);
-		g4.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
+		ctx.setTexture(envMapTU, Stage.current.environmentMap);
+		ctx.setTexture(envAlbedoMapTU, Renderer.buffer.albedoMap);
+		ctx.setTexture(envNormalMapTU, Renderer.buffer.normalMap);
+		ctx.setTexture(envORMMapTU, Renderer.buffer.ormMap);
+		ctx.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
-		g4.drawIndexedVertices();
+		ctx.drawIndexedVertices();
 
 		// stage lights
-		g4.setPipeline(pipeline);
-		g4.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
-		g4.setTexture(albedoMapTU, Renderer.buffer.albedoMap);
-		g4.setTexture(normalMapTU, Renderer.buffer.normalMap);
-		g4.setTexture(ormMapTU, Renderer.buffer.ormMap);
+		ctx.setPipeline(pipeline);
+		ctx.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
+		ctx.setTexture(albedoMapTU, Renderer.buffer.albedoMap);
+		ctx.setTexture(normalMapTU, Renderer.buffer.normalMap);
+		ctx.setTexture(ormMapTU, Renderer.buffer.ormMap);
 		for (layer in Stage.current.layers) {
 			for (light in layer.lights) {
 				#if (S2D_LIGHTING_SHADOWS == 1)
-				g4.end();
+				ctx.end();
 				ShadowPass.render(light);
-				g4.begin();
-				g4.setPipeline(pipeline);
-				g4.setIndexBuffer(@:privateAccess se.SEngine.indices);
-				g4.setVertexBuffer(@:privateAccess se.SEngine.vertices);
-				g4.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
+				ctx.begin();
+				ctx.setPipeline(pipeline);
+				ctx.setIndexBuffer(@:privateAccess se.SEngine.indices);
+				ctx.setVertexBuffer(@:privateAccess se.SEngine.vertices);
+				ctx.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
 				#end
-				g4.setFloat3(lightPositionCL, light._transform._20, light._transform._21, light.z);
-				g4.setVector3(lightColorCL, light.color.RGB);
-				g4.setFloat2(lightAttribCL, light.power, light.radius);
-				g4.drawIndexedVertices();
+				ctx.setFloat3(lightPositionCL, light._transform._20, light._transform._21, light.z);
+				ctx.setVector3(lightColorCL, light.color.RGB);
+				ctx.setFloat2(lightAttribCL, light.power, light.radius);
+				ctx.drawIndexedVertices();
 			}
 		}
-		g4.end();
+		ctx.end();
 	}
 }
 #end

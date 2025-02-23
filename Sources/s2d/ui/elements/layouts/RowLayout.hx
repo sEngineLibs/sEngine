@@ -30,9 +30,9 @@ class RowLayout extends UISceneElement {
 
 		final fillCellWidth = fillCellCount > 0 ? (crect.width - (elements.length - 1) * spacing - cellsWidth) / fillCellCount : 0;
 
-		target.context2D.color = color;
-		target.context2D.opacity = finalOpacity;
-		target.context2D.transformation = _transform;
+		target.context2D.style.color = color;
+		target.context2D.style.opacity = finalOpacity;
+		target.context2D.transform = _transform;
 
 		var _x = x + left.padding;
 		var widthsIndex = 0;

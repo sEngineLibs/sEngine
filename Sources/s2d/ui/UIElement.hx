@@ -181,7 +181,7 @@ class UIElement extends PhysicalObject<UIElement> {
 		updateTransform();
 		final ctx = target.context2D;
 
-		ctx.transformation = _transform;
+		ctx.transform = _transform;
 		ctx.style.color = color;
 		ctx.style.opacity = finalOpacity;
 

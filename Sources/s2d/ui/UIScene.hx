@@ -27,9 +27,9 @@ class UIScene extends UIElement {
 			child.updateBounds();
 			child.render(target);
 		}
-		ctx.color = se.Color.rgb(1.0, 1.0, 1.0);
-		ctx.opacity = 0.85;
-		ctx.transformation = Mat3.identity();
+		ctx.style.color = se.Color.rgb(1.0, 1.0, 1.0);
+		ctx.style.opacity = 0.85;
+		ctx.transform = Mat3.identity();
 		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 		final e = childAt(Application.input.mouse.x, Application.input.mouse.y);
 		if (e != null)
@@ -41,8 +41,10 @@ class UIScene extends UIElement {
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 	function drawBounds(e:UIElement, target:Texture) {
 		final ctx = target.context2D;
-		ctx.font = Assets.fonts.get("Roboto_Regular");
-		ctx.fontSize = 16;
+		final style = ctx.style;
+
+		style.font = Assets.fonts.get("Roboto_Regular");
+		style.fontSize = 16;
 
 		final lm = e.anchors.left == null ? 0.0 : e.anchors.leftMargin;
 		final tm = e.anchors.top == null ? 0.0 : e.anchors.topMargin;
@@ -53,30 +55,30 @@ class UIScene extends UIElement {
 		final rp = e.right.padding;
 		final bp = e.bottom.padding;
 
-		ctx.color = se.Color.rgb(0.0, 0.0, 0.0);
+		style.color = se.Color.rgb(0.0, 0.0, 0.0);
 		ctx.fillRect(e.x - lm, e.y - tm, e.width + rm, e.height + bm);
 
 		// margins
-		ctx.color = se.Color.rgb(0.75, 0.25, 0.75);
+		style.color = se.Color.rgb(0.75, 0.25, 0.75);
 		ctx.fillRect(e.x - lm, e.y, lm, e.height);
 		ctx.fillRect(e.x - lm, e.y - tm, lm + e.width + rm, tm);
 		ctx.fillRect(e.x + e.width, e.y, rm, e.height);
 		ctx.fillRect(e.x - lm, e.y + e.height, lm + e.width + rm, bm);
 
 		// padding
-		ctx.color = se.Color.rgb(0.75, 0.75, 0.25);
+		style.color = se.Color.rgb(0.75, 0.75, 0.25);
 		ctx.fillRect(e.x, e.y, lp, e.height);
 		ctx.fillRect(e.x + lp, e.y, e.width - lp - rp, tp);
 		ctx.fillRect(e.x + e.width - rp, e.y, rp, e.height);
 		ctx.fillRect(e.x + lp, e.y + e.height - bp, e.width - lp - rp, bp);
 
 		// content
-		ctx.color = se.Color.rgb(0.25, 0.75, 0.75);
+		style.color = se.Color.rgb(0.25, 0.75, 0.75);
 		ctx.fillRect(e.x + lp, e.y + tp, e.width - lp - rp, e.height - tp - bp);
 
 		// labels
-		ctx.color = se.Color.rgb(1.0, 1.0, 1.0);
-		final fs = ctx.fontSize + 5;
+		style.color = se.Color.rgb(1.0, 1.0, 1.0);
+		final fs = style.fontSize + 5;
 
 		// labels - titles
 		if (tm >= fs)
@@ -87,13 +89,13 @@ class UIScene extends UIElement {
 			ctx.drawString("content", e.x + lp + 5, e.y + tp + 5);
 
 		// labels - values
-		ctx.fontSize = 14;
+		style.fontSize = 14;
 		// margins
 		var i = 0;
 		for (m in [lm, tm, rm, bm]) {
 			final str = '${Std.int(m)}px';
-			final strWidth = ctx.font.widthOfCharacters(ctx.fontSize, str.toCharArray(), 0, str.length);
-			final strheight = ctx.font.height(ctx.fontSize);
+			final strWidth = style.font.widthOfCharacters(style.fontSize, str.toCharArray(), 0, str.length);
+			final strheight = style.font.height(style.fontSize);
 			if (m >= strWidth) {
 				if (i == 0)
 					ctx.drawString(str, e.x - (m + strWidth) / 2, e.y + e.height / 2);
@@ -112,8 +114,8 @@ class UIScene extends UIElement {
 		var i = 0;
 		for (p in [lp, tp, rp, bp]) {
 			final str = '${Std.int(p)}px';
-			final strWidth = ctx.font.widthOfCharacters(ctx.fontSize, str.toCharArray(), 0, str.length);
-			final strheight = ctx.font.height(ctx.fontSize);
+			final strWidth = style.font.widthOfCharacters(style.fontSize, str.toCharArray(), 0, str.length);
+			final strheight = style.font.height(style.fontSize);
 			if (p >= strWidth) {
 				if (i == 0)
 					ctx.drawString(str, e.x + (p - strWidth) / 2, e.y + e.height / 2);
@@ -129,18 +131,18 @@ class UIScene extends UIElement {
 			++i;
 		}
 
-		ctx.fontSize = 22;
+		style.fontSize = 22;
 		final name = e.toString();
-		ctx.drawString(name, Application.input.mouse.x - ctx.font.widthOfCharacters(ctx.fontSize, name.toCharArray(), 0, name.length),
-			Application.input.mouse.y - ctx.font.height(ctx.fontSize));
+		ctx.drawString(name, Application.input.mouse.x - style.font.widthOfCharacters(style.fontSize, name.toCharArray(), 0, name.length),
+			Application.input.mouse.y - style.font.height(style.fontSize));
 
-		ctx.fontSize = 16;
+		style.fontSize = 16;
 		final rect = '${Std.int(e.width)} × ${Std.int(e.height)} at (${Std.int(e.x)}, ${Std.int(e.y)})';
 		ctx.drawString(rect, Application.input.mouse.x
-			- ctx.font.widthOfCharacters(ctx.fontSize, rect.toCharArray(), 0, rect.length),
+			- style.font.widthOfCharacters(style.fontSize, rect.toCharArray(), 0, rect.length),
 			Application.input.mouse.y
-			- ctx.font.height(ctx.fontSize)
-			+ ctx.fontSize);
+			- style.font.height(style.fontSize)
+			+ style.fontSize);
 	}
 	#end
 }

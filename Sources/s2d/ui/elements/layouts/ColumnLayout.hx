@@ -30,9 +30,9 @@ class ColumnLayout extends UISceneElement {
 
 		final fillCellHeight = fillCellCount > 0 ? (crect.height - (elements.length - 1) * spacing - cellsHeight) / fillCellCount : 0;
 
-		target.context2D.color = color;
-		target.context2D.opacity = finalOpacity;
-		target.context2D.transformation = _transform;
+		target.context2D.style.color = color;
+		target.context2D.style.opacity = finalOpacity;
+		target.context2D.transform = _transform;
 
 		var _y = y + top.padding;
 		var heightsIndex = 0;

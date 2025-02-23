@@ -25,8 +25,8 @@ class TextElement extends UISceneElement {
 	override function draw(target:Texture) {
 		final ctx = target.context2D;
 
-		ctx.font = font;
-		ctx.fontSize = fontSize;
+		ctx.style.font = font;
+		ctx.style.fontSize = fontSize;
 
 		var drawX = x;
 		if ((alignment & Alignment.HCenter) != 0)

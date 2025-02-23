@@ -1,9 +1,7 @@
 package se;
 
-import se.graphics.Context2D;
 import kha.Window;
 import kha.Assets;
-import kha.Canvas;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
@@ -11,6 +9,7 @@ import se.system.Application;
 import se.system.Time;
 import se.math.Mat3;
 import se.math.VectorMath;
+import se.graphics.Context2D;
 import se.animation.Action;
 import s2d.stage.Stage;
 import s2d.stage.graphics.Renderer;
@@ -149,7 +148,7 @@ class SEngine {
 
 		ctx.begin();
 		ctx.style.font = Assets.fonts.Roboto_Regular;
-		ctx.fontSize = 14;
+		ctx.style.fontSize = 14;
 		ctx.style.color = black;
 		ctx.drawString('FPS: ${fps}', 6, 6);
 		ctx.style.color = white;

@@ -6,7 +6,7 @@ import se.graphics.Context1D;
 import se.graphics.Context2D;
 import se.graphics.Context3D;
 
-@:forward(width, height, format, unload)
+@:forward()
 extern abstract Texture(Image) from Image to Image {
 	var self(get, never):kha.Image;
 

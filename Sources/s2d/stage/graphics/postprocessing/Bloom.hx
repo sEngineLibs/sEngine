@@ -1,9 +1,9 @@
 package s2d.stage.graphics.postprocessing;
 
-import kha.Canvas;
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
+import se.Texture;
 
 class Bloom extends PPEffect {
 	var textureMapTU:TextureUnit;
@@ -24,20 +24,20 @@ class Bloom extends PPEffect {
 	}
 
 	@:access(s2d.stage.graphics.Renderer)
-	function render(target:Canvas) {
-		final g2 = target.g2;
-		final g4 = target.g4;
+	function render(target:Texture) {
+		final ctx = target.context2D;
+		final ctx3d = target.context3D;
 
 		Renderer.buffer.src.generateMipmaps(4);
 
-		g2.begin();
-		g4.setPipeline(pipeline);
-		g4.setIndexBuffer(@:privateAccess se.SEngine.indices);
-		g4.setVertexBuffer(@:privateAccess se.SEngine.vertices);
-		g4.setTexture(textureMapTU, Renderer.buffer.src);
-		g4.setTextureParameters(textureMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
-		g4.setFloat3(paramsCL, radius, threshold, intensity);
-		g4.drawIndexedVertices();
-		g2.end();
+		ctx.begin();
+		ctx3d.setPipeline(pipeline);
+		ctx3d.setIndexBuffer(@:privateAccess se.SEngine.indices);
+		ctx3d.setVertexBuffer(@:privateAccess se.SEngine.vertices);
+		ctx3d.setTexture(textureMapTU, Renderer.buffer.src);
+		ctx3d.setTextureParameters(textureMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
+		ctx3d.setFloat3(paramsCL, radius, threshold, intensity);
+		ctx3d.drawIndexedVertices();
+		ctx.end();
 	}
 }

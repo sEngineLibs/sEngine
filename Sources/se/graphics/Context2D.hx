@@ -6,10 +6,10 @@ import se.math.Vec2;
 import se.math.VectorMath.vec2;
 import s2d.Alignment;
 
-@:forward()
+@:forward(pipeline, clear, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)
 extern abstract Context2D(Graphics) from Graphics {
 	public var style(get, never):Context2DStyle;
-	public var transform(get, never):Transform;
+	public var transform(get, set):Transform;
 
 	inline function get_style():Context2DStyle {
 		return this;
@@ -17,6 +17,10 @@ extern abstract Context2D(Graphics) from Graphics {
 
 	inline function get_transform():Transform {
 		return this.transformation;
+	}
+
+	inline function set_transform(value:Transform):Transform {
+		return this.transformation = value;
 	}
 
 	public inline function begin() {
@@ -27,14 +31,24 @@ extern abstract Context2D(Graphics) from Graphics {
 		this.drawImage(img, x, y);
 	}
 
+	/**
+	 * `sx, sy, sw, sh` arguments is the sub-rectangle of the source `img` image
+	 */
 	public inline function drawSubImage(img:Image, x:Float, y:Float, sx:Float, sy:Float, sw:Float, sh:Float) {
 		this.drawSubImage(img, x, y, sx, sy, sw, sh);
 	}
 
+	/**
+	 * `dx, dy, dw, dh` arguments is the rectangle to draw into the destination context
+	 */
 	public inline function drawScaledImage(img:Image, dx:Float, dy:Float, dw:Float, dh:Float) {
 		this.drawScaledImage(img, dx, dy, dw, dh);
 	}
 
+	/**
+	 * `sx, sy, sw, sh` arguments is the sub-rectangle of the source `img` image
+	 * `dx, dy, dw, dh` arguments is the rectangle to draw into the destination context
+	 */
 	public inline function drawScaledSubImage(img:Image, sx:Float, sy:Float, sw:Float, sh:Float, dx:Float, dy:Float, dw:Float, dh:Float) {
 		this.drawScaledSubImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
 	}
@@ -434,7 +448,7 @@ extern abstract Context2D(Graphics) from Graphics {
 }
 
 @:dox(show)
-@:forward(opacity, font, fontsize)
+@:forward(opacity, font, fontSize)
 extern private abstract Context2DStyle(Graphics) from Graphics {
 	public var color(get, set):Color;
 
