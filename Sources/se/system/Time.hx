@@ -2,7 +2,7 @@ package se.system;
 
 import kha.System;
 
-@:allow(se.system.Application)
+@:allow(se.Application)
 class Time {
 	public static var realTime:Float = 0.0;
 	public static var time:Float = 0.0;

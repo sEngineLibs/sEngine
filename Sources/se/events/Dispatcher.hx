@@ -1,6 +1,6 @@
 package se.events;
 
-import se.system.Application;
+import se.Application;
 
 /**
 	The Dispatcher class manages event listeners and their execution.
@@ -9,7 +9,7 @@ import se.system.Application;
 
 	@see `EventListener`
  */
-@:allow(se.system.Application)
+@:allow(se.Application)
 class Dispatcher {
 	static var listeners:Array<EventListener> = [];
 

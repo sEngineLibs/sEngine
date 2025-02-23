@@ -2,7 +2,7 @@ package s2d.ui;
 
 import kha.Assets;
 import se.Texture;
-import se.system.Application;
+import se.Application;
 import se.math.Mat3;
 
 using kha.StringExtensions;
@@ -15,7 +15,7 @@ class UIScene extends UIElement {
 
 	function new() {
 		super();
-		Application.window.notifyOnResize((w, h) -> setSize(w, h));
+		Application.windows[0].notifyOnResize((w, h) -> setSize(w, h));
 	}
 
 	override function render(target:Texture) {

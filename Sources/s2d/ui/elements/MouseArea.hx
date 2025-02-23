@@ -1,7 +1,7 @@
 package s2d.ui.elements;
 
 import se.system.Time;
-import se.system.Application;
+import se.Application;
 import se.system.input.Mouse;
 
 class MouseArea extends UISceneElement {

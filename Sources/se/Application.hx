@@ -1,4 +1,4 @@
-package se.system;
+package se;
 
 import kha.Assets;
 import kha.System;
@@ -11,7 +11,7 @@ import se.events.Dispatcher;
 class Application {
 	static var updateListeners:Array<Void->Void> = [];
 
-	public static var window:Window;
+	public static var windows(get, never):Array<Window>;
 	public static var input:{
 		var mouse:Mouse;
 		var keyboard:Keyboard;
@@ -19,7 +19,6 @@ class Application {
 
 	public static function start(options:SystemOptions, setup:Void->Void) {
 		System.start(options, function(window) {
-			Application.window = window;
 			Application.input = {
 				mouse: new Mouse(),
 				keyboard: new Keyboard()
@@ -54,6 +53,10 @@ class Application {
 	public static function stop() {
 		if (!System.stop())
 			trace("This application can't be stopped!");
+	}
+
+	static function get_windows() {
+		return Window.all;
 	}
 
 	static function update() {
