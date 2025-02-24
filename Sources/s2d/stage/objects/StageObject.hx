@@ -14,6 +14,8 @@ abstract class StageObject extends PhysicalObject<StageObject> {
 		this.layer = layer;
 	}
 
+	function onParentChanged():Void {};
+
 	function get_x():FastFloat {
 		return this.transform.global.translationX;
 	}

@@ -26,22 +26,27 @@ class UIElement extends PhysicalObject<UIElement> {
 	public var layer:UILayer = new UILayer();
 
 	// anchors
-	public var anchors:Anchors = new Anchors();
-	public var left:AnchorLine = {};
-	public var top:AnchorLine = {};
-	public var right:AnchorLine = {};
-	public var bottom:AnchorLine = {};
-	@:isVar public var padding(default, set):Float = 0.0;
+	public var anchors:Anchors;
+	public var left:AnchorLine = new AnchorLine(1.0);
+	public var top:AnchorLine = new AnchorLine(1.0);
+	public var right:AnchorLine = new AnchorLine(-1.0);
+	public var bottom:AnchorLine = new AnchorLine(-1.0);
+	public var padding(never, set):Float;
 
 	// positioning
-	public var x:Float = 0.0;
-	public var y:Float = 0.0;
-	public var width:Float = 150.0;
-	public var height:Float = 150.0;
-	public var minWidth:Float = Math.NEGATIVE_INFINITY;
-	public var maxWidth:Float = Math.POSITIVE_INFINITY;
-	public var minHeight:Float = Math.NEGATIVE_INFINITY;
-	public var maxHeight:Float = Math.POSITIVE_INFINITY;
+	var __x:Float = 0.0;
+	var __y:Float = 0.0;
+	var __width:Float = 0.0;
+	var __height:Float = 0.0;
+
+	public var x(get, set):Float;
+	public var y(get, set):Float;
+	public var width(get, set):Float;
+	public var height(get, set):Float;
+	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
+	@:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
+	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
+	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
 
 	public var rect(get, set):Rect;
 	public var bounds(get, set):Bounds;
@@ -64,6 +69,16 @@ class UIElement extends PhysicalObject<UIElement> {
 
 	overload extern public static inline function mapFromElement(element:UIElement, p:Position):Position {
 		return element.mapToGlobal(p);
+	}
+
+	public function new(?parent:UIElement) {
+		anchors = new Anchors(this);
+		super(parent);
+	}
+
+	public function onParentChanged() {
+		x = __x + parent?.x;
+		y = __y + parent?.y;
 	}
 
 	public function setPadding(value:Float):Void {
@@ -192,86 +207,130 @@ class UIElement extends PhysicalObject<UIElement> {
 		ctx.style.opacity = finalOpacity;
 		draw(target);
 
-		for (child in children) {
-			child.syncBounds();
+		for (child in children)
 			if (child.visible)
 				child.render(target);
-		}
 	}
 
 	function draw(target:Texture) {}
 
-	function syncBounds() {
-		// position
-		if (anchors.left != null)
-			left.position = anchors.left.position + anchors.left.padding + anchors.leftMargin;
-		else {
-			left.position = x;
-			if (parent != null)
-				left.position += parent.left.position + parent.left.padding;
-		}
-		if (anchors.top != null)
-			top.position = anchors.top.position + anchors.top.padding + anchors.topMargin;
-		else {
-			top.position = y;
-			if (parent != null)
-				top.position += parent.top.position + parent.top.padding;
-		}
-
-		// size
-		if (anchors.right != null)
-			right.position = anchors.right.position - anchors.right.padding - anchors.rightMargin;
-		else {
-			right.position = left.position + width;
-			if (parent != null)
-				right.position += parent.left.position + parent.left.padding;
-		}
-		if (anchors.bottom != null)
-			bottom.position = anchors.bottom.position - anchors.bottom.padding - anchors.bottomMargin;
-		else {
-			bottom.position = top.position + height;
-			if (parent != null)
-				bottom.position += parent.top.position + parent.top.padding;
-		}
+	extern inline function get_x():Float {
+		return left.position;
 	}
 
-	function get_rect():Rect {
+	extern inline function set_x(value:Float):Float {
+		__x = value - parent?.x;
+		if (!left.isBinded) {
+			final d = value - x;
+			left.position = value;
+			if (anchors.right == null)
+				right.position += d;
+			for (c in children)
+				c.x += d;
+		}
+		return value;
+	}
+
+	extern inline function get_y():Float {
+		return top.position;
+	}
+
+	extern inline function set_y(value:Float):Float {
+		__y = value - parent?.y;
+		if (!top.isBinded) {
+			final d = value - y;
+			top.position = value;
+			if (anchors.bottom == null)
+				bottom.position += d;
+			for (c in children)
+				c.y += d;
+		}
+		return value;
+	}
+
+	extern inline function get_width():Float {
+		return right.position - x;
+	}
+
+	extern inline function set_width(value:Float):Float {
+		__width = value;
+		if (!right.isBinded)
+			right.position = x + clamp(value, minWidth, maxWidth);
+		return value;
+	}
+
+	extern inline function get_height():Float {
+		return right.position - x;
+	}
+
+	extern inline function set_height(value:Float):Float {
+		__height = value;
+		if (!bottom.isBinded)
+			bottom.position = y + clamp(value, minHeight, maxHeight);
+		return value;
+	}
+
+	extern inline function set_minWidth(value:Float):Float {
+		minWidth = value;
+		width = width;
+		return value;
+	}
+
+	extern inline function set_maxWidth(value:Float):Float {
+		maxWidth = value;
+		width = width;
+		return value;
+	}
+
+	extern inline function set_minHeight(value:Float):Float {
+		minHeight = value;
+		height = height;
+		return value;
+	}
+
+	extern inline function set_maxHeight(value:Float):Float {
+		minHeight = value;
+		height = height;
+		return value;
+	}
+
+	extern inline function get_rect():Rect {
 		return new Rect(x, y, width, height);
 	}
 
-	function set_rect(value:Rect):Rect {
+	extern inline function set_rect(value:Rect):Rect {
 		setRect(value);
 		return value;
 	}
 
-	function get_bounds():Bounds {
+	extern inline function get_bounds():Bounds {
 		return rect.toBounds();
 	}
 
-	function set_bounds(value:Bounds):Bounds {
+	extern inline function set_bounds(value:Bounds):Bounds {
 		setBounds(value);
 		return value;
 	}
 
-	function get_contentRect():Rect {
+	extern inline function get_contentRect():Rect {
 		return new Rect(x + left.padding, y + top.padding, width - left.padding - right.padding, height - top.padding - bottom.padding);
 	}
 
-	function set_contentRect(value:Rect):Rect {
+	extern inline function set_contentRect(value:Rect):Rect {
 		setContentRect(value);
 		return value;
 	}
 
-	function get_contentBounds():Bounds {
+	extern inline function get_contentBounds():Bounds {
 		return contentRect.toBounds();
 	}
 
-	function set_contentBounds(value:Bounds):Bounds {
+	extern inline function set_contentBounds(value:Bounds):Bounds {
 		setContentBounds(value);
 		return value;
 	}
 
-	function get_childrenBounds():Vec4 {
+	extern inline function get_childrenBounds():Vec4 {
 		var b = bounds;
 		for (child in children) {
 			b.left = Math.min(b.left, child.left.position);
@@ -282,16 +341,15 @@ class UIElement extends PhysicalObject<UIElement> {
 		return b;
 	}
 
-	function get_childrenRect():Vec4 {
+	extern inline function get_childrenRect():Vec4 {
 		return childrenBounds.toRect();
 	}
 
-	function get_finalOpacity():Float {
+	inline function get_finalOpacity():Float {
 		return parent == null ? opacity : parent.finalOpacity * opacity;
 	}
 
-	function set_padding(value:Float) {
-		padding = value;
+	extern inline function set_padding(value:Float) {
 		left.padding = value;
 		top.padding = value;
 		right.padding = value;

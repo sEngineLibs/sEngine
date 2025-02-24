@@ -19,17 +19,16 @@ class UIScene extends UIElement {
 	function new(window) {
 		super();
 		this.window = window;
+		window.notifyOnResize((w, h) -> setSize(w, h));
 	}
 
 	override inline function render(target:Texture) {
 		final ctx = target.context2D;
 
-		syncBounds();
 		ctx.begin();
-		for (child in children) {
-			child.syncBounds();
+		for (child in children)
 			child.render(target);
-		}
+
 		ctx.style.color = se.Color.rgb(1.0, 1.0, 1.0);
 		ctx.style.opacity = 0.85;
 		ctx.transform = Mat3.identity();
@@ -39,11 +38,6 @@ class UIScene extends UIElement {
 			drawBounds(e, target);
 		#end
 		ctx.end();
-	}
-
-	override inline function syncBounds() {
-		width = window.width;
-		height = window.height;
 	}
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)

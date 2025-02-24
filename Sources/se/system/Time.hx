@@ -42,6 +42,12 @@ class Time {
 		return listener;
 	}
 
+	public static function measure(f:Void->Void):Float {
+		var start = Time.realTime;
+		f();
+		return Time.realTime - start;
+	}
+
 	static function init() {
 		Application.notifyOnUpdate(update);
 	}

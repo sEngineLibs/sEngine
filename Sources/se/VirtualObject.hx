@@ -17,6 +17,7 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 		if (value != null || value != this || !children.contains(value)) {
 			value._parent = cast this;
 			children.push(value);
+			value.onParentChanged();
 		}
 	}
 
@@ -24,16 +25,22 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 		if (value != null || value != this || children.contains(value)) {
 			value._parent = null;
 			children.remove(value);
+			value.onParentChanged();
 		}
 	}
 
 	public function setParent(value:This):Void {
-		value?.addChild(cast this);
+		if (value != null)
+			value.addChild(cast this);
+		else
+			removeParent();
 	}
 
 	public function removeParent():Void {
 		parent?.removeChild(cast this);
 	}
+
+	abstract function onParentChanged():Void;
 
 	public function toString():String {
 		return Type.getClassName(Type.getClass(this));
