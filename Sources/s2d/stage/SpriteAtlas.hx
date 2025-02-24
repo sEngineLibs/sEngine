@@ -2,6 +2,7 @@ package s2d.stage;
 
 import haxe.ds.Vector;
 import kha.Image;
+import se.math.Mat3;
 import s2d.stage.objects.Sprite;
 #if (S2D_LIGHTING == 1)
 #if (S2D_LIGHTING_DEFERRED == 1)
@@ -118,7 +119,7 @@ class SpriteAtlas {
 		var i = 0;
 		for (sprite in sprites) {
 			final c = sprite.cropRect;
-			final m = sprite._transform;
+			final m = (sprite._transform : Mat3);
 			// crop rect
 			final ci = i * cStructSize;
 			cData[ci + 0] = c.x;

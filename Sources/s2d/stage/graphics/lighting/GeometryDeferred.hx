@@ -77,7 +77,7 @@ class GeometryDeferred {
 		#if (S2D_SPRITE_INSTANCING != 1)
 		ctx.setVertexBuffer(@:privateAccess se.SEngine.vertices);
 		#end
-		ctx.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
+		ctx.setMat3(viewProjectionCL, Stage.current.viewProjection);
 		for (layer in Stage.current.layers) {
 			#if (S2D_LIGHTING_SHADOWS == 1)
 			@:privateAccess layer.shadowBuffer.updateBuffersData();
@@ -89,18 +89,18 @@ class GeometryDeferred {
 				ctx.setTexture(normalMapTU, atlas.normalMap);
 				ctx.setTexture(ormMapTU, atlas.ormMap);
 				ctx.setTexture(emissionMapTU, atlas.emissionMap);
-				ctx.drawIndexedVerticesInstanced(atlas.sprites.length);
+				ctx.drawInstanced(atlas.sprites.length);
 			}
 			#else
 			for (sprite in layer.sprites) {
 				ctx.setFloat(depthCL, sprite.z);
-				ctx.setMatrix3(modelCL, sprite.finalModel);
-				ctx.setVector4(cropRectCL, sprite.cropRect);
+				ctx.setMat3(modelCL, sprite.finalModel);
+				ctx.setVec4(cropRectCL, sprite.cropRect);
 				ctx.setTexture(albedoMapTU, sprite.atlas.albedoMap);
 				ctx.setTexture(normalMapTU, sprite.atlas.normalMap);
 				ctx.setTexture(ormMapTU, sprite.atlas.ormMap);
 				ctx.setTexture(emissionMapTU, sprite.atlas.emissionMap);
-				ctx.drawIndexedVertices();
+				ctx.draw();
 			}
 			#end
 		}

@@ -94,11 +94,11 @@ class LightingDeferred {
 		ctx.setTexture(envORMMapTU, Renderer.buffer.ormMap);
 		ctx.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
-		ctx.drawIndexedVertices();
+		ctx.draw();
 
 		// stage lights
 		ctx.setPipeline(pipeline);
-		ctx.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
+		ctx.setMat3(viewProjectionCL, Stage.current.viewProjection);
 		ctx.setTexture(albedoMapTU, Renderer.buffer.albedoMap);
 		ctx.setTexture(normalMapTU, Renderer.buffer.normalMap);
 		ctx.setTexture(ormMapTU, Renderer.buffer.ormMap);
@@ -113,10 +113,11 @@ class LightingDeferred {
 				ctx.setVertexBuffer(@:privateAccess se.SEngine.vertices);
 				ctx.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
 				#end
-				ctx.setFloat3(lightPositionCL, light._transform._20, light._transform._21, light.z);
-				ctx.setVector3(lightColorCL, light.color.RGB);
+				final p = light.transform.global.translation;
+				ctx.setFloat3(lightPositionCL, p.x, p.y, light.z);
+				ctx.setVec3(lightColorCL, light.color.RGB);
 				ctx.setFloat2(lightAttribCL, light.power, light.radius);
-				ctx.drawIndexedVertices();
+				ctx.draw();
 			}
 		}
 		ctx.end();

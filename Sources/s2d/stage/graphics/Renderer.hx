@@ -131,20 +131,20 @@ class Renderer {
 		#if (S2D_SPRITE_INSTANCING != 1)
 		ctx.setVertexBuffer(@:privateAccess se.SEngine.vertices);
 		#end
-		ctx.setMatrix3(viewProjectionCL, Stage.current.viewProjection);
+		ctx.setMat3(viewProjectionCL, Stage.current.viewProjection);
 		for (layer in Stage.current.layers) {
 			#if (S2D_SPRITE_INSTANCING == 1)
 			for (atlas in layer.spriteAtlases) {
 				@:privateAccess ctx.setVertexBuffers(atlas.vertices);
 				ctx.setTexture(textureMapTU, atlas.textureMap);
-				ctx.drawIndexedVerticesInstanced(atlas.sprites.length);
+				ctx.drawInstanced(atlas.sprites.length);
 			}
 			#else
 			for (sprite in layer.sprites) {
-				ctx.setMatrix3(modelCL, sprite._transform);
-				ctx.setVector4(cropRectCL, sprite.cropRect);
+				ctx.setMat3(modelCL, sprite._transform);
+				ctx.setVec4(cropRectCL, sprite.cropRect);
 				ctx.setTexture(textureMapTU, sprite.atlas.textureMap);
-				ctx.drawIndexedVertices();
+				ctx.draw();
 			}
 			#end
 		}

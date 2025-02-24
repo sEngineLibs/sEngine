@@ -3,8 +3,6 @@ package s2d;
 import se.math.Vec2;
 import se.math.Mat3;
 
-using se.extensions.Mat3Ext;
-
 abstract class PhysicalObject<This:PhysicalObject<This>> extends se.VirtualObject<This> {
 	var _transform:Transform = Mat3.identity();
 
@@ -13,10 +11,7 @@ abstract class PhysicalObject<This:PhysicalObject<This>> extends se.VirtualObjec
 	public var transformOrigin:Vec2 = new Vec2(0.0, 0.0);
 
 	inline function syncTransform():Void {
-		var t = Mat3.identity();
-		t.translateG(transformOrigin);
-		t *= transform;
-		t.translateG(-transformOrigin);
+		var t = Mat3.translation(transformOrigin.x, transformOrigin.y) * transform * Mat3.translation(-transformOrigin.x, -transformOrigin.y);
 		_transform = parent == null ? t : parent._transform * t;
 	}
 

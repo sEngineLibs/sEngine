@@ -5,19 +5,9 @@ import se.math.Vec2;
 import se.math.Mat3;
 import se.math.VectorMath;
 
-using se.extensions.Mat3Ext;
-
-@:nullSafety
-@:forward.new
-@:forward(_00, _10, _20, _01, _11, _21, _02, _12, _22)
 extern abstract Transform(Mat3) from Mat3 to Mat3 {
-	public var translationX(get, set):Float;
-	public var translationY(get, set):Float;
-	public var translation(get, set):Vec2;
-	public var scaleX(get, set):Float;
-	public var scaleY(get, set):Float;
-	public var scale(get, set):Vec2;
-	public var rotation(get, set):Float;
+	public var global(get, set):TransformGlobal;
+	public var local(get, set):TransformLocal;
 
 	@:from
 	public static inline function fromKhaMat3(value:KhaMat3):Transform {
@@ -29,190 +19,195 @@ extern abstract Transform(Mat3) from Mat3 to Mat3 {
 		return (this : KhaMat3);
 	}
 
-	public inline function pushTranslation(value:Vec2):Void {
-		this.pushTranslation(value);
+	inline function get_global() {
+		return this;
 	}
 
-	public inline function pushScale(value:Vec2):Void {
-		this.pushScale(value);
+	inline function set_global(value:TransformGlobal):TransformGlobal {
+		return this = value;
 	}
 
-	public inline function pushRotation(value:Float):Void {
-		this.pushRotation(value);
+	inline function get_local() {
+		return this;
 	}
 
-	overload extern public inline function translateG(value:Vec2) {
-		this.translateG(value);
+	inline function set_local(value:TransformLocal):TransformLocal {
+		return this = value;
+	}
+}
+
+extern abstract TransformGlobal(Mat3) from Mat3 to Mat3 {
+	public var translationX(get, set):Float;
+	public var translationY(get, set):Float;
+	public var translation(get, set):Vec2;
+	public var scaleX(get, set):Float;
+	public var scaleY(get, set):Float;
+	public var globalScale(get, set):Vec2;
+	public var rotation(get, set):Float;
+
+	overload public inline function translate(x:Float, y:Float) {
+		translationX += x;
+		translationY += y;
 	}
 
-	overload extern public inline function translateToG(value:Vec2) {
-		this.translateToG(value);
+	overload public inline function translate(value:Vec2) {
+		translate(value.x, value.y);
 	}
 
-	overload extern public inline function scaleG(value:Vec2) {
-		this.scaleG(value);
+	overload public inline function translate(value:Float) {
+		translate(value, value);
 	}
 
-	overload extern public inline function scaleToG(value:Vec2) {
-		this.scaleToG(value);
+	overload public inline function translateTo(x:Float, y:Float) {
+		translationX = x;
+		translationY = y;
 	}
 
-	public inline function rotateG(value:Float) {
-		this.rotateG(value);
+	overload public inline function translateTo(value:Vec2) {
+		translateTo(value.x, value.y);
 	}
 
-	public inline function rotateToG(value:Float) {
-		this.rotateToG(value);
+	overload public inline function translateTo(value:Float) {
+		translateTo(value, value);
 	}
 
-	overload extern public inline function translateL(x:Float, y:Float) {
-		this.translateL(x, y);
+	overload public inline function scale(x:Float, y:Float) {
+		scaleX *= x;
+		scaleY *= y;
 	}
 
-	overload extern public inline function translateToL(x:Float, y:Float) {
-		this.translateToL(x, y);
+	overload public inline function scale(value:Vec2) {
+		scale(value.x, value.y);
 	}
 
-	overload extern public inline function scaleL(x:Float, y:Float) {
-		this.scaleL(x, y);
+	overload public inline function scale(value:Float) {
+		scale(value, value);
 	}
 
-	overload extern public inline function scaleToL(x:Float, y:Float) {
-		this.scaleToL(x, y);
+	overload public inline function scaleTo(x:Float, y:Float) {
+		scaleX = x;
+		scaleY = y;
 	}
 
-	public inline function rotateL(value:Float) {
-		this.rotateL(value);
+	overload public inline function scaleTo(value:Vec2) {
+		scaleTo(value.x, value.y);
 	}
 
-	public inline function rotateToL(value:Float) {
-		this.rotateToL(value);
+	overload public inline function scaleTo(value:Float) {
+		scaleTo(value, value);
 	}
 
-	overload extern public inline function translateG(x:Float, y:Float) {
-		this.translateG({x: x, y: y});
+	public inline function rotate(value:Float) {
+		rotation += value;
 	}
 
-	overload extern public inline function translateG(value:Float) {
-		this.translateG({x: value, y: value});
-	}
-
-	overload extern public inline function translateToG(x:Float, y:Float) {
-		this.translateToG({x: x, y: y});
-	}
-
-	overload extern public inline function translateToG(value:Float) {
-		this.translateToG({x: value, y: value});
-	}
-
-	overload extern public inline function scaleG(x:Float, y:Float) {
-		this.scaleG({x: x, y: y});
-	}
-
-	overload extern public inline function scaleG(value:Float) {
-		this.scaleG({x: value, y: value});
-	}
-
-	overload extern public inline function scaleToG(x:Float, y:Float) {
-		this.scaleToG({x: x, y: y});
-	}
-
-	overload extern public inline function scaleToG(value:Float) {
-		this.scaleToG({x: value, y: value});
-	}
-
-	overload extern public inline function translateL(value:Vec2) {
-		this.translateL(value.x, value.y);
-	}
-
-	overload extern public inline function translateL(value:Float) {
-		this.translateL(value, value);
-	}
-
-	overload extern public inline function translateToL(value:Vec2) {
-		this.translateToL(value.x, value.y);
-	}
-
-	overload extern public inline function translateToL(value:Float) {
-		this.translateToL(value, value);
-	}
-
-	overload extern public inline function scaleL(value:Vec2) {
-		this.scaleL(value.x, value.y);
-	}
-
-	overload extern public inline function scaleL(value:Float) {
-		this.scaleL(value, value);
-	}
-
-	overload extern public inline function scaleToL(value:Vec2) {
-		this.scaleToL(value.x, value.y);
-	}
-
-	overload extern public inline function scaleToL(value:Float) {
-		this.scaleToL(value, value);
+	public inline function rotateTo(value:Float) {
+		rotation = value;
 	}
 
 	inline function get_translationX():Float {
-		return this.getTranslationX();
+		return this._20;
 	}
 
 	inline function set_translationX(value:Float):Float {
-		this.setTranslationX(value);
+		this._20 = value;
 		return value;
 	}
 
 	inline function get_translationY():Float {
-		return this.getTranslationY();
+		return this._21;
 	}
 
 	inline function set_translationY(value:Float):Float {
-		this.setTranslationY(value);
+		this._21 = value;
 		return value;
 	}
 
 	inline function get_translation():Vec2 {
-		return this.getTranslation();
+		return vec2(translationX, translationY);
 	}
 
 	inline function set_translation(value:Vec2):Vec2 {
-		this.setTranslation(value);
+		translationX = value.x;
+		translationY = value.y;
 		return value;
 	}
 
 	inline function get_scaleX():Float {
-		return this.getScaleX();
+		return sqrt(this._00 * this._00 + this._10 * this._10);
 	}
 
 	inline function set_scaleX(value:Float):Float {
-		this.setScaleX(value);
+		var xt = normalize(vec2(this._00, this._10)) * value;
+		this._00 = xt.x;
+		this._10 = xt.y;
 		return value;
 	}
 
 	inline function get_scaleY():Float {
-		return this.getScaleY();
+		return sqrt(this._01 * this._01 + this._11 * this._11);
 	}
 
 	inline function set_scaleY(value:Float):Float {
-		this.setScaleY(value);
+		var yt = normalize(vec2(this._01, this._11)) * value;
+		this._01 = yt.x;
+		this._11 = yt.y;
 		return value;
 	}
 
-	inline function get_scale():Vec2 {
-		return this.getScale();
+	inline function get_globalScale():Vec2 {
+		return vec2(scaleX, scaleY);
 	}
 
-	inline function set_scale(value:Vec2):Vec2 {
-		this.setScale(value);
+	inline function set_globalScale(value:Vec2):Vec2 {
+		scaleX = value.x;
+		scaleY = value.y;
 		return value;
 	}
 
 	inline function get_rotation():Float {
-		return this.getRotation();
+		return atan2(this._10, this._00);
 	}
 
 	inline function set_rotation(value:Float):Float {
-		this.setRotation(value);
+		var sx = scaleX;
+		var sy = scaleY;
+		var c = cos(value);
+		var s = sin(value);
+		this._00 = c * sx;
+		this._10 = s * sx;
+		this._01 = -s * sy;
+		this._11 = c * sy;
 		return value;
+	}
+}
+
+extern abstract TransformLocal(Mat3) from Mat3 to Mat3 {
+	overload public inline function translate(x:Float, y:Float) {
+		this *= Mat3.translation(x, y);
+	}
+
+	overload public inline function translate(value:Vec2) {
+		translate(value.x, value.y);
+	}
+
+	overload public inline function translate(value:Float) {
+		translate(value, value);
+	}
+
+	overload public inline function scale(x:Float, y:Float) {
+		this *= Mat3.scale(x, y);
+	}
+
+	overload public inline function scale(value:Vec2) {
+		scale(value.x, value.y);
+	}
+
+	overload public inline function scale(value:Float) {
+		scale(value, value);
+	}
+
+	public inline function rotate(value:Float) {
+		this *= Mat3.rotation(value);
 	}
 }

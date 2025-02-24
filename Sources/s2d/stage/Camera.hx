@@ -13,20 +13,20 @@ abstract Camera(Transform) from Transform to Transform {
 	}
 
 	function get_x():Float {
-		return this.translationX;
+		return this.global.translationX;
 	}
 
 	function set_x(value:Float):Float {
-		this.translationX = value;
+		this.global.translationX = value;
 		return value;
 	}
 
 	function get_y():Float {
-		return this.translationY;
+		return this.global.translationY;
 	}
 
 	function set_y(value:Float):Float {
-		this.translationY = value;
+		this.global.translationY = value;
 		return value;
 	}
 }

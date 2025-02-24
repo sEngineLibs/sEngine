@@ -184,9 +184,9 @@ class UIElement extends PhysicalObject<UIElement> {
 	}
 
 	function renderTree(target:Texture) {
-		syncTransform();
 		final ctx = target.context2D;
 
+		syncTransform();
 		ctx.transform = _transform;
 		ctx.style.color = color;
 		ctx.style.opacity = finalOpacity;

@@ -38,7 +38,7 @@ class RectDrawer extends ElementDrawer<RoundedRectangle> {
 
 		ctx3d.setFloat4(rectCL, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 		ctx3d.setFloat4(rectDataCL, radius, rectangle.softness, border.width, border.softness);
-		ctx3d.setVector4(bordColorCL, border.color.RGBA);
+		ctx3d.setVec4(bordColorCL, border.color.RGBA);
 
 		final offset = Math.max(rectangle.softness, border.width + border.softness);
 

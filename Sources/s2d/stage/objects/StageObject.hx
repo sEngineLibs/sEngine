@@ -14,23 +14,21 @@ abstract class StageObject extends PhysicalObject<StageObject> {
 		this.layer = layer;
 	}
 
-	function onParentChanged() {}
-
 	function get_x():FastFloat {
-		return this.transform.translationX;
+		return this.transform.global.translationX;
 	}
 
 	function set_x(value:FastFloat):FastFloat {
-		this.transform.translationX = value;
+		this.transform.global.translationX = value;
 		return value;
 	}
 
 	function get_y():FastFloat {
-		return this.transform.translationY;
+		return this.transform.global.translationY;
 	}
 
 	function set_y(value:FastFloat):FastFloat {
-		this.transform.translationY = value;
+		this.transform.global.translationY = value;
 		return value;
 	}
 }

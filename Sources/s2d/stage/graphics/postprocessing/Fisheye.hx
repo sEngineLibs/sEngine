@@ -35,9 +35,9 @@ class Fisheye extends PPEffect {
 		ctx3d.setIndexBuffer(@:privateAccess se.SEngine.indices);
 		ctx3d.setVertexBuffer(@:privateAccess se.SEngine.vertices);
 		ctx3d.setTexture(textureMapTU, Renderer.buffer.src);
-		ctx3d.setVector2(positionCL, position);
+		ctx3d.setVec2(positionCL, position);
 		ctx3d.setFloat(strengthCL, strength);
-		ctx3d.drawIndexedVertices();
+		ctx3d.draw();
 		ctx.end();
 	}
 }

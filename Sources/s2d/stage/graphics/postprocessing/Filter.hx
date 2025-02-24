@@ -37,8 +37,8 @@ class Filter extends PPEffect {
 		ctx3d.setVertexBuffer(@:privateAccess se.SEngine.vertices);
 		ctx3d.setTexture(textureMapTU, Renderer.buffer.src);
 		for (kernel in kernels) {
-			ctx3d.setMatrix3(kernelCL, kernel);
-			ctx3d.drawIndexedVertices();
+			ctx3d.setMat3(kernelCL, kernel);
+			ctx3d.draw();
 		}
 		ctx.end();
 	}

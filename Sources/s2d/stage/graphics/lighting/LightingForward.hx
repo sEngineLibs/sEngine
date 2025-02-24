@@ -89,7 +89,7 @@ class LightingForward {
 		g4.clear(Black);
 		g4.setPipeline(pipeline);
 		g4.setIndexBuffer(@:privateAccess SEngine.indices);
-		g4.setMatrix3(viewProjectionCL, viewProjection);
+		g4.setMat3(viewProjectionCL, viewProjection);
 		#if (S2D_SPRITE_INSTANCING != 1)
 		g4.setVertexBuffer(@:privateAccess SEngine.vertices);
 		#end
@@ -118,19 +118,19 @@ class LightingForward {
 					g4.setTexture(normalMapTU, atlas.normalMap);
 					g4.setTexture(ormMapTU, atlas.ormMap);
 					g4.setTexture(emissionMapTU, atlas.emissionMap);
-					g4.drawIndexedVerticesInstanced(atlas.sprites.length);
+					g4.drawInstanced(atlas.sprites.length);
 				}
 				#else
 				var i = 0;
 				for (sprite in layer.sprites) {
 					g4.setFloat(depthCL, i / layer.sprites.length);
-					g4.setMatrix3(modelCL, sprite._transform);
-					g4.setVector4(cropRectCL, sprite.cropRect);
+					g4.setMat3(modelCL, sprite._transform);
+					g4.setVec4(cropRectCL, sprite.cropRect);
 					g4.setTexture(albedoMapTU, sprite.atlas.albedoMap);
 					g4.setTexture(normalMapTU, sprite.atlas.normalMap);
 					g4.setTexture(ormMapTU, sprite.atlas.ormMap);
 					g4.setTexture(emissionMapTU, sprite.atlas.emissionMap);
-					g4.drawIndexedVertices();
+					g4.draw();
 					++i;
 				}
 				#end

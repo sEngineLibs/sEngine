@@ -32,7 +32,7 @@ abstract class ElementDrawer<T> {
 
 		ctx.pipeline = pipeline;
 		ctx3d.setPipeline(pipeline);
-		ctx3d.setMatrix3(modelCL, ctx.transform);
+		ctx3d.setMat3(modelCL, ctx.transform);
 		draw(target, element);
 		ctx.pipeline = null;
 	}
