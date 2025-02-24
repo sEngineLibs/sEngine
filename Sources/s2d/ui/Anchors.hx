@@ -2,94 +2,88 @@ package s2d.ui;
 
 import s2d.ui.UIElement;
 
-class Anchors {
-	var _el:UIElement;
-
+abstract Anchors(UIElement) from UIElement {
 	public var left(get, set):AnchorLine;
 	public var top(get, set):AnchorLine;
 	public var right(get, set):AnchorLine;
 	public var bottom(get, set):AnchorLine;
 	public var margins(never, set):Float;
 
-	public function new(element:UIElement) {
-		_el = element;
-	}
-
-	public function fill(element:UIElement) {
+	extern public inline function fill(element:UIElement) {
 		fillWidth(element);
 		fillHeight(element);
 	}
 
-	public function unfill() {
+	extern public inline function unfill() {
 		unfillWidth();
 		unfillHeight();
 	}
 
-	public function fillWidth(element:UIElement) {
-		_el.left.bindTo(element.left);
-		_el.right.bindTo(element.right);
+	extern public inline function fillWidth(element:UIElement) {
+		this.left.bindTo(element.left);
+		this.right.bindTo(element.right);
 	}
 
-	public function unfillWidth() {
-		_el.left.unbindFrom();
-		_el.right.unbindFrom();
+	extern public inline function unfillWidth() {
+		this.left.unbindFrom();
+		this.right.unbindFrom();
 	}
 
-	public function fillHeight(element:UIElement) {
-		_el.top.bindTo(element.top);
-		_el.bottom.bindTo(element.bottom);
+	extern public inline function fillHeight(element:UIElement) {
+		this.top.bindTo(element.top);
+		this.bottom.bindTo(element.bottom);
 	}
 
-	public function unfillHeight() {
-		_el.top.unbindFrom();
-		_el.bottom.unbindFrom();
+	extern public inline function unfillHeight() {
+		this.top.unbindFrom();
+		this.bottom.unbindFrom();
 	}
 
-	public function setMargins(value:Float):Void {
+	extern public inline function setMargins(value:Float):Void {
 		margins = value;
 	}
 
 	extern inline function set_margins(value:Float) {
-		_el.left.margin = value;
-		_el.top.margin = value;
-		_el.right.margin = value;
-		_el.bottom.margin = value;
+		this.left.margin = value;
+		this.top.margin = value;
+		this.right.margin = value;
+		this.bottom.margin = value;
 		return value;
 	}
 
 	extern inline function get_left():AnchorLine {
-		return _el.left.bindedTo;
+		return this.left.bindedTo;
 	}
 
 	extern inline function set_left(value:AnchorLine):AnchorLine {
-		_el.left.bindTo(value);
+		this.left.bindTo(value);
 		return value;
 	}
 
 	extern inline function get_top():AnchorLine {
-		return _el.top.bindedTo;
+		return this.top.bindedTo;
 	}
 
 	extern inline function set_top(value:AnchorLine):AnchorLine {
-		_el.top.bindTo(value);
+		this.top.bindTo(value);
 		return value;
 	}
 
 	extern inline function get_right():AnchorLine {
-		return _el.right.bindedTo;
+		return this.right.bindedTo;
 	}
 
 	extern inline function set_right(value:AnchorLine):AnchorLine {
-		_el.right.bindTo(value);
+		this.right.bindTo(value);
 		return value;
 	}
 
 	extern inline function get_bottom():AnchorLine {
-		return _el.bottom.bindedTo;
+		return this.bottom.bindedTo;
 	}
 
 	extern inline function set_bottom(value:AnchorLine):AnchorLine {
-		_el.bottom.bindTo(value);
+		this.bottom.bindTo(value);
 		return value;
 	}
 }

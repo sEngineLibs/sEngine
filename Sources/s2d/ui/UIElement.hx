@@ -26,7 +26,7 @@ class UIElement extends PhysicalObject<UIElement> {
 	public var layer:UILayer = new UILayer();
 
 	// anchors
-	public var anchors:Anchors;
+	public var anchors(get, never):Anchors;
 	public var left:AnchorLine = new AnchorLine(1.0);
 	public var top:AnchorLine = new AnchorLine(1.0);
 	public var right:AnchorLine = new AnchorLine(-1.0);
@@ -72,7 +72,6 @@ class UIElement extends PhysicalObject<UIElement> {
 	}
 
 	public function new(?parent:UIElement) {
-		anchors = new Anchors(this);
 		super(parent);
 	}
 
@@ -213,6 +212,10 @@ class UIElement extends PhysicalObject<UIElement> {
 	}
 
 	function draw(target:Texture) {}
+
+	extern inline function get_anchors():Anchors {
+		return this;
+	}
 
 	extern inline function get_x():Float {
 		return left.position;
