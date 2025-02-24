@@ -3,7 +3,7 @@ package se.math;
 @:nullSafety
 @:forward.new
 @:forward(x, y)
-abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
+extern abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 	#if !macro
 	@:from
 	public static inline function fromVec2(value:Vec2):Vec2I {

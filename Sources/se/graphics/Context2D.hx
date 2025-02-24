@@ -6,7 +6,7 @@ import se.math.Vec2;
 import se.math.VectorMath.vec2;
 import s2d.Alignment;
 
-@:forward(pipeline, clear, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)
+@:forward(pipeline, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)
 extern abstract Context2D(Graphics) from Graphics {
 	public var style(get, never):Context2DStyle;
 	public var transform(get, set):Transform;
@@ -25,6 +25,10 @@ extern abstract Context2D(Graphics) from Graphics {
 
 	public inline function begin() {
 		this.begin(false);
+	}
+
+	public inline function clear(color:Color) {
+		this.clear(color);
 	}
 
 	public inline function drawImage(img:Image, x:Int, y:Int) {

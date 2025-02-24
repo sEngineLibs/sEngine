@@ -4,8 +4,7 @@ import kha.math.FastMatrix4 as KhaMat4;
 
 @:forward.new
 @:forward(_00, _10, _20, _30, _01, _11, _21, _31, _02, _12, _22, _32, _03, _13, _23, _33)
-abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
-	#if !macro
+extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	public static inline function identity():Mat4 {
 		return KhaMat4.identity();
 	}
@@ -566,7 +565,6 @@ abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	@:op(a != b)
 	static inline function notEqual(m:Mat4, n:Mat4):Bool
 		return !equal(m, n);
-	#end // !macro
 
 	/**
 		Copies matrix elements in column-major order into a type that supports array-write access

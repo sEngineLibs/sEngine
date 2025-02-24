@@ -61,7 +61,7 @@ class SEngine {
 	@:access(s2d.stage.graphics.Renderer)
 	public static function start(window:Window) {
 		Stage.current = new Stage();
-		UIScene.current = new UIScene();
+		UIScene.current = new UIScene(window);
 
 		window.notifyOnResize(resize);
 
@@ -133,7 +133,7 @@ class SEngine {
 	}
 
 	@:access(s2d.stage.graphics.Renderer)
-	public static function render():Texture {
+	public static inline function render():Texture {
 		var frame = Renderer.render();
 		UIScene.current.render(frame);
 		#if S2D_DEBUG_FPS

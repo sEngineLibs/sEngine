@@ -15,7 +15,7 @@ class RoundedRectangle extends UISceneElement {
 		this.softness = softness;
 	}
 
-	override function renderTree(target:Texture) {
+	override inline function renderTree(target:Texture) {
 		@:privateAccess Drawers.rectDrawer.render(target, this);
 	}
 

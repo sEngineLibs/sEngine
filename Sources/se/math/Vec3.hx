@@ -8,7 +8,7 @@ import kha.math.FastVector3 as KhaVec3;
 @:nullSafety
 @:forward.new
 @:forward(x, y, z) #if !macro @:build(se.math.VectorMath.Swizzle.generateFields(3)) #end
-abstract Vec3(KhaVec3) from KhaVec3 to KhaVec3 {
+extern abstract Vec3(KhaVec3) from KhaVec3 to KhaVec3 {
 	#if !macro
 	@:to
 	public inline function toVec3I():Vec3I {

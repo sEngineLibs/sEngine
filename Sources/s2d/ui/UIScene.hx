@@ -1,5 +1,6 @@
 package s2d.ui;
 
+import kha.Window;
 import kha.Assets;
 import se.Texture;
 import se.Application;
@@ -13,18 +14,20 @@ using kha.StringExtensions;
 class UIScene extends UIElement {
 	public static var current:UIScene;
 
-	function new() {
+	var window:Window;
+
+	function new(window) {
 		super();
-		Application.windows[0].notifyOnResize((w, h) -> setSize(w, h));
+		this.window = window;
 	}
 
-	override function render(target:Texture) {
+	override inline function render(target:Texture) {
 		final ctx = target.context2D;
 
-		updateBounds();
+		syncBounds();
 		ctx.begin();
 		for (child in children) {
-			child.updateBounds();
+			child.syncBounds();
 			child.render(target);
 		}
 		ctx.style.color = se.Color.rgb(1.0, 1.0, 1.0);
@@ -38,8 +41,13 @@ class UIScene extends UIElement {
 		ctx.end();
 	}
 
+	override inline function syncBounds() {
+		width = window.width;
+		height = window.height;
+	}
+
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-	function drawBounds(e:UIElement, target:Texture) {
+	inline function drawBounds(e:UIElement, target:Texture) {
 		final ctx = target.context2D;
 		final style = ctx.style;
 

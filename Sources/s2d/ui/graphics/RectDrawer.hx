@@ -13,24 +13,24 @@ class RectDrawer extends ElementDrawer<RoundedRectangle> {
 	var rectDataCL:ConstantLocation;
 	var bordColorCL:ConstantLocation;
 
-	function initStructure() {
+	inline function initStructure() {
 		structure = new VertexStructure();
 		structure.add("vertexPosition", VertexData.Float32_3X);
 		structure.add("vertexColor", VertexData.UInt8_4X_Normalized);
 	}
 
-	function setShaders() {
+	inline function setShaders() {
 		pipeline.vertexShader = Reflect.field(Shaders, "drawer_colored_vert");
 		pipeline.fragmentShader = Reflect.field(Shaders, "rectangle_frag");
 	}
 
-	function getUniforms() {
+	inline function getUniforms() {
 		rectCL = pipeline.getConstantLocation("rect");
 		rectDataCL = pipeline.getConstantLocation("rectData");
 		bordColorCL = pipeline.getConstantLocation("bordColor");
 	}
 
-	function draw(target:Texture, rectangle:RoundedRectangle) {
+	inline function draw(target:Texture, rectangle:RoundedRectangle) {
 		final ctx = target.context2D, ctx3d = target.context3D;
 
 		final border = rectangle.border;

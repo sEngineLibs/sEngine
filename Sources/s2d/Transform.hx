@@ -10,7 +10,7 @@ using se.extensions.Mat3Ext;
 @:nullSafety
 @:forward.new
 @:forward(_00, _10, _20, _01, _11, _21, _02, _12, _22)
-abstract Transform(Mat3) from Mat3 to Mat3 {
+extern abstract Transform(Mat3) from Mat3 to Mat3 {
 	public var translationX(get, set):Float;
 	public var translationY(get, set):Float;
 	public var translation(get, set):Vec2;
@@ -57,11 +57,11 @@ abstract Transform(Mat3) from Mat3 to Mat3 {
 		this.scaleToG(value);
 	}
 
-	public function rotateG(value:Float) {
+	public inline function rotateG(value:Float) {
 		this.rotateG(value);
 	}
 
-	public function rotateToG(value:Float) {
+	public inline function rotateToG(value:Float) {
 		this.rotateToG(value);
 	}
 

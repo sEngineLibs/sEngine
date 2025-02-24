@@ -1,7 +1,7 @@
 package s2d.ui;
 
+import s2d.geometry.Size;
 import se.Texture;
-import kha.Canvas;
 import se.Color;
 import se.math.Vec2;
 import se.math.Vec4;
@@ -34,17 +34,14 @@ class UIElement extends PhysicalObject<UIElement> {
 	@:isVar public var padding(default, set):Float = 0.0;
 
 	// positioning
-	var _x:Float = 0.0;
-	var _y:Float = 0.0;
-
-	public var x(get, set):Float;
-	public var y(get, set):Float;
-	public var width(get, set):Float;
-	public var height(get, set):Float;
-	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
-	@:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
-	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
-	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
+	public var x:Float = 0.0;
+	public var y:Float = 0.0;
+	public var width:Float = 150.0;
+	public var height:Float = 150.0;
+	public var minWidth:Float = Math.NEGATIVE_INFINITY;
+	public var maxWidth:Float = Math.POSITIVE_INFINITY;
+	public var minHeight:Float = Math.NEGATIVE_INFINITY;
+	public var maxHeight:Float = Math.POSITIVE_INFINITY;
 
 	public var rect(get, set):Rect;
 	public var bounds(get, set):Bounds;
@@ -91,9 +88,19 @@ class UIElement extends PhysicalObject<UIElement> {
 		setSize(value.x, value.y);
 	}
 
-	public function setRect(value:Rect):Void {
+	overload extern public inline function setRect(value:Rect):Void {
 		setPosition(rect.position);
 		setSize(rect.size);
+	}
+
+	overload extern public inline function setRect(position:Position, size:Size):Void {
+		setPosition(position);
+		setSize(size);
+	}
+
+	overload extern public inline function setRect(x:Float, y:Float, width:Float, height:Float):Void {
+		setPosition(x, y);
+		setSize(width, height);
 	}
 
 	public function setContentRect(value:Rect):Void {
@@ -154,9 +161,7 @@ class UIElement extends PhysicalObject<UIElement> {
 	function render(target:Texture) {
 		final ctx = target.context2D;
 
-		if (!layer.enabled) {
-			renderTree(target);
-		} else {
+		if (layer.enabled) {
 			final _ctx = layer.texture.context2D;
 			final sr = layer.sourceRect;
 
@@ -174,20 +179,21 @@ class UIElement extends PhysicalObject<UIElement> {
 				layer.effect.apply(layer.texture, target);
 			else
 				ctx.drawScaledImage(layer.texture, 0, 0, target.width, target.height);
-		}
+		} else
+			renderTree(target);
 	}
 
 	function renderTree(target:Texture) {
-		updateTransform();
+		syncTransform();
 		final ctx = target.context2D;
 
 		ctx.transform = _transform;
 		ctx.style.color = color;
 		ctx.style.opacity = finalOpacity;
-
 		draw(target);
+
 		for (child in children) {
-			child.updateBounds();
+			child.syncBounds();
 			if (child.visible)
 				child.render(target);
 		}
@@ -195,24 +201,38 @@ class UIElement extends PhysicalObject<UIElement> {
 
 	function draw(target:Texture) {}
 
-	function updateBounds() {
+	function syncBounds() {
 		// position
 		if (anchors.left != null)
 			left.position = anchors.left.position + anchors.left.padding + anchors.leftMargin;
-		else if (parent != null)
-			left.position = _x + parent.left.position + parent.left.padding;
-
+		else {
+			left.position = x;
+			if (parent != null)
+				left.position += parent.left.position + parent.left.padding;
+		}
 		if (anchors.top != null)
 			top.position = anchors.top.position + anchors.top.padding + anchors.topMargin;
-		else if (parent != null)
-			top.position = _y + parent.top.position + parent.top.padding;
+		else {
+			top.position = y;
+			if (parent != null)
+				top.position += parent.top.position + parent.top.padding;
+		}
 
 		// size
 		if (anchors.right != null)
 			right.position = anchors.right.position - anchors.right.padding - anchors.rightMargin;
-
+		else {
+			right.position = left.position + width;
+			if (parent != null)
+				right.position += parent.left.position + parent.left.padding;
+		}
 		if (anchors.bottom != null)
 			bottom.position = anchors.bottom.position - anchors.bottom.padding - anchors.bottomMargin;
+		else {
+			bottom.position = top.position + height;
+			if (parent != null)
+				bottom.position += parent.top.position + parent.top.padding;
+		}
 	}
 
 	function get_rect():Rect {
@@ -268,70 +288,6 @@ class UIElement extends PhysicalObject<UIElement> {
 
 	function get_finalOpacity():Float {
 		return parent == null ? opacity : parent.finalOpacity * opacity;
-	}
-
-	function get_x():Float {
-		return left.position;
-	}
-
-	function set_x(value:Float):Float {
-		_x = value;
-		right.position += value - x;
-		left.position = value;
-		return value;
-	}
-
-	function get_y():Float {
-		return top.position;
-	}
-
-	function set_y(value:Float):Float {
-		_y = value;
-		bottom.position += value - y;
-		top.position = value;
-		return value;
-	}
-
-	function get_width():Float {
-		return right.position - x;
-	}
-
-	function set_width(value:Float):Float {
-		right.position = x + clamp(value, minWidth, maxWidth);
-		return value;
-	}
-
-	function get_height():Float {
-		return bottom.position - y;
-	}
-
-	function set_height(value:Float):Float {
-		bottom.position = y + clamp(value, minHeight, maxHeight);
-		return value;
-	}
-
-	function set_minWidth(value:Float):Float {
-		minWidth = value;
-		width = width;
-		return value;
-	}
-
-	function set_maxWidth(value:Float):Float {
-		maxWidth = value;
-		width = width;
-		return value;
-	}
-
-	function set_minHeight(value:Float):Float {
-		minHeight = value;
-		height = height;
-		return value;
-	}
-
-	function set_maxHeight(value:Float):Float {
-		maxHeight = value;
-		height = height;
-		return value;
 	}
 
 	function set_padding(value:Float) {

@@ -12,7 +12,7 @@ abstract class PhysicalObject<This:PhysicalObject<This>> extends se.VirtualObjec
 	public var transform:Transform = Mat3.identity();
 	public var transformOrigin:Vec2 = new Vec2(0.0, 0.0);
 
-	inline function updateTransform():Void {
+	inline function syncTransform():Void {
 		var t = Mat3.identity();
 		t.translateG(transformOrigin);
 		t *= transform;

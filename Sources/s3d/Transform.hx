@@ -10,7 +10,7 @@ using se.extensions.Mat4Ext;
 @:nullSafety
 @:forward.new
 @:forward(_00, _10, _20, _30, _01, _11, _21, _31, _02, _12, _22, _32, _03, _13, _23, _33)
-abstract Transform(Mat4) from Mat4 to Mat4 {
+extern abstract Transform(Mat4) from Mat4 to Mat4 {
 	public var translationX(get, set):Float;
 	public var translationY(get, set):Float;
 	public var translationZ(get, set):Float;
@@ -59,11 +59,11 @@ abstract Transform(Mat4) from Mat4 to Mat4 {
 		this.scaleToG(value);
 	}
 
-	public function rotateG(value:Float) {
+	public inline function rotateG(value:Float) {
 		this.rotateG(value, value, value);
 	}
 
-	public function rotateToG(value:Float) {
+	public inline function rotateToG(value:Float) {
 		this.rotateToG(value, value, value);
 	}
 

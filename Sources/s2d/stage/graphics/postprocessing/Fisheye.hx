@@ -1,6 +1,5 @@
 package s2d.stage.graphics.postprocessing;
 
-import kha.Canvas;
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;

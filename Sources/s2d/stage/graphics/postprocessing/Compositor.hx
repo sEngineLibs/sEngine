@@ -1,11 +1,10 @@
 package s2d.stage.graphics.postprocessing;
 
-import se.Color;
-import kha.Canvas;
 import kha.Shaders;
 import kha.arrays.Float32Array;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
+import se.Color;
 import se.Texture;
 
 class Compositor extends PPEffect {

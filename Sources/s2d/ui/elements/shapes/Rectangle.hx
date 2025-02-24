@@ -7,7 +7,7 @@ class Rectangle extends UISceneElement {
 		super(parent);
 	}
 
-	override function draw(target:Texture) {
+	override inline function draw(target:Texture) {
 		target.context2D.fillRect(x, y, width, height);
 	}
 }

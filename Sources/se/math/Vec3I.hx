@@ -7,7 +7,7 @@ import haxe.macro.Expr.ExprOf;
 @:nullSafety
 @:forward.new
 @:forward(x, y, z)
-abstract Vec3I(Vec3IData) from Vec3IData to Vec3IData {
+extern abstract Vec3I(Vec3IData) from Vec3IData to Vec3IData {
 	#if !macro
 	@:from
 	public static inline function fromVec3(value:Vec3):Vec3I {
