@@ -33,11 +33,11 @@ class Stage {
 	}
 
 	public static function screen2LocalSpace(point:Vec2):Vec2 {
-		return vec2(point.x / SEngine.realWidth, point.y / SEngine.realHeight) * 2.0 - 1.0;
+		return vec2(point.x / SEngine.width, point.y / SEngine.height) * 2.0 - 1.0;
 	}
 
 	public static function local2ScreenSpace(point:Vec2):Vec2 {
-		return vec2(point.x * SEngine.realWidth, point.y * SEngine.realHeight) * 0.5 - 0.5;
+		return vec2(point.x * SEngine.width, point.y * SEngine.height) * 0.5 - 0.5;
 	}
 
 	public static function screen2WorldSpace(point:Vec2):Vec2 {
@@ -51,7 +51,7 @@ class Stage {
 	#if (S2D_LIGHTING_ENVIRONMENT == 1)
 	@:isVar public var environmentMap(default, set):Image;
 
-	function set_environmentMap(value:Image):Image {
+	inline function set_environmentMap(value:Image):Image {
 		environmentMap = value;
 		environmentMap.generateMipmaps(4);
 		return value;

@@ -58,19 +58,19 @@ class TextElement extends UISceneElement {
 		updateTextHeight();
 	}
 
-	function set_text(value:String) {
+	inline function set_text(value:String) {
 		text = value;
 		updateTextWidth();
 		return value;
 	}
 
-	function set_font(value:Font) {
+	inline function set_font(value:Font) {
 		font = value;
 		updateTextSize();
 		return value;
 	}
 
-	function set_fontSize(value:Int) {
+	inline function set_fontSize(value:Int) {
 		fontSize = value < 0 ? 0 : value;
 		updateTextSize();
 		return value;

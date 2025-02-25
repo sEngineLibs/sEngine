@@ -17,7 +17,7 @@ abstract class PPEffect {
 		return Renderer.commands.contains(command);
 	}
 
-	function set_enabled(value:Bool):Bool {
+	inline function set_enabled(value:Bool):Bool {
 		if (!enabled)
 			Renderer.commands.insert(index, command);
 		return value;

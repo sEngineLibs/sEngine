@@ -19,19 +19,19 @@ extern abstract Transform(Mat3) from Mat3 to Mat3 {
 		return (this : KhaMat3);
 	}
 
-	inline function get_global() {
+	private inline function get_global() {
 		return this;
 	}
 
-	inline function set_global(value:TransformGlobal):TransformGlobal {
+	private inline function set_global(value:TransformGlobal):TransformGlobal {
 		return this = value;
 	}
 
-	inline function get_local() {
+	private inline function get_local() {
 		return this;
 	}
 
-	inline function set_local(value:TransformLocal):TransformLocal {
+	private inline function set_local(value:TransformLocal):TransformLocal {
 		return this = value;
 	}
 }
@@ -105,71 +105,71 @@ extern abstract TransformGlobal(Mat3) from Mat3 to Mat3 {
 		rotation = value;
 	}
 
-	inline function get_translationX():Float {
+	private inline function get_translationX():Float {
 		return this._20;
 	}
 
-	inline function set_translationX(value:Float):Float {
+	private inline function set_translationX(value:Float):Float {
 		this._20 = value;
 		return value;
 	}
 
-	inline function get_translationY():Float {
+	private inline function get_translationY():Float {
 		return this._21;
 	}
 
-	inline function set_translationY(value:Float):Float {
+	private inline function set_translationY(value:Float):Float {
 		this._21 = value;
 		return value;
 	}
 
-	inline function get_translation():Vec2 {
+	private inline function get_translation():Vec2 {
 		return vec2(translationX, translationY);
 	}
 
-	inline function set_translation(value:Vec2):Vec2 {
+	private inline function set_translation(value:Vec2):Vec2 {
 		translationX = value.x;
 		translationY = value.y;
 		return value;
 	}
 
-	inline function get_scaleX():Float {
+	private inline function get_scaleX():Float {
 		return sqrt(this._00 * this._00 + this._10 * this._10);
 	}
 
-	inline function set_scaleX(value:Float):Float {
+	private inline function set_scaleX(value:Float):Float {
 		var xt = normalize(vec2(this._00, this._10)) * value;
 		this._00 = xt.x;
 		this._10 = xt.y;
 		return value;
 	}
 
-	inline function get_scaleY():Float {
+	private inline function get_scaleY():Float {
 		return sqrt(this._01 * this._01 + this._11 * this._11);
 	}
 
-	inline function set_scaleY(value:Float):Float {
+	private inline function set_scaleY(value:Float):Float {
 		var yt = normalize(vec2(this._01, this._11)) * value;
 		this._01 = yt.x;
 		this._11 = yt.y;
 		return value;
 	}
 
-	inline function get_globalScale():Vec2 {
+	private inline function get_globalScale():Vec2 {
 		return vec2(scaleX, scaleY);
 	}
 
-	inline function set_globalScale(value:Vec2):Vec2 {
+	private inline function set_globalScale(value:Vec2):Vec2 {
 		scaleX = value.x;
 		scaleY = value.y;
 		return value;
 	}
 
-	inline function get_rotation():Float {
+	private inline function get_rotation():Float {
 		return atan2(this._10, this._00);
 	}
 
-	inline function set_rotation(value:Float):Float {
+	private inline function set_rotation(value:Float):Float {
 		var sx = scaleX;
 		var sy = scaleY;
 		var c = cos(value);

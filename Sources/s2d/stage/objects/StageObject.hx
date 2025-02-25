@@ -14,13 +14,13 @@ abstract class StageObject extends PhysicalObject<StageObject> {
 		this.layer = layer;
 	}
 
-	function onParentChanged():Void {};
+	function onParentChanged(previous:StageObject):Void {};
 
 	function get_x():FastFloat {
 		return this.transform.global.translationX;
 	}
 
-	function set_x(value:FastFloat):FastFloat {
+	inline function set_x(value:FastFloat):FastFloat {
 		this.transform.global.translationX = value;
 		return value;
 	}
@@ -29,7 +29,7 @@ abstract class StageObject extends PhysicalObject<StageObject> {
 		return this.transform.global.translationY;
 	}
 
-	function set_y(value:FastFloat):FastFloat {
+	inline function set_y(value:FastFloat):FastFloat {
 		this.transform.global.translationY = value;
 		return value;
 	}

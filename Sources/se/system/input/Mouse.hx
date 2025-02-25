@@ -182,7 +182,7 @@ class Mouse {
 		}
 	}
 
-	function set_windowID(value:Int):Int {
+	inline function set_windowID(value:Int):Int {
 		windowID = value;
 		while (mouse.windowDownListeners.length <= windowID)
 			mouse.windowDownListeners.push([]);
@@ -197,7 +197,7 @@ class Mouse {
 		return value;
 	}
 
-	function set_cursor(value:MouseCursor):MouseCursor {
+	inline function set_cursor(value:MouseCursor):MouseCursor {
 		cursor = value;
 		mouse.setSystemCursor(value);
 		return value;
@@ -207,7 +207,7 @@ class Mouse {
 		return mouse.isLocked();
 	}
 
-	function set_locked(value:Bool):Bool {
+	inline function set_locked(value:Bool):Bool {
 		if (locked != value) {
 			if (locked)
 				mouse.unlock();

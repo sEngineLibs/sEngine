@@ -21,7 +21,7 @@ class Sprite extends StageObject {
 	@:isVar public var isCastingShadows(default, set):Bool = false;
 	public var shadowOpacity:Float = 1.0;
 
-	function set_isCastingShadows(value:Bool) {
+	inline function set_isCastingShadows(value:Bool) {
 		if (!isCastingShadows && value)
 			@:privateAccess layer.shadowBuffer.addSprite(this);
 		else if (isCastingShadows && !value)
@@ -40,7 +40,7 @@ class Sprite extends StageObject {
 	}
 
 	#if (S2D_SPRITE_INSTANCING == 1)
-	function set_atlas(value:SpriteAtlas) {
+	inline function set_atlas(value:SpriteAtlas) {
 		value.addSprite(this);
 		atlas = value;
 		return value;

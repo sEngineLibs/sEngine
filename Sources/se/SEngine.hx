@@ -24,46 +24,15 @@ class SEngine {
 
 	public static var width:Int;
 	public static var height:Int;
-	public static var realWidth(get, set):Int;
-	public static var realHeight(get, set):Int;
-	@:isVar public static var resolutionScale(default, set):Float = 1.0;
 
 	@:isVar public static var scale(default, set):Float = 1.0;
 	@:isVar public static var aspectRatio(default, set):Float = 1.0;
-
-	static function get_realWidth():Int {
-		return Std.int(width / resolutionScale);
-	}
-
-	static function set_realWidth(value:Int):Int {
-		width = Std.int(value * resolutionScale);
-		return value;
-	}
-
-	static function get_realHeight():Int {
-		return Std.int(height / resolutionScale);
-	}
-
-	static function set_realHeight(value:Int):Int {
-		height = Std.int(value * resolutionScale);
-		return value;
-	}
-
-	static function set_resolutionScale(value:Float):Float {
-		width = Std.int(width * resolutionScale / value);
-		height = Std.int(height * resolutionScale / value);
-		resolutionScale = value;
-
-		return value;
-	}
 
 	@:access(s2d.ui.graphics.Drawers)
 	@:access(s2d.stage.graphics.Renderer)
 	public static function start(window:Window) {
 		Stage.current = new Stage();
 		UIScene.current = new UIScene(window);
-
-		window.notifyOnResize(resize);
 
 		Renderer.compile(width, height);
 		Drawers.compile();
@@ -91,6 +60,9 @@ class SEngine {
 		indices.unlock();
 
 		Application.notifyOnUpdate(update);
+
+		resize(window.width, window.height);
+		window.notifyOnResize(resize);
 	}
 
 	@:access(s2d.stage.SpriteAtlas)
@@ -106,19 +78,19 @@ class SEngine {
 
 	@:access(s2d.stage.graphics.Renderer)
 	public static function resize(w:Int, h:Int) {
-		realWidth = w;
-		realHeight = h;
+		width = w;
+		height = h;
 		aspectRatio = width / height;
 		Renderer.resize(width, height);
 	}
 
-	static function set_scale(value:Float):Float {
+	static inline function set_scale(value:Float):Float {
 		scale = value;
 		updateProjection();
 		return value;
 	}
 
-	static function set_aspectRatio(value:Float):Float {
+	static inline function set_aspectRatio(value:Float):Float {
 		aspectRatio = value;
 		updateProjection();
 		return value;

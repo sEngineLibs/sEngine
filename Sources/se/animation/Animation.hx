@@ -120,7 +120,7 @@ abstract class Animation<T> {
 		return @:privateAccess actuator.duration;
 	}
 
-	function set_duration(value:Float) {
+	inline function set_duration(value:Float) {
 		@:privateAccess actuator.duration = value;
 		return value;
 	}
@@ -129,7 +129,7 @@ abstract class Animation<T> {
 		return @:privateAccess actuator.easing;
 	}
 
-	function set_easing(value:Float->Float) {
+	inline function set_easing(value:Float->Float) {
 		ease(value);
 		return value;
 	}
@@ -138,7 +138,7 @@ abstract class Animation<T> {
 		return _running;
 	}
 
-	function set_running(value:Bool) {
+	inline function set_running(value:Bool) {
 		if (!running && value)
 			start();
 		else
@@ -150,7 +150,7 @@ abstract class Animation<T> {
 		return _paused;
 	}
 
-	function set_paused(value:Bool) {
+	inline function set_paused(value:Bool) {
 		if (!paused && value)
 			pause();
 		else

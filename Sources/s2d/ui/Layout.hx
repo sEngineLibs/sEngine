@@ -25,7 +25,7 @@ class Layout {
 		bottomMargin = value;
 	}
 
-	function set_margins(value:Float) {
+	inline function set_margins(value:Float) {
 		setMargins(value);
 		return value;
 	}

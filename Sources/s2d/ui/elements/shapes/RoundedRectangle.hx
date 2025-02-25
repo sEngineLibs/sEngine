@@ -9,7 +9,7 @@ class RoundedRectangle extends UISceneElement {
 	public var radius:Float;
 	@:isVar public var softness(default, set):Float;
 
-	public function new(?radius:Float = 0.0, ?softness:Float = 0.2, ?parent:UIElement) {
+	public function new(?radius:Float = 0.0, ?softness:Float = 0.5, ?parent:UIElement) {
 		super(parent);
 		this.radius = radius;
 		this.softness = softness;
@@ -19,7 +19,7 @@ class RoundedRectangle extends UISceneElement {
 		@:privateAccess Drawers.rectDrawer.render(target, this);
 	}
 
-	function set_softness(value:Float):Float {
+	inline function set_softness(value:Float):Float {
 		softness = Math.max(value, 0.0);
 		return value;
 	}

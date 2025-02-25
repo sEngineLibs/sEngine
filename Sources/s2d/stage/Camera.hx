@@ -16,7 +16,7 @@ abstract Camera(Transform) from Transform to Transform {
 		return this.global.translationX;
 	}
 
-	function set_x(value:Float):Float {
+	inline function set_x(value:Float):Float {
 		this.global.translationX = value;
 		return value;
 	}
@@ -25,7 +25,7 @@ abstract Camera(Transform) from Transform to Transform {
 		return this.global.translationY;
 	}
 
-	function set_y(value:Float):Float {
+	inline function set_y(value:Float):Float {
 		this.global.translationY = value;
 		return value;
 	}
