@@ -5,6 +5,8 @@ import se.math.Vec2;
 import se.math.Mat3;
 import se.math.VectorMath;
 
+@:forward.new
+@:forward(_00, _10, _20, _01, _11, _21, _02, _12, _22)
 extern abstract Transform(Mat3) from Mat3 to Mat3 {
 	public var global(get, set):TransformGlobal;
 	public var local(get, set):TransformLocal;

@@ -108,7 +108,7 @@ class Mouse {
 			remove: null
 		}
 		buttonDownHandlers.push(handler);
-		handler.remove = buttonDownHandlers.remove(handler);
+		handler.remove = () -> buttonDownHandlers.remove(handler);
 		return handler;
 	}
 
@@ -127,7 +127,7 @@ class Mouse {
 			remove: null
 		}
 		buttonUpHandlers.push(handler);
-		handler.remove = buttonUpHandlers.remove(handler);
+		handler.remove = () -> buttonUpHandlers.remove(handler);
 		return handler;
 	}
 
@@ -170,7 +170,7 @@ class Mouse {
 			remove: null
 		}
 		buttonHoldHandlers.push(handler);
-		handler.remove = buttonHoldHandlers.remove(handler);
+		handler.remove = () -> buttonHoldHandlers.remove(handler);
 		return handler;
 	}
 

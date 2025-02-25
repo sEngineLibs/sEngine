@@ -35,47 +35,56 @@ abstract class Animation<T> {
 
 	public function onStart(f:Void->Void) {
 		_start = f;
+		return this;
 	}
 
 	public function onStop(f:Void->Void) {
 		_stop = f;
+		return this;
 	}
 
 	public function onPause(f:Void->Void) {
 		_pause = f;
+		return this;
 	}
 
 	public function onResume(f:Void->Void) {
 		_resume = f;
+		return this;
 	}
 
 	public function onTick(f:T->Void) {
 		_tick = f;
+		return this;
 	}
 
 	public function onCompleted(f:Void->Void) {
 		_completed = f;
+		return this;
 	}
 
 	public function ease(f:Float->Float) {
 		actuator.ease(f);
+		return this;
 	}
 
 	public function start() {
 		if (!running) {
 			@:privateAccess actuator.start = Time.time;
 			Action.actuators.push(actuator);
-			running = true;
+			_running = true;
 			_start();
 		}
+		return this;
 	}
 
 	public function stop() {
 		if (running) {
 			actuator.stop();
-			running = false;
+			_running = false;
 			_stop();
 		}
+		return this;
 	}
 
 	public function pause() {
@@ -85,6 +94,7 @@ abstract class Animation<T> {
 			paused = true;
 			_pause();
 		}
+		return this;
 	}
 
 	public function resume() {
@@ -94,11 +104,13 @@ abstract class Animation<T> {
 			paused = false;
 			_resume();
 		}
+		return this;
 	}
 
 	public function restart() {
 		stop();
 		start();
+		return this;
 	}
 
 	public function complete() {
@@ -108,6 +120,7 @@ abstract class Animation<T> {
 			running = false;
 			_completed();
 		}
+		return this;
 	}
 
 	abstract function update(t:Float):T;
