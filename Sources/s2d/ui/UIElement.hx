@@ -32,10 +32,10 @@ class UIElement extends PhysicalObject<UIElement> {
 	public var anchors(get, never):Anchors;
 	public var padding(never, set):Float;
 
-	public var x(get, set):Float;
-	public var y(get, set):Float;
-	public var width(get, set):Float;
-	public var height(get, set):Float;
+	@bind public var x(get, set):Float;
+	@bind public var y(get, set):Float;
+	@bind public var width(get, set):Float;
+	@bind public var height(get, set):Float;
 	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
 	@:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
 	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
@@ -79,7 +79,7 @@ class UIElement extends PhysicalObject<UIElement> {
 		}
 	}
 
-	public function setPadding(value:Float):Void {
+	@bind public function setPadding(value:Float):Void {
 		padding = value;
 	}
 

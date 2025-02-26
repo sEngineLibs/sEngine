@@ -7,7 +7,12 @@ import s2d.Alignment;
 class ColumnLayout extends UISceneElement {
 	public var spacing:Float = 0.0;
 
-	override function renderTree(target:Texture) {
+	override function addChild(value:UIElement) {
+		super.addChild(value);
+		build();
+	}
+
+	function build() {
 		var elements = [];
 		var heights = [];
 		var cellsHeight = 0.0;
@@ -29,10 +34,6 @@ class ColumnLayout extends UISceneElement {
 		}
 
 		final fillCellHeight = fillCellCount > 0 ? (crect.height - (elements.length - 1) * spacing - cellsHeight) / fillCellCount : 0;
-
-		target.context2D.style.color = color;
-		target.context2D.style.opacity = finalOpacity;
-		target.context2D.transform = _transform;
 
 		var _y = y + top.padding;
 		var heightsIndex = 0;
@@ -64,14 +65,23 @@ class ColumnLayout extends UISceneElement {
 			} else {
 				_w = crect.width - e.layout.leftMargin - e.layout.rightMargin;
 			}
-
 			e.x = _x + xo;
 			e.y = _y + yo;
 			e.width = _w;
 			e.height = _h;
-			e.render(target);
-
 			_y += _h + spacing;
 		}
+	}
+
+	override function renderTree(target:Texture) {
+		final ctx = target.context2D;
+
+		syncTransform();
+		ctx.transform = _transform;
+		ctx.style.opacity = finalOpacity;
+
+		for (child in children)
+			if (child.visible)
+				child.render(target);
 	}
 }

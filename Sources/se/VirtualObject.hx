@@ -1,5 +1,6 @@
 package se;
 
+@:autoBuild(se.macro.SMacro.build())
 abstract class VirtualObject<This:VirtualObject<This>> {
 	var _parent:This;
 
