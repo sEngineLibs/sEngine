@@ -6,7 +6,9 @@ import haxe.macro.Printer;
 
 using se.extensions.MacroExt;
 
+@:dox(hide)
 class MacroExt {
+	#if macro
 	static public inline function resolve(s:String, ?pos)
 		return drill(s.split('.'), pos);
 
@@ -32,4 +34,5 @@ class MacroExt {
 
 	static public function toString(t:ComplexType)
 		return new Printer().printComplexType(t);
+	#end
 }

@@ -1,6 +1,9 @@
 package se;
 
+#if !macro
+@:build(se.macro.SMacro.build())
 @:autoBuild(se.macro.SMacro.build())
+#end
 abstract class VirtualObject<This:VirtualObject<This>> {
 	var _parent:This;
 

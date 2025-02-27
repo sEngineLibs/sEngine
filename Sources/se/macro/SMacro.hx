@@ -5,7 +5,9 @@ import haxe.macro.Expr;
 
 using se.extensions.MacroExt;
 
+@:dox(hide)
 class SMacro {
+	#if macro
 	static var fields:Array<Field>;
 
 	static var funcField:String;
@@ -32,31 +34,25 @@ class SMacro {
 		switch (field.kind) {
 			// gen property
 			case FVar(t, e):
+				genObservable(fieldName, t);
 				field.meta.push({name: ":isVar", pos: Context.currentPos()});
 				field.kind = FProp("default", "set", t, e);
-				var docstring = '
-					**This variable is **observable***.
-				';
+				var docstring = '_This variable is **observable**._\n';
 				field.doc = field.doc == null ? docstring : docstring + field.doc;
 				field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Changed`';
-				genObservable(fieldName, t);
 
 			// edit property
 			case FProp(get, set, t, e):
-				if (set == "default" || set == "set" || set == "null") {
-					var docstring = '
-						**This property is **observable***.
-					';
-					field.doc = field.doc == null ? docstring : docstring + field.doc;
-					field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Changed`';
-				}
+				var docstring = '_This property is **observable**._\n';
 				switch (set) {
 					case "never", "dynamic":
 						Context.error('Can\'t observable a property with no access.', field.pos);
 
 					case "default":
-						field.kind = FProp(get, "set", t, e);
 						genObservable(fieldName, t);
+						field.kind = FProp(get, "set", t, e);
+						field.doc = field.doc == null ? docstring : docstring + field.doc;
+						field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Changed`';
 
 					case "set", "null":
 						// find setter
@@ -86,21 +82,22 @@ class SMacro {
 								// recursivelly add a observable call before return statements.
 								f.expr = addObservableCall(f.expr);
 
+								field.doc = field.doc == null ? docstring : docstring + field.doc;
+								field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Changed`';
+
 							case _: Context.error("setter must be function", setter.pos);
 						}
 				}
 
 			// edit function
 			case FFun(f):
-				var docstring = '
-					**This function is **observable***.
-				';
+				var docstring = '_This function is **observable**._\n';
 				field.doc = field.doc == null ? docstring : docstring + field.doc;
 				field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Called`';
 
 				genObservableListeners(fieldName, f.ret);
 				genFuncObservableListenerPusher(fieldName, f.ret);
-				funcField = f.args[0].name;
+				funcField = fieldName;
 
 				var returnType = f.ret.match(TPath(_)) ? f.ret : null;
 				var hasReturn = returnType != null && returnType.toString() != "Void";
@@ -153,8 +150,8 @@ class SMacro {
 			pos: Context.currentPos(),
 			name: 'on${name.charAt(0).toUpperCase() + name.substr(1)}Changed',
 			doc: 'Adds a listener that is triggered when `$name` changes. 
-       			@param listener `($name:${t.getParameters()[0].name}) -> Void` A callback that receives the new value of the property.
-       			@return An object with a `remove` function that removes the listener from the active list.`',
+       			@param listener A callback that receives the new value of the property.
+       			@return An object with a `remove` function that removes the listener from the active list.',
 			kind: FFun({
 				ret: macro :{
 					remove:Void->Void
@@ -182,7 +179,7 @@ class SMacro {
 			pos: Context.currentPos(),
 			name: 'on${name.charAt(0).toUpperCase() + name.substr(1)}Called',
 			doc: 'Adds a listener that is triggered when `$name` is called.
-       			@param listener `${t.getParameters()[0].name} -> Void` A callback that receives the returned value from the function.
+       			@param listener A callback that receives the returned value from the function.
        			@return An object with a `remove` function that removes the listener from the active list.',
 			kind: FFun({
 				ret: macro :{
@@ -255,4 +252,5 @@ class SMacro {
 		}
 		return null;
 	}
+	#end
 }
