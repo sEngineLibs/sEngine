@@ -1,24 +1,23 @@
 package se;
 
-import kha.Color as KhaColor;
 import se.math.Vec3;
 import se.math.Vec4;
 import se.math.VectorMath;
 
 @:forward.new
-enum abstract Color(KhaColor) from KhaColor to KhaColor {
-	var black = KhaColor.Black;
-	var white = KhaColor.White;
-	var red = KhaColor.Red;
-	var blue = KhaColor.Blue;
-	var green = KhaColor.Green;
-	var magenta = KhaColor.Magenta;
-	var yellow = KhaColor.Yellow;
-	var cyan = KhaColor.Cyan;
-	var purple = KhaColor.Purple;
-	var pink = KhaColor.Pink;
-	var orange = KhaColor.Orange;
-	var transparent = KhaColor.Transparent;
+enum abstract Color(kha.Color) from kha.Color to kha.Color {
+	var black = kha.Color.Black;
+	var white = kha.Color.White;
+	var red = kha.Color.Red;
+	var blue = kha.Color.Blue;
+	var green = kha.Color.Green;
+	var magenta = kha.Color.Magenta;
+	var yellow = kha.Color.Yellow;
+	var cyan = kha.Color.Cyan;
+	var purple = kha.Color.Purple;
+	var pink = kha.Color.Pink;
+	var orange = kha.Color.Orange;
+	var transparent = kha.Color.Transparent;
 
 	public var r(get, set):Float;
 	public var g(get, set):Float;
@@ -35,11 +34,11 @@ enum abstract Color(KhaColor) from KhaColor to KhaColor {
 	public var HSLA(get, set):Vec4;
 
 	public static inline function rgb(r:Float, g:Float, b:Float):Color {
-		return KhaColor.fromFloats(r, g, b);
+		return kha.Color.fromFloats(r, g, b);
 	}
 
 	public static inline function rgba(r:Float, g:Float, b:Float, a:Float = 1.0):Color {
-		return KhaColor.fromFloats(r, g, b, a);
+		return kha.Color.fromFloats(r, g, b, a);
 	}
 
 	public static inline function hsv(h:Float, s:Float, v:Float):Color {
@@ -134,7 +133,7 @@ enum abstract Color(KhaColor) from KhaColor to KhaColor {
 			case "transparent":
 				return transparent;
 			default:
-				return KhaColor.fromString(value);
+				return kha.Color.fromString(value);
 		}
 	}
 

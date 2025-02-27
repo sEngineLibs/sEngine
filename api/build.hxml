@@ -46,4 +46,4 @@
 
 # html generation
 --next
---cmd haxelib run dox -i build -o build/html/pages --title "sEngine API"
+--cmd haxelib run dox -i build -o build/html/pages -in "se|s2d|s3d" --title "sEngine API" -D version 1.0.0a -D description "sEngine libraries APIs" -D source-path https://github.com/sEngineLibs/sEngine/tree/main/Sources
