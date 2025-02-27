@@ -3,8 +3,7 @@ package se.macro;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 
-using Lambda;
-using tink.MacroApi;
+using se.extensions.MacroExt;
 
 class SMacro {
 	static var fields:Array<Field>;
@@ -85,7 +84,7 @@ class SMacro {
 									case _:
 								}
 								// recursivelly add a observable call before return statements.
-								f.expr = f.expr.map(addObservableCall);
+								f.expr = addObservableCall(f.expr);
 
 							case _: Context.error("setter must be function", setter.pos);
 						}
@@ -98,7 +97,7 @@ class SMacro {
 				';
 				field.doc = field.doc == null ? docstring : docstring + field.doc;
 				field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Called`';
-				
+
 				genObservableListeners(fieldName, f.ret);
 				genFuncObservableListenerPusher(fieldName, f.ret);
 				funcField = f.args[0].name;
@@ -246,13 +245,13 @@ class SMacro {
 						}
 					case _:
 						macro {
-							${e.map(addObservableCall)};
+							${addObservableCall(e)};
 							for (l in $listRef)
 								l($fieldRef);
 							return $i{funcField};
 						}
 				}
-			case _: expr.map(addObservableCall);
+			case _: expr;
 		}
 		return null;
 	}
