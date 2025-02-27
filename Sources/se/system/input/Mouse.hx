@@ -203,7 +203,7 @@ class Mouse {
 		return value;
 	}
 
-	function get_locked():Bool {
+	inline function get_locked():Bool {
 		return mouse.isLocked();
 	}
 

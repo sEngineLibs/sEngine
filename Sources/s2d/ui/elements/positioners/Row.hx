@@ -3,8 +3,6 @@ package s2d.ui.elements.positioners;
 import s2d.Alignment;
 
 class Row extends Positioner {
-	public var spacing:Float = 10.0;
-
 	function position(element:UIElement) {
 		var _x = prevBounds.right + spacing;
 
@@ -13,6 +11,6 @@ class Row extends Positioner {
 			_yo = (height - element.height) / 2;
 		else if (element.layout.alignment & Alignment.Bottom != 0)
 			_yo = height - element.height;
-		element.setPosition(_x + element.layout.leftMargin, _y + _yo);
+		element.setPosition(_x + element.layout.leftMargin, y + _yo);
 	}
 }

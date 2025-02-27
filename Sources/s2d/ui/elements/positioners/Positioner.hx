@@ -7,6 +7,8 @@ import s2d.geometry.Bounds;
 abstract class Positioner extends UISceneElement {
 	var prevBounds:Bounds;
 
+	@observable public var spacing:Float = 0.0;
+
 	abstract function position(element:UIElement):Void;
 
 	override function renderTree(target:Texture) {

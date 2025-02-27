@@ -129,7 +129,7 @@ abstract class Animation<T> {
 		_tick(update(t));
 	}
 
-	function get_duration() {
+	inline function get_duration() {
 		return @:privateAccess actuator.duration;
 	}
 
@@ -138,7 +138,7 @@ abstract class Animation<T> {
 		return value;
 	}
 
-	function get_easing() {
+	inline function get_easing() {
 		return @:privateAccess actuator.easing;
 	}
 
@@ -147,7 +147,7 @@ abstract class Animation<T> {
 		return value;
 	}
 
-	function get_running() {
+	inline function get_running() {
 		return _running;
 	}
 
@@ -159,7 +159,7 @@ abstract class Animation<T> {
 		return value;
 	}
 
-	function get_paused() {
+	inline function get_paused() {
 		return _paused;
 	}
 

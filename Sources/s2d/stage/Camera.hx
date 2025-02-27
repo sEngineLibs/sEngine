@@ -12,7 +12,7 @@ abstract Camera(Transform) from Transform to Transform {
 		this = Mat3.lookAt({x: 0.0, y: 0.0}, {x: 0.0, y: -1.0}, {x: 0.0, y: 1.0});
 	}
 
-	function get_x():Float {
+	inline function get_x():Float {
 		return this.global.translationX;
 	}
 
@@ -21,7 +21,7 @@ abstract Camera(Transform) from Transform to Transform {
 		return value;
 	}
 
-	function get_y():Float {
+	inline function get_y():Float {
 		return this.global.translationY;
 	}
 

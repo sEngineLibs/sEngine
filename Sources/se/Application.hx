@@ -55,7 +55,7 @@ class Application {
 			trace("This application can't be stopped!");
 	}
 
-	static function get_windows() {
+	static inline function get_windows() {
 		return Window.all;
 	}
 

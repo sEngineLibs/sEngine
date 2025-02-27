@@ -6,17 +6,15 @@ import s2d.PhysicalObject;
 abstract class StageObject extends PhysicalObject<StageObject> {
 	var layer:Layer;
 
-	public var x(get, set):FastFloat;
-	public var y(get, set):FastFloat;
+	@observable public var x(get, set):FastFloat;
+	@observable public var y(get, set):FastFloat;
 
-	public function new(layer:Layer) {
+	public inline function new(layer:Layer) {
 		super(null);
 		this.layer = layer;
 	}
 
-	function onParentChanged(previous:StageObject):Void {};
-
-	function get_x():FastFloat {
+	inline function get_x():FastFloat {
 		return this.transform.global.translationX;
 	}
 
@@ -25,7 +23,7 @@ abstract class StageObject extends PhysicalObject<StageObject> {
 		return value;
 	}
 
-	function get_y():FastFloat {
+	inline function get_y():FastFloat {
 		return this.transform.global.translationY;
 	}
 

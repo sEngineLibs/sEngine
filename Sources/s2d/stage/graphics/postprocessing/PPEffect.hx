@@ -13,7 +13,7 @@ abstract class PPEffect {
 
 	public function new() {}
 
-	function get_enabled():Bool {
+	inline function get_enabled():Bool {
 		return Renderer.commands.contains(command);
 	}
 

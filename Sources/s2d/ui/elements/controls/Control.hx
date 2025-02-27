@@ -29,11 +29,11 @@ abstract class Control extends UISceneElement {
 		// mouseArea.notifyOnClicked(() -> f(true));
 	}
 
-	function get_hovered():Bool {
+	inline function get_hovered():Bool {
 		return mouseArea.entered;
 	}
 
-	function get_pressed():Bool {
+	inline function get_pressed():Bool {
 		return mouseArea.pressed;
 	}
 }

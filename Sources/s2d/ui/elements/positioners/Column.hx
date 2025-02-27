@@ -3,8 +3,6 @@ package s2d.ui.elements.positioners;
 import s2d.Alignment;
 
 class Column extends Positioner {
-	public var spacing:Float = 0.0;
-
 	function position(element:UIElement) {
 		var _y = prevBounds.bottom + spacing;
 

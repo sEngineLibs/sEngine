@@ -57,11 +57,11 @@ class RenderBuffer {
 		tgtInd = 1 - tgtInd;
 	}
 
-	function get_src():Texture {
+	inline function get_src():Texture {
 		return buffer[srcInd];
 	}
 
-	function get_tgt():Texture {
+	inline function get_tgt():Texture {
 		return buffer[tgtInd];
 	}
 }

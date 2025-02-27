@@ -5,7 +5,7 @@ import se.math.VectorMath;
 import s2d.Alignment;
 
 class RowLayout extends UISceneElement {
-	public var spacing:Float = 0.0;
+	@observable public var spacing:Float = 0.0;
 
 	override function renderTree(target:Texture) {
 		var elements = [];

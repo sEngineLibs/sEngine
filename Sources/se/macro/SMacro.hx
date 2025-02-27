@@ -21,31 +21,43 @@ class SMacro {
 			fieldRef = fieldName.resolve();
 			for (meta in field.meta ?? []) {
 				switch (meta.name) {
-					case "bind":
-						buildBind(field);
+					case "observable":
+						buildObservable(field);
 				}
 			}
 		}
 		return fields;
 	}
 
-	static function buildBind(field:Field) {
+	static function buildObservable(field:Field) {
 		switch (field.kind) {
 			// gen property
 			case FVar(t, e):
 				field.meta.push({name: ":isVar", pos: Context.currentPos()});
 				field.kind = FProp("default", "set", t, e);
-				genBind(fieldName, t);
+				var docstring = '
+					**This variable is **observable***.
+				';
+				field.doc = field.doc == null ? docstring : docstring + field.doc;
+				field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Changed`';
+				genObservable(fieldName, t);
 
 			// edit property
 			case FProp(get, set, t, e):
+				if (set == "default" || set == "set" || set == "null") {
+					var docstring = '
+						**This property is **observable***.
+					';
+					field.doc = field.doc == null ? docstring : docstring + field.doc;
+					field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Changed`';
+				}
 				switch (set) {
 					case "never", "dynamic":
-						Context.error('can\'t bind "$set" with no access.', field.pos);
+						Context.error('Can\'t observable a property with no access.', field.pos);
 
 					case "default":
 						field.kind = FProp(get, "set", t, e);
-						genBind(fieldName, t);
+						genObservable(fieldName, t);
 
 					case "set", "null":
 						// find setter
@@ -58,24 +70,22 @@ class SMacro {
 							}
 
 						if (setter == null)
-							Context.error("can't find setter: " + methodName, field.pos);
+							Context.error("Can't find setter: " + methodName, field.pos);
 
 						switch (setter.kind) {
 							case FFun(f):
-								genBindListeners(fieldName, t);
-								genVarBindListenerPusher(fieldName, t);
+								genObservableListeners(fieldName, t);
+								genVarObservableListenerPusher(fieldName, t);
 
 								funcField = f.args[0].name;
-
 								// store the current field value at the beggining of the setter
 								switch (f.expr.expr) {
 									case EBlock(exprs):
 										exprs.unshift(macro var __from__ = $fieldRef);
 									case _:
 								}
-
-								// recursivelly add a bind call before return statements.
-								f.expr = f.expr.map(addBindCall);
+								// recursivelly add a observable call before return statements.
+								f.expr = f.expr.map(addObservableCall);
 
 							case _: Context.error("setter must be function", setter.pos);
 						}
@@ -83,8 +93,14 @@ class SMacro {
 
 			// edit function
 			case FFun(f):
-				genBindListeners(fieldName, f.ret);
-				genFuncBindListenerPusher(fieldName, f.ret);
+				var docstring = '
+					**This function is **observable***.
+				';
+				field.doc = field.doc == null ? docstring : docstring + field.doc;
+				field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Called`';
+				
+				genObservableListeners(fieldName, f.ret);
+				genFuncObservableListenerPusher(fieldName, f.ret);
 				funcField = f.args[0].name;
 
 				var returnType = f.ret.match(TPath(_)) ? f.ret : null;
@@ -108,8 +124,6 @@ class SMacro {
 								for (l in $listRef)
 									l();
 							});
-
-						exprs = [];
 						f.expr = {expr: EBlock(exprs), pos: f.expr.pos};
 
 					case _: null;
@@ -117,13 +131,13 @@ class SMacro {
 		}
 	}
 
-	static function genBind(name:String, t:ComplexType) {
-		genBindListeners(name, t);
-		genVarBindListenerPusher(name, t);
-		genBindSetter(name, t);
+	static function genObservable(name:String, t:ComplexType) {
+		genObservableListeners(name, t);
+		genVarObservableListenerPusher(name, t);
+		genObservableSetter(name, t);
 	}
 
-	static function genBindListeners(name:String, t:ComplexType) {
+	static function genObservableListeners(name:String, t:ComplexType) {
 		name = name.charAt(0).toUpperCase() + name.substr(1);
 		var listName = '__${name}Listeners';
 		listRef = listName.resolve();
@@ -135,13 +149,13 @@ class SMacro {
 		});
 	}
 
-	static inline function genVarBindListenerPusher(name:String, t:ComplexType) {
+	static inline function genVarObservableListenerPusher(name:String, t:ComplexType) {
 		fields.push({
 			pos: Context.currentPos(),
 			name: 'on${name.charAt(0).toUpperCase() + name.substr(1)}Changed',
-			doc: 'Adds a listener that is triggered when the value of the property `$name` changes.
+			doc: 'Adds a listener that is triggered when `$name` changes. 
        			@param listener `($name:${t.getParameters()[0].name}) -> Void` A callback that receives the new value of the property.
-       			@return An object with a `remove` function that removes the listener from the active list.',
+       			@return An object with a `remove` function that removes the listener from the active list.`',
 			kind: FFun({
 				ret: macro :{
 					remove:Void->Void
@@ -164,7 +178,7 @@ class SMacro {
 		});
 	}
 
-	static function genFuncBindListenerPusher(name:String, t:ComplexType) {
+	static function genFuncObservableListenerPusher(name:String, t:ComplexType) {
 		fields.push({
 			pos: Context.currentPos(),
 			name: 'on${name.charAt(0).toUpperCase() + name.substr(1)}Called',
@@ -193,7 +207,7 @@ class SMacro {
 		});
 	}
 
-	static function genBindSetter(name:String, t:ComplexType) {
+	static function genObservableSetter(name:String, t:ComplexType) {
 		fields.push({
 			pos: Context.currentPos(),
 			name: "set_" + name,
@@ -201,24 +215,24 @@ class SMacro {
 			meta: [],
 			kind: FFun({
 				ret: t,
-				expr: macro {
-					var __from__ = $fieldRef;
-					$fieldRef = v;
-					for (l in $listRef)
-						l(v);
-					return $fieldRef;
-				},
 				args: [
 					{
 						name: "value",
 						type: t
 					}
-				]
+				],
+				expr: macro {
+					var __from__ = $fieldRef;
+					$fieldRef = value;
+					for (l in $listRef)
+						l(value);
+					return $fieldRef;
+				}
 			})
 		});
 	}
 
-	static function addBindCall(expr:Expr):Expr {
+	static function addObservableCall(expr:Expr):Expr {
 		return switch (expr.expr) {
 			case EReturn(e):
 				if (e == null)
@@ -232,13 +246,13 @@ class SMacro {
 						}
 					case _:
 						macro {
-							${e.map(addBindCall)};
+							${e.map(addObservableCall)};
 							for (l in $listRef)
 								l($fieldRef);
 							return $i{funcField};
 						}
 				}
-			case _: expr.map(addBindCall);
+			case _: expr.map(addObservableCall);
 		}
 		return null;
 	}
