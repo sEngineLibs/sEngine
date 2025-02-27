@@ -5,7 +5,6 @@ import haxe.macro.Expr;
 
 using Lambda;
 using tink.MacroApi;
-using se.extensions.StringExt;
 
 class SMacro {
 	static var fields:Array<Field>;
@@ -86,18 +85,35 @@ class SMacro {
 			case FFun(f):
 				genBindListeners(fieldName, f.ret);
 				genFuncBindListenerPusher(fieldName, f.ret);
-
 				funcField = f.args[0].name;
 
-				// store the current field value at the beggining of the setter
+				var returnType = f.ret.match(TPath(_)) ? f.ret : null;
+				var hasReturn = returnType != null && returnType.toString() != "Void";
+
 				switch (f.expr.expr) {
 					case EBlock(exprs):
-						exprs.unshift(macro var __from__ = $fieldRef);
-					case _:
-				}
+						if (hasReturn)
+							exprs = [
+								macro {
+									__result__ = {
+										$b{exprs}
+									};
+									for (l in $listRef)
+										l(__result__);
+									return __result__;
+								}
+							];
+						else
+							exprs.push(macro {
+								for (l in $listRef)
+									l();
+							});
 
-				// recursivelly add a bind call before return statements.
-				f.expr = f.expr.map(addBindCall);
+						exprs = [];
+						f.expr = {expr: EBlock(exprs), pos: f.expr.pos};
+
+					case _: null;
+				}
 		}
 	}
 
@@ -108,7 +124,7 @@ class SMacro {
 	}
 
 	static function genBindListeners(name:String, t:ComplexType) {
-		name = name.capitalize();
+		name = name.charAt(0).toUpperCase() + name.substr(1);
 		var listName = '__${name}Listeners';
 		listRef = listName.resolve();
 		fields.push({
@@ -119,13 +135,13 @@ class SMacro {
 		});
 	}
 
-	static function genBindListenerPusher(name:String, lname:String, t:ComplexType) {
+	static inline function genVarBindListenerPusher(name:String, t:ComplexType) {
 		fields.push({
 			pos: Context.currentPos(),
-			name: lname,
+			name: 'on${name.charAt(0).toUpperCase() + name.substr(1)}Changed',
 			doc: 'Adds a listener that is triggered when the value of the property `$name` changes.
-       			@param listener :`($name:${t.getParameters()[0].name}) -> Void` A callback function that receives the new value of the property.
-       			@return An object with a `remove` function that, when called, removes the listener from the active listeners, preventing memory leaks.',
+       			@param listener `($name:${t.getParameters()[0].name}) -> Void` A callback that receives the new value of the property.
+       			@return An object with a `remove` function that removes the listener from the active list.',
 			kind: FFun({
 				ret: macro :{
 					remove:Void->Void
@@ -148,12 +164,33 @@ class SMacro {
 		});
 	}
 
-	static inline function genVarBindListenerPusher(name:String, t:ComplexType) {
-		genBindListenerPusher(name, 'on${name.capitalize()}Changed', t);
-	}
-
 	static function genFuncBindListenerPusher(name:String, t:ComplexType) {
-		genBindListenerPusher(name, 'on${name.charAt(0).toUpperCase() + name.substr(1)}Called', t);
+		fields.push({
+			pos: Context.currentPos(),
+			name: 'on${name.charAt(0).toUpperCase() + name.substr(1)}Called',
+			doc: 'Adds a listener that is triggered when `$name` is called.
+       			@param listener `${t.getParameters()[0].name} -> Void` A callback that receives the returned value from the function.
+       			@return An object with a `remove` function that removes the listener from the active list.',
+			kind: FFun({
+				ret: macro :{
+					remove:Void->Void
+				},
+				args: [
+					{
+						name: 'listener',
+						type: macro :$t->Void
+					}
+				],
+				expr: macro {
+					var listener = $i{'listener'};
+					$listRef.push(listener);
+					return {
+						remove: () -> $listRef.remove(listener)
+					};
+				}
+			}),
+			access: [APublic, AInline]
+		});
 	}
 
 	static function genBindSetter(name:String, t:ComplexType) {
