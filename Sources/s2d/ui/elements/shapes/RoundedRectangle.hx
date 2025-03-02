@@ -5,9 +5,9 @@ import s2d.ui.effects.Border;
 import s2d.ui.graphics.Drawers;
 
 class RoundedRectangle extends UISceneElement {
-	@observable public var border:Border = {};
-	@observable public var radius:Float;
-	@observable @:isVar public var softness(default, set):Float;
+	public var border:Border = {};
+	public var radius:Float;
+	@:isVar public var softness(default, set):Float;
 
 	public function new(?radius:Float = 0.0, ?softness:Float = 0.5, ?parent:UIElement) {
 		super(parent);

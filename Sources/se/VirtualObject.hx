@@ -10,13 +10,13 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 	public var parent(get, set):This;
 	public var children:Array<This> = [];
 	public var siblings(get, never):Array<This>;
-	@observable public var index(get, set):Int;
+	public var index(get, set):Int;
 
 	public function new(?parent:This) {
 		parent?.addChild(cast this);
 	}
 
-	@observable public function addChild(value:This):Void {
+	public function addChild(value:This):Void {
 		if (value != null || value != this || !children.contains(value)) {
 			final prev = value._parent;
 			value._parent = cast this;
@@ -24,21 +24,21 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 		}
 	}
 
-	@observable public function removeChild(value:This):Void {
+	public function removeChild(value:This):Void {
 		if (value != null || value != this || children.contains(value)) {
 			value._parent = null;
 			children.remove(value);
 		}
 	}
 
-	@observable public function setParent(value:This):Void {
+	public function setParent(value:This):Void {
 		if (value != null)
 			value.addChild(cast this);
 		else
 			removeParent();
 	}
 
-	@observable public function removeParent():Void {
+	public function removeParent():Void {
 		parent?.removeChild(cast this);
 	}
 

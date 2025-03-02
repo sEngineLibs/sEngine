@@ -1,256 +1,475 @@
 package se.macro;
 
-import haxe.macro.Context;
 import haxe.macro.Expr;
+import haxe.macro.Type;
+import haxe.macro.Context;
 
-using se.extensions.MacroExt;
+using tink.MacroApi;
 
 @:dox(hide)
 class SMacro {
 	#if macro
-	static var fields:Array<Field>;
+	static var classPack:Array<String>;
+	static var className:String;
+	static var classFields:Array<Field>;
 
-	static var funcField:String;
-	static var fieldName:String;
-	static var fieldRef:Dynamic;
-	static var listRef:Dynamic;
+	static var signals:Map<Field, Array<Expr>>;
 
 	macro public static function build():Array<Field> {
-		fields = Context.getBuildFields();
-		for (field in fields) {
-			fieldName = field.name;
-			fieldRef = fieldName.resolve();
+		var path = Context.getLocalModule().split(".");
+		// get name
+		className = path[path.length - 1];
+		// get pack
+		classPack = path.slice(0, path.length - 1);
+		// get fields
+		classFields = Context.getBuildFields();
+
+		signals = [];
+		var constructor = buildConstructor();
+
+		for (field in classFields) {
 			for (meta in field.meta ?? []) {
 				switch (meta.name) {
-					case "observable":
-						buildObservable(field);
+					case ":signal":
+						if (!signals.exists(field))
+							signals[field] = [];
+					case ":slot":
+						switch (field.kind) {
+							case FFun(f):
+								for (signal in meta.params) {
+									switch (signal.expr) {
+										case EConst(c):
+											switch (c) {
+												case CIdent(s):
+													var signalField = findField(s);
+													if (signalField != null) {
+														if (signals.exists(signalField)) {
+															signals[signalField].push(field.name.resolve());
+														} else {
+															signals[signalField] = [field.name.resolve()];
+														}
+													}
+												default: null;
+											}
+										default: null;
+									}
+								}
+							default:
+								Context.error("slot must be a function", field.pos);
+						}
+					case ":track":
+						buildTrack(field);
 				}
 			}
 		}
-		return fields;
+
+		for (signal in signals.keys()) {
+			buildSignal(signal);
+
+			// connect slots to the signal
+			var signalRef = signal.name.resolve();
+			var slots = signals[signal];
+			switch (constructor.expr.expr) {
+				case EBlock(exprs):
+					for (slot in slots)
+						exprs.unshift(macro $signalRef.connect($slot));
+				default:
+					constructor.expr = {
+						expr: EBlock([
+							for (slot in slots)
+								macro $signalRef.connect($slot)
+						].concat([constructor.expr])),
+						pos: Context.currentPos()
+					}
+			}
+		}
+
+		return classFields;
 	}
 
-	static function buildObservable(field:Field) {
+	static function buildSignal(field:Field):Void {
 		switch (field.kind) {
-			// gen property
+			case FFun(f):
+				var signalName = '${className}_${field.name}_Signal';
+
+				var args = [
+					for (arg in f.args) {
+						var t = TNamed(arg.name, arg.type);
+						if (arg.opt) TOptional(t); else t;
+					}
+				];
+
+				var _t = ComplexType.TFunction(args, f.ret ?? macro :Void);
+				var t = macro :Array<$_t>;
+
+				Context.defineType({
+					pack: classPack,
+					meta: [
+						{
+							name: ":forward.new",
+							pos: Context.currentPos()
+						}
+					],
+					name: signalName,
+					isExtern: true,
+					kind: TDAbstract(t, [AbFrom(t), AbTo(t)]),
+					fields: [
+						{
+							meta: [
+								{
+									name: ":op",
+									params: [macro a()],
+									pos: Context.currentPos()
+								}
+							],
+							name: "emit",
+							kind: FFun({
+								args: f.args,
+								expr: {
+									expr: EFor(macro slot in this, {
+										expr: ECall(macro slot, [
+											for (arg in f.args)
+												macro ${arg.name.resolve()}
+										]),
+										pos: Context.currentPos()
+									}),
+									pos: Context.currentPos()
+								}
+							}),
+							access: [APublic, AInline],
+							pos: Context.currentPos()
+						},
+						{
+							name: "connect",
+							kind: FFun({
+								args: [{name: "slot"}],
+								expr: macro {
+									this.push(slot);
+								}
+							}),
+							access: [APublic, AInline],
+							pos: Context.currentPos()
+						},
+						{
+							name: "disconnect",
+							kind: FFun({
+								args: [{name: "slot"}],
+								expr: macro {
+									this.remove(slot);
+								}
+							}),
+							access: [APublic, AInline],
+							pos: Context.currentPos()
+						}
+					],
+					pos: Context.currentPos()
+				});
+
+				field.meta = [];
+				field.kind = FVar(TPath({
+					pack: classPack,
+					name: signalName
+				}), macro []);
+
+				field.access = field.access.contains(APublic) ? [APublic] : [];
+
+				// add connector
+				classFields.push(genSignalConnector(field));
+			default:
+				Context.error("Signal must be a function, not " + field, field.pos);
+		}
+	}
+
+	static function buildTrack(field:Field):Void {
+		switch (field.kind) {
 			case FVar(t, e):
-				genObservable(fieldName, t);
 				field.meta.push({name: ":isVar", pos: Context.currentPos()});
 				field.kind = FProp("default", "set", t, e);
-				var docstring = '_This variable is **observable**._\n';
-				field.doc = field.doc == null ? docstring : docstring + field.doc;
-				field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Changed`';
 
-			// edit property
+				// generate signal
+				var signal = genSignal('${field.name}Changed', field.access.contains(APublic), [{name: field.name, type: t}]);
+
+				// generate setter
+				var fieldRef = field.name.resolve();
+				var setter = {
+					name: 'set_${field.name}',
+					access: [AExtern, APrivate, AInline],
+					kind: FFun({
+						args: [{name: "value", type: t}],
+						expr: macro {
+							$fieldRef = value;
+							${signal.name.resolve()}($fieldRef);
+							return $fieldRef;
+						},
+					}),
+					pos: Context.currentPos()
+				}
+
+				classFields.push(signal);
+				if (!signals.exists(signal))
+					signals[signal] = [];
+				classFields.push(setter);
+
 			case FProp(get, set, t, e):
-				var docstring = '_This property is **observable**._\n';
 				switch (set) {
 					case "never", "dynamic":
-						Context.error('Can\'t observable a property with no access.', field.pos);
+						Context.error('Can\'t track a property with no write access.', field.pos);
 
 					case "default":
-						genObservable(fieldName, t);
 						field.kind = FProp(get, "set", t, e);
-						field.doc = field.doc == null ? docstring : docstring + field.doc;
-						field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Changed`';
+
+						// generate signal
+						var signal = genSignal('${field.name}Changed', field.access.contains(APublic), [{name: field.name, type: t}]);
+
+						// generate setter
+						var fieldRef = field.name.resolve();
+						var setter = {
+							name: 'set_${field.name}',
+							access: [APrivate, AInline],
+							kind: FFun({
+								args: [{name: "value", type: t}],
+								expr: macro {
+									$fieldRef = value;
+									${signal.name.resolve()}($fieldRef);
+									return $fieldRef;
+								},
+							}),
+							pos: Context.currentPos()
+						}
+
+						classFields.push(signal);
+						if (!signals.exists(signal))
+							signals[signal] = [];
+						classFields.push(setter);
 
 					case "set", "null":
-						// find setter
-						var methodName = "set_" + fieldName;
-						var setter = null;
-						for (f in fields)
-							if (f.name == methodName) {
-								setter = f;
-								break;
+						var setter = findField('set_${field.name}');
+						if (setter == null) {
+							Context.error("Can't find setter: " + 'set_${field.name}', field.pos);
+						} else {
+							// generate signal
+							var signal:Field = {
+								name: '${field.name}Changed',
+								access: field.access.contains(APublic) ? [APublic, AInline] : [AInline],
+								kind: FFun({
+									args: [{name: field.name, type: t}]
+								}),
+								pos: Context.currentPos()
+							}
+							switch (setter.kind) {
+								case FFun(f):
+									f.expr = injectCall(f.expr, signal.name.resolve());
+								default: Context.error("Setter must be function", Context.currentPos());
 							}
 
-						if (setter == null)
-							Context.error("Can't find setter: " + methodName, field.pos);
-
-						switch (setter.kind) {
-							case FFun(f):
-								genObservableListeners(fieldName, t);
-								genVarObservableListenerPusher(fieldName, t);
-
-								funcField = f.args[0].name;
-								// store the current field value at the beggining of the setter
-								switch (f.expr.expr) {
-									case EBlock(exprs):
-										exprs.unshift(macro var __from__ = $fieldRef);
-									case _:
-								}
-								// recursivelly add a observable call before return statements.
-								f.expr = addObservableCall(f.expr);
-
-								field.doc = field.doc == null ? docstring : docstring + field.doc;
-								field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Changed`';
-
-							case _: Context.error("setter must be function", setter.pos);
+							classFields.push(signal);
+							if (!signals.exists(signal))
+								signals[signal] = [];
 						}
 				}
 
-			// edit function
 			case FFun(f):
-				var docstring = '_This function is **observable**._\n';
-				field.doc = field.doc == null ? docstring : docstring + field.doc;
-				field.doc += '\n@see `on${fieldName.charAt(0).toUpperCase() + fieldName.substr(1)}Called`';
+				if (f.ret == null)
+					Context.error("Function return must be type-hinted", Context.currentPos());
+				else {
+					// generate signal
+					var signal:Field = {
+						name: '${field.name}Called',
+						access: field.access.contains(APublic) ? [APublic, AInline] : [AInline],
+						kind: FFun({
+							args: switch (f.ret) {
+								case TPath(p):
+									p.name == "Void" ? [] : [{name: "result", type: f.ret}];
+								default: [{name: "result", type: f.ret}];
+							}
+						}),
+						pos: Context.currentPos()
+					}
+					f.expr = injectCall(f.expr, signal.name.resolve());
 
-				genObservableListeners(fieldName, f.ret);
-				genFuncObservableListenerPusher(fieldName, f.ret);
-				funcField = fieldName;
+					classFields.push(signal);
+					if (!signals.exists(signal))
+						signals[signal] = [];
+				}
+		}
+	}
 
-				var returnType = f.ret.match(TPath(_)) ? f.ret : null;
-				var hasReturn = returnType != null && returnType.toString() != "Void";
-
-				switch (f.expr.expr) {
-					case EBlock(exprs):
-						if (hasReturn)
-							exprs = [
+	static function injectCall(f:Expr, call:Expr):Expr {
+		function inject(f:Expr, call:Expr):Expr {
+			function replace(e:Expr):Expr {
+				if (e != null)
+					return switch (e.expr) {
+						case EReturn(eValue):
+							if (eValue != null) {
 								macro {
-									__result__ = {
-										$b{exprs}
-									};
-									for (l in $listRef)
-										l(__result__);
-									return __result__;
+									final result = $eValue;
+									$call(result);
+									return result;
 								}
-							];
-						else
-							exprs.push(macro {
-								for (l in $listRef)
-									l();
-							});
-						f.expr = {expr: EBlock(exprs), pos: f.expr.pos};
+							} else {
+								macro {
+									$call();
+									return;
+								}
+							}
+						case EIf(econd, ethen, eelse):
+							macro {
+								if ($econd)
+									${replace(ethen)};
+								else
+									${replace(eelse)};
+							}
+						default:
+							e.map(replace);
+					}
+				else
+					return e;
+			}
 
-					case _: null;
-				}
+			return replace(f);
+		}
+
+		if (f.has((e) -> switch (e.expr) {
+			case EReturn(e): true;
+			default: false;
+		}))
+			return inject(f, call);
+
+		return macro {
+			$f;
+			$call();
+		};
+	}
+
+	static function genSignal(name, isPublic, args):Field {
+		return {
+			name: name,
+			access: isPublic ? [APublic] : [],
+			kind: FFun({
+				args: args
+			}),
+			pos: Context.currentPos()
 		}
 	}
 
-	static function genObservable(name:String, t:ComplexType) {
-		genObservableListeners(name, t);
-		genVarObservableListenerPusher(name, t);
-		genObservableSetter(name, t);
-	}
-
-	static function genObservableListeners(name:String, t:ComplexType) {
-		name = name.charAt(0).toUpperCase() + name.substr(1);
-		var listName = '__${name}Listeners';
-		listRef = listName.resolve();
-		fields.push({
-			pos: Context.currentPos(),
-			name: listName,
-			access: [APrivate],
-			kind: FVar(macro :Array<$t->Void>, macro [])
-		});
-	}
-
-	static inline function genVarObservableListenerPusher(name:String, t:ComplexType) {
-		fields.push({
-			pos: Context.currentPos(),
-			name: 'on${name.charAt(0).toUpperCase() + name.substr(1)}Changed',
-			doc: 'Adds a listener that is triggered when `$name` changes. 
-       			@param listener A callback that receives the new value of the property.
-       			@return An object with a `remove` function that removes the listener from the active list.',
+	static function genSignalConnector(signal:Field):Field {
+		var name = signal.name;
+		var ref = name.resolve();
+		return {
+			name: 'on${name.charAt(0).toUpperCase() + name.substr(1)}',
 			kind: FFun({
-				ret: macro :{
-					remove:Void->Void
-				},
-				args: [
-					{
-						name: 'listener',
-						type: macro :($name:$t) -> Void
-					}
-				],
-				expr: macro {
-					var listener = $i{'listener'};
-					$listRef.push(listener);
-					return {
-						remove: () -> $listRef.remove(listener)
-					};
-				}
+				args: [{name: "slot"}],
+				expr: macro $ref.connect(slot)
 			}),
-			access: [APublic, AInline]
-		});
+			access: signal.access.concat([AExtern, AInline]),
+			pos: Context.currentPos()
+		};
 	}
 
-	static function genFuncObservableListenerPusher(name:String, t:ComplexType) {
-		fields.push({
-			pos: Context.currentPos(),
-			name: 'on${name.charAt(0).toUpperCase() + name.substr(1)}Called',
-			doc: 'Adds a listener that is triggered when `$name` is called.
-       			@param listener A callback that receives the returned value from the function.
-       			@return An object with a `remove` function that removes the listener from the active list.',
-			kind: FFun({
-				ret: macro :{
-					remove:Void->Void
-				},
-				args: [
-					{
-						name: 'listener',
-						type: macro :$t->Void
-					}
-				],
-				expr: macro {
-					var listener = $i{'listener'};
-					$listRef.push(listener);
-					return {
-						remove: () -> $listRef.remove(listener)
-					};
-				}
-			}),
-			access: [APublic, AInline]
-		});
-	}
-
-	static function genObservableSetter(name:String, t:ComplexType) {
-		fields.push({
-			pos: Context.currentPos(),
-			name: "set_" + name,
-			access: [AInline, APrivate],
-			meta: [],
-			kind: FFun({
-				ret: t,
-				args: [
-					{
-						name: "value",
-						type: t
-					}
-				],
-				expr: macro {
-					var __from__ = $fieldRef;
-					$fieldRef = value;
-					for (l in $listRef)
-						l(value);
-					return $fieldRef;
-				}
-			})
-		});
-	}
-
-	static function addObservableCall(expr:Expr):Expr {
-		return switch (expr.expr) {
-			case EReturn(e):
-				if (e == null)
-					Context.error("setter must return value", expr.pos);
-				switch (e.expr) {
-					case EConst(c):
-						macro {
-							for (l in $listRef)
-								l($fieldRef);
-							return $e;
-						}
-					case _:
-						macro {
-							${addObservableCall(e)};
-							for (l in $listRef)
-								l($fieldRef);
-							return $i{funcField};
-						}
-				}
-			case _: expr;
-		}
+	static function findField(name:String):Field {
+		for (field in classFields)
+			if (field.name == name)
+				return field;
 		return null;
+	}
+
+	static function buildConstructor():Function {
+		var f = findField("new");
+		if (f == null) {
+			var constructor;
+			// var sup = findSuperConstructor(Context.getLocalClass().get());
+			var sup = Context.getLocalClass().get().superClass;
+			if (sup != null) {
+				Context.error("This class must have a constructor", Context.currentPos());
+				// var sargs:Array<FunctionArg>;
+
+				// switch (sup) {
+				// 	case TFun(args, ret):
+				// 		sargs = [
+				// 			for (arg in args) {
+				// 				{
+				// 					name: arg.name,
+				// 					type: arg.t.toComplex(),
+				// 					opt: arg.opt,
+				// 				}
+				// 			}
+				// 		];
+				// 	default:
+				// 		null;
+				// }
+
+				// constructor = {
+				// 	args: sargs,
+				// 	expr: {
+				// 		expr: ECall(macro super, [
+				// 			for (arg in sargs)
+				// 				macro ${arg.name.resolve()}
+				// 		]),
+				// 		pos: Context.currentPos()
+				// 	}
+				// }
+			} else {
+				constructor = {
+					args: [],
+					expr: macro {}
+				}
+			}
+
+			classFields.push({
+				name: "new",
+				kind: FFun(constructor),
+				access: [APublic],
+				pos: Context.currentPos()
+			});
+			return constructor;
+		} else {
+			return switch (f.kind) {
+				case FFun(f):
+					f;
+				default:
+					null;
+			}
+		}
+	}
+
+	static function findSuperConstructor(cls:ClassType):Type {
+		function findParam(typeParams:Array<TypeParameter>, param:Type) {
+			for (i in 0...typeParams.length) {
+				var tp = typeParams[i];
+				if (tp.t.compare(param) == 0)
+					return tp;
+			}
+			return null;
+		}
+
+		if (cls.constructor == null) {
+			var sup = cls.superClass;
+			if (sup != null) {
+				var typeParams:Map<String, Type> = [
+					for (i in 0...sup.t.get().params.length)
+						sup.t.get().params[i].t.toExactString() => sup.params[i]
+				];
+				var constructor = sup.t.get().constructor?.get().expr().t;
+				if (constructor != null)
+					return switch (constructor) {
+						case TFun(args, ret):
+							TFun([
+								for (arg in args)
+									{
+										name: arg.name,
+										t: typeParams.exists(arg.t.toExactString()) ? typeParams.get(arg.t.toExactString()) : arg.t,
+										opt: arg.opt
+									}
+							], ret);
+						default:
+							constructor;
+					}
+				else
+					return null;
+			}
+			return null;
+		} else
+			return cls.constructor.get().expr().t;
 	}
 	#end
 }

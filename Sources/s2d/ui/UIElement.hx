@@ -12,6 +12,7 @@ import s2d.geometry.Bounds;
 import s2d.geometry.Position;
 import s2d.ui.Anchors;
 
+@:build(se.macro.SMacro.build())
 @:allow(s2d.ui.UIScene)
 class UIElement extends PhysicalObject<UIElement> {
 	var finalOpacity(get, never):Float;
@@ -26,21 +27,21 @@ class UIElement extends PhysicalObject<UIElement> {
 	public var anchors(get, never):Anchors;
 	public var padding(never, set):Float;
 
-	@observable public var focused:Bool = false;
-	@observable public var visible:Bool = true;
-	@observable public var color:Color = white;
-	@observable public var opacity:Float = 1.0;
-	@observable public var enabled:Bool = true;
-	@observable public var clip:Bool = false;
-	@observable public var x(get, set):Float;
-	@observable public var y(get, set):Float;
+	public var focused:Bool = false;
+	public var visible:Bool = true;
+	public var color:Color = white;
+	public var opacity:Float = 1.0;
+	public var enabled:Bool = true;
+	public var clip:Bool = false;
+	public var x(get, set):Float;
+	public var y(get, set):Float;
 
-	@observable public var width(get, set):Float;
-	@observable public var height(get, set):Float;
-	@observable @:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
-	@observable @:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
-	@observable @:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
-	@observable @:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
+	public var width(get, set):Float;
+	public var height(get, set):Float;
+	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
+	@:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
+	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
+	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
 
 	public var rect(get, set):Rect;
 	public var bounds(get, set):Bounds;
@@ -80,11 +81,11 @@ class UIElement extends PhysicalObject<UIElement> {
 		}
 	}
 
-	@observable public function setPadding(value:Float):Void {
+	public function setPadding(value:Float):Void {
 		padding = value;
 	}
 
-	@observable overload extern public inline function setPosition(x:Float, y:Float):Void {
+	overload extern public inline function setPosition(x:Float, y:Float):Void {
 		this.x = x;
 		this.y = y;
 	}

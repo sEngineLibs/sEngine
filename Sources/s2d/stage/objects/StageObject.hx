@@ -6,8 +6,8 @@ import s2d.PhysicalObject;
 abstract class StageObject extends PhysicalObject<StageObject> {
 	var layer:Layer;
 
-	@observable public var x(get, set):FastFloat;
-	@observable public var y(get, set):FastFloat;
+	public var x(get, set):FastFloat;
+	public var y(get, set):FastFloat;
 
 	public inline function new(layer:Layer) {
 		super(null);

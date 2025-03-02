@@ -9,17 +9,17 @@ using se.extensions.VectorExt;
 class Sprite extends StageObject {
 	var _id:UInt;
 
-	@observable public var mesh:Mesh;
-	@observable public var cropRect:Vec4 = new Vec4(0.0, 0.0, 1.0, 1.0);
+	public var mesh:Mesh;
+	public var cropRect:Vec4 = new Vec4(0.0, 0.0, 1.0, 1.0);
 	#if (S2D_SPRITE_INSTANCING == 1)
-	@observable @:isVar public var atlas(default, set):SpriteAtlas;
+	@:isVar public var atlas(default, set):SpriteAtlas;
 	#else
-	@observable public var atlas:SpriteAtlas;
+	public var atlas:SpriteAtlas;
 	#end
 
 	#if (S2D_LIGHTING && S2D_LIGHTING_SHADOWS == 1)
-	@observable @:isVar public var isCastingShadows(default, set):Bool = false;
-	@observable public var shadowOpacity:Float = 1.0;
+	@:isVar public var isCastingShadows(default, set):Bool = false;
+	public var shadowOpacity:Float = 1.0;
 
 	inline function set_isCastingShadows(value:Bool) {
 		if (!isCastingShadows && value)

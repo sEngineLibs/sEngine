@@ -10,8 +10,12 @@ package se.math;
 	**Usage**:
 	Add `import se.math.VectorMath;` to be able to use GLSL functions and constructors
 
-	@license MIT
 	Original author: haxiomic (George Corney)
+
+	@license MIT
+**/
+/**
+	Overrides default haxe's 64-bit Float type to use 32-bit floats on platforms that support it.
 **/
 @:eager typedef Float = kha.FastFloat;
 

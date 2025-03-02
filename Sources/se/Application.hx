@@ -6,7 +6,6 @@ import kha.Window;
 import se.system.Time;
 import se.system.input.Mouse;
 import se.system.input.Keyboard;
-import se.events.Dispatcher;
 
 class Application {
 	static var updateListeners:Array<Void->Void> = [];
@@ -25,7 +24,6 @@ class Application {
 			}
 
 			Time.init();
-			Dispatcher.init();
 			SEngine.start(window);
 			Assets.loadEverything(function() {
 				setup();

@@ -1,37 +1,44 @@
 package se.events;
 
-/**
-	Represents an event listener that waits for a condition to be met and then executes a callback.
+@:forward.new
+@:forward(callback, breakable)
+extern abstract EventListener(__EventListener__) from __EventListener__ to __EventListener__ {
+	@:from
+	overload public static inline function fromCallback(callback:Dynamic->Void) {
+		return new EventListener(callback);
+	}
 
-	This class is used internally by the `Dispatcher` to manage event-based logic.
+	@:from
+	overload public static inline function fromCallback(callback:Void->Void) {
+		return new EventListener((v) -> callback());
+	}
 
-	@see `Dispatcher`
- */
-@:allow(se.events.Dispatcher)
-@:access(se.events.Dispatcher)
-class EventListener {
-	var event:Void->Bool;
-	var callback:Void->Void;
-	var breakable:Bool;
+	public var event(get, never):Event;
 
-	function new(event:Void->Bool, callback:Void->Void, breakable:Bool) {
-		this.event = event;
+	@:op(a())
+	public inline function call(?data:Dynamic) {
+		this.callback(data);
+		if (this.breakable)
+			remove();
+	}
+
+	public inline function remove() {
+		@:privateAccess this.event?.removeListener(this);
+	}
+
+	private inline function get_event():Event {
+		@:privateAccess return this.event;
+	}
+}
+
+class __EventListener__ {
+	var event:Event = null;
+
+	public var breakable:Bool;
+	public var callback:Dynamic<Void>->Void;
+
+	public inline function new(callback:Dynamic<Void>->Void, breakable = false) {
 		this.callback = callback;
 		this.breakable = breakable;
-	}
-
-	function update():Bool {
-		if (event()) {
-			callback();
-			return breakable;
-		}
-		return false;
-	}
-
-	/**
-		Stops the listener and removes it from the `Dispatcher`.
-	 */
-	public function stop() {
-		Dispatcher.listeners.remove(this);
 	}
 }

@@ -4,9 +4,9 @@ package s2d.stage.objects;
 import se.Color;
 
 class Light extends StageObject {
-	@observable public var color:Color = "white";
-	@observable public var power:Float = 15.0;
-	@observable public var radius:Float = 1.0;
+	public var color:Color = "white";
+	public var power:Float = 15.0;
+	public var radius:Float = 1.0;
 	// #if (S2D_LIGHTING_VOLUMETRIC == 1)
 	// public var volume:Float = 0.0;
 	// #end

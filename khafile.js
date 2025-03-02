@@ -114,7 +114,7 @@ const shaderOutputDir = path.join(cwd, "build", "shaders_assembled");
 assembleShaders(shaderInputDir, shaderOutputDir);
 
 let project = new Project("s2D");
-
+project.addLibrary("tink_macro");
 project.addSources("Sources");
 project.addAssets("Assets/**", {
     nameBaseDir: "assets",
@@ -147,8 +147,7 @@ project.addAssets("Assets/**", {
 // S2D_LIGHTING_SHADOWS_SOFT -> enables soft shadows
 
 let defs = [];
-if (process.defines == null)
-    process.defines = [];
+if (process.defines == null) process.defines = [];
 for (const def of process.defines) {
     let kv = def.split(" ");
     if (kv.length === 2) {

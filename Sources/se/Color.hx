@@ -1,23 +1,24 @@
 package se;
 
+import kha.Color as KhaColor;
 import se.math.Vec3;
 import se.math.Vec4;
 import se.math.VectorMath;
 
 @:forward.new
-enum abstract Color(kha.Color) from kha.Color to kha.Color {
-	var black = kha.Color.Black;
-	var white = kha.Color.White;
-	var red = kha.Color.Red;
-	var blue = kha.Color.Blue;
-	var green = kha.Color.Green;
-	var magenta = kha.Color.Magenta;
-	var yellow = kha.Color.Yellow;
-	var cyan = kha.Color.Cyan;
-	var purple = kha.Color.Purple;
-	var pink = kha.Color.Pink;
-	var orange = kha.Color.Orange;
-	var transparent = kha.Color.Transparent;
+enum abstract Color(KhaColor) from KhaColor to KhaColor {
+	inline final black = 0xff000000;
+	inline final white = 0xffffffff;
+	inline final red = 0xffff0000;
+	inline final blue = 0xff0000ff;
+	inline final green = 0xff00ff00;
+	inline final magenta = 0xffff00ff;
+	inline final yellow = 0xffffff00;
+	inline final cyan = 0xff00ffff;
+	inline final purple = 0xff800080;
+	inline final pink = 0xffffc0cb;
+	inline final orange = 0xffffa500;
+	inline final transparent = 0x00000000;
 
 	public var r(get, set):Float;
 	public var g(get, set):Float;
@@ -107,33 +108,33 @@ enum abstract Color(kha.Color) from kha.Color to kha.Color {
 
 	@:from
 	public static inline function fromString(value:String):Color {
-		switch (value.toLowerCase()) {
+		return switch (value.toLowerCase()) {
 			case "black":
-				return black;
+				Color.black;
 			case "white":
-				return white;
+				Color.white;
 			case "red":
-				return red;
+				Color.red;
 			case "blue":
-				return blue;
+				Color.blue;
 			case "green":
-				return green;
+				Color.green;
 			case "magenta":
-				return magenta;
+				Color.magenta;
 			case "yellow":
-				return yellow;
+				Color.yellow;
 			case "cyan":
-				return cyan;
+				Color.cyan;
 			case "purple":
-				return purple;
+				Color.purple;
 			case "pink":
-				return pink;
+				Color.pink;
 			case "orange":
-				return orange;
+				Color.orange;
 			case "transparent":
-				return transparent;
+				Color.transparent;
 			default:
-				return kha.Color.fromString(value);
+				kha.Color.fromString(value);
 		}
 	}
 

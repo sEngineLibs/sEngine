@@ -1,137 +1,111 @@
 package se.system.input;
 
 import kha.input.KeyCode;
-import se.system.Time;
-import se.events.Dispatcher;
+import se.events.Event;
 import se.events.EventListener;
+import se.events.EventDispatcher;
 
 @:allow(se.Application)
 @:access(kha.input.Keyboard)
 class Keyboard {
+	var dispatcher:EventDispatcher = new EventDispatcher();
+	var keyEvents = {
+		down: new Map<KeyCode, Event>(),
+		up: new Map<KeyCode, Event>(),
+		pressed: new Map<KeyCode, Event>(),
+		hold: new Map<KeyCode, Event>(),
+	};
+	var charEvents:Map<KeyCode, Event> = [];
+
+	var timers:Map<KeyCode, Timer> = [];
+
 	var keyboard:kha.input.Keyboard;
-	var keysPressed:Array<KeyCode> = [];
-
-	var keyDownHandlers:Array<{key:KeyCode, callback:Void->Void}> = [];
-	var keyUpHandlers:Array<{key:KeyCode, callback:Void->Void}> = [];
-	var charPressHandlers:Array<{char:String, callback:Void->Void}> = [];
-	var hotkeyHandlers:Array<{hotkey:Array<KeyCode>, callback:Void->Void}> = [];
-
-	var keyHoldEventHandlers:Array<{key:KeyCode, listener:EventListener}> = [];
-	var holdHandlers:Array<(key:KeyCode) -> Void> = [];
+	var keysDown:Array<KeyCode> = [];
 
 	public var holdInterval:Float = 0.8;
 
 	function new(?keyboardID = 0) {
 		keyboard = kha.input.Keyboard.get(keyboardID);
-		notifyOnDown(key -> {
-			if (!keysPressed.contains(key)) {
-				keysPressed.push(key);
-				for (keyDownListener in keyDownHandlers)
-					if (keyDownListener.key == key)
-						keyDownListener.callback();
-				for (hotkeyListener in hotkeyHandlers) {
-					var flag = true;
-					for (key in hotkeyListener.hotkey)
-						if (!keysPressed.contains(key)) {
-							flag = false;
-							break;
-						}
-					if (flag)
-						hotkeyListener.callback();
-				}
-				var time = Time.realTime;
-				keyHoldEventHandlers.push({
-					key: key,
-					listener: Dispatcher.addEventListener(() -> {
-						return keysPressed.contains(key) && Time.realTime >= time + holdInterval;
-					}, () -> {
-						for (holdListener in holdHandlers)
-							holdListener(key);
-					})
-				});
-			}
-		});
-		notifyOnUp(key -> {
-			keysPressed.remove(key);
-			for (keyUpListener in keyUpHandlers)
-				if (keyUpListener.key == key)
-					keyUpListener.callback();
-			for (keyHoldEventListener in keyHoldEventHandlers) {
-				if (keyHoldEventListener.key == key) {
-					Dispatcher.removeEventListener(keyHoldEventListener.listener);
-					keyHoldEventHandlers.remove(keyHoldEventListener);
-				}
-			}
-		});
-		notifyOnPressed(char -> {
-			for (charPressListener in charPressHandlers)
-				if (charPressListener.char == char)
-					charPressListener.callback();
-		});
+		keyboard.notify(down, up, press);
+
+		dispatcher.downEvent = new Event([processDown]);
+		dispatcher.upEvent = new Event([processUp]);
+		dispatcher.pressEvent = new Event([processPress]);
+
+		dispatcher.holdEvent = new Event();
 	}
 
-	public function notifyOnDown(callback:KeyCode->Void) {
-		keyboard.downListeners.push(callback);
-		return {
-			callback: callback,
-			remove: () -> keyboard.downListeners.remove(callback)
-		}
+	public inline function isDown(key:KeyCode):Bool {
+		return keysDown.contains(key);
 	}
 
-	public function notifyOnUp(callback:KeyCode->Void) {
-		keyboard.upListeners.push(callback);
-		return {
-			callback: callback,
-			remove: () -> keyboard.upListeners.remove(callback)
-		}
+	public inline function down(key:KeyCode) {
+		dispatcher.downEvent.emit(key);
 	}
 
-	public function notifyOnPressed(callback:String->Void) {
-		keyboard.pressListeners.push(callback);
-		return {
-			callback: callback,
-			remove: () -> keyboard.pressListeners.remove(callback)
-		}
+	public inline function up(key:KeyCode) {
+		dispatcher.upEvent.emit(key);
 	}
 
-	public function notifyOnHold(callback:(key:KeyCode) -> Void) {
-		holdHandlers.push(callback);
-		return {
-			callback: callback,
-			remove: () -> holdHandlers.remove(callback)
-		}
+	public inline function hold(key:KeyCode) {
+		dispatcher.holdEvent.emit(key);
 	}
 
-	public function notifyOnKeyDown(key:KeyCode, callback:Void->Void) {
-		var handler = {
-			key: key,
-			callback: callback,
-			remove: null
-		};
-		keyDownHandlers.push(handler);
-		handler.remove = () -> keyDownHandlers.remove(handler);
-		return handler;
+	public inline function press(char:String) {
+		dispatcher.pressEvent.emit(char);
 	}
 
-	public function notifyOnCharPressed(char:String, callback:Void->Void) {
-		var handler = {
-			char: char,
-			callback: callback,
-			remove: null
-		};
-		charPressHandlers.push(handler);
-		handler.remove = () -> charPressHandlers.remove(handler);
-		return handler;
+	public inline function onDown(callback:(key:KeyCode) -> Void):EventListener {
+		return dispatcher.downEvent.addListener(callback);
 	}
 
-	public function notifyOnHotKeyPressed(hotkey:Array<KeyCode>, callback:Void->Void) {
-		var handler = {
-			hotkey: hotkey,
-			callback: callback,
-			remove: null
-		};
-		hotkeyHandlers.push(handler);
-		handler.remove = () -> hotkeyHandlers.remove(handler);
-		return handler;
+	public inline function onUp(callback:(key:KeyCode) -> Void):EventListener {
+		return dispatcher.upEvent.addListener(callback);
+	}
+
+	public inline function onHold(callback:(key:KeyCode) -> Void):EventListener {
+		return dispatcher.holdEvent.addListener(callback);
+	}
+
+	public inline function onPressed(callback:(char:String) -> Void):EventListener {
+		return dispatcher.pressEvent.addListener(callback);
+	}
+
+	public inline function onKeyDown(key:KeyCode, callback:Void->Void):EventListener {
+		return dispatcher.downEvent.addListener(callback);
+	}
+
+	public inline function onKeyUp(key:KeyCode, callback:Void->Void):EventListener {
+		return dispatcher.upEvent.addListener(callback);
+	}
+
+	public inline function onKeyHold(key:KeyCode, callback:Void->Void):EventListener {
+		return dispatcher.holdEvent.addListener(callback);
+	}
+
+	public inline function onCharPressed(char:String, callback:Void->Void):EventListener {
+		return dispatcher.pressEvent.addListener(callback);
+	}
+
+	inline function processDown(key:KeyCode) {
+		if (!keysDown.contains(key))
+			keysDown.push(key);
+		dispatcher.emitEvent('${key}PressedEvent', key);
+		timers.set(key, new Timer(() -> {
+			if (isDown(key))
+				hold(key);
+		}, holdInterval));
+		timers.get(key).start();
+	}
+
+	inline function processUp(key:KeyCode) {
+		if (keysDown.contains(key))
+			keysDown.remove(key);
+
+		timers.get(key).stop();
+	}
+
+	inline function processPress(char:String) {
+		dispatcher.emitEvent('${char}PressedEvent', char);
 	}
 }
