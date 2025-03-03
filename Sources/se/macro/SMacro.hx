@@ -1,5 +1,6 @@
 package se.macro;
 
+#if macro
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
@@ -7,7 +8,6 @@ using tink.MacroApi;
 
 @:dox(hide)
 class SMacro {
-	#if macro
 	static var cls:ClassBuilder;
 	static var signals:Map<Member, Array<Expr>>;
 
@@ -334,5 +334,5 @@ class SMacro {
 			$call();
 		};
 	}
-	#end
 }
+#end

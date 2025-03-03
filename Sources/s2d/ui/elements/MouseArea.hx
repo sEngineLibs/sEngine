@@ -22,7 +22,7 @@ class MouseArea extends UISceneElement {
 
 	public function new(?parent:UIElement) {
 		super(parent);
-		Application.input.mouse.notifyOnMoved((mx, my, dx, dy) -> {
+		Application.input.mouse.onMoved((mx, my, dx, dy) -> {
 			final p = mapToGlobal(mx, my);
 			final _x = p.x - x;
 			final _y = p.y - y;
@@ -40,12 +40,12 @@ class MouseArea extends UISceneElement {
 				}
 			}
 		});
-		Application.input.mouse.notifyOnDown((button, x, y) -> {
+		Application.input.mouse.onDown((button, x, y) -> {
 			if (acceptedButtons.contains(button))
 				if (entered)
 					press(button, x, y);
 		});
-		Application.input.mouse.notifyOnUp((button, x, y) -> {
+		Application.input.mouse.onUp((button, x, y) -> {
 			if (acceptedButtons.contains(button)) {
 				release(button, x, y);
 				if (entered)
