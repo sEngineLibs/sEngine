@@ -11,6 +11,10 @@ abstract class PhysicalObject<This:PhysicalObject<This>> extends se.VirtualObjec
 	public var transform:Transform = Mat4.identity();
 	public var transformOrigin:Vec3 = new Vec3(0.0, 0.0, 0.0);
 
+	public inline function new(?parent:This) {
+		super(parent);
+	}
+
 	inline function updateTransform():Void {
 		var t = Mat4.identity();
 		t.translateG(transformOrigin);
