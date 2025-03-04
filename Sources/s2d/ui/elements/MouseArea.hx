@@ -1,7 +1,7 @@
 package s2d.ui.elements;
 
 import se.system.Time;
-import se.Application;
+import se.App;
 import se.system.input.Mouse;
 
 class MouseArea extends UISceneElement {
@@ -22,7 +22,7 @@ class MouseArea extends UISceneElement {
 
 	public function new(?parent:UIElement) {
 		super(parent);
-		Application.input.mouse.onMoved((mx, my, dx, dy) -> {
+		App.input.mouse.onMoved((mx, my, dx, dy) -> {
 			final p = mapToGlobal(mx, my);
 			final _x = p.x - x;
 			final _y = p.y - y;
@@ -40,12 +40,12 @@ class MouseArea extends UISceneElement {
 				}
 			}
 		});
-		Application.input.mouse.onDown((button, x, y) -> {
+		App.input.mouse.onDown((button, x, y) -> {
 			if (acceptedButtons.contains(button))
 				if (entered)
 					press(button, x, y);
 		});
-		Application.input.mouse.onUp((button, x, y) -> {
+		App.input.mouse.onUp((button, x, y) -> {
 			if (acceptedButtons.contains(button)) {
 				release(button, x, y);
 				if (entered)

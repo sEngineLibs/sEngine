@@ -2,7 +2,6 @@
 -cp ../Kha/Sources
 -cp ../Kha/Backends/HTML5
 -cp ../Sources
--L tink_macro
 --macro include('se')
 --macro include('s2d')
 --macro include('s3d')

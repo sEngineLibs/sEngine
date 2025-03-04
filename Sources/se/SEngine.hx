@@ -5,7 +5,7 @@ import kha.Assets;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
-import se.Application;
+import se.App;
 import se.system.Time;
 import se.math.Mat3;
 import se.math.VectorMath;
@@ -16,7 +16,7 @@ import s2d.stage.graphics.Renderer;
 import s2d.ui.UIScene;
 import s2d.ui.graphics.Drawers;
 
-@:allow(se.Application)
+@:allow(se.App)
 class SEngine {
 	static var indices:IndexBuffer;
 	static var vertices:VertexBuffer;
@@ -59,7 +59,7 @@ class SEngine {
 		ind[5] = 0;
 		indices.unlock();
 
-		Application.notifyOnUpdate(update);
+		App.notifyOnUpdate(update);
 
 		resize(window.width, window.height);
 		window.notifyOnResize(resize);

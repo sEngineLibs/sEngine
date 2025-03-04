@@ -1,20 +1,35 @@
 package s2d.ui;
 
-import s2d.geometry.Size;
-import se.Texture;
 import se.Color;
+import se.Texture;
 import se.math.Vec2;
 import se.math.Vec4;
 import se.math.Mat3;
 import se.math.VectorMath;
+import s2d.ui.Anchors;
+import s2d.geometry.Size;
 import s2d.geometry.Rect;
 import s2d.geometry.Bounds;
 import s2d.geometry.Position;
-import s2d.ui.Anchors;
 
-@:build(se.macro.SMacro.build())
 @:allow(s2d.ui.UIScene)
 class UIElement extends PhysicalObject<UIElement> {
+	overload extern public static inline function mapToElement(element:UIElement, x:Float, y:Float):Position {
+		return element.mapFromGlobal(x, y);
+	}
+
+	overload extern public static inline function mapToElement(element:UIElement, p:Position):Position {
+		return element.mapFromGlobal(p.x, p.y);
+	}
+
+	overload extern public static inline function mapFromElement(element:UIElement, x:Float, y:Float):Position {
+		return element.mapToGlobal(x, y);
+	}
+
+	overload extern public static inline function mapFromElement(element:UIElement, p:Position):Position {
+		return element.mapToGlobal(p.x, p.y);
+	}
+
 	var finalOpacity(get, never):Float;
 
 	public var layout:Layout = new Layout();
@@ -27,21 +42,21 @@ class UIElement extends PhysicalObject<UIElement> {
 	public var anchors(get, never):Anchors;
 	public var padding(never, set):Float;
 
-	public var focused:Bool = false;
-	public var visible:Bool = true;
-	public var color:Color = white;
-	public var opacity:Float = 1.0;
-	public var enabled:Bool = true;
-	public var clip:Bool = false;
-	public var x(get, set):Float;
-	public var y(get, set):Float;
+	@:track public var visible:Bool = true;
+	@:track public var focused:Bool = false;
+	@:track public var enabled:Bool = true;
+	@:track public var opacity:Float = 1.0;
+	@:track public var color:Color = white;
+	@:track public var clip:Bool = false;
 
-	public var width(get, set):Float;
-	public var height(get, set):Float;
-	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
-	@:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
-	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
-	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
+	@:track public var x(get, set):Float;
+	@:track public var y(get, set):Float;
+	@:track public var width(get, set):Float;
+	@:track public var height(get, set):Float;
+	@:track public var minWidth:Float = Math.NEGATIVE_INFINITY;
+	@:track public var maxWidth:Float = Math.POSITIVE_INFINITY;
+	@:track public var minHeight:Float = Math.NEGATIVE_INFINITY;
+	@:track public var maxHeight:Float = Math.POSITIVE_INFINITY;
 
 	public var rect(get, set):Rect;
 	public var bounds(get, set):Bounds;
@@ -50,39 +65,37 @@ class UIElement extends PhysicalObject<UIElement> {
 	public var childrenRect(get, never):Rect;
 	public var childrenBounds(get, never):Bounds;
 
-	overload extern public static inline function mapToElement(element:UIElement, x:Float, y:Float):Position {
-		return element.mapFromGlobal(x, y);
-	}
-
-	overload extern public static inline function mapToElement(element:UIElement, p:Position):Position {
-		return element.mapFromGlobal(p);
-	}
-
-	overload extern public static inline function mapFromElement(element:UIElement, x:Float, y:Float):Position {
-		return element.mapToGlobal(x, y);
-	}
-
-	overload extern public static inline function mapFromElement(element:UIElement, p:Position):Position {
-		return element.mapToGlobal(p);
-	}
-
-	public inline function new(?parent:UIElement) {
+	public function new(?parent:UIElement) {
 		super(parent);
+
+		onMinWidthChanged(v -> {
+			width = width;
+		});
+		onMaxWidthChanged(v -> {
+			width = width;
+		});
+		onMinHeightChanged(v -> {
+			height = height;
+		});
+		onMaxHeightChanged(v -> {
+			height = height;
+		});
 	}
 
-	public function onParentChanged(previous:UIElement) {
-		if (parent != null) {
-			x += parent.x ?? 0.0;
-			y += parent.y ?? 0.0;
-		}
-		if (previous != null) {
-			x -= previous.x ?? 0.0;
-			y -= previous.y ?? 0.0;
-		}
+	overload extern public inline function mapFromGlobal(p:Position):Position {
+		return (_transform : Mat3) * p;
 	}
 
-	public function setPadding(value:Float):Void {
-		padding = value;
+	overload extern public inline function mapFromGlobal(x:Float, y:Float):Position {
+		return mapFromGlobal(vec2(x, y));
+	}
+
+	overload extern public inline function mapToGlobal(p:Position):Position {
+		return inverse(_transform) * p;
+	}
+
+	overload extern public inline function mapToGlobal(x:Float, y:Float):Position {
+		return mapToGlobal(vec2(x, y));
 	}
 
 	overload extern public inline function setPosition(x:Float, y:Float):Void {
@@ -91,7 +104,8 @@ class UIElement extends PhysicalObject<UIElement> {
 	}
 
 	overload extern public inline function setPosition(value:Vec2):Void {
-		setPosition(value.x, value.y);
+		this.x = value.x;
+		this.y = value.y;
 	}
 
 	overload extern public inline function setSize(width:Float, height:Float) {
@@ -100,7 +114,8 @@ class UIElement extends PhysicalObject<UIElement> {
 	}
 
 	overload extern public inline function setSize(value:Vec2) {
-		setSize(value.x, value.y);
+		this.width = value.x;
+		this.height = value.y;
 	}
 
 	overload extern public inline function setRect(value:Rect):Void {
@@ -133,20 +148,8 @@ class UIElement extends PhysicalObject<UIElement> {
 		setContentRect(value.toRect());
 	}
 
-	overload extern public inline function mapFromGlobal(p:Position):Position {
-		return (_transform : Mat3) * p;
-	}
-
-	overload extern public inline function mapFromGlobal(x:Float, y:Float):Position {
-		return mapFromGlobal(vec2(x, y));
-	}
-
-	overload extern public inline function mapToGlobal(p:Position):Position {
-		return inverse(_transform) * p;
-	}
-
-	overload extern public inline function mapToGlobal(x:Float, y:Float):Position {
-		return mapToGlobal(vec2(x, y));
+	public function setPadding(value:Float):Void {
+		padding = value;
 	}
 
 	public function childAt(x:Float, y:Float):UIElement {
@@ -270,30 +273,6 @@ class UIElement extends PhysicalObject<UIElement> {
 		return value;
 	}
 
-	inline function set_minWidth(value:Float):Float {
-		minWidth = value;
-		width = width;
-		return value;
-	}
-
-	inline function set_maxWidth(value:Float):Float {
-		maxWidth = value;
-		width = width;
-		return value;
-	}
-
-	inline function set_minHeight(value:Float):Float {
-		minHeight = value;
-		height = height;
-		return value;
-	}
-
-	inline function set_maxHeight(value:Float):Float {
-		maxHeight = value;
-		height = height;
-		return value;
-	}
-
 	inline function get_rect():Rect {
 		return new Rect(x, y, width, height);
 	}
@@ -345,15 +324,15 @@ class UIElement extends PhysicalObject<UIElement> {
 		return childrenBounds.toRect();
 	}
 
-	inline function get_finalOpacity():Float {
-		return parent == null ? opacity : parent.finalOpacity * opacity;
-	}
-
 	inline function set_padding(value:Float) {
 		left.padding = value;
 		top.padding = value;
 		right.padding = value;
 		bottom.padding = value;
 		return value;
+	}
+
+	inline function get_finalOpacity():Float {
+		return parent == null ? opacity : parent.finalOpacity * opacity;
 	}
 }

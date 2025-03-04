@@ -1,9 +1,138 @@
 package se.system.input;
 
 import kha.input.Mouse.MouseCursor;
-import se.system.Time;
-import se.events.EventListener;
-import se.events.EventDispatcher;
+
+#if !macro
+@:build(se.macro.SMacro.build())
+#end
+class Mouse {
+	var buttonsTimers:Map<MouseButton, Timer> = [];
+	var recentPressed:Map<MouseButton, Timer> = [];
+
+	var buttonDownSlots:Map<MouseButton, Array<(x:Int, y:Int) -> Void>> = [];
+	var buttonUpSlots:Map<MouseButton, Array<(x:Int, y:Int) -> Void>> = [];
+	var buttonHoldSlots:Map<MouseButton, Array<Void->Void>> = [];
+
+	public var holdInterval = 0.8;
+	public var doubleClickInterval = 0.5;
+
+	/**
+	 * If set to `true`, locks the cursor position and hides it. For catching movements, use the `dx`/`dy` arguments of your `onMoved` handler.
+	 */
+	@:track public var locked:Bool = false;
+
+	@:track public var x:Int = 0;
+	@:track public var y:Int = 0;
+	@:track public var cursor:MouseCursor = MouseCursor.Default;
+	@:track public var buttonsDown:Array<MouseButton> = [];
+
+	public function new(id:Int = 0) {
+		var mouse = kha.input.Mouse.get(id);
+		mouse.notify(down.emit, up.emit, moved.emit, scrolled.emit);
+
+		onDown(processDown);
+		onUp(processUp);
+		onMoved(processMoved);
+		onHold(processHold);
+		onCursorChanged(mouse.setSystemCursor);
+		onLockedChanged(locked -> if (locked) mouse.lock() else mouse.unlock());
+	}
+
+	public function setSystemCursor(cursor:MouseCursor) {
+		this.cursor = cursor;
+	}
+
+	public function onButtonDown(button:MouseButton, slot:(x:Int, y:Int) -> Void) {
+		if (buttonDownSlots.exists(button))
+			buttonDownSlots.get(button).push(slot);
+		else
+			buttonDownSlots.set(button, [slot]);
+	}
+
+	public function onButtonUp(button:MouseButton, slot:(x:Int, y:Int) -> Void) {
+		if (buttonUpSlots.exists(button))
+			buttonUpSlots.get(button).push(slot);
+		else
+			buttonUpSlots.set(button, [slot]);
+	}
+
+	public function onButtonHold(button:MouseButton, slot:Void->Void) {
+		if (buttonHoldSlots.exists(button))
+			buttonHoldSlots.get(button).push(slot);
+		else
+			buttonHoldSlots.set(button, [slot]);
+	}
+
+	inline function processDown(button:MouseButton, x:Int, y:Int) {
+		var t = new Timer(() -> {
+			if (buttonsTimers.exists(button))
+				hold(button);
+		}, holdInterval);
+		t.start();
+		buttonsTimers.set(button, t);
+
+		buttonsDown = [for (key in buttonsTimers.keys()) key];
+		buttonDown(button, x, y);
+
+		if (recentPressed.exists(button))
+			doubleClicked(button, x, y);
+
+		var d = new Timer(() -> {
+			recentPressed.remove(button);
+		}, doubleClickInterval);
+		d.start();
+		recentPressed.set(button, d);
+	}
+
+	inline function processUp(button:MouseButton, x:Int, y:Int) {
+		buttonsTimers.get(button).stop();
+		buttonsTimers.remove(button);
+
+		buttonUp(button, x, y);
+	}
+
+	inline function processMoved(x:Int, y:Int, dx:Int, dy:Int) {
+		this.x = x;
+		this.y = y;
+	}
+
+	inline function processHold(button:MouseButton) {
+		buttonHold(button);
+	}
+
+	@:signal
+	function down(button:MouseButton, x:Int, y:Int) {}
+
+	@:signal
+	function up(button:MouseButton, x:Int, y:Int) {}
+
+	@:signal
+	function doubleClicked(button:MouseButton, x:Int, y:Int) {}
+
+	@:signal
+	function hold(button:MouseButton) {}
+
+	@:signal
+	function moved(x:Int, y:Int, dx:Int, dy:Int) {}
+
+	@:signal
+	function scrolled(delta:Int) {}
+
+	function buttonDown(button:MouseButton, x:Int, y:Int) {
+		for (slot in buttonDownSlots.get(button))
+			slot(x, y);
+	}
+
+	function buttonUp(button:MouseButton, x:Int, y:Int) {
+		for (slot in buttonUpSlots.get(button))
+			slot(x, y);
+	}
+
+	function buttonHold(button:MouseButton) {
+		for (slot in buttonHoldSlots.get(button))
+			slot();
+	}
+}
 
 enum abstract MouseButton(Int) from Int to Int {
 	var Left;
@@ -11,203 +140,4 @@ enum abstract MouseButton(Int) from Int to Int {
 	var Middle;
 	var Back;
 	var Forward;
-}
-
-@:allow(se.Application)
-@:access(kha.input.Mouse)
-class Mouse {
-	@:isVar var windowID(default, set):Int;
-	var mouse:kha.input.Mouse;
-	var buttonsDown:Array<MouseButton> = [];
-	var buttonHoldEventListeners:Array<{button:MouseButton, listener:EventListener}> = [];
-	var buttonDownHandlers:Array<{button:MouseButton, callback:(x:Int, y:Int) -> Void}> = [];
-	var buttonUpHandlers:Array<{button:MouseButton, callback:(x:Int, y:Int) -> Void}> = [];
-	var holdHandlers:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
-	var buttonHoldHandlers:Array<{button:MouseButton, callback:(x:Int, y:Int) -> Void}> = [];
-	var doubleClickHandlers:Array<(button:MouseButton, x:Int, y:Int) -> Void> = [];
-
-	public var holdInterval:Float = 0.8;
-	@:isVar public var x(default, null):Int = 0;
-	@:isVar public var y(default, null):Int = 0;
-
-	@:isVar public var cursor(default, set):MouseCursor = MouseCursor.Default;
-	public var locked(get, set):Bool;
-
-	function new(?mouseID:Int = 0, ?windowID:Int = 0) {
-		// mouse = kha.input.Mouse.get(mouseID);
-		// if (mouse.windowDownListeners == null)
-		// 	mouse.windowDownListeners = [];
-		// if (mouse.windowUpListeners == null)
-		// 	mouse.windowUpListeners = [];
-		// if (mouse.windowMoveListeners == null)
-		// 	mouse.windowMoveListeners = [];
-		// if (mouse.windowWheelListeners == null)
-		// 	mouse.windowWheelListeners = [];
-		// if (mouse.windowLeaveListeners == null)
-		// 	mouse.windowLeaveListeners = [];
-		// this.windowID = windowID;
-		// onMoved((x, y, mx, my) -> {
-		// 	this.x = x;
-		// 	this.y = y;
-		// });
-		// onDown((button, x, y) -> {
-		// 	for (buttonDownHandler in buttonDownHandlers)
-		// 		if (buttonDownHandler.button == button)
-		// 			buttonDownHandler.callback(x, y);
-		// 	if (!buttonsDown.contains(button)) {
-		// 		buttonsDown.push(button);
-		// 		var time = Time.realTime;
-		// 		buttonHoldEventListeners.push({
-		// 			button: button,
-		// 			listener: dispatcher.addEventListener("buttonHoldEvent", () -> {
-		// 				return buttonsDown.contains(button) && Time.realTime >= time + holdInterval;
-		// 			}, () -> {
-		// 				for (holdHandler in holdHandlers)
-		// 					holdHandler(button, x, y);
-		// 			})
-		// 		});
-		// 	}
-		// });
-		// onUp((button, x, y) -> {
-		// 	for (buttonUpHandler in buttonUpHandlers)
-		// 		if (buttonUpHandler.button == button)
-		// 			buttonUpHandler.callback(x, y);
-		// 	buttonsDown.remove(button);
-		// 	for (buttonHoldEventListener in buttonHoldEventListeners) {
-		// 		if (buttonHoldEventListener.button == button) {
-		// 			dispatcher.removeEventListener("buttonHoldEvent", buttonHoldEventListener.listener);
-		// 			buttonHoldEventListeners.remove(buttonHoldEventListener);
-		// 		}
-		// 	}
-		// });
-		// onHold((button, x, y) -> {
-		// 	for (buttonHoldHandler in buttonHoldHandlers)
-		// 		if (buttonHoldHandler.button == button)
-		// 			buttonHoldHandler.callback(x, y);
-		// });
-	}
-
-	public function onDown(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
-		mouse.windowDownListeners[windowID].push(callback);
-		return {
-			callback: callback,
-			remove: () -> mouse.windowDownListeners[windowID].remove(callback)
-		}
-	}
-
-	public function onButtonDown(button:MouseButton, callback:(x:Int, y:Int) -> Void) {
-		var handler = {
-			button: button,
-			callback: callback,
-			remove: null
-		}
-		buttonDownHandlers.push(handler);
-		handler.remove = () -> buttonDownHandlers.remove(handler);
-		return handler;
-	}
-
-	public function onUp(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
-		mouse.windowUpListeners[windowID].push(callback);
-		return {
-			callback: callback,
-			remove: () -> mouse.windowUpListeners[windowID].remove(callback)
-		}
-	}
-
-	public function onButtonUp(button:MouseButton, callback:(x:Int, y:Int) -> Void) {
-		var handler = {
-			button: button,
-			callback: callback,
-			remove: null
-		}
-		buttonUpHandlers.push(handler);
-		handler.remove = () -> buttonUpHandlers.remove(handler);
-		return handler;
-	}
-
-	public function onMoved(callback:(x:Int, y:Int, dx:Int, dy:Int) -> Void) {
-		mouse.windowMoveListeners[windowID].push(callback);
-		return {
-			callback: callback,
-			remove: () -> mouse.windowMoveListeners[windowID].remove(callback)
-		}
-	}
-
-	public function onScrolled(callback:(delta:Int) -> Void) {
-		mouse.windowWheelListeners[windowID].push(callback);
-		return {
-			callback: callback,
-			remove: () -> mouse.windowWheelListeners[windowID].remove(callback)
-		}
-	}
-
-	public function onLeft(callback:Void->Void) {
-		mouse.windowLeaveListeners[windowID].push(callback);
-		return {
-			callback: callback,
-			remove: () -> mouse.windowLeaveListeners[windowID].remove(callback)
-		}
-	}
-
-	public function onHold(callback:(button:MouseButton, x:Int, y:Int) -> Void) {
-		holdHandlers.push(callback);
-		return {
-			callback: callback,
-			remove: () -> holdHandlers.remove(callback)
-		}
-	}
-
-	public function onButtonHold(button:MouseButton, callback:(x:Int, y:Int) -> Void) {
-		var handler = {
-			button: button,
-			callback: callback,
-			remove: null
-		}
-		buttonHoldHandlers.push(handler);
-		handler.remove = () -> buttonHoldHandlers.remove(handler);
-		return handler;
-	}
-
-	public function onLockChanged(callback:Void->Void) {
-		mouse.notifyOnLockChange(callback, () -> {});
-		return {
-			callback: callback,
-			remove: () -> mouse.removeFromLockChange(callback, () -> {})
-		}
-	}
-
-	inline function set_windowID(value:Int):Int {
-		windowID = value;
-		while (mouse.windowDownListeners.length <= windowID)
-			mouse.windowDownListeners.push([]);
-		while (mouse.windowUpListeners.length <= windowID)
-			mouse.windowUpListeners.push([]);
-		while (mouse.windowMoveListeners.length <= windowID)
-			mouse.windowMoveListeners.push([]);
-		while (mouse.windowWheelListeners.length <= windowID)
-			mouse.windowWheelListeners.push([]);
-		while (mouse.windowLeaveListeners.length <= windowID)
-			mouse.windowLeaveListeners.push([]);
-		return value;
-	}
-
-	inline function set_cursor(value:MouseCursor):MouseCursor {
-		cursor = value;
-		mouse.setSystemCursor(value);
-		return value;
-	}
-
-	inline function get_locked():Bool {
-		return mouse.isLocked();
-	}
-
-	inline function set_locked(value:Bool):Bool {
-		if (locked != value) {
-			if (locked)
-				mouse.unlock();
-			else
-				mouse.lock();
-		}
-		return value;
-	}
 }

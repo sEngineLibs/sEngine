@@ -7,7 +7,7 @@ import se.system.Time;
 import se.system.input.Mouse;
 import se.system.input.Keyboard;
 
-class Application {
+class App {
 	static var updateListeners:Array<Void->Void> = [];
 
 	public static var windows(get, never):Array<Window>;
@@ -18,7 +18,7 @@ class Application {
 
 	public static function start(options:SystemOptions, setup:Void->Void) {
 		System.start(options, function(window) {
-			Application.input = {
+			App.input = {
 				mouse: new Mouse(),
 				keyboard: new Keyboard()
 			}

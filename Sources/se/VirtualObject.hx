@@ -7,10 +7,10 @@ package se;
 abstract class VirtualObject<This:VirtualObject<This>> {
 	var _parent:This;
 
-	public var parent(get, set):This;
+	@:track public var parent(get, set):This;
+	@:track public var index(get, set):Int;
 	public var children:Array<This> = [];
 	public var siblings(get, never):Array<This>;
-	public var index(get, set):Int;
 
 	public function new(?parent:This) {
 		parent?.addChild(cast this);
@@ -18,7 +18,6 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 
 	public function addChild(value:This):Void {
 		if (value != null || value != this || !children.contains(value)) {
-			final prev = value._parent;
 			value._parent = cast this;
 			children.push(value);
 		}

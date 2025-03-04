@@ -2,8 +2,8 @@ package s2d.ui;
 
 import kha.Window;
 import kha.Assets;
+import se.App;
 import se.Texture;
-import se.Application;
 import se.math.Mat3;
 
 using kha.StringExtensions;
@@ -22,7 +22,7 @@ class UIScene extends UIElement {
 		window.notifyOnResize((w, h) -> setSize(w, h));
 	}
 
-	override inline function render(target:Texture) {
+	override function render(target:Texture) {
 		final ctx = target.context2D;
 
 		ctx.begin();
@@ -33,7 +33,7 @@ class UIScene extends UIElement {
 		ctx.style.opacity = 0.85;
 		ctx.transform = Mat3.identity();
 		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-		final e = childAt(Application.input.mouse.x, Application.input.mouse.y);
+		final e = childAt(App.input.mouse.x, App.input.mouse.y);
 		if (e != null)
 			drawBounds(e, target);
 		#end
@@ -135,14 +135,14 @@ class UIScene extends UIElement {
 
 		style.fontSize = 22;
 		final name = e.toString();
-		ctx.drawString(name, Application.input.mouse.x - style.font.widthOfCharacters(style.fontSize, name.toCharArray(), 0, name.length),
-			Application.input.mouse.y - style.font.height(style.fontSize));
+		ctx.drawString(name, App.input.mouse.x - style.font.widthOfCharacters(style.fontSize, name.toCharArray(), 0, name.length),
+			App.input.mouse.y - style.font.height(style.fontSize));
 
 		style.fontSize = 16;
 		final rect = '${Std.int(e.width)} × ${Std.int(e.height)} at (${Std.int(e.x)}, ${Std.int(e.y)})';
-		ctx.drawString(rect, Application.input.mouse.x
+		ctx.drawString(rect, App.input.mouse.x
 			- style.font.widthOfCharacters(style.fontSize, rect.toCharArray(), 0, rect.length),
-			Application.input.mouse.y
+			App.input.mouse.y
 			- style.font.height(style.fontSize)
 			+ style.fontSize);
 	}

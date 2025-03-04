@@ -3,14 +3,15 @@ package s2d.stage.objects;
 import kha.FastFloat;
 import s2d.PhysicalObject;
 
-abstract class StageObject extends PhysicalObject<StageObject> {
+class StageObject extends PhysicalObject<StageObject> {
 	var layer:Layer;
 
-	public var x(get, set):FastFloat;
-	public var y(get, set):FastFloat;
+	@:track public var x(get, set):FastFloat;
+	@:track public var y(get, set):FastFloat;
 
 	public inline function new(layer:Layer) {
 		super(null);
+
 		this.layer = layer;
 	}
 

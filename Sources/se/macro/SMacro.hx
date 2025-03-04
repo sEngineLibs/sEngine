@@ -4,307 +4,161 @@ package se.macro;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
-using tink.MacroApi;
+using se.extensions.StringExt;
 
 @:dox(hide)
-class SMacro {
-	static var cls:ClassBuilder;
-	static var signals:Map<Member, Array<Expr>>;
-
+class SMacro extends Builder {
 	macro public static function build():Array<Field> {
-		return ClassBuilder.run([buildClass]);
+		return new SMacro().export();
 	}
 
-	static public function buildClass(cls:ClassBuilder) {
-		SMacro.cls = cls;
-		signals = [];
-
-		for (member in cls.iterator()) {
-			switch member.extractMeta(":signal") {
-				case Success(meta):
-					if (!signals.exists(member))
-						signals[member] = [];
-				default:
-					null;
-			}
-
-			switch member.extractMeta(":slot") {
-				case Success(meta):
-					if (meta.params.length == 0)
-						Context.warning('Slot must have signal list', meta.pos);
-
-					for (param in meta.params) {
-						switch param.getIdent() {
-							case Success(data):
-								switch cls.memberByName(data) {
-									case Success(signal):
-										if (signals.exists(signal)) {
-											signals[signal].push(member.name.resolve());
-										} else if (signal.hasMeta(":signal")) {
-											signals[signal] = [member.name.resolve()];
-										} else {
-											Context.warning('$data is not a signal', param.pos);
-										}
-									case Failure(failure):
-										Context.warning('Can\'t find signal $data', param.pos);
-								}
-							case Failure(failure):
-								Context.warning(failure.message, param.pos);
-						}
-					}
-				default:
-					null;
-			}
-
-			switch member.extractMeta(":track") {
-				case Success(meta):
-					buildTrack(member);
-				default:
-					null;
-			}
-		}
-
-		var constructor = cls.getConstructor();
-
-		for (signal in signals.keys()) {
-			buildSignal(signal);
-
-			// connect slots to the signal
-			var signalRef = signal.name.resolve();
-			for (slot in signals[signal] ?? [])
-				constructor.addStatement(macro $signalRef.connect($slot));
-		}
+	function run() {
+		for (field in fields)
+			for (meta in field.meta ?? [])
+				switch (meta.name) {
+					case ":signal":
+						buildSignal(field);
+					case ":track":
+						buildTrack(field);
+				}
 	}
 
-	static function buildSignal(member:Member):Void {
-		switch (member.kind) {
+	function buildSignal(field:Field):Void {
+		switch (field.kind) {
 			case FFun(f):
-				// define abstract methods
-				var emit = Member.method("emit", {
-					args: f.args,
-					ret: macro :Void,
-					expr: macro {
-						for (slot in this)
-							slot(${
-								for (arg in f.args)
-									macro $i{arg.name}
-							});
-					}
-				}).addMeta(":op", [macro a()]);
-				emit.isBound = true;
-
-				var connect = Member.method("connect", {
-					args: [{name: "slot"}],
-					ret: macro :Void,
-					expr: macro this.push(slot)
-				});
-				connect.isBound = true;
-
-				var disconnect = Member.method("disconnect", {
-					args: [{name: "slot"}],
-					ret: macro :Void,
-					expr: macro this.remove(slot)
-				});
-				disconnect.isBound = true;
+				for (arg in f.args)
+					arg.type = resolve(arg.type ?? expected());
+				f.ret = resolve(f.ret ?? expected());
 
 				// define underlying type
 				var _t = ComplexType.TFunction([
 					for (arg in f.args) {
 						var t = TNamed(arg.name, arg.type);
-						if (arg.opt) TOptional(t); else t;
+						if (arg.opt) TOptional(t) else t;
 					}
 				], f.ret ?? macro :Void);
 				var t = macro :Array<$_t>;
+				var typeName = '${cls.name}_${field.name}_Signal';
 
-				// define abstract
-				var signalName = '${cls.target.name}_${member.name}_Signal';
-				var params = [
-					for (param in cls.target.params)
-						{
-							name: param.name,
-							defaultType: param.defaultType?.toComplex()
-						}
-				];
 				Context.defineType({
-					params: [
-						for (param in cls.target.params)
-							{
-								name: param.name,
-								defaultType: param.defaultType?.toComplex()
-							}
-					],
-					pack: cls.target.pack,
-					meta: [
-						{
-							name: ":forward.new",
-							pos: Context.currentPos()
-						}
-					],
-					name: signalName,
+					params: cls.params.map(p -> {
+						name: p.name,
+						defaultType: p.defaultType != null ? toComplex(p.defaultType) : null,
+						constraints: null,
+						params: null,
+						meta: null
+					}),
+					pack: cls.pack,
+					meta: [meta(":forward.new"), meta(":dox", [macro hide])],
+					name: typeName,
 					isExtern: true,
 					kind: TDAbstract(t, [AbFrom(t), AbTo(t)]),
-					fields: [emit, connect, disconnect],
+					fields: [
+						method("emit", fun(f.args, macro :Void,
+							macro {
+								for (slot in this)
+									slot(${
+										for (arg in f.args)
+											macro $i{arg.name}
+									});
+							}),
+							[APublic, AInline], [meta(":op", [macro a()])]),
+						method("connect", fun([arg("slot", _t)], macro :Void, macro this.push(slot)), [APublic, AInline]),
+						method("disconnect", fun([arg("slot", _t)], macro :Void, macro this.remove(slot)), [APublic, AInline]),
+					],
 					pos: Context.currentPos()
 				});
 
-				member.meta = [];
-				member.kind = FVar(TPath({
-					pack: cls.target.pack,
-					name: signalName,
+				field.kind = FVar(TPath({
+					pack: cls.pack,
+					name: typeName,
 					params: [
-						for (param in cls.target.params)
-							TPType(param.t.toComplex())
+						for (param in cls.params)
+							TPType(toComplex(param.t))
 					]
 				}), macro []);
 
 				// add connector
-				var connector = Member.method('on${member.name.charAt(0).toUpperCase() + member.name.substr(1)}', {
-					args: [{name: "slot"}],
-					expr: macro $i{member.name}.connect(slot)
-				});
-				connector.isBound = true;
-				cls.addMember(connector);
+				add(method('on${field.name.capitalize()}', fun([arg("slot", _t)], macro $i{field.name}.connect(slot)), [APublic, AInline]));
+
 			default:
-				Context.error("Signal must be a function, not " + member, member.pos);
+				err("Signal must be function", field.pos);
 		}
 	}
 
-	static function buildTrack(member:Member):Void {
-		switch (member.kind) {
+	function buildTrack(field:Field):Void {
+		switch (field.kind) {
 			case FVar(t, e):
-				member.meta = [
+				field.meta = [
 					{
 						name: ":isVar",
 						pos: Context.currentPos()
 					}
 				];
-				member.kind = FProp('default', 'set', t, e);
+				field.kind = FProp("default", "default", t, e);
+				buildTrack(field);
 
-				// generate signal
-				var signal = Member.method('${member.name}Changed', Context.currentPos(), member.isPublic, {
-					args: [{name: member.name, type: t}],
-					expr: macro {}
-				});
-				cls.addMember(signal);
-
-				if (!signals.exists(signal))
-					signals[signal] = [];
-
-				// generate setter
-				var fieldRef = member.name.resolve();
-				var setter = Member.method('set_${member.name}', false, {
-					args: [{name: "value", type: t}],
-					expr: macro {
-						$fieldRef = value;
-						${signal.name.resolve()}($fieldRef);
-						trace($fieldRef);
-						return $fieldRef;
-					}
-				});
-				setter.asField().access = [AExtern, APrivate, AInline];
-				cls.addMember(setter);
 			case FProp(get, set, t, e):
 				switch (set) {
 					case "never", "dynamic":
-						Context.error('Can\'t track a property with no write access.', member.pos);
+						err("Can\'t track a property with no write access", field.pos);
 
 					case "default":
-						member.kind = FProp(get, "set", t, e);
-
-						// generate signal
-						var signal = Member.method('${member.name}Changed', member.isPublic, {
-							args: [{name: member.name, type: t}]
-						});
-						cls.addMember(signal);
-
-						if (!signals.exists(signal))
-							signals[signal] = [];
-
-						// generate setter
-						var fieldRef = member.name.resolve();
-						var setter = Member.method('set_${member.name}', false, {
-							args: [{name: "value", type: t}],
-							expr: macro {
-								$fieldRef = value;
-								${signal.name.resolve()}($fieldRef);
-								return $fieldRef;
-							},
-						});
-						setter.asField().access = [AExtern, APrivate, AInline];
-						cls.addMember(setter);
+						field.kind = FProp(get, "set", t, e);
+						buildTrack(field);
 
 					case "set", "null":
-						switch cls.memberByName('set_${member.name}') {
-							case Success(setter):
-								// generate signal
-								var signal:Field = {
-									name: '${member.name}Changed',
-									access: member.isPublic ? [APublic, AInline] : [AInline],
-									kind: FFun({
-										args: [{name: member.name, type: t}]
-									}),
-									pos: Context.currentPos()
-								}
-								switch (setter.kind) {
-									case FFun(f):
-										f.expr = injectCall(f.expr, signal.name.resolve());
-									default: Context.error("Setter must be function", setter.pos);
-								}
-
-								cls.addMember(signal);
-								if (!signals.exists(signal)) {
-									signals[signal] = [];
-								}
-
-							case Failure(failure):
-								Context.error("Can't find setter: " + 'set_${member.name}', member.pos);
+						var _setter = find('set_${field.name}');
+						if (_setter != null) {
+							switch (_setter.kind) {
+								case FFun(f):
+									// generate signal
+									var signal = method('${field.name}Changed', fun([arg(field.name, t)], macro {}));
+									add(signal);
+									buildSignal(signal);
+									// inject
+									f.expr = injectCall(f.expr, macro $i{signal.name});
+								default:
+									err("Setter must be function", _setter.pos);
+							}
+						} else {
+							// generate setter
+							add(setter(field, fun([arg("value", t)], macro {
+								$i{field.name} = value;
+								return $i{field.name};
+							}), [APrivate, AInline]));
+							buildTrack(field);
 						}
 				}
-			case FFun(f):
-				if (f.ret == null)
-					Context.error("Function return must be type-hinted", member.pos);
-				else {
-					// generate signal
-					var signal:Field = {
-						name: '${member.name}Called',
-						access: member.isPublic ? [APublic, AInline] : [AInline],
-						kind: FFun({
-							args: switch (f.ret) {
-								case TPath(p):
-									p.name == "Void" ? [] : [{name: "result", type: f.ret}];
-								default: [{name: "result", type: f.ret}];
-							}
-						}),
-						pos: Context.currentPos()
-					}
-					f.expr = injectCall(f.expr, signal.name.resolve());
 
-					cls.addMember(signal);
-					if (!signals.exists(signal))
-						signals[signal] = [];
-				}
-			default:
-				null;
+			case FFun(f):
+				f.ret = f.ret ?? expected();
+				// generate signal
+				var signal = method('${field.name}Called', fun(switch (f.ret) {
+					case TPath(p):
+						p.name == "Void" ? [] : [arg("result", f.ret)];
+					default: [arg("result", f.ret)];
+				}, macro {}));
+				add(signal);
+				buildSignal(signal);
+				// inject
+				f.expr = injectCall(f.expr, macro $i{signal.name});
 		}
 	}
 
-	static function injectCall(f:Expr, call:Expr):Expr {
+	function injectCall(f:Expr, call:Expr):Expr {
 		function inject(f:Expr, call:Expr):Expr {
 			function replace(e:Expr):Expr {
 				if (e != null)
 					return switch (e.expr) {
 						case EReturn(eValue):
-							if (eValue != null) {
-								macro {
-									final result = $eValue;
-									$call(result);
-									return result;
-								}
-							} else {
-								macro {
-									$call();
-									return;
-								}
+							if (eValue != null) macro {
+								final result = $eValue;
+								$call(result);
+								return result;
+							} else macro {
+								$call();
+								return;
 							}
 						case EIf(econd, ethen, eelse):
 							macro {
@@ -314,21 +168,18 @@ class SMacro {
 									${replace(eelse)};
 							}
 						default:
-							e.map(replace);
+							map(e, replace);
 					}
 				else
 					return e;
 			}
-
 			return replace(f);
 		}
-
-		if (f.has((e) -> switch (e.expr) {
+		if (has(f, (e) -> switch (e.expr) {
 			case EReturn(e): true;
 			default: false;
 		}))
 			return inject(f, call);
-
 		return macro {
 			$f;
 			$call();

@@ -2,7 +2,7 @@ package se.system;
 
 import kha.System;
 
-@:allow(se.Application)
+@:allow(se.App)
 class Time {
 	public static var realTime:Float = 0.0;
 	public static var time:Float = 0.0;
@@ -49,7 +49,7 @@ class Time {
 	}
 
 	static function init() {
-		Application.notifyOnUpdate(update);
+		App.notifyOnUpdate(update);
 	}
 
 	static function update() {

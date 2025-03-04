@@ -1,111 +1,143 @@
 package se.system.input;
 
 import kha.input.KeyCode;
-import se.events.Event;
-import se.events.EventListener;
-import se.events.EventDispatcher;
 
-@:allow(se.Application)
-@:access(kha.input.Keyboard)
+#if !macro
+@:build(se.macro.SMacro.build())
+#end
 class Keyboard {
-	var dispatcher:EventDispatcher = new EventDispatcher();
-	var keyEvents = {
-		down: new Map<KeyCode, Event>(),
-		up: new Map<KeyCode, Event>(),
-		pressed: new Map<KeyCode, Event>(),
-		hold: new Map<KeyCode, Event>(),
-	};
-	var charEvents:Map<KeyCode, Event> = [];
+	var keysTimers:Map<KeyCode, Timer> = [];
+	var hotkeyListeners:Map<Array<KeyCode>, Array<Void->Void>> = [];
 
-	var timers:Map<KeyCode, Timer> = [];
+	var keyDownSlots:Map<KeyCode, Array<Void->Void>> = [];
+	var keyUpSlots:Map<KeyCode, Array<Void->Void>> = [];
+	var keyHoldSlots:Map<KeyCode, Array<Void->Void>> = [];
+	var charPressedSlots:Map<String, Array<Void->Void>> = [];
 
-	var keyboard:kha.input.Keyboard;
-	var keysDown:Array<KeyCode> = [];
+	public var holdInterval = 0.8;
 
-	public var holdInterval:Float = 0.8;
+	@:track public var keysDown:Array<kha.input.KeyCode> = [];
 
-	function new(?keyboardID = 0) {
-		keyboard = kha.input.Keyboard.get(keyboardID);
-		keyboard.notify(down, up, press);
+	public function new(id:Int = 0) {
+		kha.input.Keyboard.get(id).notify(down.emit, up.emit, pressed.emit);
 
-		dispatcher.downEvent = new Event([processDown]);
-		dispatcher.upEvent = new Event([processUp]);
-		dispatcher.pressEvent = new Event([processPress]);
-
-		dispatcher.holdEvent = new Event();
+		onDown(processDown);
+		onUp(processUp);
+		onPressed(processPressed);
+		onHold(processHold);
 	}
 
-	public inline function isDown(key:KeyCode):Bool {
-		return keysDown.contains(key);
+	public function onHotkeyDown(hotkey:Array<KeyCode>, slot:Void->Void) {
+		if (hotkeyListeners.exists(hotkey))
+			hotkeyListeners.get(hotkey).push(slot);
+		else
+			hotkeyListeners.set(hotkey, [slot]);
 	}
 
-	public inline function down(key:KeyCode) {
-		dispatcher.downEvent.emit(key);
+	public function onKeyDown(key:KeyCode, slot:Void->Void) {
+		if (keyDownSlots.exists(key))
+			keyDownSlots.get(key).push(slot);
+		else
+			keyDownSlots.set(key, [slot]);
 	}
 
-	public inline function up(key:KeyCode) {
-		dispatcher.upEvent.emit(key);
+	public function onKeyUp(key:KeyCode, slot:Void->Void) {
+		if (keyUpSlots.exists(key))
+			keyUpSlots.get(key).push(slot);
+		else
+			keyUpSlots.set(key, [slot]);
 	}
 
-	public inline function hold(key:KeyCode) {
-		dispatcher.holdEvent.emit(key);
+	public function onKeyHold(key:KeyCode, slot:Void->Void) {
+		if (keyHoldSlots.exists(key))
+			keyHoldSlots.get(key).push(slot);
+		else
+			keyHoldSlots.set(key, [slot]);
 	}
 
-	public inline function press(char:String) {
-		dispatcher.pressEvent.emit(char);
-	}
-
-	public inline function onDown(callback:(key:KeyCode) -> Void):EventListener {
-		return dispatcher.downEvent.addListener(callback);
-	}
-
-	public inline function onUp(callback:(key:KeyCode) -> Void):EventListener {
-		return dispatcher.upEvent.addListener(callback);
-	}
-
-	public inline function onHold(callback:(key:KeyCode) -> Void):EventListener {
-		return dispatcher.holdEvent.addListener(callback);
-	}
-
-	public inline function onPressed(callback:(char:String) -> Void):EventListener {
-		return dispatcher.pressEvent.addListener(callback);
-	}
-
-	public inline function onKeyDown(key:KeyCode, callback:Void->Void):EventListener {
-		return dispatcher.downEvent.addListener(callback);
-	}
-
-	public inline function onKeyUp(key:KeyCode, callback:Void->Void):EventListener {
-		return dispatcher.upEvent.addListener(callback);
-	}
-
-	public inline function onKeyHold(key:KeyCode, callback:Void->Void):EventListener {
-		return dispatcher.holdEvent.addListener(callback);
-	}
-
-	public inline function onCharPressed(char:String, callback:Void->Void):EventListener {
-		return dispatcher.pressEvent.addListener(callback);
+	public function onCharPressed(char:String, slot:Void->Void) {
+		if (charPressedSlots.exists(char))
+			charPressedSlots.get(char).push(slot);
+		else
+			charPressedSlots.set(char, [slot]);
 	}
 
 	inline function processDown(key:KeyCode) {
-		if (!keysDown.contains(key))
-			keysDown.push(key);
-		dispatcher.emitEvent('${key}PressedEvent', key);
-		timers.set(key, new Timer(() -> {
-			if (isDown(key))
+		var t = new Timer(() -> {
+			if (keysTimers.exists(key))
 				hold(key);
-		}, holdInterval));
-		timers.get(key).start();
+		}, holdInterval);
+		t.start();
+		keysTimers.set(key, t);
+		keysDown = [for (key in keysTimers.keys()) key];
+
+		keyDown(key);
+		hotkeyDown(keysDown);
 	}
 
 	inline function processUp(key:KeyCode) {
-		if (keysDown.contains(key))
-			keysDown.remove(key);
+		keysTimers.get(key).stop();
+		keysTimers.remove(key);
+		keysDown = [for (key in keysTimers.keys()) key];
 
-		timers.get(key).stop();
+		keyUp(key);
+		hotkeyDown(keysDown);
 	}
 
-	inline function processPress(char:String) {
-		dispatcher.emitEvent('${char}PressedEvent', char);
+	inline function processHold(key:KeyCode) {
+		keyHold(key);
+	}
+
+	inline function processPressed(char:String) {
+		charPressed(char);
+	}
+
+	@:signal
+	function down(key:kha.input.KeyCode) {}
+
+	@:signal
+	function up(key:kha.input.KeyCode) {}
+
+	@:signal
+	function hold(key:kha.input.KeyCode) {}
+
+	@:signal
+	function pressed(char:String) {}
+
+	function hotkeyDown(hotkey:Array<KeyCode>) {
+		for (listener in hotkeyListeners.keyValueIterator())
+			if (listener.key.length == hotkey.length) {
+				var flag = true;
+				for (k in listener.key)
+					if (!hotkey.contains(k)) {
+						flag = false;
+						break;
+					}
+				if (flag) {
+					for (callback in listener.value)
+						callback();
+					break;
+				}
+			}
+	}
+
+	function keyDown(key:KeyCode) {
+		for (slot in keyDownSlots.get(key))
+			slot();
+	}
+
+	function keyUp(key:KeyCode) {
+		for (slot in keyUpSlots.get(key))
+			slot();
+	}
+
+	function keyHold(key:KeyCode) {
+		for (slot in keyHoldSlots.get(key))
+			slot();
+	}
+
+	function charPressed(char:String) {
+		for (slot in charPressedSlots.get(char))
+			slot();
 	}
 }

@@ -9,7 +9,7 @@ using se.extensions.VectorExt;
 class Sprite extends StageObject {
 	var _id:UInt;
 
-	public var mesh:Mesh;
+	@:track public var mesh:Mesh;
 	public var cropRect:Vec4 = new Vec4(0.0, 0.0, 1.0, 1.0);
 	#if (S2D_SPRITE_INSTANCING == 1)
 	@:isVar public var atlas(default, set):SpriteAtlas;
@@ -33,7 +33,9 @@ class Sprite extends StageObject {
 
 	public function new(atlas:SpriteAtlas, ?polygons:Array<Vec2>) {
 		super(atlas.layer);
+
 		layer.addSprite(this);
+
 		this.atlas = atlas;
 		if (polygons != null)
 			this.mesh = polygons;

@@ -114,7 +114,6 @@ const shaderOutputDir = path.join(cwd, "build", "shaders_assembled");
 assembleShaders(shaderInputDir, shaderOutputDir);
 
 let project = new Project("s2D");
-project.addLibrary("tink_macro");
 project.addSources("Sources");
 project.addAssets("Assets/**", {
     nameBaseDir: "assets",

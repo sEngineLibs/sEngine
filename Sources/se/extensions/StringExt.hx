@@ -24,7 +24,7 @@ class StringExt {
 	}
 
 	public static function capitalize(word:String):String {
-		return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
+		return word.charAt(0).toUpperCase() + word.substr(1);
 	}
 
 	public static function capitalizeWords(str:String, delimiter:String = ' '):String {

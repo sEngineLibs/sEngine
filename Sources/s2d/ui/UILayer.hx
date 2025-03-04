@@ -1,8 +1,8 @@
 package s2d.ui;
 
 import kha.graphics4.TextureFormat;
+import se.App;
 import se.Texture;
-import se.Application;
 import s2d.geometry.RectI;
 import s2d.geometry.SizeI;
 import s2d.ui.effects.ShaderEffect;
@@ -27,7 +27,7 @@ class UILayer {
 			if (textureSize.width > 0 && textureSize.height > 0)
 				texture = new Texture(textureSize.width, textureSize.height, format, NoDepthAndStencil, samples);
 			else
-				texture = new Texture(Application.windows[0].width, Application.windows[0].height, format, NoDepthAndStencil, samples);
+				texture = new Texture(App.windows[0].width, App.windows[0].height, format, NoDepthAndStencil, samples);
 		} else {
 			texture.unload();
 			texture = null;
