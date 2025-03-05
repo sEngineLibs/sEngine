@@ -18,6 +18,7 @@ class Mouse {
 
 	/**
 	 * If set to `true`, locks the cursor position and hides it. For catching movements, use the `dx`/`dy` arguments of your `onMoved` handler.
+	 * @param a bbbb
 	 */
 	@:track public var locked:Bool = false;
 
@@ -29,7 +30,6 @@ class Mouse {
 	public function new(id:Int = 0) {
 		var mouse = kha.input.Mouse.get(id);
 		mouse.notify(down.emit, up.emit, moved.emit, scrolled.emit);
-
 		onDown(processDown);
 		onUp(processUp);
 		onMoved(processMoved);
@@ -100,23 +100,17 @@ class Mouse {
 		buttonHold(button);
 	}
 
-	@:signal
-	function down(button:MouseButton, x:Int, y:Int) {}
+	@:signal function down(button:MouseButton, x:Int, y:Int);
 
-	@:signal
-	function up(button:MouseButton, x:Int, y:Int) {}
+	@:signal function up(button:MouseButton, x:Int, y:Int);
 
-	@:signal
-	function doubleClicked(button:MouseButton, x:Int, y:Int) {}
+	@:signal function doubleClicked(button:MouseButton, x:Int, y:Int);
 
-	@:signal
-	function hold(button:MouseButton) {}
+	@:signal function hold(button:MouseButton);
 
-	@:signal
-	function moved(x:Int, y:Int, dx:Int, dy:Int) {}
+	@:signal function moved(x:Int, y:Int, dx:Int, dy:Int);
 
-	@:signal
-	function scrolled(delta:Int) {}
+	@:signal function scrolled(delta:Int);
 
 	function buttonDown(button:MouseButton, x:Int, y:Int) {
 		for (slot in buttonDownSlots.get(button))

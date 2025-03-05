@@ -92,17 +92,13 @@ class Keyboard {
 		charPressed(char);
 	}
 
-	@:signal
-	function down(key:kha.input.KeyCode) {}
+	@:signal function down(key:kha.input.KeyCode);
 
-	@:signal
-	function up(key:kha.input.KeyCode) {}
+	@:signal function up(key:kha.input.KeyCode);
 
-	@:signal
-	function hold(key:kha.input.KeyCode) {}
+	@:signal function hold(key:kha.input.KeyCode);
 
-	@:signal
-	function pressed(char:String) {}
+	@:signal function pressed(char:String);
 
 	function hotkeyDown(hotkey:Array<KeyCode>) {
 		for (listener in hotkeyListeners.keyValueIterator())
