@@ -7,7 +7,6 @@ abstract class Control extends UISceneElement {
 	public var content:UIElement;
 
 	public var hovered(get, never):Bool;
-	public var pressed(get, never):Bool;
 
 	function new(?scene:UIScene) {
 		super(scene);
@@ -30,10 +29,6 @@ abstract class Control extends UISceneElement {
 	}
 
 	inline function get_hovered():Bool {
-		return mouseArea.entered;
-	}
-
-	inline function get_pressed():Bool {
-		return mouseArea.pressed;
+		return mouseArea.isEntered;
 	}
 }

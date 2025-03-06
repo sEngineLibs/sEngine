@@ -78,7 +78,7 @@ class LightingDeferred {
 	@:access(s2d.stage.objects.Light)
 	@:access(s2d.stage.graphics.Renderer)
 	public static function render():Void {
-		final ctx = Renderer.buffer.tgt.context3D;
+		final ctx = Renderer.buffer.tgt.ctx3D;
 
 		// emission + (environment)
 		ctx.begin();

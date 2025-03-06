@@ -28,7 +28,7 @@ abstract class ElementDrawer<T> {
 	}
 
 	inline function render(target:Texture, element:T) {
-		final ctx = target.context2D, ctx3d = target.context3D;
+		final ctx = target.ctx2D, ctx3d = target.ctx3D;
 
 		ctx.pipeline = pipeline;
 		ctx3d.setPipeline(pipeline);

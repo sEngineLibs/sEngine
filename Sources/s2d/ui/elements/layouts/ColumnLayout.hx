@@ -74,7 +74,7 @@ class ColumnLayout extends UISceneElement {
 	}
 
 	override function renderTree(target:Texture) {
-		final ctx = target.context2D;
+		final ctx = target.ctx2D;
 
 		syncTransform();
 		ctx.transform = _transform;

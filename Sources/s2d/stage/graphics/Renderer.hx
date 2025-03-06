@@ -122,7 +122,7 @@ class Renderer {
 
 	@:access(s2d.stage.objects.Sprite)
 	static function _render():Void {
-		final ctx = Renderer.buffer.tgt.context3D;
+		final ctx = Renderer.buffer.tgt.ctx3D;
 
 		ctx.begin();
 		ctx.clear(Black);

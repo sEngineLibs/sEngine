@@ -68,7 +68,7 @@ class SMacro extends Builder {
 		switch (field.kind) {
 			case FFun(f):
 				if (f.expr != null)
-					warn("Signal is not a real function and its body will be removed", f.expr.pos);
+					warn("Beware: Signal is not a real function and its body will be removed", f.expr.pos);
 
 				for (arg in f.args)
 					arg.type = resolve(arg.type ?? expected());
@@ -90,6 +90,15 @@ class SMacro extends Builder {
 				], macro :Void);
 				var typeName = '${cls.name}_${field.name}_Signal';
 
+				var stypepath = {
+					pack: cls.pack,
+					name: typeName,
+					params: [
+						for (param in cls.params)
+							TPType(toComplex(param.t))
+					]
+				};
+
 				if (maskKeys.length == 0) {
 					Context.defineType(tdAbstract(cls.pack, typeName, macro :Array<$_t>, [
 						method("emit", fun(f.args, macro :Void,
@@ -103,6 +112,7 @@ class SMacro extends Builder {
 							[APublic, AInline], [meta(":op", [macro a()])]),
 						method("connect", fun([arg("slot", _t)], macro :Void, macro this.push(slot)), [APublic, AInline]),
 						method("disconnect", fun([arg("slot", _t)], macro :Void, macro this.remove(slot)), [APublic, AInline]),
+						method("clear", fun([], macro :Void, macro this = new $stypepath()), [APublic, AInline])
 					],
 						[AbFrom(macro :Array<$_t>), AbTo(macro :Array<$_t>)], [meta(":forward.new"), meta(":dox", [macro hide])], cls.params.map(p -> {
 							name: p.name,
@@ -131,21 +141,15 @@ class SMacro extends Builder {
 					Call `${field.name}($callDoc)` or `${field.name}.emit($callDoc)` to emit the signal
 					';
 
-					field.access = isPublic ? [APublic] : [APrivate];
-					var stypepath = {
-						pack: cls.pack,
-						name: typeName,
-						params: [
-							for (param in cls.params)
-								TPType(toComplex(param.t))
-						]
-					};
 					field.kind = FVar(TPath(stypepath), macro new $stypepath());
+					field.access = isPublic ? [APublic] : [APrivate];
 
 					// add connector
-					var connector = method('on${field.name.capitalize()}', fun([arg("slot", _t)], macro $i{field.name}.connect(slot)), [APublic, AInline]);
+					var connector = method('on${field.name.capitalize()}', fun([arg("slot", _t)], macro {
+						$i{field.name}.connect(slot);
+					}), [APublic, AInline]);
 					connector.doc = '
-					This function is a shortcut for `${field.name}` signal\'s function `connect` which connects slots to it.
+					Shortcut for `${field.name}` signal\'s function `connect` which connects slots to it.
 					@param slot a callback to invoke when `${field.name}` is emitted
 					';
 					add(connector);
@@ -161,6 +165,15 @@ class SMacro extends Builder {
 						for (k in sidents)
 							'p.key.$k'
 					]), sidentsExpr);
+
+					var stypepath = {
+						pack: cls.pack,
+						name: typeName,
+						params: [
+							for (param in cls.params)
+								TPType(toComplex(param.t))
+						]
+					};
 
 					Context.defineType(tdAbstract(cls.pack, typeName, underlying, [
 						method("emit", fun(f.args, macro :Void, macro {
@@ -193,13 +206,16 @@ class SMacro extends Builder {
 									])
 								}, [slot]);
 						}), [APublic, AInline]),
-						method("disconnect", fun([arg("slot", _t)], macro :Void, macro {
-							for (slotList in this)
-								if (slotList.contains(slot)) {
-									slotList.remove(slot);
-									break;
-								}
-						}), [APublic, AInline])
+						method("disconnect", fun([arg("slot", _t)], macro :Void,
+							macro {
+								for (slotList in this)
+									if (slotList.contains(slot)) {
+										slotList.remove(slot);
+										break;
+									}
+							}),
+							[APublic, AInline]),
+						method("clear", fun([], macro :Void, macro this = new $stypepath()), [APublic, AInline])
 					], [AbFrom(underlying), AbTo(underlying)],
 						[meta(":forward.new"), meta(":dox", [macro hide])], cls.params.map(p -> {
 							name: p.name,
@@ -226,15 +242,6 @@ class SMacro extends Builder {
 					';
 
 					field.access = isPublic ? [APublic] : [APrivate];
-
-					var stypepath = {
-						pack: cls.pack,
-						name: typeName,
-						params: [
-							for (param in cls.params)
-								TPType(toComplex(param.t))
-						]
-					};
 					field.kind = FVar(TPath(stypepath), macro new $stypepath());
 
 					// add connector
@@ -247,12 +254,23 @@ class SMacro extends Builder {
 					for (key in maskKeys)
 						maskDoc += '\n@param ${key.name} Mask parameter of the slot';
 					connector.doc = '
-					This function is a shortcut for `${field.name}` signal\'s function `connect` which connects slots to it.
+					Shortcut for `${field.name}` signal\'s function `connect` which connects slots to it.
 					$maskDoc
 					@param slot a callback to invoke when `${field.name}` is emitted
 					';
 					add(connector);
 				}
+
+				// add disconnector
+				var disconnector = method('off${field.name.capitalize()}', fun([arg("slot", _t)], macro {
+					$i{field.name}.disconnect(slot);
+				}), [APublic, AInline]);
+
+				disconnector.doc = '
+					Shortcut for `${field.name}` signal\'s function `disconnect` which disconnects slots from it.
+					@param slot a callback to remove from `${field.name}`\'s list
+					';
+				add(disconnector);
 
 			default:
 				err("Signal must be declared as a function. Use the `:track` meta to track this field\'s value", field.pos);

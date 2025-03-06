@@ -38,6 +38,10 @@ abstract class Builder {
 
 // SHORTCUTS
 
+function info(msg:String, ?pos:Position) {
+	Context.info(msg, pos ?? Context.currentPos());
+}
+
 function warn(msg:String, ?pos:Position) {
 	Context.warning(msg, pos ?? Context.currentPos());
 }

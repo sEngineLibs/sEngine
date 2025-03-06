@@ -6,19 +6,19 @@ import se.math.Vec4;
 import se.math.VectorMath;
 
 @:forward.new
-enum abstract Color(KhaColor) from KhaColor to KhaColor {
-	inline final black = 0xff000000;
-	inline final white = 0xffffffff;
-	inline final red = 0xffff0000;
-	inline final blue = 0xff0000ff;
-	inline final green = 0xff00ff00;
-	inline final magenta = 0xffff00ff;
-	inline final yellow = 0xffffff00;
-	inline final cyan = 0xff00ffff;
-	inline final purple = 0xff800080;
-	inline final pink = 0xffffc0cb;
-	inline final orange = 0xffffa500;
-	inline final transparent = 0x00000000;
+extern enum abstract Color(KhaColor) from KhaColor to KhaColor {
+	inline final Black = 0xff000000;
+	inline final White = 0xffffffff;
+	inline final Red = 0xffff0000;
+	inline final Blue = 0xff0000ff;
+	inline final Green = 0xff00ff00;
+	inline final Magenta = 0xffff00ff;
+	inline final Yellow = 0xffffff00;
+	inline final Cyan = 0xff00ffff;
+	inline final Purple = 0xff800080;
+	inline final Pink = 0xffffc0cb;
+	inline final Orange = 0xffffa500;
+	inline final Transparent = 0x00000000;
 
 	public var r(get, set):Float;
 	public var g(get, set):Float;
@@ -110,29 +110,29 @@ enum abstract Color(KhaColor) from KhaColor to KhaColor {
 	public static inline function fromString(value:String):Color {
 		return switch (value.toLowerCase()) {
 			case "black":
-				Color.black;
+				Color.Black;
 			case "white":
-				Color.white;
+				Color.White;
 			case "red":
-				Color.red;
+				Color.Red;
 			case "blue":
-				Color.blue;
+				Color.Blue;
 			case "green":
-				Color.green;
+				Color.Green;
 			case "magenta":
-				Color.magenta;
+				Color.Magenta;
 			case "yellow":
-				Color.yellow;
+				Color.Yellow;
 			case "cyan":
-				Color.cyan;
+				Color.Cyan;
 			case "purple":
-				Color.purple;
+				Color.Purple;
 			case "pink":
-				Color.pink;
+				Color.Pink;
 			case "orange":
-				Color.orange;
+				Color.Orange;
 			case "transparent":
-				Color.transparent;
+				Color.Transparent;
 			default:
 				kha.Color.fromString(value);
 		}

@@ -7,11 +7,11 @@ import kha.input.KeyCode;
 #end
 class Keyboard {
 	var keysTimers:Map<KeyCode, Timer> = [];
-	var hotkeyListeners:Map<Array<KeyCode>, Array<Void->Void>> = [];
+	var hotkeyListeners:Map<Set<KeyCode>, Array<Void->Void>> = [];
 
 	public var holdInterval = 0.8;
 
-	@:track public var keysDown:Array<KeyCode> = [];
+	@:track public var keysDown:Set<KeyCode> = [];
 
 	@:signal function down(key:KeyCode);
 
@@ -32,50 +32,39 @@ class Keyboard {
 	public function new(id:Int = 0) {
 		kha.input.Keyboard.get(id).notify(down.emit, up.emit, pressed.emit);
 
-		onDown(processDown);
-		onUp(processUp);
-		onPressed(processPressed);
-		onHold(processHold);
+		onDown(key -> {
+			var t = new Timer(() -> {
+				if (keysTimers.exists(key))
+					hold(key);
+			}, holdInterval);
+			t.start();
+			keysTimers.set(key, t);
+			keysDown = [for (key in keysTimers.keys()) key];
+
+			keyDown(key);
+			hotkeyDown(keysDown);
+		});
+		onUp(key -> {
+			keysTimers.get(key).stop();
+			keysTimers.remove(key);
+			keysDown = [for (key in keysTimers.keys()) key];
+
+			keyUp(key);
+			hotkeyDown(keysDown);
+		});
+
+		onPressed(charPressed.emit);
+		onHold(keyHold.emit);
 	}
 
-	public function onHotkeyDown(hotkey:Array<KeyCode>, slot:Void->Void) {
+	public function onHotkeyDown(hotkey:Set<KeyCode>, slot:Void->Void) {
 		if (hotkeyListeners.exists(hotkey))
 			hotkeyListeners.get(hotkey).push(slot);
 		else
 			hotkeyListeners.set(hotkey, [slot]);
 	}
 
-	inline function processDown(key:KeyCode) {
-		var t = new Timer(() -> {
-			if (keysTimers.exists(key))
-				hold(key);
-		}, holdInterval);
-		t.start();
-		keysTimers.set(key, t);
-		keysDown = [for (key in keysTimers.keys()) key];
-
-		keyDown(key);
-		hotkeyDown(keysDown);
-	}
-
-	inline function processUp(key:KeyCode) {
-		keysTimers.get(key).stop();
-		keysTimers.remove(key);
-		keysDown = [for (key in keysTimers.keys()) key];
-
-		keyUp(key);
-		hotkeyDown(keysDown);
-	}
-
-	inline function processHold(key:KeyCode) {
-		keyHold(key);
-	}
-
-	inline function processPressed(char:String) {
-		charPressed(char);
-	}
-
-	function hotkeyDown(hotkey:Array<KeyCode>) {
+	function hotkeyDown(hotkey:Set<KeyCode>) {
 		for (listener in hotkeyListeners.keyValueIterator())
 			if (listener.key.length == hotkey.length) {
 				var flag = true;

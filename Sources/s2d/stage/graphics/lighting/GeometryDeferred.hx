@@ -64,7 +64,7 @@ class GeometryDeferred {
 
 	@:access(s2d.stage.graphics.Renderer)
 	public static function render():Void {
-		final ctx = Renderer.buffer.depthMap.context3D;
+		final ctx = Renderer.buffer.depthMap.ctx3D;
 		ctx.begin([
 			Renderer.buffer.albedoMap,
 			Renderer.buffer.normalMap,

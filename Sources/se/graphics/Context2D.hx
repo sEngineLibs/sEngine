@@ -2,9 +2,9 @@ package se.graphics;
 
 import kha.graphics2.Graphics;
 import s2d.Transform;
+import s2d.Alignment;
 import se.math.Vec2;
 import se.math.VectorMath.vec2;
-import s2d.Alignment;
 
 @:forward(pipeline, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)
 extern abstract Context2D(Graphics) from Graphics {
@@ -23,6 +23,13 @@ extern abstract Context2D(Graphics) from Graphics {
 		return this.transformation = value;
 	}
 
+	public inline function render(?clear:Bool, ?clearColor:Color = Transparent, commands:Array<Context2D->Void>) {
+		this.begin(clear, clearColor);
+		for (c in commands)
+			c(this);
+		this.end();
+	}
+
 	public inline function begin() {
 		this.begin(false);
 	}
@@ -31,7 +38,7 @@ extern abstract Context2D(Graphics) from Graphics {
 		this.clear(color);
 	}
 
-	public inline function drawImage(img:Image, x:Int, y:Int) {
+	public inline function drawImage(img:Image, x:Float, y:Float) {
 		this.drawImage(img, x, y);
 	}
 

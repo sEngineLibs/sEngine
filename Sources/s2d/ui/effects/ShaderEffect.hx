@@ -11,7 +11,7 @@ abstract class ShaderEffect {
 	abstract function draw(source:Image, target:Texture):Void;
 
 	public function apply(source:Image, target:Texture) {
-		final ctx = target.context2D;
+		final ctx = target.ctx2D;
 
 		ctx.pipeline = @:privateAccess shader.pipeline;
 		draw(source, target);

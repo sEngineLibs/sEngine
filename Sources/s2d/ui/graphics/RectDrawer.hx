@@ -31,7 +31,7 @@ class RectDrawer extends ElementDrawer<RoundedRectangle> {
 	}
 
 	inline function draw(target:Texture, rectangle:RoundedRectangle) {
-		final ctx = target.context2D, ctx3d = target.context3D;
+		final ctx = target.ctx2D, ctx3d = target.ctx3D;
 
 		final border = rectangle.border;
 		final radius = clamp(rectangle.radius, 0.0, Math.min(rectangle.width, rectangle.height) / 2);

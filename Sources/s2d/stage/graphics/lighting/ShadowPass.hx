@@ -38,7 +38,7 @@ class ShadowPass {
 		final target = @:privateAccess Renderer.buffer.shadowMap;
 		target.setDepthStencilFrom(Renderer.buffer.depthMap);
 
-		final ctx = target.context3D;
+		final ctx = target.ctx3D;
 		ctx.begin();
 		ctx.clear(White);
 		if (light.isMappingShadows) {

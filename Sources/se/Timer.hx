@@ -15,10 +15,10 @@ class Timer {
 	public var started:Bool = false;
 
 	/**
-	 * Creates a timer and immediately starts it
-	 * @param callback A function to call after the timer was triggered
-	 * @param delay Amount of seconds to wait
-	 * @return Returns the timer instance
+		Creates a timer and immediately starts it
+		@param callback A function to call after the timer was triggered
+		@param delay Amount of seconds to wait
+		@return Returns the timer instance
 	 */
 	public static function set(callback:Void->Void, delay:Float):Timer {
 		final timer = new Timer(callback, delay);
@@ -27,9 +27,9 @@ class Timer {
 	}
 
 	/**
-	 * Creates a timer
-	 * @param callback A function to call after the timer was triggered
-	 * @param delay Amount of seconds to wait
+		Creates a timer
+		@param callback A function to call after the timer was triggered
+		@param delay Amount of seconds to wait
 	 */
 	public function new(callback:Void->Void, delay:Float) {
 		this.callback = callback;
@@ -37,9 +37,9 @@ class Timer {
 	}
 
 	/**
-	 * Starts the timer
-	 * @param lock Whether to skip if the timer is already started
-	 * @return Returns true if the timer was started
+		Starts the timer
+		@param lock Whether to skip if the timer is already started
+		@return Returns true if the timer was started
 	 */
 	public function start(?lock:Bool = true):Bool {
 		if (!lock || !started) {
@@ -54,7 +54,7 @@ class Timer {
 	}
 
 	/**
-	 * Stops the timer
+		Stops the timer
 	 */
 	public function stop() {
 		started = false;
@@ -62,10 +62,10 @@ class Timer {
 	}
 
 	/**
-	 * Starts the timer repeatedly.
-	 * @param count How many times to start the timer.
-	 * @param lock Whether to skip if the timer is already started
-	 * @return Returns true if the timer was started
+		Starts the timer repeatedly.
+		@param count How many times to start the timer.
+		@param lock Whether to skip if the timer is already started
+		@return Returns true if the timer was started
 	 */
 	public function repeat(count:Int = 1, ?lock:Bool = true):Bool {
 		if (count < 0)

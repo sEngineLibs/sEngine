@@ -19,10 +19,10 @@ class Time {
 	}> = [];
 
 	/**
-	 * Adds a time listener
-	 * @param callback A function to call
-	 * @param time Timestamp in seconds
-	 * @return Returns a listener
+		Adds a time listener
+		@param callback A function to call
+		@param time Timestamp in seconds
+		@return Returns a listener
 	 */
 	public static function notifyOnTime(callback:Void->Void, time:Float) {
 		var listener = {f: callback, time: time};
@@ -31,10 +31,10 @@ class Time {
 	}
 
 	/**
-	 * Adds a real time listener
-	 * @param callback A function to call
-	 * @param time Real timestamp in seconds
-	 * @return Returns a listener
+		Adds a real time listener
+		@param callback A function to call
+		@param time Real timestamp in seconds
+		@return Returns a listener
 	 */
 	public static function notifyOnRealTime(callback:Void->Void, time:Float) {
 		var listener = {f: callback, time: time};

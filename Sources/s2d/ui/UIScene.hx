@@ -23,13 +23,13 @@ class UIScene extends UIElement {
 	}
 
 	override function render(target:Texture) {
-		final ctx = target.context2D;
+		final ctx = target.ctx2D;
 
 		ctx.begin();
 		for (child in children)
 			child.render(target);
 
-		ctx.style.color = se.Color.rgb(1.0, 1.0, 1.0);
+		ctx.style.color = White;
 		ctx.style.opacity = 0.85;
 		ctx.transform = Mat3.identity();
 		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
@@ -42,7 +42,7 @@ class UIScene extends UIElement {
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 	inline function drawBounds(e:UIElement, target:Texture) {
-		final ctx = target.context2D;
+		final ctx = target.ctx2D;
 		final style = ctx.style;
 
 		style.font = Assets.fonts.get("Roboto_Regular");
@@ -57,7 +57,7 @@ class UIScene extends UIElement {
 		final rp = e.right.padding;
 		final bp = e.bottom.padding;
 
-		style.color = se.Color.rgb(0.0, 0.0, 0.0);
+		style.color = Black;
 		ctx.fillRect(e.x - lm, e.y - tm, e.width + rm, e.height + bm);
 
 		// margins

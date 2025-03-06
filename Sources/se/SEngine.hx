@@ -109,7 +109,7 @@ class SEngine {
 		var frame = Renderer.render();
 		UIScene.current.render(frame);
 		#if S2D_DEBUG_FPS
-		showFPS(frame.context2D);
+		showFPS(frame.ctx2D);
 		#end
 		return frame;
 	}
@@ -121,9 +121,9 @@ class SEngine {
 		ctx.begin();
 		ctx.style.font = Assets.fonts.Roboto_Regular;
 		ctx.style.fontSize = 14;
-		ctx.style.color = black;
+		ctx.style.color = Black;
 		ctx.drawString('FPS: ${fps}', 6, 6);
-		ctx.style.color = white;
+		ctx.style.color = White;
 		ctx.drawString('FPS: ${fps}', 5, 5);
 		ctx.end();
 	}

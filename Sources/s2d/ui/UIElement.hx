@@ -46,7 +46,7 @@ class UIElement extends PhysicalObject<UIElement> {
 	@:track public var focused:Bool = false;
 	@:track public var enabled:Bool = true;
 	@:track public var opacity:Float = 1.0;
-	@:track public var color:Color = white;
+	@:track public var color:Color = White;
 	@:track public var clip:Bool = false;
 
 	@:track public var x(get, set):Float;
@@ -177,10 +177,10 @@ class UIElement extends PhysicalObject<UIElement> {
 	}
 
 	function render(target:Texture) {
-		final ctx = target.context2D;
+		final ctx = target.ctx2D;
 
 		if (layer.enabled) {
-			final _ctx = layer.texture.context2D;
+			final _ctx = layer.texture.ctx2D;
 			final sr = layer.sourceRect;
 
 			ctx.end();
@@ -202,7 +202,7 @@ class UIElement extends PhysicalObject<UIElement> {
 	}
 
 	function renderTree(target:Texture) {
-		final ctx = target.context2D;
+		final ctx = target.ctx2D;
 
 		syncTransform();
 		ctx.transform = _transform;

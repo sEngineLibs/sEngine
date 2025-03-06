@@ -28,8 +28,8 @@ class Filter extends PPEffect {
 
 	@:access(s2d.stage.graphics.Renderer)
 	function render(target:Texture) {
-		final ctx = target.context2D;
-		final ctx3d = target.context3D;
+		final ctx = target.ctx2D;
+		final ctx3d = target.ctx3D;
 
 		ctx.begin();
 		ctx3d.setPipeline(pipeline);
