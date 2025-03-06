@@ -66,6 +66,14 @@ function arg(name:String, ?type:ComplexType):FunctionArg {
 	}
 }
 
+function args(v:Array<{name:String, ?type:ComplexType}>) {
+	return v.map(a -> arg(a.name, a.type));
+}
+
+function anon(fields:Array<Field>):ComplexType {
+	return TAnonymous(fields);
+}
+
 function def(t:TypeDefinition, ?moduleDependency:String):Void {
 	Context.defineType(t, moduleDependency);
 }
@@ -222,79 +230,27 @@ overload extern inline function resolve(usings:Array<Ref<haxe.macro.Type.ClassTy
 	});
 }
 
-function opt(e:Null<Expr>, f:Expr->Expr):Expr {
-	return e == null ? null : f(e);
+function eq(a:Expr, b:Expr) {
+	return macro $a == $b;
 }
 
-function map(e:Expr, f:Expr->Expr):Expr {
-	return {
-		pos: e.pos,
-		expr: switch (e.expr) {
-			case EConst(_): e.expr;
-			case EArray(e1, e2): EArray(f(e1), f(e2));
-			case EBinop(op, e1, e2): EBinop(op, f(e1), f(e2));
-			case EField(e, field, kind): EField(f(e), field, kind);
-			case EParenthesis(e): EParenthesis(f(e));
-			case EObjectDecl(fields):
-				var ret = [];
-				for (field in fields)
-					ret.push({field: field.field, expr: f(field.expr), quotes: field.quotes});
-				EObjectDecl(ret);
-			case EArrayDecl(el): EArrayDecl(el.map(e -> map(e, f)));
-			case ECall(e, params): ECall(f(e), params.map(e -> map(e, f)));
-			case ENew(tp, params): ENew(tp, params.map(e -> map(e, f)));
-			case EUnop(op, postFix, e): EUnop(op, postFix, f(e));
-			case EVars(vars):
-				var ret = [];
-				for (v in vars) {
-					var v2:Var = {name: v.name, type: v.type, expr: opt(v.expr, f)};
-					if (v.isFinal != null)
-						v2.isFinal = v.isFinal;
-					ret.push(v2);
-				}
-				EVars(ret);
-			case EBlock(el): EBlock(el.map(e -> map(e, f)));
-			case EFor(it, expr): EFor(f(it), f(expr));
-			case EIf(econd, eif, eelse): EIf(f(econd), f(eif), opt(eelse, f));
-			case EWhile(econd, e, normalWhile): EWhile(f(econd), f(e), normalWhile);
-			case EReturn(e): EReturn(opt(e, f));
-			case EUntyped(e): EUntyped(f(e));
-			case EThrow(e): EThrow(f(e));
-			case ECast(e, t): ECast(f(e), t);
-			case EIs(e, t): EIs(f(e), t);
-			case EDisplay(e, dk): EDisplay(f(e), dk);
-			case ETernary(econd, eif, eelse): ETernary(f(econd), f(eif), f(eelse));
-			case ECheckType(e, t): ECheckType(f(e), t);
-			case EContinue, EBreak:
-				e.expr;
-			case ETry(e, catches):
-				var ret = [];
-				for (c in catches)
-					ret.push({name: c.name, type: c.type, expr: f(c.expr)});
-				ETry(f(e), ret);
-			case ESwitch(e, cases, edef):
-				var ret = [];
-				for (c in cases)
-					ret.push({expr: opt(c.expr, f), guard: opt(c.guard, f), values: c.values.map(e -> map(e, f))});
-				ESwitch(f(e), ret, edef == null || edef.expr == null ? edef : f(edef));
-			case EFunction(kind, func):
-				var ret = [];
-				for (arg in func.args)
-					ret.push({
-						name: arg.name,
-						opt: arg.opt,
-						type: arg.type,
-						value: opt(arg.value, f)
-					});
-				EFunction(kind, {
-					args: ret,
-					ret: func.ret,
-					params: func.params,
-					expr: f(func.expr)
-				});
-			case EMeta(m, e): EMeta(m, f(e));
-		}
-	};
+function eqChain(a:Array<Expr>, b:Array<Expr>) {
+	if (a.length == 1 && b.length == 1)
+		return macro ${a[0]} == ${b[0]}
+	else
+		return macro ${a[0]} == ${b[0]} && ${eqChain(a.slice(1), b.slice(1))};
+}
+
+function ident(name:String):Expr {
+	var s = name.split(".");
+	if (s.length == 1)
+		return macro $i{name}; // Too many arguments
+	else
+		return macro $p{s};
+}
+
+function idents(names:Array<String>) {
+	return names.map(name -> ident(name));
 }
 
 function has(e:Expr, condition:Expr->Bool, ?options:{?enterFunctions:Bool}) {

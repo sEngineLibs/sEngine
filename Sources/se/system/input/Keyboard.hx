@@ -9,14 +9,25 @@ class Keyboard {
 	var keysTimers:Map<KeyCode, Timer> = [];
 	var hotkeyListeners:Map<Array<KeyCode>, Array<Void->Void>> = [];
 
-	var keyDownSlots:Map<KeyCode, Array<Void->Void>> = [];
-	var keyUpSlots:Map<KeyCode, Array<Void->Void>> = [];
-	var keyHoldSlots:Map<KeyCode, Array<Void->Void>> = [];
-	var charPressedSlots:Map<String, Array<Void->Void>> = [];
-
 	public var holdInterval = 0.8;
 
-	@:track public var keysDown:Array<kha.input.KeyCode> = [];
+	@:track public var keysDown:Array<KeyCode> = [];
+
+	@:signal function down(key:KeyCode);
+
+	@:signal function up(key:KeyCode);
+
+	@:signal function hold(key:KeyCode);
+
+	@:signal function pressed(char:String);
+
+	@:signal(key) function keyDown(key:KeyCode);
+
+	@:signal(key) function keyUp(key:KeyCode);
+
+	@:signal(key) function keyHold(key:KeyCode);
+
+	@:signal(char) function charPressed(char:String);
 
 	public function new(id:Int = 0) {
 		kha.input.Keyboard.get(id).notify(down.emit, up.emit, pressed.emit);
@@ -32,34 +43,6 @@ class Keyboard {
 			hotkeyListeners.get(hotkey).push(slot);
 		else
 			hotkeyListeners.set(hotkey, [slot]);
-	}
-
-	public function onKeyDown(key:KeyCode, slot:Void->Void) {
-		if (keyDownSlots.exists(key))
-			keyDownSlots.get(key).push(slot);
-		else
-			keyDownSlots.set(key, [slot]);
-	}
-
-	public function onKeyUp(key:KeyCode, slot:Void->Void) {
-		if (keyUpSlots.exists(key))
-			keyUpSlots.get(key).push(slot);
-		else
-			keyUpSlots.set(key, [slot]);
-	}
-
-	public function onKeyHold(key:KeyCode, slot:Void->Void) {
-		if (keyHoldSlots.exists(key))
-			keyHoldSlots.get(key).push(slot);
-		else
-			keyHoldSlots.set(key, [slot]);
-	}
-
-	public function onCharPressed(char:String, slot:Void->Void) {
-		if (charPressedSlots.exists(char))
-			charPressedSlots.get(char).push(slot);
-		else
-			charPressedSlots.set(char, [slot]);
 	}
 
 	inline function processDown(key:KeyCode) {
@@ -92,14 +75,6 @@ class Keyboard {
 		charPressed(char);
 	}
 
-	@:signal function down(key:kha.input.KeyCode);
-
-	@:signal function up(key:kha.input.KeyCode);
-
-	@:signal function hold(key:kha.input.KeyCode);
-
-	@:signal function pressed(char:String);
-
 	function hotkeyDown(hotkey:Array<KeyCode>) {
 		for (listener in hotkeyListeners.keyValueIterator())
 			if (listener.key.length == hotkey.length) {
@@ -115,25 +90,5 @@ class Keyboard {
 					break;
 				}
 			}
-	}
-
-	function keyDown(key:KeyCode) {
-		for (slot in keyDownSlots.get(key))
-			slot();
-	}
-
-	function keyUp(key:KeyCode) {
-		for (slot in keyUpSlots.get(key))
-			slot();
-	}
-
-	function keyHold(key:KeyCode) {
-		for (slot in keyHoldSlots.get(key))
-			slot();
-	}
-
-	function charPressed(char:String) {
-		for (slot in charPressedSlots.get(char))
-			slot();
 	}
 }

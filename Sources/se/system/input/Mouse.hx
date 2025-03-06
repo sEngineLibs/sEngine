@@ -27,9 +27,28 @@ class Mouse {
 	@:track public var cursor:MouseCursor = MouseCursor.Default;
 	@:track public var buttonsDown:Array<MouseButton> = [];
 
+	@:signal function down(button:MouseButton, x:Int, y:Int);
+
+	@:signal function up(button:MouseButton, x:Int, y:Int);
+
+	@:signal function doubleClicked(button:MouseButton, x:Int, y:Int);
+
+	@:signal function hold(button:MouseButton);
+
+	@:signal function moved(x:Int, y:Int, dx:Int, dy:Int);
+
+	@:signal function scrolled(delta:Int);
+
+	@:signal(button) function buttonDown(button:MouseButton, x:Int, y:Int);
+
+	@:signal(button) function buttonUp(button:MouseButton, x:Int, y:Int);
+
+	@:signal(button) function buttonHold(button:MouseButton);
+
 	public function new(id:Int = 0) {
 		var mouse = kha.input.Mouse.get(id);
 		mouse.notify(down.emit, up.emit, moved.emit, scrolled.emit);
+
 		onDown(processDown);
 		onUp(processUp);
 		onMoved(processMoved);
@@ -40,27 +59,6 @@ class Mouse {
 
 	public function setSystemCursor(cursor:MouseCursor) {
 		this.cursor = cursor;
-	}
-
-	public function onButtonDown(button:MouseButton, slot:(x:Int, y:Int) -> Void) {
-		if (buttonDownSlots.exists(button))
-			buttonDownSlots.get(button).push(slot);
-		else
-			buttonDownSlots.set(button, [slot]);
-	}
-
-	public function onButtonUp(button:MouseButton, slot:(x:Int, y:Int) -> Void) {
-		if (buttonUpSlots.exists(button))
-			buttonUpSlots.get(button).push(slot);
-		else
-			buttonUpSlots.set(button, [slot]);
-	}
-
-	public function onButtonHold(button:MouseButton, slot:Void->Void) {
-		if (buttonHoldSlots.exists(button))
-			buttonHoldSlots.get(button).push(slot);
-		else
-			buttonHoldSlots.set(button, [slot]);
 	}
 
 	inline function processDown(button:MouseButton, x:Int, y:Int) {
@@ -98,33 +96,6 @@ class Mouse {
 
 	inline function processHold(button:MouseButton) {
 		buttonHold(button);
-	}
-
-	@:signal function down(button:MouseButton, x:Int, y:Int);
-
-	@:signal function up(button:MouseButton, x:Int, y:Int);
-
-	@:signal function doubleClicked(button:MouseButton, x:Int, y:Int);
-
-	@:signal function hold(button:MouseButton);
-
-	@:signal function moved(x:Int, y:Int, dx:Int, dy:Int);
-
-	@:signal function scrolled(delta:Int);
-
-	function buttonDown(button:MouseButton, x:Int, y:Int) {
-		for (slot in buttonDownSlots.get(button))
-			slot(x, y);
-	}
-
-	function buttonUp(button:MouseButton, x:Int, y:Int) {
-		for (slot in buttonUpSlots.get(button))
-			slot(x, y);
-	}
-
-	function buttonHold(button:MouseButton) {
-		for (slot in buttonHoldSlots.get(button))
-			slot();
 	}
 }
 

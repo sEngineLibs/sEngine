@@ -1,12 +1,12 @@
 package se.macro;
 
-import haxe.macro.ComplexTypeTools;
 #if macro
 import haxe.macro.Expr;
 import haxe.macro.Context;
 import se.macro.Builder;
 
 using haxe.macro.ExprTools;
+using haxe.macro.ComplexTypeTools;
 using se.extensions.StringExt;
 
 @:dox(hide)
@@ -72,74 +72,187 @@ class SMacro extends Builder {
 
 				for (arg in f.args)
 					arg.type = resolve(arg.type ?? expected());
-				f.ret = resolve(f.ret ?? expected());
+
+				var maskedArgs = [];
+				var maskKeys = [];
+				for (arg in f.args)
+					if (!mask.contains(arg.name))
+						maskedArgs.push(arg);
+					else
+						maskKeys.push(arg);
 
 				// define underlying type
 				var _t = ComplexType.TFunction([
-					for (arg in f.args) {
+					for (arg in maskedArgs) {
 						var t = TNamed(arg.name, arg.type);
 						if (arg.opt) TOptional(t) else t;
 					}
-				], f.ret ?? macro :Void);
+				], macro :Void);
 				var typeName = '${cls.name}_${field.name}_Signal';
 
-				Context.defineType(tdAbstract(cls.pack, typeName, macro :Array<$_t>, [
-					method("emit", fun(f.args, macro :Void,
-						macro {
-							for (slot in this)
-								slot(${
-									for (arg in f.args)
-										macro $i{arg.name}
-								});
-						}),
-						[APublic, AInline], [meta(":op", [macro a()])]),
-					method("connect", fun([arg("slot", _t)], macro :Void, macro this.push(slot)), [APublic, AInline]),
-					method("disconnect", fun([arg("slot", _t)], macro :Void, macro this.remove(slot)), [APublic, AInline]),
-				],
-					[AbFrom(macro :Array<$_t>), AbTo(macro :Array<$_t>)], [meta(":forward.new"), meta(":dox", [macro hide])], cls.params.map(p -> {
-						name: p.name,
-						defaultType: p.defaultType != null ? toComplex(p.defaultType) : null,
-						constraints: null,
-						params: null,
-						meta: null
-					}), true));
+				if (maskKeys.length == 0) {
+					Context.defineType(tdAbstract(cls.pack, typeName, macro :Array<$_t>, [
+						method("emit", fun(f.args, macro :Void,
+							macro {
+								for (slot in this)
+									slot(${
+										for (arg in f.args)
+											macro $i{arg.name}
+									});
+							}),
+							[APublic, AInline], [meta(":op", [macro a()])]),
+						method("connect", fun([arg("slot", _t)], macro :Void, macro this.push(slot)), [APublic, AInline]),
+						method("disconnect", fun([arg("slot", _t)], macro :Void, macro this.remove(slot)), [APublic, AInline]),
+					],
+						[AbFrom(macro :Array<$_t>), AbTo(macro :Array<$_t>)], [meta(":forward.new"), meta(":dox", [macro hide])], cls.params.map(p -> {
+							name: p.name,
+							defaultType: p.defaultType != null ? toComplex(p.defaultType) : null,
+							constraints: null,
+							params: null,
+							meta: null
+						}), true));
 
-				// docs
-				var paramDoc = "";
-				var callDoc = "";
-				for (arg in f.args) {
-					paramDoc += '${arg.name}:${switch arg.type {
-						case TPath(p): p.sub ?? p.name;
-						default: 'Void';
-					}}, ';
-					callDoc += '${arg.name}, ';
+					// docs
+					var paramDoc = "";
+					var callDoc = "";
+					for (arg in f.args) {
+						paramDoc += '${arg.name}:${switch arg.type {
+							case TPath(p): p.sub ?? p.name;
+							default: 'Void';
+						}}, ';
+						callDoc += '${arg.name}, ';
+					}
+					paramDoc = '`${paramDoc.substring(0, paramDoc.length - 2)}`' + (f.args.length == 1 ? " parameter" : " parameters");
+					callDoc = '${callDoc.substring(0, callDoc.length - 2)}';
+
+					field.doc = '
+					This signal invokes its slots ${f.args.length > 0 ? 'with $paramDoc' : ""} when emitted.
+					
+					Call `${field.name}($callDoc)` or `${field.name}.emit($callDoc)` to emit the signal
+					';
+
+					field.access = isPublic ? [APublic] : [APrivate];
+					var stypepath = {
+						pack: cls.pack,
+						name: typeName,
+						params: [
+							for (param in cls.params)
+								TPType(toComplex(param.t))
+						]
+					};
+					field.kind = FVar(TPath(stypepath), macro new $stypepath());
+
+					// add connector
+					var connector = method('on${field.name.capitalize()}', fun([arg("slot", _t)], macro $i{field.name}.connect(slot)), [APublic, AInline]);
+					connector.doc = '
+					This function is a shortcut for `${field.name}` signal\'s function `connect` which connects slots to it.
+					@param slot a callback to invoke when `${field.name}` is emitted
+					';
+					add(connector);
 				}
-				paramDoc = '`${paramDoc.substring(0, paramDoc.length - 2)}`' + (f.args.length == 1 ? " parameter" : " parameters");
-				callDoc = '${callDoc.substring(0, callDoc.length - 2)}';
+				// masked signal
+				else {
+					var _m = anon(maskKeys.map(k -> variable(k.name, k.type)));
+					var underlying = macro :Map<$_m, Array<$_t>>;
 
-				field.doc = '
-				This signal executes its slots ${f.args.length > 0 ? 'with $paramDoc' : ""} when emitted.
-				
-				Call `${field.name}($callDoc)` or `${field.name}.emit($callDoc)` to emit the signal
-				';
+					var sidents = maskKeys.map(k -> k.name);
+					var sidentsExpr = idents(sidents);
+					var cond = eqChain(idents([
+						for (k in sidents)
+							'p.key.$k'
+					]), sidentsExpr);
 
-				field.access = isPublic ? [APublic] : [APrivate];
-				field.kind = FVar(TPath({
-					pack: cls.pack,
-					name: typeName,
-					params: [
-						for (param in cls.params)
-							TPType(toComplex(param.t))
-					]
-				}), macro []);
+					Context.defineType(tdAbstract(cls.pack, typeName, underlying, [
+						method("emit", fun(f.args, macro :Void, macro {
+							for (p in this.keyValueIterator()) {
+								if ($cond) {
+									for (slot in p.value) {
+										slot(${
+											for (arg in maskedArgs)
+												macro $i{arg.name}
+										});
+										break;
+									}
+								}
+							}
+						}), [APublic, AInline],
+							[meta(":op", [macro a()])]),
+						method("connect", fun(args(maskKeys).concat([arg("slot", _t)]), macro :Void, macro {
+							var flag = false;
+							for (p in this.keyValueIterator())
+								if ($cond) {
+									p.value.push(slot);
+									flag = true;
+									break;
+								}
+							if (!flag)
+								this.set(${
+									obj([
+										for (k in maskKeys)
+											objField(k.name, macro $i{k.name})
+									])
+								}, [slot]);
+						}), [APublic, AInline]),
+						method("disconnect", fun([arg("slot", _t)], macro :Void, macro {
+							for (slotList in this)
+								if (slotList.contains(slot)) {
+									slotList.remove(slot);
+									break;
+								}
+						}), [APublic, AInline])
+					], [AbFrom(underlying), AbTo(underlying)],
+						[meta(":forward.new"), meta(":dox", [macro hide])], cls.params.map(p -> {
+							name: p.name,
+							defaultType: p.defaultType != null ? toComplex(p.defaultType) : null,
+							constraints: null,
+							params: null,
+							meta: null
+						}), true));
 
-				// add connector
-				var connector = method('on${field.name.capitalize()}', fun([arg("slot", _t)], macro $i{field.name}.connect(slot)), [APublic, AInline]);
-				connector.doc = '
-				This function is a shortcut for `${field.name}` signal\'s function `connect` which connects slots to it.
-				@param slot a callback to execute when `${field.name}` is emitted
-				';
-				add(connector);
+					// docs
+					var maskValuesDoc = "";
+					for (key in maskKeys)
+						maskValuesDoc += '`${key.name}:${key.type.toString()}`';
+					var callDoc = "";
+					for (arg in f.args)
+						callDoc += '${arg.name}, ';
+					callDoc = '${callDoc.substring(0, callDoc.length - 2)}';
+
+					field.doc = '
+					When this signal is emitted, only the slots with the exact parameter mask 
+					($maskValuesDoc) values are invoked.
+
+					Call `${field.name}($callDoc)` or `${field.name}.emit($callDoc)` to emit the signal
+					';
+
+					field.access = isPublic ? [APublic] : [APrivate];
+
+					var stypepath = {
+						pack: cls.pack,
+						name: typeName,
+						params: [
+							for (param in cls.params)
+								TPType(toComplex(param.t))
+						]
+					};
+					field.kind = FVar(TPath(stypepath), macro new $stypepath());
+
+					// add connector
+					var cargs = sidentsExpr.concat([macro slot]);
+					var connector = method('on${field.name.capitalize()}', fun(args(maskKeys).concat([arg("slot", _t)]), macro {
+						$i{field.name}.connect($a{cargs});
+					}), [APublic, AInline]);
+
+					var maskDoc = "";
+					for (key in maskKeys)
+						maskDoc += '\n@param ${key.name} Mask parameter of the slot';
+					connector.doc = '
+					This function is a shortcut for `${field.name}` signal\'s function `connect` which connects slots to it.
+					$maskDoc
+					@param slot a callback to invoke when `${field.name}` is emitted
+					';
+					add(connector);
+				}
 
 			default:
 				err("Signal must be declared as a function. Use the `:track` meta to track this field\'s value", field.pos);
@@ -233,7 +346,7 @@ class SMacro extends Builder {
 									${replace(eelse)};
 							}
 						default:
-							map(e, replace);
+							e.map(replace);
 					}
 				else
 					return e;
