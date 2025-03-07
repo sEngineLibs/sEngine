@@ -9,9 +9,8 @@ class Keyboard {
 	var keysTimers:Map<KeyCode, Timer> = [];
 	var hotkeyListeners:Map<Set<KeyCode>, Array<Void->Void>> = [];
 
+	public var keysDown:Set<KeyCode> = [];
 	public var holdInterval = 0.8;
-
-	@:track public var keysDown:Set<KeyCode> = [];
 
 	@:signal function down(key:KeyCode);
 
@@ -32,29 +31,30 @@ class Keyboard {
 	public function new(id:Int = 0) {
 		kha.input.Keyboard.get(id).notify(down.emit, up.emit, pressed.emit);
 
-		onDown(key -> {
-			var t = new Timer(() -> {
-				if (keysTimers.exists(key))
-					hold(key);
-			}, holdInterval);
-			t.start();
-			keysTimers.set(key, t);
-			keysDown = [for (key in keysTimers.keys()) key];
-
-			keyDown(key);
-			hotkeyDown(keysDown);
-		});
-		onUp(key -> {
-			keysTimers.get(key).stop();
-			keysTimers.remove(key);
-			keysDown = [for (key in keysTimers.keys()) key];
-
-			keyUp(key);
-			hotkeyDown(keysDown);
-		});
-
 		onPressed(charPressed.emit);
 		onHold(keyHold.emit);
+	}
+
+	@:slot(down) function _down(key:KeyCode) {
+		keyDown(key);
+		keysDown.push(key);
+
+		hotkeyDown(keysDown);
+
+		keysTimers.set(key, Timer.set(() -> {
+			if (keysTimers.exists(key))
+				hold(key);
+		}, holdInterval));
+	}
+
+	@:slot(up) function _up(key:KeyCode) {
+		keyUp(key);
+		keysDown.remove(key);
+
+		hotkeyDown(keysDown);
+
+		keysTimers.get(key).stop();
+		keysTimers.remove(key);
 	}
 
 	public function onHotkeyDown(hotkey:Set<KeyCode>, slot:Void->Void) {

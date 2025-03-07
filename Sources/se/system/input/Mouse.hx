@@ -20,11 +20,11 @@ class Mouse {
 	@:track public var locked:Bool = false;
 	@:track public var cursor:MouseCursor = MouseCursor.Default;
 
-	@:signal function moved(x:Int, y:Int, dx:Int, dy:Int);
-
 	@:signal function left();
 
 	@:signal function scrolled(delta:Int);
+
+	@:signal function moved(x:Int, y:Int, dx:Int, dy:Int);
 
 	@:signal function down(button:MouseButton, x:Int, y:Int);
 
@@ -55,49 +55,53 @@ class Mouse {
 
 		onDoubleClicked(buttonDoubleClicked.emit);
 		onHold(buttonHold.emit);
-
-		onMoved((x, y, dx, dy) -> {
-			this.x = x;
-			this.y = y;
-		});
-
-		onLeft(() -> {
-			recentPressed.clear();
-			buttonHoldTimers.clear();
-		});
-
-		onClicked(b -> {
-			buttonClicked(b);
-
-			if (recentClicked.exists(b))
-				doubleClicked(b);
-
-			recentClicked.set(b, Timer.set(() -> recentClicked.remove(b), doubleClickInterval));
-		});
-
-		onUp((b, x, y) -> {
-			buttonUp(b, x, y);
-
-			trace(recentPressed.exists(b));
-			if (recentPressed.exists(b))
-				clicked(b);
-
-			buttonHoldTimers.get(b)?.stop();
-			buttonHoldTimers.remove(b);
-			buttonsDown.remove(b);
-		});
-
-		onDown((b, x, y) -> {
-			buttonDown(b, x, y);
-			buttonsDown.push(b);
-
-			recentPressed.set(b, Timer.set(() -> recentPressed.remove(b), clickInterval));
-			buttonHoldTimers.set(b, Timer.set(() -> if (buttonHoldTimers.exists(b)) hold(b), holdInterval));
-		});
 	}
 
 	public function setSystemCursor(cursor:MouseCursor) {
 		this.cursor = cursor;
+	}
+
+	@:slot(down) function _down(button:MouseButton, x:Int, y:Int) {
+		buttonDown(button, x, y);
+		buttonsDown.push(button);
+
+		recentPressed.set(button, Timer.set(() -> {
+			recentPressed.remove(button);
+		}, clickInterval));
+		buttonHoldTimers.set(button, Timer.set(() -> {
+			if (buttonHoldTimers.exists(button))
+				hold(button);
+		}, holdInterval));
+	}
+
+	@:slot(up) function _up(button:MouseButton, x:Int, y:Int) {
+		buttonUp(button, x, y);
+
+		if (recentPressed.exists(button))
+			clicked(button);
+
+		buttonHoldTimers.get(button)?.stop();
+		buttonHoldTimers.remove(button);
+		buttonsDown.remove(button);
+	}
+
+	@:slot(clicked) function _clicked(button:MouseButton) {
+		buttonClicked(button);
+
+		if (recentClicked.exists(button))
+			doubleClicked(button);
+
+		recentClicked.set(button, Timer.set(() -> recentClicked.remove(button), doubleClickInterval));
+	}
+
+	@:slot(left) function _left() {
+		recentPressed.clear();
+		buttonHoldTimers.clear();
+	}
+
+	@:slot(moved) function _moved(x:Int, y:Int, dx:Int, dy:Int) {
+		this.x = x;
+		this.y = y;
 	}
 }
 

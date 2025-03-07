@@ -68,18 +68,14 @@ class UIElement extends PhysicalObject<UIElement> {
 	public function new(?parent:UIElement) {
 		super(parent);
 
-		onMinWidthChanged(v -> {
-			width = width;
-		});
-		onMaxWidthChanged(v -> {
-			width = width;
-		});
-		onMinHeightChanged(v -> {
-			height = height;
-		});
-		onMaxHeightChanged(v -> {
-			height = height;
-		});
+		onMinWidthChanged(_ -> width = width);
+		onMaxWidthChanged(_ -> width = width);
+		onMinHeightChanged(_ -> height = height);
+		onMaxHeightChanged(_ -> height = height);
+	}
+
+	public function setPadding(value:Float):Void {
+		padding = value;
 	}
 
 	overload extern public inline function mapFromGlobal(p:Position):Position {
@@ -146,10 +142,6 @@ class UIElement extends PhysicalObject<UIElement> {
 
 	public function setContentBounds(value:Bounds):Void {
 		setContentRect(value.toRect());
-	}
-
-	public function setPadding(value:Float):Void {
-		padding = value;
 	}
 
 	public function childAt(x:Float, y:Float):UIElement {

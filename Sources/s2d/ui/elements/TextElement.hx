@@ -11,9 +11,9 @@ class TextElement extends UISceneElement {
 	var textWidth:Float;
 	var textHeight:Float;
 
-	@:isVar public var text(default, set):String;
-	@:isVar public var font(default, set):Font;
-	@:isVar public var fontSize(default, set):Int = 14;
+	@:inject(updateTextWidth) public var text:String;
+	@:inject(updateTextSize) public var font:Font;
+	@:inject(updateTextSize) @:isVar public var fontSize(default, set):Int = 14;
 	public var alignment:Alignment = Alignment.Left | Alignment.Top;
 
 	public function new(?text:String = "Text", ?parent:UIElement) {
@@ -58,21 +58,8 @@ class TextElement extends UISceneElement {
 		updateTextHeight();
 	}
 
-	inline function set_text(value:String) {
-		text = value;
-		updateTextWidth();
-		return value;
-	}
-
-	inline function set_font(value:Font) {
-		font = value;
-		updateTextSize();
-		return value;
-	}
-
 	inline function set_fontSize(value:Int) {
 		fontSize = value < 0 ? 0 : value;
-		updateTextSize();
 		return value;
 	}
 }

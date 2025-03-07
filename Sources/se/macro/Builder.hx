@@ -4,35 +4,74 @@ package se.macro;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 import haxe.macro.Type.Ref;
+import haxe.macro.Type.TypedExprDef;
 import haxe.macro.TypeTools;
-import haxe.macro.ExprTools;
 import haxe.macro.ComplexTypeTools;
 
 abstract class Builder {
 	var cls:haxe.macro.Type.ClassType;
 	var fields:Array<Field>;
+	var newFields:Array<Field>;
 
 	function new() {
 		cls = Context.getLocalClass().get();
 		fields = Context.getBuildFields();
+		newFields = [];
 	}
 
 	function export() {
 		run();
-		return fields;
+		return fields.concat(newFields);
 	}
 
 	abstract function run():Void;
 
-	function add(field:Field) {
-		fields.push(field);
+	function add(field:Field):Field {
+		newFields.push(field);
+		return field;
 	}
 
-	function find(name:String) {
-		for (field in fields)
+	function find(name:String):Field {
+		for (field in fields.concat(newFields))
 			if (field.name == name)
 				return field;
 		return null;
+	}
+
+	function contains(name:String):Bool {
+		return find(name) != null;
+	}
+
+	function getConstructor():Field {
+		function findCArgs(cls:haxe.macro.Type.ClassType) {
+			var sup = cls.superClass?.t.get();
+			if (sup == null)
+				return null;
+
+			var supc = sup.constructor.get();
+			if (supc != null)
+				return switch supc.expr().expr {
+					case TypedExprDef.TFunction(f): f.args.map(a -> arg(a.v.name, toComplex(a.v.t)));
+					default: null;
+				}
+
+			return findCArgs(sup);
+		}
+
+		var constructor = find("new");
+		if (constructor != null)
+			return constructor;
+
+		var cargs = findCArgs(cls);
+		if (cargs == null)
+			return add(method("new", fun([], macro {})));
+		else
+			return add(method("new", fun(cargs, macro {
+				super(${
+					for (arg in cargs)
+						macro $i{arg.name}
+				});
+			})));
 	}
 }
 
@@ -234,6 +273,10 @@ overload extern inline function resolve(usings:Array<Ref<haxe.macro.Type.ClassTy
 	});
 }
 
+function copy(v:Field):Field {
+	return field(v.name, v.kind, v.doc, v.access, v.meta, v.pos);
+}
+
 function eq(a:Expr, b:Expr) {
 	return macro $a == $b;
 }
@@ -248,31 +291,12 @@ function eqChain(a:Array<Expr>, b:Array<Expr>) {
 function ident(name:String):Expr {
 	var s = name.split(".");
 	if (s.length == 1)
-		return macro $i{name}; // Too many arguments
+		return macro $i{name};
 	else
 		return macro $p{s};
 }
 
 function idents(names:Array<String>) {
 	return names.map(name -> ident(name));
-}
-
-function has(e:Expr, condition:Expr->Bool, ?options:{?enterFunctions:Bool}) {
-	var skipFunctions = options == null || options.enterFunctions != true;
-	function seek(e:Expr)
-		switch e {
-			case {expr: EFunction(_)} if (skipFunctions):
-			case _ if (condition(e)):
-				throw "Error";
-			default:
-				ExprTools.iter(e, seek);
-		}
-
-	return try {
-		ExprTools.iter(e, seek);
-		false;
-	} catch (e) {
-		true;
-	}
 }
 #end
