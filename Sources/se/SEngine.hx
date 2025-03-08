@@ -13,8 +13,8 @@ import se.graphics.Context2D;
 import se.animation.Action;
 import s2d.stage.Stage;
 import s2d.stage.graphics.Renderer;
-import s2d.ui.UIScene;
-import s2d.ui.graphics.Drawers;
+import s2d.UIScene;
+import s2d.graphics.Drawers;
 
 @:allow(se.App)
 class SEngine {
@@ -28,7 +28,7 @@ class SEngine {
 	@:isVar public static var scale(default, set):Float = 1.0;
 	@:isVar public static var aspectRatio(default, set):Float = 1.0;
 
-	@:access(s2d.ui.graphics.Drawers)
+	@:access(s2d.graphics.Drawers)
 	@:access(s2d.stage.graphics.Renderer)
 	public static function start(window:Window) {
 		Stage.current = new Stage();

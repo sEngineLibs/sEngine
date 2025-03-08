@@ -6,7 +6,7 @@ import s2d.geometry.Mesh;
 
 using se.extensions.VectorExt;
 
-class Sprite extends StageObject {
+class Sprite extends LayerObject {
 	var _id:UInt;
 
 	@:track public var mesh:Mesh;

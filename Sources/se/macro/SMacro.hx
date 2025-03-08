@@ -44,9 +44,9 @@ class SMacro extends Builder {
 					case "alias":
 						buildAlias(field);
 					case "readonly":
-						buildAlias(field);
+						buildAccessor(field, true, false);
 					case "writeonly":
-						buildAlias(field);
+						buildAccessor(field, false, true);
 					case ":inject":
 						var injections:Map<String, Function> = [];
 						for (slotIdent in extractMetaParams(meta).keyValueIterator()) {
@@ -203,76 +203,6 @@ class SMacro extends Builder {
 				field.kind = FProp(readable ? "get" : "null", writeable ? "set" : "null", t, e);
 			case FFun(f):
 				warn("Functions can\'t have accessors");
-		}
-	}
-
-	function buildInjection(field:Field, injections:Map<String, Function>) {
-		function injectCalls(f:Function, injections:Map<String, Function>) {
-			var injected = false;
-
-			if ((f.ret ?? expected()).toString() == "Void") {
-				var block = [];
-				for (func in injections.keyValueIterator()) {
-					if (func.value.args.length == 0)
-						block.push(macro $i{func.key}());
-					else
-						err('Invalid number of arguments. Expected 0, got ${func.value.args.length}', find(func.key).pos);
-				}
-
-				f.expr = macro {
-					${f.expr};
-					$b{block}
-				}
-			} else {
-				var block = [];
-				for (func in injections.keyValueIterator()) {
-					var args = func.value.args;
-					if (args.length == 0)
-						block.push(macro $i{func.key}());
-					else if (args.length == 1)
-						block.push(macro $i{func.key}(res));
-					else
-						err('Invalid number of arguments. Expected 1, got ${args.length}', find(func.key).pos);
-				}
-				
-				f.expr = f.expr.map(expr -> switch expr.expr {
-					case EReturn(e):
-						macro {
-							var res = $e;
-							$b{block};
-							return res;
-						}
-					default: expr;
-				});
-			}
-		}
-
-		switch field.kind {
-			case FVar(t, e):
-				field.meta.push(meta(":isVar"));
-				field.kind = FProp("default", "set", t, e);
-				buildInjection(field, injections);
-
-			case FProp(get, set, t, e):
-				switch (set) {
-					case "set", "null":
-						var _setter = find('set_${field.name}');
-						if (_setter == null) {
-							// generate setter
-							_setter = add(setter(field, fun([arg("value", t)], macro {
-								$i{field.name} = value;
-								return $i{field.name};
-							}), [APrivate, AInline]));
-						}
-						buildInjection(_setter, injections);
-
-					default:
-						field.kind = FProp(get, "set", t, e);
-						buildInjection(field, injections);
-				}
-
-			case FFun(f):
-				injectCalls(f, injections);
 		}
 	}
 
@@ -498,6 +428,75 @@ class SMacro extends Builder {
 		buildSignal(add(method(signalName, signalFun, [meta(":signal")])), isPublic, []);
 		buildInjection(field, [signalName => signalFun]);
 		field.doc = '_Note: this field is **tracked**. The corresponding connector is_ `on${signalName.capitalize()}`\n\n' + (field.doc ?? "");
+	}
+
+	function buildInjection(field:Field, injections:Map<String, Function>) {
+		function injectCalls(f:Function, injections:Map<String, Function>) {
+			var injected = false;
+
+			if ((f.ret ?? expected()).toString() == "Void") {
+				var block = [];
+				for (func in injections.keyValueIterator()) {
+					if (func.value.args.length == 0)
+						block.push(macro $i{func.key}());
+					else
+						err('Invalid number of arguments. Expected 0, got ${func.value.args.length}', find(func.key).pos);
+				}
+
+				f.expr = macro {
+					${f.expr};
+					$b{block}
+				}
+			} else {
+				var block = [];
+				for (func in injections.keyValueIterator()) {
+					var args = func.value.args;
+					if (args.length == 0)
+						block.push(macro $i{func.key}());
+					else if (args.length == 1)
+						block.push(macro $i{func.key}(res));
+					else
+						err('Invalid number of arguments. Expected 1, got ${args.length}', find(func.key).pos);
+				}
+
+				f.expr = f.expr.map(expr -> switch expr.expr {
+					case EReturn(e):
+						macro {
+							var res = $e;
+							$b{block};
+							return res;
+						}
+					default: expr;
+				});
+			}
+		}
+
+		switch field.kind {
+			case FVar(t, e):
+				field.meta.push(meta(":isVar"));
+				field.kind = FProp("default", "set", t, e);
+				buildInjection(field, injections);
+
+			case FProp(get, set, t, e):
+				switch (set) {
+					case "set", "null":
+						var _setter = find('set_${field.name}');
+						if (_setter == null) {
+							// generate setter
+							_setter = add(setter(field, fun([arg("value", t)], macro {
+								$i{field.name} = value;
+								return $i{field.name};
+							}), [APrivate, AInline]));
+						}
+						buildInjection(_setter, injections);
+
+					default:
+						err("Can't track property with no write access", field.pos);
+				}
+
+			case FFun(f):
+				injectCalls(f, injections);
+		}
 	}
 }
 #end

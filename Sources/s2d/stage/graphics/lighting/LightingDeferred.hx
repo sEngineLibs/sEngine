@@ -113,8 +113,7 @@ class LightingDeferred {
 				ctx.setVertexBuffer(@:privateAccess se.SEngine.vertices);
 				ctx.setTexture(shadowMapTU, Renderer.buffer.shadowMap);
 				#end
-				final p = light.transform.global.translation;
-				ctx.setFloat3(lightPositionCL, p.x, p.y, light.z);
+				ctx.setFloat3(lightPositionCL, light.x, light.y, light.z);
 				ctx.setVec3(lightColorCL, light.color.RGB);
 				ctx.setFloat2(lightAttribCL, light.power, light.radius);
 				ctx.draw();

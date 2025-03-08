@@ -2,31 +2,13 @@ package s2d.stage;
 
 import se.math.Mat3;
 import se.math.VectorMath;
+import s2d.stage.objects.StageObject;
 
-@:forward(rotation)
-abstract Camera(Transform) from Transform to Transform {
-	public var x(get, set):Float;
-	public var y(get, set):Float;
+@:allow(s2d.stage.Stage)
+class Camera extends StageObject {
+	var view:Mat3 = Mat3.lookAt({x: 0.0, y: 0.0}, {x: 0.0, y: -1.0}, {x: 0.0, y: 1.0});
 
 	public function new() {
-		this = Mat3.lookAt({x: 0.0, y: 0.0}, {x: 0.0, y: -1.0}, {x: 0.0, y: 1.0});
-	}
-
-	inline function get_x():Float {
-		return this.global.translationX;
-	}
-
-	inline function set_x(value:Float):Float {
-		this.global.translationX = value;
-		return value;
-	}
-
-	inline function get_y():Float {
-		return this.global.translationY;
-	}
-
-	inline function set_y(value:Float):Float {
-		this.global.translationY = value;
-		return value;
+		super();
 	}
 }

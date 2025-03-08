@@ -46,7 +46,7 @@ class ShadowPass {
 			ctx.setIndexBuffer(light.layer.shadowBuffer.indices);
 			ctx.setVertexBuffer(light.layer.shadowBuffer.vertices);
 			ctx.setMat3(vpCL, Stage.current.viewProjection);
-			ctx.setVec2(lightPosCL, light._transform.global.translation);
+			ctx.setFloat2(lightPosCL, light.x, light.y);
 			ctx.draw();
 		}
 		ctx.end();

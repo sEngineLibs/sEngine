@@ -1,25 +1,25 @@
 package se.graphics;
 
 import kha.graphics2.Graphics;
-import s2d.Transform;
 import s2d.Alignment;
 import se.math.Vec2;
+import se.math.Mat3;
 import se.math.VectorMath.vec2;
 
 @:forward(pipeline, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)
 extern abstract Context2D(Graphics) from Graphics {
 	public var style(get, never):Context2DStyle;
-	public var transform(get, set):Transform;
+	public var transform(get, set):Mat3;
 
 	inline function get_style():Context2DStyle {
 		return this;
 	}
 
-	inline function get_transform():Transform {
+	inline function get_transform():Mat3 {
 		return this.transformation;
 	}
 
-	inline function set_transform(value:Transform):Transform {
+	inline function set_transform(value:Mat3):Mat3 {
 		return this.transformation = value;
 	}
 

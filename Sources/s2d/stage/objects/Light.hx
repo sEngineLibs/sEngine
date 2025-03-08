@@ -3,7 +3,7 @@ package s2d.stage.objects;
 #if (S2D_LIGHTING == 1)
 import se.Color;
 
-class Light extends StageObject {
+class Light extends LayerObject {
 	public var color:Color = "white";
 	public var power:Float = 15.0;
 	public var radius:Float = 1.0;

@@ -141,6 +141,19 @@ extern abstract Set<T>(Array<T>) from Array<T> to Array<T> {
 	}
 
 	/**
+		Reverse the order of elements of the copy of `this` Set.
+
+		This operation does not modify `this`.
+
+		If `this.length < 2`, the copy remains unchanged.
+	**/
+	public inline function reversed():Set<T> {
+		var _copy = copy();
+		_copy.reverse();
+		return _copy;
+	}
+
+	/**
 		Creates a shallow copy of the range of `this` Set, starting at and
 		including `pos`, up to but not including `end`.
 
