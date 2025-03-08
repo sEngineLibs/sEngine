@@ -23,6 +23,8 @@ class TextElement extends UISceneElement {
 	}
 
 	override inline function draw(target:Texture) {
+		super.draw(target);
+
 		final ctx = target.ctx2D;
 
 		ctx.style.font = font;

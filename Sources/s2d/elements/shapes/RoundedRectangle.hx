@@ -11,11 +11,14 @@ class RoundedRectangle extends UISceneElement {
 
 	public function new(?radius:Float = 0.0, ?softness:Float = 0.5, ?parent:Element) {
 		super(parent);
+		
 		this.radius = radius;
 		this.softness = softness;
 	}
 
 	override inline function draw(target:Texture) {
+		super.draw(target);
+
 		@:privateAccess Drawers.rectDrawer.render(target, this);
 	}
 

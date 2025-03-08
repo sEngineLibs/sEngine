@@ -31,14 +31,6 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 			value.removeParent();
 	}
 
-	public inline function traverse(t:This->Void, ?reversed:Bool = false):Void {
-		final _c = children.copy();
-		if (reversed)
-			_c.reverse();
-		for (c in _c)
-			t(c);
-	}
-
 	public function toString():String {
 		return Type.getClassName(Type.getClass(this));
 	}

@@ -1,12 +1,11 @@
 package se;
 
-import kha.Color as KhaColor;
 import se.math.Vec3;
 import se.math.Vec4;
 import se.math.VectorMath;
 
 @:forward.new
-extern enum abstract Color(KhaColor) from KhaColor to KhaColor {
+extern enum abstract Color(Int) from Int to Int {
 	inline final Black = 0xff000000;
 	inline final White = 0xffffffff;
 	inline final Red = 0xffff0000;
@@ -35,11 +34,11 @@ extern enum abstract Color(KhaColor) from KhaColor to KhaColor {
 	public var HSLA(get, set):Vec4;
 
 	public static inline function rgb(r:Float, g:Float, b:Float):Color {
-		return kha.Color.fromFloats(r, g, b);
+		return rgba(r, g, b, 1.0);
 	}
 
 	public static inline function rgba(r:Float, g:Float, b:Float, a:Float = 1.0):Color {
-		return kha.Color.fromFloats(r, g, b, a);
+		return (Std.int(a * 255) << 24) | (Std.int(r * 255) << 16) | (Std.int(g * 255) << 8) | Std.int(b * 255);
 	}
 
 	public static inline function hsv(h:Float, s:Float, v:Float):Color {
@@ -107,6 +106,11 @@ extern enum abstract Color(KhaColor) from KhaColor to KhaColor {
 	}
 
 	@:from
+	public static inline function fromColor(value:kha.Color):Color {
+		return value.value;
+	}
+
+	@:from
 	public static inline function fromString(value:String):Color {
 		return switch (value.toLowerCase()) {
 			case "black":
@@ -134,8 +138,27 @@ extern enum abstract Color(KhaColor) from KhaColor to KhaColor {
 			case "transparent":
 				Color.Transparent;
 			default:
-				kha.Color.fromString(value);
+				if (!(value.length == 4 || value.length == 7 || value.length == 9) || StringTools.fastCodeAt(value, 0) != "#".code)
+					throw 'Invalid Color string: $value';
+
+				if (value.length == 4) {
+					final r = value.charAt(1);
+					final g = value.charAt(2);
+					final b = value.charAt(3);
+					value = '#$r$r$g$g$b$b';
+				}
+
+				var colorValue = Std.parseInt("0x" + value.substr(1));
+				if (value.length == 7)
+					colorValue += 0xFF000000;
+
+				return colorValue | 0;
 		}
+	}
+
+	@:to
+	public inline function toColor():kha.Color {
+		return this;
 	}
 
 	@:to
@@ -164,47 +187,47 @@ extern enum abstract Color(KhaColor) from KhaColor to KhaColor {
 	}
 
 	inline function get_r():Float {
-		return this.R;
+		return ((this & 0x00ff0000) >>> 16) * (1 / 255);
 	}
 
 	inline function set_r(value:Float):Float {
-		this.R = value;
+		this = (Std.int(a * 255) << 24) | (Std.int(value * 255) << 16) | (Std.int(g * 255) << 8) | Std.int(b * 255);
 		return value;
 	}
 
 	inline function get_g():Float {
-		return this.G;
+		return ((this & 0x0000ff00) >>> 8) * (1 / 255);
 	}
 
 	inline function set_g(value:Float):Float {
-		this.G = value;
+		this = (Std.int(a * 255) << 24) | (Std.int(r * 255) << 16) | (Std.int(value * 255) << 8) | Std.int(b * 255);
 		return value;
 	}
 
 	inline function get_b():Float {
-		return this.B;
+		return (this & 0x000000ff) * (1 / 255);
 	}
 
 	inline function set_b(value:Float):Float {
-		this.B = value;
+		this = (Std.int(a * 255) << 24) | (Std.int(r * 255) << 16) | (Std.int(g * 255) << 8) | Std.int(value * 255);
 		return value;
 	}
 
 	inline function get_a():Float {
-		return this.A;
+		return (this >>> 24) * (1 / 255);
 	}
 
 	inline function set_a(value:Float):Float {
-		this.A = value;
+		this = (Std.int(value * 255) << 24) | (Std.int(r * 255) << 16) | (Std.int(g * 255) << 8) | Std.int(b * 255);
 		return value;
 	}
 
 	inline function get_h():Float {
-		return Color.rgb2hsv(this).r;
+		return rgb2hsv(this).r;
 	}
 
 	inline function set_h(value:Float):Float {
-		var c = Color.hsv2rgb(vec3(value, s, v));
+		var c = hsv2rgb(vec3(value, s, v));
 		r = c.r;
 		g = c.g;
 		b = c.b;
@@ -212,11 +235,11 @@ extern enum abstract Color(KhaColor) from KhaColor to KhaColor {
 	}
 
 	inline function get_s():Float {
-		return Color.rgb2hsv(this).g;
+		return rgb2hsv(this).g;
 	}
 
 	inline function set_s(value:Float):Float {
-		var c = Color.hsv2rgb(vec3(h, value, v));
+		var c = hsv2rgb(vec3(h, value, v));
 		r = c.r;
 		g = c.g;
 		b = c.b;
@@ -224,11 +247,11 @@ extern enum abstract Color(KhaColor) from KhaColor to KhaColor {
 	}
 
 	inline function get_v():Float {
-		return Color.rgb2hsv(this).b;
+		return rgb2hsv(this).b;
 	}
 
 	inline function set_v(value:Float):Float {
-		var c = Color.hsv2rgb(vec3(h, s, value));
+		var c = hsv2rgb(vec3(h, s, value));
 		r = c.r;
 		g = c.g;
 		b = c.b;

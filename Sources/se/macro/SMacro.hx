@@ -182,25 +182,65 @@ class SMacro extends Builder {
 					$e = value;
 					return value;
 				})));
-			default:
-				err("Alias must be a variable", field.pos);
+
+			case FProp(get, set, t, e):
+				field.kind = FProp(get, set, t, null);
+				for (meta in field.meta)
+					if (meta.name == ":isVar")
+						field.meta.remove(meta);
+
+				switch get {
+					case "get", "null":
+						var _getter = find('get_${field.name}');
+						switch _getter.kind {
+							case FFun(f):
+								f.expr = macro {
+									return $e;
+								}
+							default:
+								err("Getter must be function", _getter.pos);
+						}
+				}
+				switch set {
+					case "set", "null":
+						var _setter = find('set_${field.name}');
+						switch _setter.kind {
+							case FFun(f):
+								var value = macro $i{f.args[0].name};
+								f.expr = macro {
+									$e = $value;
+									return $value;
+								}
+							default:
+								err("Setter must be function", _setter.pos);
+						}
+				}
+
+			case FFun(f):
+				err("Function can't be alias", field.pos);
 		}
 	}
 
 	function buildAccessor(field:Field, readable:Bool, writeable:Bool) {
 		switch field.kind {
 			case FVar(t, e):
-				field.meta.push(meta(":isVar"));
-				field.kind = FProp(readable ? "get" : "null", writeable ? "set" : "null", t);
-				add(getter(field, fun([], t, macro {
-					return $i{field.name};
-				})));
-				add(setter(field, fun([arg("value", t)], t, macro {
-					$i{field.name} = value;
-					return value;
-				})));
+				field.meta.push(meta(":isVar", field.pos));
+				field.kind = FProp(readable ? "get" : "never", writeable ? "set" : "never", t, e);
+				if (readable)
+					add(getter(field, fun([], t, macro {
+						return $i{field.name};
+					})));
+				if (writeable)
+					add(setter(field, fun([arg("value", t)], t, macro {
+						$i{field.name} = value;
+						return value;
+					})));
 			case FProp(get, set, t, e):
-				field.kind = FProp(readable ? "get" : "null", writeable ? "set" : "null", t, e);
+				field.kind = FProp(readable ? "get" : "never", writeable ? "set" : "never", t, e);
+				if (!readable)
+					fields.remove(find('get_${field.name}'));
+				if (writeable)
+					fields.remove(find('set_${field.name}'));
 			case FFun(f):
 				warn("Functions can\'t have accessors");
 		}
@@ -427,7 +467,7 @@ class SMacro extends Builder {
 
 		buildSignal(add(method(signalName, signalFun, [meta(":signal")])), isPublic, []);
 		buildInjection(field, [signalName => signalFun]);
-		field.doc = '_Note: this field is **tracked**. The corresponding connector is_ `on${signalName.capitalize()}`\n\n' + (field.doc ?? "");
+		field.doc = '_This field is **tracked**. The corresponding connector is_ `on${signalName.capitalize()}`\n\n' + (field.doc ?? "");
 	}
 
 	function buildInjection(field:Field, injections:Map<String, Function>) {

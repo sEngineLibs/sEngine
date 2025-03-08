@@ -10,9 +10,9 @@ class MouseArea extends Element {
 	public var acceptedButtons:Set<MouseButton> = [MouseButton.Left];
 	public var doubleClickInterval:Float = 0.5;
 
-	@readonly public var isEntered:Bool = false;
-	@readonly @:track public var mouseX:Float = 0.0;
-	@readonly @:track public var mouseY:Float = 0.0;
+	public var isEntered:Bool = false;
+	@:track public var mouseX:Float = 0.0;
+	@:track public var mouseY:Float = 0.0;
 
 	@:signal function entered(x:Int, y:Int);
 

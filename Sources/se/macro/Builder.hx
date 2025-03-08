@@ -4,11 +4,12 @@ package se.macro;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 import haxe.macro.Type.Ref;
-import haxe.macro.Type.TypedExprDef;
 import haxe.macro.TypeTools;
 import haxe.macro.ComplexTypeTools;
 
 abstract class Builder {
+	static var built:Map<String, {sup:String, fields:Array<Field>}> = [];
+
 	var cls:haxe.macro.Type.ClassType;
 	var fields:Array<Field>;
 	var newFields:Array<Field>;
@@ -21,7 +22,12 @@ abstract class Builder {
 
 	function export() {
 		run();
-		return fields.concat(newFields);
+		fields = fields.concat(newFields);
+		built.set(cls.name, {
+			sup: cls.superClass?.t.get().name,
+			fields: fields
+		});
+		return fields;
 	}
 
 	abstract function run():Void;
@@ -43,26 +49,35 @@ abstract class Builder {
 	}
 
 	function getConstructor():Field {
-		function findCArgs(cls:haxe.macro.Type.ClassType) {
+		function findConstructorArgs(cls:haxe.macro.Type.ClassType) {
 			var sup = cls.superClass?.t.get();
+
 			if (sup == null)
 				return null;
 
-			var supc = sup.constructor.get();
-			if (supc != null)
-				return switch supc.expr().expr {
-					case TypedExprDef.TFunction(f): f.args.map(a -> arg(a.v.name, toComplex(a.v.t)));
-					default: null;
-				}
+			if (built.exists(sup.name))
+				for (field in built.get(sup.name).fields)
+					if (field.name == "new")
+						return switch field.kind {
+							case FFun(f): f.args;
+							default: null;
+						}
 
-			return findCArgs(sup);
+			// var supc = sup.constructor.get();
+			// if (supc != null)
+			// 	return switch supc.expr().expr { // this throws a "Loop in class building prevent compiler termination" error
+			// 		case TFunction(f): f.args.map(a -> arg(a.v.name, toComplex(a.v.t)));
+			// 		default: null;
+			// 	}
+
+			return findConstructorArgs(sup);
 		}
 
 		var constructor = find("new");
 		if (constructor != null)
 			return constructor;
 
-		var cargs = findCArgs(cls);
+		var cargs = findConstructorArgs(cls);
 		if (cargs == null)
 			return add(method("new", fun([], macro {})));
 		else
