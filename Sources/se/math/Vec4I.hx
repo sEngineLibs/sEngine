@@ -30,7 +30,7 @@ extern abstract Vec4I(Vec4IData) from Vec4IData to Vec4IData {
 	}
 
 	@:op([])
-	inline function arrayRead(i:Int)
+	private inline function arrayRead(i:Int)
 		return switch i {
 			case 0: this.x;
 			case 1: this.y;
@@ -40,7 +40,7 @@ extern abstract Vec4I(Vec4IData) from Vec4IData to Vec4IData {
 		}
 
 	@:op([])
-	inline function arrayWrite(i:Int, v:Int)
+	private inline function arrayWrite(i:Int, v:Int)
 		return switch i {
 			case 0: this.x = v;
 			case 1: this.y = v;
@@ -50,11 +50,11 @@ extern abstract Vec4I(Vec4IData) from Vec4IData to Vec4IData {
 		}
 
 	@:op(-a)
-	static inline function neg(a:Vec4I)
+	static private inline function neg(a:Vec4I)
 		return new Vec4I(-a.x, -a.y, -a.z, -a.w);
 
 	@:op(++a)
-	static inline function prefixIncrement(a:Vec4I) {
+	static private inline function prefixIncrement(a:Vec4I) {
 		++a.x;
 		++a.y;
 		++a.z;
@@ -63,7 +63,7 @@ extern abstract Vec4I(Vec4IData) from Vec4IData to Vec4IData {
 	}
 
 	@:op(--a)
-	static inline function prefixDecrement(a:Vec4I) {
+	static private inline function prefixDecrement(a:Vec4I) {
 		--a.x;
 		--a.y;
 		--a.z;
@@ -72,7 +72,7 @@ extern abstract Vec4I(Vec4IData) from Vec4IData to Vec4IData {
 	}
 
 	@:op(a++)
-	static inline function postfixIncrement(a:Vec4I) {
+	static private inline function postfixIncrement(a:Vec4I) {
 		var ret = a.clone();
 		++a.x;
 		++a.y;
@@ -82,7 +82,7 @@ extern abstract Vec4I(Vec4IData) from Vec4IData to Vec4IData {
 	}
 
 	@:op(a--)
-	static inline function postfixDecrement(a:Vec4I) {
+	static private inline function postfixDecrement(a:Vec4I) {
 		var ret = a.clone();
 		--a.x;
 		--a.y;
@@ -92,51 +92,51 @@ extern abstract Vec4I(Vec4IData) from Vec4IData to Vec4IData {
 	}
 
 	@:op(a * b)
-	static inline function mul(a:Vec4I, b:Vec4I):Vec4I
+	static private inline function mul(a:Vec4I, b:Vec4I):Vec4I
 		return new Vec4I(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
 
 	@:op(a * b) @:commutative
-	static inline function mulScalar(a:Vec4I, b:Int):Vec4I
+	static private inline function mulScalar(a:Vec4I, b:Int):Vec4I
 		return new Vec4I(a.x * b, a.y * b, a.z * b, a.w * b);
 
 	@:op(a / b)
-	static inline function div(a:Vec4I, b:Vec4I):Vec4I
+	static private inline function div(a:Vec4I, b:Vec4I):Vec4I
 		return new Vec4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
 
 	@:op(a / b)
-	static inline function divScalar(a:Vec4I, b:Int):Vec4I
+	static private inline function divScalar(a:Vec4I, b:Int):Vec4I
 		return new Vec4(a.x / b, a.y / b, a.z / b, a.w / b);
 
 	@:op(a / b)
-	static inline function divScalarInv(a:Int, b:Vec4I):Vec4I
+	static private inline function divScalarInv(a:Int, b:Vec4I):Vec4I
 		return new Vec4(a / b.x, a / b.y, a / b.z, a / b.w);
 
 	@:op(a + b)
-	static inline function add(a:Vec4I, b:Vec4I):Vec4I
+	static private inline function add(a:Vec4I, b:Vec4I):Vec4I
 		return new Vec4I(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 
 	@:op(a + b) @:commutative
-	static inline function addScalar(a:Vec4I, b:Int):Vec4I
+	static private inline function addScalar(a:Vec4I, b:Int):Vec4I
 		return new Vec4I(a.x + b, a.y + b, a.z + b, a.w + b);
 
 	@:op(a - b)
-	static inline function sub(a:Vec4I, b:Vec4I):Vec4I
+	static private inline function sub(a:Vec4I, b:Vec4I):Vec4I
 		return new Vec4I(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 
 	@:op(a - b)
-	static inline function subScalar(a:Vec4I, b:Int):Vec4I
+	static private inline function subScalar(a:Vec4I, b:Int):Vec4I
 		return new Vec4I(a.x - b, a.y - b, a.z - b, a.w - b);
 
 	@:op(b - a)
-	static inline function subScalarInv(a:Int, b:Vec4I):Vec4I
+	static private inline function subScalarInv(a:Int, b:Vec4I):Vec4I
 		return new Vec4I(a - b.x, a - b.y, a - b.z, a - b.w);
 
 	@:op(a == b)
-	static inline function equal(a:Vec4I, b:Vec4I):Bool
+	static private inline function equal(a:Vec4I, b:Vec4I):Bool
 		return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
 
 	@:op(a != b)
-	static inline function notEqual(a:Vec4I, b:Vec4I):Bool
+	static private inline function notEqual(a:Vec4I, b:Vec4I):Bool
 		return !equal(a, b);
 	#end // !macro
 

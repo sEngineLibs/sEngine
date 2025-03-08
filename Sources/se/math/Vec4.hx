@@ -98,7 +98,8 @@ extern abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 	}
 
 	public inline function sign():Vec4 {
-		return new Vec4(this.x > 0.?1.:(this.x < 0.? -1.:0.), this.y > 0.?1.:(this.y < 0.? -1.:0.), this.z > 0.?1.:(this.z < 0.? -1.:0.), this.w > 0.?1.:(this.w < 0.? -1.:0.));
+		return new Vec4(this.x > 0.?1.:(this.x < 0.? -1.:0.), this.y > 0.?1.:(this.y < 0.? -1.:0.), this.z > 0.?1.:(this.z < 0.?
+			-1.:0.), this.w > 0.?1.:(this.w < 0.? -1.:0.));
 	}
 
 	public inline function floor():Vec4 {
@@ -113,60 +114,60 @@ extern abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 		return (this : Vec4) - floor();
 	}
 
-	public extern overload inline function mod(d:Float):Vec4 {
+	extern overload public inline function mod(d:Float):Vec4 {
 		return (this : Vec4) - d * ((this : Vec4) / d).floor();
 	}
 
-	public extern overload inline function mod(d:Vec4):Vec4 {
+	extern overload public inline function mod(d:Vec4):Vec4 {
 		return (this : Vec4) - d * ((this : Vec4) / d).floor();
 	}
 
-	public extern overload inline function min(b:Vec4):Vec4 {
+	extern overload public inline function min(b:Vec4):Vec4 {
 		return new Vec4(b.x < this.x ? b.x : this.x, b.y < this.y ? b.y : this.y, b.z < this.z ? b.z : this.z, b.w < this.w ? b.w : this.w);
 	}
 
-	public extern overload inline function min(b:Float):Vec4 {
+	extern overload public inline function min(b:Float):Vec4 {
 		return new Vec4(b < this.x ? b : this.x, b < this.y ? b : this.y, b < this.z ? b : this.z, b < this.w ? b : this.w);
 	}
 
-	public extern overload inline function max(b:Vec4):Vec4 {
+	extern overload public inline function max(b:Vec4):Vec4 {
 		return new Vec4(this.x < b.x ? b.x : this.x, this.y < b.y ? b.y : this.y, this.z < b.z ? b.z : this.z, this.w < b.w ? b.w : this.w);
 	}
 
-	public extern overload inline function max(b:Float):Vec4 {
+	extern overload public inline function max(b:Float):Vec4 {
 		return new Vec4(this.x < b ? b : this.x, this.y < b ? b : this.y, this.z < b ? b : this.z, this.w < b ? b : this.w);
 	}
 
-	public extern overload inline function clamp(minLimit:Vec4, maxLimit:Vec4) {
+	extern overload public inline function clamp(minLimit:Vec4, maxLimit:Vec4) {
 		return max(minLimit).min(maxLimit);
 	}
 
-	public extern overload inline function clamp(minLimit:Float, maxLimit:Float) {
+	extern overload public inline function clamp(minLimit:Float, maxLimit:Float) {
 		return max(minLimit).min(maxLimit);
 	}
 
-	public extern overload inline function mix(b:Vec4, t:Vec4):Vec4 {
+	extern overload public inline function mix(b:Vec4, t:Vec4):Vec4 {
 		return (this : Vec4) * (1.0 - t) + b * t;
 	}
 
-	public extern overload inline function mix(b:Vec4, t:Float):Vec4 {
+	extern overload public inline function mix(b:Vec4, t:Float):Vec4 {
 		return (this : Vec4) * (1.0 - t) + b * t;
 	}
 
-	public extern overload inline function step(edge:Vec4):Vec4 {
+	extern overload public inline function step(edge:Vec4):Vec4 {
 		return new Vec4(this.x < edge.x ? 0.0 : 1.0, this.y < edge.y ? 0.0 : 1.0, this.z < edge.z ? 0.0 : 1.0, this.w < edge.w ? 0.0 : 1.0);
 	}
 
-	public extern overload inline function step(edge:Float):Vec4 {
+	extern overload public inline function step(edge:Float):Vec4 {
 		return new Vec4(this.x < edge ? 0.0 : 1.0, this.y < edge ? 0.0 : 1.0, this.z < edge ? 0.0 : 1.0, this.w < edge ? 0.0 : 1.0);
 	}
 
-	public extern overload inline function smoothstep(edge0:Vec4, edge1:Vec4):Vec4 {
+	extern overload public inline function smoothstep(edge0:Vec4, edge1:Vec4):Vec4 {
 		var t = (((this : Vec4) - edge0) / (edge1 - edge0)).clamp(0, 1);
 		return t * t * (3.0 - 2.0 * t);
 	}
 
-	public extern overload inline function smoothstep(edge0:Float, edge1:Float):Vec4 {
+	extern overload public inline function smoothstep(edge0:Float, edge1:Float):Vec4 {
 		var t = (((this : Vec4) - edge0) / (edge1 - edge0)).clamp(0, 1);
 		return t * t * (3.0 - 2.0 * t);
 	}
@@ -212,7 +213,7 @@ extern abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 	}
 
 	@:op([])
-	inline function arrayRead(i:Int)
+	private inline function arrayRead(i:Int)
 		return switch i {
 			case 0: this.x;
 			case 1: this.y;
@@ -222,7 +223,7 @@ extern abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 		}
 
 	@:op([])
-	inline function arrayWrite(i:Int, v:Float)
+	private inline function arrayWrite(i:Int, v:Float)
 		return switch i {
 			case 0: this.x = v;
 			case 1: this.y = v;
@@ -232,11 +233,11 @@ extern abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 		}
 
 	@:op(-a)
-	static inline function neg(a:Vec4)
+	static private inline function neg(a:Vec4)
 		return new Vec4(-a.x, -a.y, -a.z, -a.w);
 
 	@:op(++a)
-	static inline function prefixIncrement(a:Vec4) {
+	static private inline function prefixIncrement(a:Vec4) {
 		++a.x;
 		++a.y;
 		++a.z;
@@ -245,7 +246,7 @@ extern abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 	}
 
 	@:op(--a)
-	static inline function prefixDecrement(a:Vec4) {
+	static private inline function prefixDecrement(a:Vec4) {
 		--a.x;
 		--a.y;
 		--a.z;
@@ -254,7 +255,7 @@ extern abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 	}
 
 	@:op(a++)
-	static inline function postfixIncrement(a:Vec4) {
+	static private inline function postfixIncrement(a:Vec4) {
 		var ret = a.clone();
 		++a.x;
 		++a.y;
@@ -264,7 +265,7 @@ extern abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 	}
 
 	@:op(a--)
-	static inline function postfixDecrement(a:Vec4) {
+	static private inline function postfixDecrement(a:Vec4) {
 		var ret = a.clone();
 		--a.x;
 		--a.y;
@@ -274,51 +275,51 @@ extern abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 	}
 
 	@:op(a * b)
-	static inline function mul(a:Vec4, b:Vec4):Vec4
+	static private inline function mul(a:Vec4, b:Vec4):Vec4
 		return new Vec4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
 
 	@:op(a * b) @:commutative
-	static inline function mulScalar(a:Vec4, b:Float):Vec4
+	static private inline function mulScalar(a:Vec4, b:Float):Vec4
 		return new Vec4(a.x * b, a.y * b, a.z * b, a.w * b);
 
 	@:op(a / b)
-	static inline function div(a:Vec4, b:Vec4):Vec4
+	static private inline function div(a:Vec4, b:Vec4):Vec4
 		return new Vec4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
 
 	@:op(a / b)
-	static inline function divScalar(a:Vec4, b:Float):Vec4
+	static private inline function divScalar(a:Vec4, b:Float):Vec4
 		return new Vec4(a.x / b, a.y / b, a.z / b, a.w / b);
 
 	@:op(a / b)
-	static inline function divScalarInv(a:Float, b:Vec4):Vec4
+	static private inline function divScalarInv(a:Float, b:Vec4):Vec4
 		return new Vec4(a / b.x, a / b.y, a / b.z, a / b.w);
 
 	@:op(a + b)
-	static inline function add(a:Vec4, b:Vec4):Vec4
+	static private inline function add(a:Vec4, b:Vec4):Vec4
 		return new Vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 
 	@:op(a + b) @:commutative
-	static inline function addScalar(a:Vec4, b:Float):Vec4
+	static private inline function addScalar(a:Vec4, b:Float):Vec4
 		return new Vec4(a.x + b, a.y + b, a.z + b, a.w + b);
 
 	@:op(a - b)
-	static inline function sub(a:Vec4, b:Vec4):Vec4
+	static private inline function sub(a:Vec4, b:Vec4):Vec4
 		return new Vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 
 	@:op(a - b)
-	static inline function subScalar(a:Vec4, b:Float):Vec4
+	static private inline function subScalar(a:Vec4, b:Float):Vec4
 		return new Vec4(a.x - b, a.y - b, a.z - b, a.w - b);
 
 	@:op(b - a)
-	static inline function subScalarInv(a:Float, b:Vec4):Vec4
+	static private inline function subScalarInv(a:Float, b:Vec4):Vec4
 		return new Vec4(a - b.x, a - b.y, a - b.z, a - b.w);
 
 	@:op(a == b)
-	static inline function equal(a:Vec4, b:Vec4):Bool
+	static private inline function equal(a:Vec4, b:Vec4):Bool
 		return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
 
 	@:op(a != b)
-	static inline function notEqual(a:Vec4, b:Vec4):Bool
+	static private inline function notEqual(a:Vec4, b:Vec4):Bool
 		return !equal(a, b);
 	#end // !macro
 

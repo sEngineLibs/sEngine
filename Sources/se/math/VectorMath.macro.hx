@@ -98,7 +98,7 @@ class Swizzle {
 
 		var getterName = 'get_$ident';
 		var getter = (macro class {
-			inline function $getterName():$type return ${
+			private inline function $getterName():$type return ${
 				if (swizzle.length > 1) {
 					macro new $typePath($a{swizzle.map(i -> thisReadExpr[i])});
 				} else {
@@ -113,7 +113,7 @@ class Swizzle {
 		if (!readonly) {
 			var setterName = 'set_$ident';
 			var setter = (macro class {
-				inline function $setterName(v : $type):$type {
+				private inline function $setterName(v : $type):$type {
 					$b{
 						[
 							for (i in 0...swizzle.length)

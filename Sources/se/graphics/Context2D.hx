@@ -11,15 +11,15 @@ extern abstract Context2D(Graphics) from Graphics {
 	public var style(get, never):Context2DStyle;
 	public var transform(get, set):Mat3;
 
-	inline function get_style():Context2DStyle {
+	private inline function get_style():Context2DStyle {
 		return this;
 	}
 
-	inline function get_transform():Mat3 {
+	private inline function get_transform():Mat3 {
 		return this.transformation;
 	}
 
-	inline function set_transform(value:Mat3):Mat3 {
+	private inline function set_transform(value:Mat3):Mat3 {
 		return this.transformation = value;
 	}
 
@@ -194,7 +194,7 @@ extern abstract Context2D(Graphics) from Graphics {
 		}
 	}
 
-	inline function drawInnerLine(x1:Float, y1:Float, x2:Float, y2:Float, strength:Float):Void {
+	private inline function drawInnerLine(x1:Float, y1:Float, x2:Float, y2:Float, strength:Float):Void {
 		var side = y2 > y1 ? 1 : 0;
 		if (y2 == y1)
 			side = x2 - x1 > 0 ? 1 : 0;
@@ -331,7 +331,7 @@ extern abstract Context2D(Graphics) from Graphics {
 		}
 	}
 
-	inline function calculateCubicBezierPoint(t:Float, x:Array<Float>, y:Array<Float>):Array<Float> {
+	private inline function calculateCubicBezierPoint(t:Float, x:Array<Float>, y:Array<Float>):Array<Float> {
 		var u:Float = 1 - t;
 		var tt:Float = t * t;
 		var uu:Float = u * u;
@@ -398,7 +398,7 @@ extern abstract Context2D(Graphics) from Graphics {
 		}
 	}
 
-	inline function calculateQuadraticBezierPoint(t:Float, x:Array<Float>, y:Array<Float>):Array<Float> {
+	private inline function calculateQuadraticBezierPoint(t:Float, x:Array<Float>, y:Array<Float>):Array<Float> {
 		var u:Float = 1 - t;
 		var tt:Float = t * t;
 		var uu:Float = u * u;
@@ -463,11 +463,11 @@ extern abstract Context2D(Graphics) from Graphics {
 extern private abstract Context2DStyle(Graphics) from Graphics {
 	public var color(get, set):Color;
 
-	inline function get_color():Color {
+	private inline function get_color():Color {
 		return this.color;
 	}
 
-	inline function set_color(value:Color):Color {
+	private inline function set_color(value:Color):Color {
 		return this.color = value;
 	}
 }

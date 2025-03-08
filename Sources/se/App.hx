@@ -53,7 +53,7 @@ class App {
 			trace("This application can't be stopped!");
 	}
 
-	static inline function get_windows() {
+	static private inline function get_windows() {
 		return Window.all;
 	}
 

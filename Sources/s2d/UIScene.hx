@@ -43,7 +43,7 @@ class UIScene extends Element {
 	}
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-	inline function drawBounds(e:Element, target:Texture) {
+	private inline function drawBounds(e:Element, target:Texture) {
 		final ctx = target.ctx2D;
 		final style = ctx.style;
 

@@ -27,20 +27,20 @@ abstract Size(Vec2) from Vec2 to Vec2 {
 		return '${width}x${height}';
 	}
 
-	inline function get_width():FastFloat {
+	private inline function get_width():FastFloat {
 		return this.x;
 	}
 
-	inline function set_width(value:FastFloat):FastFloat {
+	private inline function set_width(value:FastFloat):FastFloat {
 		this.x = value;
 		return value;
 	}
 
-	inline function get_height():FastFloat {
+	private inline function get_height():FastFloat {
 		return this.y;
 	}
 
-	inline function set_height(value:FastFloat):FastFloat {
+	private inline function set_height(value:FastFloat):FastFloat {
 		this.y = value;
 		return value;
 	}

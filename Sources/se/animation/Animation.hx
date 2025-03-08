@@ -129,29 +129,29 @@ abstract class Animation<T> {
 		_tick(update(t));
 	}
 
-	inline function get_duration() {
+	private inline function get_duration() {
 		return @:privateAccess actuator.duration;
 	}
 
-	inline function set_duration(value:Float) {
+	private inline function set_duration(value:Float) {
 		@:privateAccess actuator.duration = value;
 		return value;
 	}
 
-	inline function get_easing() {
+	private inline function get_easing() {
 		return @:privateAccess actuator.easing;
 	}
 
-	inline function set_easing(value:Float->Float) {
+	private inline function set_easing(value:Float->Float) {
 		ease(value);
 		return value;
 	}
 
-	inline function get_running() {
+	private inline function get_running() {
 		return _running;
 	}
 
-	inline function set_running(value:Bool) {
+	private inline function set_running(value:Bool) {
 		if (!running && value)
 			start();
 		else
@@ -159,11 +159,11 @@ abstract class Animation<T> {
 		return value;
 	}
 
-	inline function get_paused() {
+	private inline function get_paused() {
 		return _paused;
 	}
 
-	inline function set_paused(value:Bool) {
+	private inline function set_paused(value:Bool) {
 		if (!paused && value)
 			pause();
 		else

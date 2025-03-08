@@ -31,39 +31,39 @@ abstract Rect(Vec4) from Vec4 to Vec4 {
 		return '$size at $position';
 	}
 
-	inline function get_width():FastFloat {
+	private inline function get_width():FastFloat {
 		return this.z;
 	}
 
-	inline function set_width(value:FastFloat):FastFloat {
+	private inline function set_width(value:FastFloat):FastFloat {
 		this.z = value;
 		return value;
 	}
 
-	inline function get_height():FastFloat {
+	private inline function get_height():FastFloat {
 		return this.w;
 	}
 
-	inline function set_height(value:FastFloat):FastFloat {
+	private inline function set_height(value:FastFloat):FastFloat {
 		this.w = value;
 		return value;
 	}
 
-	inline function get_position():Position {
+	private inline function get_position():Position {
 		return new Position(this.x, this.y);
 	}
 
-	inline function set_position(value:Position):Position {
+	private inline function set_position(value:Position):Position {
 		this.x = value.x;
 		this.y = value.y;
 		return value;
 	}
 
-	inline function get_size():Size {
+	private inline function get_size():Size {
 		return new Size(width, height);
 	}
 
-	inline function set_size(value:Size):Size {
+	private inline function set_size(value:Size):Size {
 		width = size.width;
 		height = size.height;
 		return value;

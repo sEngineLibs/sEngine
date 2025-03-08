@@ -57,38 +57,38 @@ class Compositor extends PPEffect {
 		ctx.end();
 	}
 
-	inline function get_posterizeGamma():Float {
+	private inline function get_posterizeGamma():Float {
 		return params[0];
 	}
 
-	inline function set_posterizeGamma(value:Float):Float {
+	private inline function set_posterizeGamma(value:Float):Float {
 		params[0] = value;
 		return value;
 	}
 
-	inline function get_posterizeSteps():Float {
+	private inline function get_posterizeSteps():Float {
 		return params[1];
 	}
 
-	inline function set_posterizeSteps(value:Float):Float {
+	private inline function set_posterizeSteps(value:Float):Float {
 		params[1] = value;
 		return value;
 	}
 
-	inline function get_vignetteStrength():Float {
+	private inline function get_vignetteStrength():Float {
 		return params[2];
 	}
 
-	inline function set_vignetteStrength(value:Float):Float {
+	private inline function set_vignetteStrength(value:Float):Float {
 		params[2] = value;
 		return value;
 	}
 
-	inline function get_vignetteColor():Color {
+	private inline function get_vignetteColor():Color {
 		return Color.rgba(params[3], params[4], params[5], params[6]);
 	}
 
-	inline function set_vignetteColor(value:Color):Color {
+	private inline function set_vignetteColor(value:Color):Color {
 		params[3] = value.r;
 		params[4] = value.g;
 		params[5] = value.b;

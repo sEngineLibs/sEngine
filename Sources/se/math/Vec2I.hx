@@ -24,7 +24,7 @@ extern abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 	}
 
 	@:op([])
-	inline function arrayRead(i:Int)
+	private inline function arrayRead(i:Int)
 		return switch i {
 			case 0: this.x;
 			case 1: this.y;
@@ -32,7 +32,7 @@ extern abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 		}
 
 	@:op([])
-	inline function arrayWrite(i:Int, v:Int)
+	private inline function arrayWrite(i:Int, v:Int)
 		return switch i {
 			case 0: this.x = v;
 			case 1: this.y = v;
@@ -40,25 +40,25 @@ extern abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 		}
 
 	@:op(-a)
-	static inline function neg(a:Vec2I)
+	static private inline function neg(a:Vec2I)
 		return new Vec2I(-a.x, -a.y);
 
 	@:op(++a)
-	static inline function prefixIncrement(a:Vec2I) {
+	static private inline function prefixIncrement(a:Vec2I) {
 		++a.x;
 		++a.y;
 		return a.clone();
 	}
 
 	@:op(--a)
-	static inline function prefixDecrement(a:Vec2I) {
+	static private inline function prefixDecrement(a:Vec2I) {
 		--a.x;
 		--a.y;
 		return a.clone();
 	}
 
 	@:op(a++)
-	static inline function postfixIncrement(a:Vec2I) {
+	static private inline function postfixIncrement(a:Vec2I) {
 		var ret = a.clone();
 		++a.x;
 		++a.y;
@@ -66,7 +66,7 @@ extern abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 	}
 
 	@:op(a--)
-	static inline function postfixDecrement(a:Vec2I) {
+	static private inline function postfixDecrement(a:Vec2I) {
 		var ret = a.clone();
 		--a.x;
 		--a.y;
@@ -74,51 +74,51 @@ extern abstract Vec2I(Vec2IData) from Vec2IData to Vec2IData {
 	}
 
 	@:op(a * b)
-	static inline function mul(a:Vec2I, b:Vec2I):Vec2I
+	static private inline function mul(a:Vec2I, b:Vec2I):Vec2I
 		return new Vec2I(a.x * b.x, a.y * b.y);
 
 	@:op(a * b) @:commutative
-	static inline function mulScalar(a:Vec2I, b:Int):Vec2I
+	static private inline function mulScalar(a:Vec2I, b:Int):Vec2I
 		return new Vec2I(a.x * b, a.y * b);
 
 	@:op(a / b)
-	static inline function div(a:Vec2I, b:Vec2I):Vec2I
+	static private inline function div(a:Vec2I, b:Vec2I):Vec2I
 		return new Vec2(a.x / b.x, a.y / b.y);
 
 	@:op(a / b)
-	static inline function divScalar(a:Vec2I, b:Int):Vec2I
+	static private inline function divScalar(a:Vec2I, b:Int):Vec2I
 		return new Vec2(a.x / b, a.y / b);
 
 	@:op(a / b)
-	static inline function divScalarInv(a:Int, b:Vec2I):Vec2I
+	static private inline function divScalarInv(a:Int, b:Vec2I):Vec2I
 		return new Vec2(a / b.x, a / b.y);
 
 	@:op(a + b)
-	static inline function add(a:Vec2I, b:Vec2I):Vec2I
+	static private inline function add(a:Vec2I, b:Vec2I):Vec2I
 		return new Vec2I(a.x + b.x, a.y + b.y);
 
 	@:op(a + b) @:commutative
-	static inline function addScalar(a:Vec2I, b:Int):Vec2I
+	static private inline function addScalar(a:Vec2I, b:Int):Vec2I
 		return new Vec2I(a.x + b, a.y + b);
 
 	@:op(a - b)
-	static inline function sub(a:Vec2I, b:Vec2I):Vec2I
+	static private inline function sub(a:Vec2I, b:Vec2I):Vec2I
 		return new Vec2I(a.x - b.x, a.y - b.y);
 
 	@:op(a - b)
-	static inline function subScalar(a:Vec2I, b:Int):Vec2I
+	static private inline function subScalar(a:Vec2I, b:Int):Vec2I
 		return new Vec2I(a.x - b, a.y - b);
 
 	@:op(b - a)
-	static inline function subScalarInv(a:Int, b:Vec2I):Vec2I
+	static private inline function subScalarInv(a:Int, b:Vec2I):Vec2I
 		return new Vec2I(a - b.x, a - b.y);
 
 	@:op(a == b)
-	static inline function equal(a:Vec2I, b:Vec2I):Bool
+	static private inline function equal(a:Vec2I, b:Vec2I):Bool
 		return a.x == b.x && a.y == b.y;
 
 	@:op(a != b)
-	static inline function notEqual(a:Vec2I, b:Vec2I):Bool
+	static private inline function notEqual(a:Vec2I, b:Vec2I):Bool
 		return !equal(a, b);
 	#end // !macro
 

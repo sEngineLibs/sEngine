@@ -84,13 +84,13 @@ class SEngine {
 		Renderer.resize(width, height);
 	}
 
-	static inline function set_scale(value:Float):Float {
+	static private inline function set_scale(value:Float):Float {
 		scale = value;
 		updateProjection();
 		return value;
 	}
 
-	static inline function set_aspectRatio(value:Float):Float {
+	static private inline function set_aspectRatio(value:Float):Float {
 		aspectRatio = value;
 		updateProjection();
 		return value;

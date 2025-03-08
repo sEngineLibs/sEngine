@@ -31,20 +31,20 @@ abstract SizeI(Vec2I) from Vec2I to Vec2I {
 		return '${width}x${height}';
 	}
 
-	inline function get_width():Int {
+	private inline function get_width():Int {
 		return this.x;
 	}
 
-	inline function set_width(value:Int):Int {
+	private inline function set_width(value:Int):Int {
 		this.x = value;
 		return value;
 	}
 
-	inline function get_height():Int {
+	private inline function get_height():Int {
 		return this.y;
 	}
 
-	inline function set_height(value:Int):Int {
+	private inline function set_height(value:Int):Int {
 		this.y = value;
 		return value;
 	}

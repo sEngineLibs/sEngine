@@ -60,7 +60,7 @@ class TextElement extends UISceneElement {
 		updateTextHeight();
 	}
 
-	inline function set_fontSize(value:Int) {
+	private inline function set_fontSize(value:Int) {
 		fontSize = value < 0 ? 0 : value;
 		return value;
 	}

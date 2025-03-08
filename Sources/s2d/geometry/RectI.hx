@@ -35,39 +35,39 @@ abstract RectI(Vec4I) from Vec4I to Vec4I {
 		return '$size at $position';
 	}
 
-	inline function get_width():Int {
+	private inline function get_width():Int {
 		return this.z;
 	}
 
-	inline function set_width(value:Int):Int {
+	private inline function set_width(value:Int):Int {
 		this.z = value;
 		return value;
 	}
 
-	inline function get_height():Int {
+	private inline function get_height():Int {
 		return this.w;
 	}
 
-	inline function set_height(value:Int):Int {
+	private inline function set_height(value:Int):Int {
 		this.w = value;
 		return value;
 	}
 
-	inline function get_position():PositionI {
+	private inline function get_position():PositionI {
 		return new PositionI(this.x, this.y);
 	}
 
-	inline function set_position(value:PositionI):PositionI {
+	private inline function set_position(value:PositionI):PositionI {
 		this.x = value.x;
 		this.y = value.y;
 		return value;
 	}
 
-	inline function get_size():SizeI {
+	private inline function get_size():SizeI {
 		return new SizeI(width, height);
 	}
 
-	inline function set_size(value:SizeI):SizeI {
+	private inline function set_size(value:SizeI):SizeI {
 		width = size.width;
 		height = size.height;
 		return value;

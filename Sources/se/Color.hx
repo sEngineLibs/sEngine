@@ -186,47 +186,47 @@ extern enum abstract Color(Int) from Int to Int {
 		return vec4(r, g, b, a);
 	}
 
-	inline function get_r():Float {
+	private inline function get_r():Float {
 		return ((this & 0x00ff0000) >>> 16) * (1 / 255);
 	}
 
-	inline function set_r(value:Float):Float {
+	private inline function set_r(value:Float):Float {
 		this = (Std.int(a * 255) << 24) | (Std.int(value * 255) << 16) | (Std.int(g * 255) << 8) | Std.int(b * 255);
 		return value;
 	}
 
-	inline function get_g():Float {
+	private inline function get_g():Float {
 		return ((this & 0x0000ff00) >>> 8) * (1 / 255);
 	}
 
-	inline function set_g(value:Float):Float {
+	private inline function set_g(value:Float):Float {
 		this = (Std.int(a * 255) << 24) | (Std.int(r * 255) << 16) | (Std.int(value * 255) << 8) | Std.int(b * 255);
 		return value;
 	}
 
-	inline function get_b():Float {
+	private inline function get_b():Float {
 		return (this & 0x000000ff) * (1 / 255);
 	}
 
-	inline function set_b(value:Float):Float {
+	private inline function set_b(value:Float):Float {
 		this = (Std.int(a * 255) << 24) | (Std.int(r * 255) << 16) | (Std.int(g * 255) << 8) | Std.int(value * 255);
 		return value;
 	}
 
-	inline function get_a():Float {
+	private inline function get_a():Float {
 		return (this >>> 24) * (1 / 255);
 	}
 
-	inline function set_a(value:Float):Float {
+	private inline function set_a(value:Float):Float {
 		this = (Std.int(value * 255) << 24) | (Std.int(r * 255) << 16) | (Std.int(g * 255) << 8) | Std.int(b * 255);
 		return value;
 	}
 
-	inline function get_h():Float {
+	private inline function get_h():Float {
 		return rgb2hsv(this).r;
 	}
 
-	inline function set_h(value:Float):Float {
+	private inline function set_h(value:Float):Float {
 		var c = hsv2rgb(vec3(value, s, v));
 		r = c.r;
 		g = c.g;
@@ -234,11 +234,11 @@ extern enum abstract Color(Int) from Int to Int {
 		return value;
 	}
 
-	inline function get_s():Float {
+	private inline function get_s():Float {
 		return rgb2hsv(this).g;
 	}
 
-	inline function set_s(value:Float):Float {
+	private inline function set_s(value:Float):Float {
 		var c = hsv2rgb(vec3(h, value, v));
 		r = c.r;
 		g = c.g;
@@ -246,11 +246,11 @@ extern enum abstract Color(Int) from Int to Int {
 		return value;
 	}
 
-	inline function get_v():Float {
+	private inline function get_v():Float {
 		return rgb2hsv(this).b;
 	}
 
-	inline function set_v(value:Float):Float {
+	private inline function set_v(value:Float):Float {
 		var c = hsv2rgb(vec3(h, s, value));
 		r = c.r;
 		g = c.g;
@@ -258,56 +258,56 @@ extern enum abstract Color(Int) from Int to Int {
 		return value;
 	}
 
-	inline function get_RGB():Vec3 {
+	private inline function get_RGB():Vec3 {
 		return toVec3();
 	}
 
-	inline function set_RGB(value:Vec3):Vec3 {
+	private inline function set_RGB(value:Vec3):Vec3 {
 		fromVec3(value);
 		return value;
 	}
 
-	inline function get_RGBA():Vec4 {
+	private inline function get_RGBA():Vec4 {
 		return toVec4();
 	}
 
-	inline function set_RGBA(value:Vec4):Vec4 {
+	private inline function set_RGBA(value:Vec4):Vec4 {
 		fromVec4(value);
 		return value;
 	}
 
-	inline function get_HSV():Vec3 {
+	private inline function get_HSV():Vec3 {
 		return rgb2hsv(toVec3());
 	}
 
-	inline function set_HSV(value:Vec3):Vec3 {
+	private inline function set_HSV(value:Vec3):Vec3 {
 		fromVec3(hsv2rgb(value));
 		return value;
 	}
 
-	inline function get_HSVA():Vec4 {
+	private inline function get_HSVA():Vec4 {
 		return rgb2hsv(toVec3());
 	}
 
-	inline function set_HSVA(value:Vec4):Vec4 {
+	private inline function set_HSVA(value:Vec4):Vec4 {
 		fromVec4(hsv2rgb(value));
 		return value;
 	}
 
-	inline function get_HSL():Vec3 {
+	private inline function get_HSL():Vec3 {
 		return rgb2hsv(toVec3());
 	}
 
-	inline function set_HSL(value:Vec3):Vec3 {
+	private inline function set_HSL(value:Vec3):Vec3 {
 		fromVec3(hsl2rgb(value));
 		return value;
 	}
 
-	inline function get_HSLA():Vec4 {
+	private inline function get_HSLA():Vec4 {
 		return rgb2hsl(toVec3());
 	}
 
-	inline function set_HSLA(value:Vec4):Vec4 {
+	private inline function set_HSLA(value:Vec4):Vec4 {
 		fromVec4(hsl2rgb(value));
 		return value;
 	}

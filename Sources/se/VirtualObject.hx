@@ -35,7 +35,7 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 		return Type.getClassName(Type.getClass(this));
 	}
 
-	inline function set_parent(value:This):This {
+	private inline function set_parent(value:This):This {
 		if (value != null && value != this) {
 			if (value.children.push(cast this) != null)
 				parent = value;
@@ -45,17 +45,17 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 		return value;
 	}
 
-	inline function get_index():Int {
+	private inline function get_index():Int {
 		return parent.children.indexOf(cast this);
 	}
 
-	inline function set_index(value:Int):Int {
+	private inline function set_index(value:Int):Int {
 		parent.children.remove(cast this);
 		parent.children.insert(value, cast this);
 		return value;
 	}
 
-	inline function get_siblings() {
+	private inline function get_siblings() {
 		if (parent != null) {
 			var s = parent.children.copy();
 			s.remove(cast this);

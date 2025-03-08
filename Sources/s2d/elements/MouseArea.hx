@@ -104,7 +104,7 @@ class MouseArea extends Element {
 			doubleClicked(button);
 	}
 
-	inline function isAccepted(button:MouseButton):Bool {
+	private inline function isAccepted(button:MouseButton):Bool {
 		return isEntered && acceptedButtons.contains(button);
 	}
 }

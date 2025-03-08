@@ -51,7 +51,7 @@ class Stage {
 	#if (S2D_LIGHTING_ENVIRONMENT == 1)
 	@:isVar public var environmentMap(default, set):Image;
 
-	inline function set_environmentMap(value:Image):Image {
+	private inline function set_environmentMap(value:Image):Image {
 		environmentMap = value;
 		environmentMap.generateMipmaps(4);
 		return value;

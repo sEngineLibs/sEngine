@@ -34,38 +34,38 @@ abstract Bounds(Vec4) from Vec4 to Vec4 {
 		return '($left, $top, $right, $bottom)';
 	}
 
-	inline function get_left():FastFloat {
+	private inline function get_left():FastFloat {
 		return this.x;
 	}
 
-	inline function set_left(value:FastFloat):FastFloat {
+	private inline function set_left(value:FastFloat):FastFloat {
 		this.x = value;
 		return value;
 	}
 
-	inline function get_top():FastFloat {
+	private inline function get_top():FastFloat {
 		return this.y;
 	}
 
-	inline function set_top(value:FastFloat):FastFloat {
+	private inline function set_top(value:FastFloat):FastFloat {
 		this.y = value;
 		return value;
 	}
 
-	inline function get_right():FastFloat {
+	private inline function get_right():FastFloat {
 		return this.z;
 	}
 
-	inline function set_right(value:FastFloat):FastFloat {
+	private inline function set_right(value:FastFloat):FastFloat {
 		this.z = value;
 		return value;
 	}
 
-	inline function get_bottom():FastFloat {
+	private inline function get_bottom():FastFloat {
 		return this.w;
 	}
 
-	inline function set_bottom(value:FastFloat):FastFloat {
+	private inline function set_bottom(value:FastFloat):FastFloat {
 		this.w = value;
 		return value;
 	}

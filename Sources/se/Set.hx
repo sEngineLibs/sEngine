@@ -350,7 +350,7 @@ extern abstract Set<T>(Array<T>) from Array<T> to Array<T> {
 		return this.keyValueIterator();
 	}
 
-	inline function get_length():Int {
+	private inline function get_length():Int {
 		return this.length;
 	}
 }

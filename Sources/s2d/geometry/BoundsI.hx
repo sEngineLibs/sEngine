@@ -38,38 +38,38 @@ abstract BoundsI(Vec4I) from Vec4I to Vec4I {
 		return '($left, $top, $right, $bottom)';
 	}
 
-	inline function get_left():Int {
+	private inline function get_left():Int {
 		return this.x;
 	}
 
-	inline function set_left(value:Int):Int {
+	private inline function set_left(value:Int):Int {
 		this.x = value;
 		return value;
 	}
 
-	inline function get_top():Int {
+	private inline function get_top():Int {
 		return this.y;
 	}
 
-	inline function set_top(value:Int):Int {
+	private inline function set_top(value:Int):Int {
 		this.y = value;
 		return value;
 	}
 
-	inline function get_right():Int {
+	private inline function get_right():Int {
 		return this.z;
 	}
 
-	inline function set_right(value:Int):Int {
+	private inline function set_right(value:Int):Int {
 		this.z = value;
 		return value;
 	}
 
-	inline function get_bottom():Int {
+	private inline function get_bottom():Int {
 		return this.w;
 	}
 
-	inline function set_bottom(value:Int):Int {
+	private inline function set_bottom(value:Int):Int {
 		this.w = value;
 		return value;
 	}

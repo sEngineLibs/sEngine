@@ -34,25 +34,25 @@ class UILayer {
 		}
 	}
 
-	inline function set_enabled(value:Bool):Bool {
+	private inline function set_enabled(value:Bool):Bool {
 		enabled = value;
 		updateTexture();
 		return value;
 	}
 
-	inline function set_textureSize(value:SizeI):SizeI {
+	private inline function set_textureSize(value:SizeI):SizeI {
 		textureSize = value;
 		updateTexture();
 		return value;
 	}
 
-	inline function set_format(value:TextureFormat):TextureFormat {
+	private inline function set_format(value:TextureFormat):TextureFormat {
 		format = value;
 		updateTexture();
 		return value;
 	}
 
-	inline function set_samples(value:UInt):UInt {
+	private inline function set_samples(value:UInt):UInt {
 		samples = value;
 		updateTexture();
 		return value;

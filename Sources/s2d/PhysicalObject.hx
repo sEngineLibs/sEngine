@@ -19,7 +19,7 @@ abstract class PhysicalObject<This:PhysicalObject<This>> extends se.VirtualObjec
 			}
 	}
 
-	inline function set_transform(value:Mat3):Mat3 {
+	private inline function set_transform(value:Mat3):Mat3 {
 		final d = inverse(transform) * value;
 		transform = value;
 

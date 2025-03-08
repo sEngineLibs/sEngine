@@ -39,7 +39,7 @@ class SpriteAtlas {
 		#end
 	}
 
-	inline function set_layer(value:Layer) {
+	private inline function set_layer(value:Layer) {
 		value.addSpriteAtlas(this);
 		layer = value;
 		return value;

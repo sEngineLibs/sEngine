@@ -180,7 +180,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(-a)
-	static inline function neg(m:Mat4) {
+	static private inline function neg(m:Mat4) {
 		var m:KhaMat4 = m;
 		return new Mat4(-m._00,
 			-m._10,
@@ -201,7 +201,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(++a)
-	static inline function prefixIncrement(m:Mat4) {
+	static private inline function prefixIncrement(m:Mat4) {
 		var _m:KhaMat4 = m;
 		++_m._00;
 		++_m._10;
@@ -223,7 +223,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(--a)
-	static inline function prefixDecrement(m:Mat4) {
+	static private inline function prefixDecrement(m:Mat4) {
 		var _m:KhaMat4 = m;
 		--_m._00;
 		--_m._10;
@@ -245,7 +245,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(a++)
-	static inline function postfixIncrement(m:Mat4) {
+	static private inline function postfixIncrement(m:Mat4) {
 		var ret = m.clone();
 		var m:KhaMat4 = m;
 		++m._00;
@@ -268,7 +268,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(a--)
-	static inline function postfixDecrement(m:Mat4) {
+	static private inline function postfixDecrement(m:Mat4) {
 		var ret = m.clone();
 		var m:KhaMat4 = m;
 		--m._00;
@@ -293,39 +293,39 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	// assignment overload should come before other binary ops to ensure they have priority
 
 	@:op(a *= b)
-	static inline function mulEq(a:Mat4, b:Mat4):Mat4
+	static private inline function mulEq(a:Mat4, b:Mat4):Mat4
 		return a.copyFrom(a * b);
 
 	@:op(a *= b)
-	static inline function mulEqScalar(a:Mat4, f:Float):Mat4
+	static private inline function mulEqScalar(a:Mat4, f:Float):Mat4
 		return a.copyFrom(a * f);
 
 	@:op(a /= b)
-	static inline function divEq(a:Mat4, b:Mat4):Mat4
+	static private inline function divEq(a:Mat4, b:Mat4):Mat4
 		return a.copyFrom(a / b);
 
 	@:op(a /= b)
-	static inline function divEqScalar(a:Mat4, f:Float):Mat4
+	static private inline function divEqScalar(a:Mat4, f:Float):Mat4
 		return a.copyFrom(a / f);
 
 	@:op(a += b)
-	static inline function addEq(a:Mat4, b:Mat4):Mat4
+	static private inline function addEq(a:Mat4, b:Mat4):Mat4
 		return a.copyFrom(a + b);
 
 	@:op(a += b)
-	static inline function addEqScalar(a:Mat4, f:Float):Mat4
+	static private inline function addEqScalar(a:Mat4, f:Float):Mat4
 		return a.copyFrom(a + f);
 
 	@:op(a -= b)
-	static inline function subEq(a:Mat4, b:Mat4):Mat4
+	static private inline function subEq(a:Mat4, b:Mat4):Mat4
 		return a.copyFrom(a - b);
 
 	@:op(a -= b)
-	static inline function subEqScalar(a:Mat4, f:Float):Mat4
+	static private inline function subEqScalar(a:Mat4, f:Float):Mat4
 		return a.copyFrom(a - f);
 
 	@:op(a + b)
-	static inline function add(m:Mat4, n:Mat4):Mat4 {
+	static private inline function add(m:Mat4, n:Mat4):Mat4 {
 		var m:KhaMat4 = m;
 		var n:KhaMat4 = n;
 		return new Mat4(m._00
@@ -349,7 +349,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(a + b) @:commutative
-	static inline function addScalar(m:Mat4, f:Float):Mat4 {
+	static private inline function addScalar(m:Mat4, f:Float):Mat4 {
 		var m:KhaMat4 = m;
 		return new Mat4(m._00
 			+ f, m._10
@@ -372,7 +372,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(a - b)
-	static inline function sub(m:Mat4, n:Mat4):Mat4 {
+	static private inline function sub(m:Mat4, n:Mat4):Mat4 {
 		var m:KhaMat4 = m;
 		var n:KhaMat4 = n;
 		return new Mat4(m._00
@@ -396,7 +396,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(a - b)
-	static inline function subScalar(m:Mat4, f:Float):Mat4 {
+	static private inline function subScalar(m:Mat4, f:Float):Mat4 {
 		var m:KhaMat4 = m;
 		return new Mat4(m._00
 			- f, m._10
@@ -419,7 +419,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(a - b)
-	static inline function subScalarInv(f:Float, m:Mat4):Mat4 {
+	static private inline function subScalarInv(f:Float, m:Mat4):Mat4 {
 		var m:KhaMat4 = m;
 		return new Mat4(f
 			- m._00, f
@@ -442,7 +442,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(a * b)
-	static inline function mul(m:Mat4, n:Mat4):Mat4 {
+	static private inline function mul(m:Mat4, n:Mat4):Mat4 {
 		var m:KhaMat4 = m;
 		var n:KhaMat4 = n;
 		return new Mat4(m._00 * n._00
@@ -504,7 +504,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(a * b)
-	static inline function postMulVec4(m:Mat4, v:Vec4):Vec4 {
+	static private inline function postMulVec4(m:Mat4, v:Vec4):Vec4 {
 		var m:KhaMat4 = m;
 		return new Vec4(m._00 * v.x
 			+ m._01 * v.y
@@ -523,39 +523,39 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(a * b)
-	static inline function preMulVec4(v:Vec4, m:Mat4):Vec4 {
+	static private inline function preMulVec4(v:Vec4, m:Mat4):Vec4 {
 		var m:KhaMat4 = m;
 		return new Vec4(v.dot(new Vec4(m._00, m._10, m._20, m._30)), v.dot(new Vec4(m._01, m._11, m._21, m._31)), v.dot(new Vec4(m._02, m._12, m._22, m._32)),
 			v.dot(new Vec4(m._03, m._13, m._23, m._33)));
 	}
 
 	@:op(a * b) @:commutative
-	static inline function mulScalar(m:Mat4, f:Float):Mat4 {
+	static private inline function mulScalar(m:Mat4, f:Float):Mat4 {
 		var m:KhaMat4 = m;
 		return new Mat4(m._00 * f, m._10 * f, m._20 * f, m._30 * f, m._01 * f, m._11 * f, m._21 * f, m._31 * f, m._02 * f, m._12 * f, m._22 * f, m._32 * f,
 			m._03 * f, m._13 * f, m._23 * f, m._33 * f);
 	}
 
 	@:op(a / b)
-	static inline function div(m:Mat4, n:Mat4):Mat4
+	static private inline function div(m:Mat4, n:Mat4):Mat4
 		return m.matrixCompMult(1.0 / n);
 
 	@:op(a / b)
-	static inline function divScalar(m:Mat4, f:Float):Mat4 {
+	static private inline function divScalar(m:Mat4, f:Float):Mat4 {
 		var m:KhaMat4 = m;
 		return new Mat4(m._00 / f, m._10 / f, m._20 / f, m._30 / f, m._01 / f, m._11 / f, m._21 / f, m._31 / f, m._02 / f, m._12 / f, m._22 / f, m._32 / f,
 			m._03 / f, m._13 / f, m._23 / f, m._33 / f);
 	}
 
 	@:op(a / b)
-	static inline function divScalarInv(f:Float, m:Mat4):Mat4 {
+	static private inline function divScalarInv(f:Float, m:Mat4):Mat4 {
 		var m:KhaMat4 = m;
 		return new Mat4(f / m._00, f / m._10, f / m._20, f / m._30, f / m._01, f / m._11, f / m._21, f / m._31, f / m._02, f / m._12, f / m._22, f / m._32,
 			f / m._03, f / m._13, f / m._23, f / m._33);
 	}
 
 	@:op(a == b)
-	static inline function equal(m:Mat4, n:Mat4):Bool {
+	static private inline function equal(m:Mat4, n:Mat4):Bool {
 		var m:KhaMat4 = m;
 		var n:KhaMat4 = n;
 		return m._00 == n._00 && m._10 == n._10 && m._20 == n._20 && m._30 == n._30 && m._01 == n._01 && m._11 == n._11 && m._21 == n._21 && m._31 == n._31
@@ -563,7 +563,7 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	@:op(a != b)
-	static inline function notEqual(m:Mat4, n:Mat4):Bool
+	static private inline function notEqual(m:Mat4, n:Mat4):Bool
 		return !equal(m, n);
 
 	/**

@@ -116,60 +116,60 @@ extern abstract Vec3(KhaVec3) from KhaVec3 to KhaVec3 {
 		return (this : Vec3) - floor();
 	}
 
-	public extern overload inline function mod(d:Vec3):Vec3 {
+	extern overload public inline function mod(d:Vec3):Vec3 {
 		return (this : Vec3) - d * ((this : Vec3) / d).floor();
 	}
 
-	public extern overload inline function mod(d:Float):Vec3 {
+	extern overload public inline function mod(d:Float):Vec3 {
 		return (this : Vec3) - d * ((this : Vec3) / d).floor();
 	}
 
-	public extern overload inline function min(b:Vec3):Vec3 {
+	extern overload public inline function min(b:Vec3):Vec3 {
 		return new Vec3(b.x < this.x ? b.x : this.x, b.y < this.y ? b.y : this.y, b.z < this.z ? b.z : this.z);
 	}
 
-	public extern overload inline function min(b:Float):Vec3 {
+	extern overload public inline function min(b:Float):Vec3 {
 		return new Vec3(b < this.x ? b : this.x, b < this.y ? b : this.y, b < this.z ? b : this.z);
 	}
 
-	public extern overload inline function max(b:Vec3):Vec3 {
+	extern overload public inline function max(b:Vec3):Vec3 {
 		return new Vec3(this.x < b.x ? b.x : this.x, this.y < b.y ? b.y : this.y, this.z < b.z ? b.z : this.z);
 	}
 
-	public extern overload inline function max(b:Float):Vec3 {
+	extern overload public inline function max(b:Float):Vec3 {
 		return new Vec3(this.x < b ? b : this.x, this.y < b ? b : this.y, this.z < b ? b : this.z);
 	}
 
-	public extern overload inline function clamp(minLimit:Vec3, maxLimit:Vec3) {
+	extern overload public inline function clamp(minLimit:Vec3, maxLimit:Vec3) {
 		return max(minLimit).min(maxLimit);
 	}
 
-	public extern overload inline function clamp(minLimit:Float, maxLimit:Float) {
+	extern overload public inline function clamp(minLimit:Float, maxLimit:Float) {
 		return max(minLimit).min(maxLimit);
 	}
 
-	public extern overload inline function mix(b:Vec3, t:Vec3):Vec3 {
+	extern overload public inline function mix(b:Vec3, t:Vec3):Vec3 {
 		return (this : Vec3) * (1.0 - t) + b * t;
 	}
 
-	public extern overload inline function mix(b:Vec3, t:Float):Vec3 {
+	extern overload public inline function mix(b:Vec3, t:Float):Vec3 {
 		return (this : Vec3) * (1.0 - t) + b * t;
 	}
 
-	public extern overload inline function step(edge:Vec3):Vec3 {
+	extern overload public inline function step(edge:Vec3):Vec3 {
 		return new Vec3(this.x < edge.x ? 0.0 : 1.0, this.y < edge.y ? 0.0 : 1.0, this.z < edge.z ? 0.0 : 1.0);
 	}
 
-	public extern overload inline function step(edge:Float):Vec3 {
+	extern overload public inline function step(edge:Float):Vec3 {
 		return new Vec3(this.x < edge ? 0.0 : 1.0, this.y < edge ? 0.0 : 1.0, this.z < edge ? 0.0 : 1.0);
 	}
 
-	public extern overload inline function smoothstep(edge0:Vec3, edge1:Vec3):Vec3 {
+	extern overload public inline function smoothstep(edge0:Vec3, edge1:Vec3):Vec3 {
 		var t = (((this : Vec3) - edge0) / (edge1 - edge0)).clamp(0, 1);
 		return t * t * (3.0 - 2.0 * t);
 	}
 
-	public extern overload inline function smoothstep(edge0:Float, edge1:Float):Vec3 {
+	extern overload public inline function smoothstep(edge0:Float, edge1:Float):Vec3 {
 		var t = (((this : Vec3) - edge0) / (edge1 - edge0)).clamp(0, 1);
 		return t * t * (3.0 - 2.0 * t);
 	}
@@ -215,7 +215,7 @@ extern abstract Vec3(KhaVec3) from KhaVec3 to KhaVec3 {
 	}
 
 	@:op([])
-	inline function arrayRead(i:Int)
+	private inline function arrayRead(i:Int)
 		return switch i {
 			case 0: this.x;
 			case 1: this.y;
@@ -224,7 +224,7 @@ extern abstract Vec3(KhaVec3) from KhaVec3 to KhaVec3 {
 		}
 
 	@:op([])
-	inline function arrayWrite(i:Int, v:Float)
+	private inline function arrayWrite(i:Int, v:Float)
 		return switch i {
 			case 0: this.x = v;
 			case 1: this.y = v;
@@ -233,11 +233,11 @@ extern abstract Vec3(KhaVec3) from KhaVec3 to KhaVec3 {
 		}
 
 	@:op(-a)
-	static inline function neg(a:Vec3)
+	static private inline function neg(a:Vec3)
 		return new Vec3(-a.x, -a.y, -a.z);
 
 	@:op(++a)
-	static inline function prefixIncrement(a:Vec3) {
+	static private inline function prefixIncrement(a:Vec3) {
 		++a.x;
 		++a.y;
 		++a.z;
@@ -245,7 +245,7 @@ extern abstract Vec3(KhaVec3) from KhaVec3 to KhaVec3 {
 	}
 
 	@:op(--a)
-	static inline function prefixDecrement(a:Vec3) {
+	static private inline function prefixDecrement(a:Vec3) {
 		--a.x;
 		--a.y;
 		--a.z;
@@ -253,7 +253,7 @@ extern abstract Vec3(KhaVec3) from KhaVec3 to KhaVec3 {
 	}
 
 	@:op(a++)
-	static inline function postfixIncrement(a:Vec3) {
+	static private inline function postfixIncrement(a:Vec3) {
 		var ret = a.clone();
 		++a.x;
 		++a.y;
@@ -262,7 +262,7 @@ extern abstract Vec3(KhaVec3) from KhaVec3 to KhaVec3 {
 	}
 
 	@:op(a--)
-	static inline function postfixDecrement(a:Vec3) {
+	static private inline function postfixDecrement(a:Vec3) {
 		var ret = a.clone();
 		--a.x;
 		--a.y;
@@ -271,51 +271,51 @@ extern abstract Vec3(KhaVec3) from KhaVec3 to KhaVec3 {
 	}
 
 	@:op(a * b)
-	static inline function mul(a:Vec3, b:Vec3):Vec3
+	static private inline function mul(a:Vec3, b:Vec3):Vec3
 		return new Vec3(a.x * b.x, a.y * b.y, a.z * b.z);
 
 	@:op(a * b) @:commutative
-	static inline function mulScalar(a:Vec3, b:Float):Vec3
+	static private inline function mulScalar(a:Vec3, b:Float):Vec3
 		return new Vec3(a.x * b, a.y * b, a.z * b);
 
 	@:op(a / b)
-	static inline function div(a:Vec3, b:Vec3):Vec3
+	static private inline function div(a:Vec3, b:Vec3):Vec3
 		return new Vec3(a.x / b.x, a.y / b.y, a.z / b.z);
 
 	@:op(a / b)
-	static inline function divScalar(a:Vec3, b:Float):Vec3
+	static private inline function divScalar(a:Vec3, b:Float):Vec3
 		return new Vec3(a.x / b, a.y / b, a.z / b);
 
 	@:op(a / b)
-	static inline function divScalarInv(a:Float, b:Vec3):Vec3
+	static private inline function divScalarInv(a:Float, b:Vec3):Vec3
 		return new Vec3(a / b.x, a / b.y, a / b.z);
 
 	@:op(a + b)
-	static inline function add(a:Vec3, b:Vec3):Vec3
+	static private inline function add(a:Vec3, b:Vec3):Vec3
 		return new Vec3(a.x + b.x, a.y + b.y, a.z + b.z);
 
 	@:op(a + b) @:commutative
-	static inline function addScalar(a:Vec3, b:Float):Vec3
+	static private inline function addScalar(a:Vec3, b:Float):Vec3
 		return new Vec3(a.x + b, a.y + b, a.z + b);
 
 	@:op(a - b)
-	static inline function sub(a:Vec3, b:Vec3):Vec3
+	static private inline function sub(a:Vec3, b:Vec3):Vec3
 		return new Vec3(a.x - b.x, a.y - b.y, a.z - b.z);
 
 	@:op(a - b)
-	static inline function subScalar(a:Vec3, b:Float):Vec3
+	static private inline function subScalar(a:Vec3, b:Float):Vec3
 		return new Vec3(a.x - b, a.y - b, a.z - b);
 
 	@:op(b - a)
-	static inline function subScalarInv(a:Float, b:Vec3):Vec3
+	static private inline function subScalarInv(a:Float, b:Vec3):Vec3
 		return new Vec3(a - b.x, a - b.y, a - b.z);
 
 	@:op(a == b)
-	static inline function equal(a:Vec3, b:Vec3):Bool
+	static private inline function equal(a:Vec3, b:Vec3):Bool
 		return a.x == b.x && a.y == b.y && a.z == b.z;
 
 	@:op(a != b)
-	static inline function notEqual(a:Vec3, b:Vec3):Bool
+	static private inline function notEqual(a:Vec3, b:Vec3):Bool
 		return !equal(a, b);
 	#end // !macro
 

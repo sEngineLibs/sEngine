@@ -203,15 +203,15 @@ class Element extends PhysicalObject<Element> {
 		ctx.style.opacity = finalOpacity;
 	}
 
-	inline function get_anchors():Anchors {
+	private inline function get_anchors():Anchors {
 		return this;
 	}
 
-	inline function get_x():Float {
+	private inline function get_x():Float {
 		return left.position;
 	}
 
-	inline function set_x(value:Float):Float {
+	private inline function set_x(value:Float):Float {
 		if (!left.isBinded) {
 			final d = value - x;
 			left.position = value;
@@ -223,11 +223,11 @@ class Element extends PhysicalObject<Element> {
 		return value;
 	}
 
-	inline function get_y():Float {
+	private inline function get_y():Float {
 		return top.position;
 	}
 
-	inline function set_y(value:Float):Float {
+	private inline function set_y(value:Float):Float {
 		if (!top.isBinded) {
 			final d = value - y;
 			top.position = value;
@@ -239,63 +239,63 @@ class Element extends PhysicalObject<Element> {
 		return value;
 	}
 
-	inline function get_width():Float {
+	private inline function get_width():Float {
 		return right.position - x;
 	}
 
-	inline function set_width(value:Float):Float {
+	private inline function set_width(value:Float):Float {
 		if (!right.isBinded)
 			right.position = x + clamp(value, minWidth, maxWidth);
 		return value;
 	}
 
-	inline function get_height():Float {
+	private inline function get_height():Float {
 		return bottom.position - y;
 	}
 
-	inline function set_height(value:Float):Float {
+	private inline function set_height(value:Float):Float {
 		if (!bottom.isBinded)
 			bottom.position = y + clamp(value, minHeight, maxHeight);
 		return value;
 	}
 
-	inline function get_rect():Rect {
+	private inline function get_rect():Rect {
 		return new Rect(x, y, width, height);
 	}
 
-	inline function set_rect(value:Rect):Rect {
+	private inline function set_rect(value:Rect):Rect {
 		setRect(value);
 		return value;
 	}
 
-	inline function get_bounds():Bounds {
+	private inline function get_bounds():Bounds {
 		return rect.toBounds();
 	}
 
-	inline function set_bounds(value:Bounds):Bounds {
+	private inline function set_bounds(value:Bounds):Bounds {
 		setBounds(value);
 		return value;
 	}
 
-	inline function get_contentRect():Rect {
+	private inline function get_contentRect():Rect {
 		return new Rect(x + left.padding, y + top.padding, width - left.padding - right.padding, height - top.padding - bottom.padding);
 	}
 
-	inline function set_contentRect(value:Rect):Rect {
+	private inline function set_contentRect(value:Rect):Rect {
 		setContentRect(value);
 		return value;
 	}
 
-	inline function get_contentBounds():Bounds {
+	private inline function get_contentBounds():Bounds {
 		return contentRect.toBounds();
 	}
 
-	inline function set_contentBounds(value:Bounds):Bounds {
+	private inline function set_contentBounds(value:Bounds):Bounds {
 		setContentBounds(value);
 		return value;
 	}
 
-	inline function get_childrenBounds():Vec4 {
+	private inline function get_childrenBounds():Vec4 {
 		var b = bounds;
 		for (child in children) {
 			b.left = Math.min(b.left, child.left.position);
@@ -306,11 +306,11 @@ class Element extends PhysicalObject<Element> {
 		return b;
 	}
 
-	inline function get_childrenRect():Vec4 {
+	private inline function get_childrenRect():Vec4 {
 		return childrenBounds.toRect();
 	}
 
-	inline function set_padding(value:Float) {
+	private inline function set_padding(value:Float) {
 		left.padding = value;
 		top.padding = value;
 		right.padding = value;
@@ -318,7 +318,7 @@ class Element extends PhysicalObject<Element> {
 		return value;
 	}
 
-	inline function get_finalOpacity():Float {
+	private inline function get_finalOpacity():Float {
 		return parent == null ? opacity : parent.finalOpacity * opacity;
 	}
 }
