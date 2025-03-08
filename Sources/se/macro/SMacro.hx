@@ -146,27 +146,32 @@ class SMacro extends Builder {
 			}
 		}
 
-		getConstructor();
-		var cf = switch find("new").kind {
-			case FFun(f): f;
-			default: null;
-		}
+		if (slotsSignals.iterator().hasNext()) {
+			var constructor = find("new");
+			if (constructor == null)
+				err("This class must have a constructor");
 
-		for (slot in slotsSignals.keyValueIterator()) {
-			var conns = [
-				for (signal in slot.value.keys())
-					macro $i{signal}.connect($i{slot.key})
-			];
-			cf.expr = switch cf.expr.expr {
-				case EBlock(exprs): {
-						expr: EBlock(exprs.concat(conns)),
-						pos: Context.currentPos()
-					}
-				default:
-					{
-						expr: EBlock([macro ${cf.expr}].concat(conns)),
-						pos: Context.currentPos()
-					}
+			var cf = switch constructor.kind {
+				case FFun(f): f;
+				default: null;
+			}
+
+			for (slot in slotsSignals.keyValueIterator()) {
+				var conns = [
+					for (signal in slot.value.keys())
+						macro $i{signal}.connect($i{slot.key})
+				];
+				cf.expr = switch cf.expr.expr {
+					case EBlock(exprs): {
+							expr: EBlock(exprs.concat(conns)),
+							pos: Context.currentPos()
+						}
+					default:
+						{
+							expr: EBlock([macro ${cf.expr}].concat(conns)),
+							pos: Context.currentPos()
+						}
+				}
 			}
 		}
 	}

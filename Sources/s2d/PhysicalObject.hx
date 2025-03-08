@@ -11,6 +11,10 @@ abstract class PhysicalObject<This:PhysicalObject<This>> extends se.VirtualObjec
 	@readonly @alias public var global:Global<This> = this;
 	@readonly @alias public var local:Local<This> = this;
 
+	public function new(?parent:This) {
+		super(parent);
+	}
+
 	@:slot(zChanged) function _zChanged(z:Float) {
 		for (s in siblings)
 			if (s.z <= z) {
@@ -22,10 +26,8 @@ abstract class PhysicalObject<This:PhysicalObject<This>> extends se.VirtualObjec
 	private inline function set_transform(value:Mat3):Mat3 {
 		final d = inverse(transform) * value;
 		transform = value;
-
 		for (c in children)
 			c.transform = c.transform * d;
-
 		return value;
 	}
 }

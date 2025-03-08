@@ -101,7 +101,7 @@ extern abstract Set<T>(Array<T>) from Array<T> to Array<T> {
 
 	/**
 		Adds the element `x` at the end of `this` Set and returns the new
-		length of `this` Set if `this` doesn't already contain it.
+		length of `this` Set if `this` doesn't already contain it. -1 is returned otherwise.
 
 		If so, this operation modifies `this` Set in place and `this.length` increases by 1.
 	**/
@@ -109,7 +109,7 @@ extern abstract Set<T>(Array<T>) from Array<T> to Array<T> {
 	public inline function push(x:T):Int {
 		if (!contains(x))
 			return this.push(x);
-		return null;
+		return -1;
 	}
 
 	/**

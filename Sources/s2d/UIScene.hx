@@ -5,7 +5,6 @@ import kha.Assets;
 import se.App;
 import se.Texture;
 import se.math.Mat3;
-import s2d.Anchors;
 
 using kha.StringExtensions;
 

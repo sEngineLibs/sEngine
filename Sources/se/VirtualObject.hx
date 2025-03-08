@@ -10,6 +10,8 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 	public var children:Set<This> = [];
 	public var siblings(get, never):Set<This>;
 
+	@:track public var flatHierarchy:Array<This> = [];
+
 	public function new(?parent:This) {
 		parent?.addChild(cast this);
 	}
@@ -36,12 +38,22 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 	}
 
 	private inline function set_parent(value:This):This {
-		if (value != null && value != this) {
-			if (value.children.push(cast this) != null)
-				parent = value;
-		} else {
-			parent?.children.remove(cast this);
+		var s = false;
+
+		if (value != null)
+			if (value.children.push(cast this) != -1) {
+				value.flatHierarchy = value.flatHierarchy.concat([cast this]).concat(flatHierarchy);
+				s = true;
+			}
+
+		if (parent != null) {
+			parent.children.remove(cast this);
+			parent.flatHierarchy.remove(cast this);
+			for (c in children)
+				parent.flatHierarchy.remove(cast c);
 		}
+		if (s)
+			parent = value;
 		return value;
 	}
 
