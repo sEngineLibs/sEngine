@@ -76,7 +76,7 @@ class ColumnLayout extends Element {
 	override function renderTree(target:Texture) {
 		final ctx = target.ctx2D;
 
-		ctx.transform = _transform;
+		ctx.transform = transform;
 		ctx.style.opacity = finalOpacity;
 
 		for (child in children)

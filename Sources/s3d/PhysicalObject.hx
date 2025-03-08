@@ -6,7 +6,7 @@ import se.math.Mat4;
 using se.extensions.Mat4Ext;
 
 abstract class PhysicalObject<This:PhysicalObject<This>> extends se.VirtualObject<This> {
-	var _transform:Transform = Mat4.identity();
+	var transform:Transform = Mat4.identity();
 
 	public var transform:Transform = Mat4.identity();
 	public var transformOrigin:Vec3 = new Vec3(0.0, 0.0, 0.0);
@@ -16,6 +16,6 @@ abstract class PhysicalObject<This:PhysicalObject<This>> extends se.VirtualObjec
 		t.translateG(transformOrigin);
 		t *= transform;
 		t.translateG(-transformOrigin);
-		_transform = parent == null ? t : parent._transform * t;
+		transform = parent == null ? t : parent.transform * t;
 	}
 }

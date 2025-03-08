@@ -31,7 +31,7 @@ class RowLayout extends Element {
 		final fillCellWidth = fillCellCount > 0 ? (crect.width - (elements.length - 1) * spacing - cellsWidth) / fillCellCount : 0;
 
 		target.ctx2D.style.opacity = finalOpacity;
-		target.ctx2D.transform = _transform;
+		target.ctx2D.transform = transform;
 
 		var _x = x + left.padding;
 		var widthsIndex = 0;

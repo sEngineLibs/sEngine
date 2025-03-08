@@ -124,7 +124,7 @@ class LightingForward {
 				var i = 0;
 				for (sprite in layer.sprites) {
 					g4.setFloat(depthCL, i / layer.sprites.length);
-					g4.setMat3(modelCL, sprite._transform);
+					g4.setMat3(modelCL, sprite.transform);
 					g4.setVec4(cropRectCL, sprite.cropRect);
 					g4.setTexture(albedoMapTU, sprite.atlas.albedoMap);
 					g4.setTexture(normalMapTU, sprite.atlas.normalMap);

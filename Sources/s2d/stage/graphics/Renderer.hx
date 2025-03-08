@@ -141,7 +141,7 @@ class Renderer {
 			}
 			#else
 			for (sprite in layer.sprites) {
-				ctx.setMat3(modelCL, sprite._transform);
+				ctx.setMat3(modelCL, sprite.transform);
 				ctx.setVec4(cropRectCL, sprite.cropRect);
 				ctx.setTexture(textureMapTU, sprite.atlas.textureMap);
 				ctx.draw();

@@ -4,8 +4,6 @@ import se.math.Vec2;
 import se.math.Mat3;
 
 abstract class PhysicalObject<This:PhysicalObject<This>> extends se.VirtualObject<This> {
-	public var _transform:Mat3;
-
 	@:track public var z:Float = 0.0;
 	@:track public var transform:Mat3 = Mat3.identity();
 

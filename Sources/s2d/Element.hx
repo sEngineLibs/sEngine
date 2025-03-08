@@ -79,7 +79,7 @@ class Element extends PhysicalObject<Element> {
 	}
 
 	overload extern public inline function mapFromGlobal(p:Position):Position {
-		return (_transform : Mat3) * p;
+		return transform * p;
 	}
 
 	overload extern public inline function mapFromGlobal(x:Float, y:Float):Position {
@@ -87,7 +87,7 @@ class Element extends PhysicalObject<Element> {
 	}
 
 	overload extern public inline function mapToGlobal(p:Position):Position {
-		return inverse(_transform) * p;
+		return inverse(transform) * p;
 	}
 
 	overload extern public inline function mapToGlobal(x:Float, y:Float):Position {
@@ -198,7 +198,7 @@ class Element extends PhysicalObject<Element> {
 	function draw(target:Texture):Void {
 		final ctx = target.ctx2D;
 
-		ctx.transform = _transform;
+		ctx.transform = transform;
 		ctx.style.color = color;
 		ctx.style.opacity = finalOpacity;
 	}
