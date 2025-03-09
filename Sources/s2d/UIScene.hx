@@ -23,27 +23,21 @@ class UIScene extends Element {
 		window.notifyOnResize((w, h) -> setSize(w, h));
 	}
 
-	override function render(target:Texture) {
-		final ctx = target.ctx2D;
+	override inline function render(target:Texture) {
+		// final e = childAt(App.input.mouse.x, App.input.mouse.y);
 
-		ctx.begin();
-		for (child in children)
-			child.render(target);
-
-		ctx.style.color = White;
-		ctx.style.opacity = 0.85;
-		ctx.transform = Mat3.identity();
-		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-		final e = childAt(App.input.mouse.x, App.input.mouse.y);
-		if (e != null)
-			drawBounds(e, target);
-		#end
-		ctx.end();
+		target.ctx2D.render(true, color, ctx -> {
+			for (child in children)
+				child.render(target);
+			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
+			if (e != null)
+				drawBounds(e, target);
+			#end
+		});
 	}
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-	private inline function drawBounds(e:Element, target:Texture) {
-		final ctx = target.ctx2D;
+	private inline function drawBounds(e:Element, ctx:Context2D) {
 		final style = ctx.style;
 
 		style.font = Assets.fonts.get("Roboto_Regular");

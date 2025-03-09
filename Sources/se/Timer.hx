@@ -63,9 +63,9 @@ class Timer {
 
 	/**
 		Starts the timer repeatedly.
-		@param count How many times to start the timer.
+		@param count How many times to start the timer. 0 for infinity
 		@param lock Whether to skip if the timer is already started
-		@return Returns true if the timer was started
+		@return Returns true if the timer was repeated
 	 */
 	public function repeat(count:Int = 1, ?lock:Bool = true):Bool {
 		if (count < 0)
@@ -94,5 +94,14 @@ class Timer {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+		Loops the timer.
+		@param lock Whether to skip if the timer is already started
+		@return Returns true if the timer was looped
+	 */
+	public function loop(?lock:Bool = true):Bool {
+		return repeat(0, lock);
 	}
 }

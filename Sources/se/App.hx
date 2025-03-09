@@ -7,8 +7,9 @@ import se.system.Time;
 import se.system.input.Mouse;
 import se.system.input.Keyboard;
 
+@:build(se.macro.SMacro.build())
 class App {
-	static var updateListeners:Array<Void->Void> = [];
+	@:signal static function update();
 
 	public static var windows(get, never):Array<Window>;
 	public static var input:{
@@ -17,18 +18,20 @@ class App {
 	};
 
 	public static function start(options:SystemOptions, setup:Void->Void) {
+		onUpdate(Time.update);
+
 		System.start(options, function(window) {
 			App.input = {
 				mouse: new Mouse(),
 				keyboard: new Keyboard()
 			}
-
-			Time.init();
 			SEngine.start(window);
 			Assets.loadEverything(function() {
 				setup();
+
 				System.notifyOnFrames(function(frames) {
 					update();
+
 					var frame = SEngine.render();
 
 					final g2 = frames[0].g2;
@@ -40,14 +43,6 @@ class App {
 		});
 	}
 
-	public static function notifyOnUpdate(f:Void->Void) {
-		updateListeners.push(f);
-		return {
-			f: f,
-			remove: () -> updateListeners.remove(f)
-		}
-	}
-
 	public static function stop() {
 		if (!System.stop())
 			trace("This application can't be stopped!");
@@ -55,10 +50,5 @@ class App {
 
 	static private inline function get_windows() {
 		return Window.all;
-	}
-
-	static function update() {
-		for (listener in updateListeners)
-			listener();
 	}
 }

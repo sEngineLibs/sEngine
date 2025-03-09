@@ -59,7 +59,7 @@ class SEngine {
 		ind[5] = 0;
 		indices.unlock();
 
-		App.notifyOnUpdate(update);
+		App.onUpdate(update);
 
 		resize(window.width, window.height);
 		window.notifyOnResize(resize);

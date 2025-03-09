@@ -59,7 +59,6 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 	}
 
 	public inline function matrixCompMult(n:Mat3):Mat3 {
-		var n:KhaMat3 = n;
 		return new Mat3(this._00 * n._00, this._10 * n._10, this._20 * n._20, this._01 * n._01, this._11 * n._11, this._21 * n._21, this._02 * n._02,
 			this._12 * n._12, this._22 * n._22);
 	}
@@ -71,39 +70,36 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 	}
 
 	public inline function determinant():Float {
-		var m = this;
-		return (m._00 * (m._22 * m._11 - m._21 * m._12) + m._10 * (-m._22 * m._01 + m._21 * m._02) + m._20 * (m._12 * m._01 - m._11 * m._02));
+		return (this._00 * (this._22 * this._11 - this._21 * this._12) + this._10 * (-this._22 * this._01 + this._21 * this._02) + this._20 * (this._12 * this._01 - this._11 * this._02));
 	}
 
 	public inline function inverse():Mat3 {
-		var m = this;
-		var b01 = m._22 * m._11 - m._21 * m._12;
-		var b11 = -m._22 * m._01 + m._21 * m._02;
-		var b21 = m._12 * m._01 - m._11 * m._02;
+		var b01 = this._22 * this._11 - this._21 * this._12;
+		var b11 = -this._22 * this._01 + this._21 * this._02;
+		var b21 = this._12 * this._01 - this._11 * this._02;
 
 		// determinant
-		var det = m._00 * b01 + m._10 * b11 + m._20 * b21;
+		var det = this._00 * b01 + this._10 * b11 + this._20 * b21;
 
 		var f = 1.0 / det;
 
-		return new Mat3(b01 * f, (-m._22 * m._10 + m._20 * m._12) * f, (m._21 * m._10 - m._20 * m._11) * f, b11 * f, (m._22 * m._00 - m._20 * m._02) * f,
-			(-m._21 * m._00 + m._20 * m._01) * f, b21 * f, (-m._12 * m._00 + m._10 * m._02) * f, (m._11 * m._00 - m._10 * m._01) * f);
+		return new Mat3(b01 * f, (-this._22 * this._10 + this._20 * this._12) * f, (this._21 * this._10 - this._20 * this._11) * f, b11 * f, (this._22 * this._00 - this._20 * this._02) * f,
+			(-this._21 * this._00 + this._20 * this._01) * f, b21 * f, (-this._12 * this._00 + this._10 * this._02) * f, (this._11 * this._00 - this._10 * this._01) * f);
 	}
 
 	public inline function adjoint():Mat3 {
-		var m = this;
-		return new Mat3(m._11 * m._22
-			- m._21 * m._12, m._20 * m._12
-			- m._10 * m._22, m._10 * m._21
-			- m._20 * m._11, m._21 * m._02
-			- m._01 * m._22,
-			m._00 * m._22
-			- m._20 * m._02, m._20 * m._01
-			- m._00 * m._21, m._01 * m._12
-			- m._11 * m._02, m._10 * m._02
-			- m._00 * m._12,
-			m._00 * m._11
-			- m._10 * m._01);
+		return new Mat3(this._11 * this._22
+			- this._21 * this._12, this._20 * this._12
+			- this._10 * this._22, this._10 * this._21
+			- this._20 * this._11,
+			this._21 * this._02
+			- this._01 * this._22, this._00 * this._22
+			- this._20 * this._02, this._20 * this._01
+			- this._00 * this._21,
+			this._01 * this._12
+			- this._11 * this._02, this._10 * this._02
+			- this._00 * this._12, this._00 * this._11
+			- this._10 * this._01);
 	}
 
 	public inline function toString() {
@@ -116,44 +112,40 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 
 	@:op(-a)
 	static private inline function neg(m:Mat3) {
-		var m:KhaMat3 = m;
 		return new Mat3(-m._00, -m._10, -m._20, -m._01, -m._11, -m._21, -m._02, -m._12, -m._22);
 	}
 
 	@:op(++a)
 	static private inline function prefixIncrement(m:Mat3) {
-		var _m:KhaMat3 = m;
-		++_m._00;
-		++_m._10;
-		++_m._20;
-		++_m._01;
-		++_m._11;
-		++_m._21;
-		++_m._02;
-		++_m._12;
-		++_m._22;
+		++m._00;
+		++m._10;
+		++m._20;
+		++m._01;
+		++m._11;
+		++m._21;
+		++m._02;
+		++m._12;
+		++m._22;
 		return m.clone();
 	}
 
 	@:op(--a)
 	static private inline function prefixDecrement(m:Mat3) {
-		var _m:KhaMat3 = m;
-		--_m._00;
-		--_m._10;
-		--_m._20;
-		--_m._01;
-		--_m._11;
-		--_m._21;
-		--_m._02;
-		--_m._12;
-		--_m._22;
+		--m._00;
+		--m._10;
+		--m._20;
+		--m._01;
+		--m._11;
+		--m._21;
+		--m._02;
+		--m._12;
+		--m._22;
 		return m.clone();
 	}
 
 	@:op(a++)
 	static private inline function postfixIncrement(m:Mat3) {
 		var ret = m.clone();
-		var m:KhaMat3 = m;
 		++m._00;
 		++m._10;
 		++m._20;
@@ -169,7 +161,6 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 	@:op(a--)
 	static private inline function postfixDecrement(m:Mat3) {
 		var ret = m.clone();
-		var m:KhaMat3 = m;
 		--m._00;
 		--m._10;
 		--m._20;
@@ -218,8 +209,6 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 
 	@:op(a + b)
 	static private inline function add(m:Mat3, n:Mat3):Mat3 {
-		var m:KhaMat3 = m;
-		var n:KhaMat3 = n;
 		return new Mat3(m._00
 			+ n._00, m._10
 			+ n._10, m._20
@@ -234,14 +223,11 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 
 	@:op(a + b) @:commutative
 	static private inline function addScalar(m:Mat3, f:Float):Mat3 {
-		var m:KhaMat3 = m;
 		return new Mat3(m._00 + f, m._10 + f, m._20 + f, m._01 + f, m._11 + f, m._21 + f, m._02 + f, m._12 + f, m._22 + f);
 	}
 
 	@:op(a - b)
 	static private inline function sub(m:Mat3, n:Mat3):Mat3 {
-		var m:KhaMat3 = m;
-		var n:KhaMat3 = n;
 		return new Mat3(m._00
 			- n._00, m._10
 			- n._10, m._20
@@ -256,20 +242,16 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 
 	@:op(a - b)
 	static private inline function subScalar(m:Mat3, f:Float):Mat3 {
-		var m:KhaMat3 = m;
 		return new Mat3(m._00 - f, m._10 - f, m._20 - f, m._01 - f, m._11 - f, m._21 - f, m._02 - f, m._12 - f, m._22 - f);
 	}
 
 	@:op(a - b)
 	static private inline function subScalarInv(f:Float, m:Mat3):Mat3 {
-		var m:KhaMat3 = m;
 		return new Mat3(f - m._00, f - m._10, f - m._20, f - m._01, f - m._11, f - m._21, f - m._02, f - m._12, f - m._22);
 	}
 
 	@:op(a * b)
 	static private inline function mul(m:Mat3, n:Mat3):Mat3 {
-		var m:KhaMat3 = m;
-		var n:KhaMat3 = n;
 		return new Mat3(m._00 * n._00
 			+ m._01 * n._10
 			+ m._02 * n._20, m._10 * n._00
@@ -301,7 +283,6 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 
 	@:op(a * b)
 	static private inline function postMulVec3(m:Mat3, v:Vec3):Vec3 {
-		var m:KhaMat3 = m;
 		return new Vec3(m._00 * v.x
 			+ m._01 * v.y
 			+ m._02 * v.z, m._10 * v.x
@@ -313,13 +294,11 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 
 	@:op(a * b)
 	static private inline function preMulVec3(v:Vec3, m:Mat3):Vec3 {
-		var m:KhaMat3 = m;
 		return new Vec3(v.dot(new Vec3(m._00, m._10, m._20)), v.dot(new Vec3(m._01, m._11, m._21)), v.dot(new Vec3(m._02, m._12, m._22)));
 	}
 
 	@:op(a * b) @:commutative
 	static private inline function mulScalar(m:Mat3, f:Float):Mat3 {
-		var m:KhaMat3 = m;
 		return new Mat3(m._00 * f, m._10 * f, m._20 * f, m._01 * f, m._11 * f, m._21 * f, m._02 * f, m._12 * f, m._22 * f);
 	}
 
@@ -329,20 +308,16 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 
 	@:op(a / b)
 	static private inline function divScalar(m:Mat3, f:Float):Mat3 {
-		var m:KhaMat3 = m;
 		return new Mat3(m._00 / f, m._10 / f, m._20 / f, m._01 / f, m._11 / f, m._21 / f, m._02 / f, m._12 / f, m._22 / f);
 	}
 
 	@:op(a / b)
 	static private inline function divScalarInv(f:Float, m:Mat3):Mat3 {
-		var m:KhaMat3 = m;
 		return new Mat3(f / m._00, f / m._10, f / m._20, f / m._01, f / m._11, f / m._21, f / m._02, f / m._12, f / m._22);
 	}
 
 	@:op(a == b)
 	static private inline function equal(m:Mat3, n:Mat3):Bool {
-		var m:KhaMat3 = m;
-		var n:KhaMat3 = n;
 		return m._00 == n._00 && m._10 == n._10 && m._20 == n._20 && m._01 == n._01 && m._11 == n._11 && m._21 == n._21 && m._02 == n._02 && m._12 == n._12
 			&& m._22 == n._22;
 	}

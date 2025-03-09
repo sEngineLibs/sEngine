@@ -82,7 +82,7 @@ class SMacro extends Builder {
 							for (param in extractMetaParams(meta).keys())
 								mask.push(param);
 
-							buildSignal(field, isPublic, mask);
+							buildSignal(field, isPublic, field.access.contains(AStatic), mask);
 						}
 				}
 			}
@@ -251,7 +251,7 @@ class SMacro extends Builder {
 		}
 	}
 
-	function buildSignal(field:Field, isPublic:Bool, mask:Array<String>):Void {
+	function buildSignal(field:Field, isPublic:Bool, isStatic:Bool, mask:Array<String>):Void {
 		var fieldOG = copy(field);
 
 		switch (field.kind) {
@@ -323,11 +323,16 @@ class SMacro extends Builder {
 					Call `${field.name}($callDoc)` or `${field.name}.emit($callDoc)` to emit the signal
 					';
 					field.kind = FVar(TPath(stypepath), macro new $stypepath());
-					field.access = isPublic ? [APublic] : [APrivate];
+					field.access = [isPublic ? APublic : APrivate];
+					if (isStatic)
+						field.access.push(AStatic);
+
 					// add connector
 					var connector = method('on${field.name.capitalize()}', fun([arg("slot", _t)], macro {
 						$i{field.name}.connect(slot);
 					}), [APublic, AInline]);
+					if (isStatic)
+						connector.access.push(AStatic);
 					connector.doc = '
 					Shortcut for `${field.name}` signal\'s function `connect` which connects slots to it.
 					@param slot a callback to invoke when `${field.name}` is emitted
@@ -414,13 +419,17 @@ class SMacro extends Builder {
 					($maskValuesDoc) values are invoked.
 					Call `${field.name}($callDoc)` or `${field.name}.emit($callDoc)` to emit the signal
 					';
-					field.access = isPublic ? [APublic] : [APrivate];
 					field.kind = FVar(TPath(stypepath), macro new $stypepath());
+					field.access = isPublic ? [APublic] : [APrivate];
+					if (isStatic)
+						field.access.push(AStatic);
 					// add connector
 					var cargs = sidentsExpr.concat([macro slot]);
 					var connector = method('on${field.name.capitalize()}', fun(args(maskKeys).concat([arg("slot", _t)]), macro {
 						$i{field.name}.connect($a{cargs});
 					}), [APublic, AInline]);
+					if (isStatic)
+						connector.access.push(AStatic);
 					var maskDoc = "";
 					for (key in maskKeys)
 						maskDoc += '\n@param ${key.name} Mask parameter of the slot';
@@ -436,6 +445,8 @@ class SMacro extends Builder {
 				var disconnector = method('off${field.name.capitalize()}', fun([arg("slot", _t)], macro {
 					$i{field.name}.disconnect(slot);
 				}), [APublic, AInline]);
+				if (isStatic)
+					disconnector.access.push(AStatic);
 				disconnector.doc = '
 					Shortcut for `${field.name}` signal\'s function `disconnect` which disconnects slots from it.
 					@param slot a callback to remove from `${field.name}`\'s list
@@ -470,7 +481,7 @@ class SMacro extends Builder {
 				});
 		}
 
-		buildSignal(add(method(signalName, signalFun, [meta(":signal")])), isPublic, []);
+		buildSignal(add(method(signalName, signalFun, [meta(":signal")])), isPublic, field.access.contains(AStatic), []);
 		buildInjection(field, [signalName => signalFun]);
 		field.doc = '_This field is **tracked**. The corresponding connector is_ `on${signalName.capitalize()}`\n\n' + (field.doc ?? "");
 	}

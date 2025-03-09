@@ -133,10 +133,12 @@ abstract AnchorLine(AnchorLineData) from AnchorLineData to AnchorLineData {
 	}
 
 	private inline function set_position(value:Float) {
-		final d = value - position;
-		this.position = value;
-		for (b in this.binded)
-			b.position += d;
+		if (!isBinded) {
+			final d = value - position;
+			this.position = value;
+			for (b in this.binded)
+				b.position += d;
+		}
 		return value;
 	}
 

@@ -1,10 +1,10 @@
 package s2d;
 
+import se.math.Mat3;
 import se.Color;
 import se.Texture;
 import se.math.Vec2;
 import se.math.Vec4;
-import se.math.Mat3;
 import se.math.VectorMath;
 import s2d.Anchors;
 import s2d.geometry.Size;
@@ -30,10 +30,7 @@ class Element extends PhysicalObject<Element> {
 		return element.mapToGlobal(p.x, p.y);
 	}
 
-	var finalOpacity(get, never):Float;
-
 	public var layout:Layout = new Layout();
-	public var layer:UILayer = new UILayer();
 
 	public var left:AnchorLine = new AnchorLine(1.0);
 	public var top:AnchorLine = new AnchorLine(1.0);
@@ -42,21 +39,20 @@ class Element extends PhysicalObject<Element> {
 	public var anchors(get, never):Anchors;
 	public var padding(never, set):Float;
 
-	@:track public var visible:Bool = true;
-	@:track public var focused:Bool = false;
-	@:track public var enabled:Bool = true;
-	@:track public var opacity:Float = 1.0;
-	@:track public var clip:Bool = false;
-	@:track public var color:Color = White;
+	public var visible:Bool = true;
+	public var focused:Bool = false;
+	public var enabled:Bool = true;
+	public var opacity:Float = 1.0;
+	public var color:Color = White;
 
 	@:track public var x(get, set):Float;
 	@:track public var y(get, set):Float;
 	@:track public var width(get, set):Float;
 	@:track public var height(get, set):Float;
-	@:track public var minWidth:Float = Math.NEGATIVE_INFINITY;
-	@:track public var maxWidth:Float = Math.POSITIVE_INFINITY;
-	@:track public var minHeight:Float = Math.NEGATIVE_INFINITY;
-	@:track public var maxHeight:Float = Math.POSITIVE_INFINITY;
+	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
+	@:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
+	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
+	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
 
 	public var rect(get, set):Rect;
 	public var bounds(get, set):Bounds;
@@ -67,11 +63,6 @@ class Element extends PhysicalObject<Element> {
 
 	public function new(?parent:Element) {
 		super(parent);
-
-		onMinWidthChanged(_ -> width = width);
-		onMaxWidthChanged(_ -> width = width);
-		onMinHeightChanged(_ -> height = height);
-		onMaxHeightChanged(_ -> height = height);
 	}
 
 	public function setPadding(value:Float):Void {
@@ -146,7 +137,7 @@ class Element extends PhysicalObject<Element> {
 
 	public function childAt(x:Float, y:Float):Element {
 		for (c in children.reversed()) {
-			final cat = c.childAt(x, y);
+			var cat = c.childAt(x, y);
 			if (cat == null) {
 				if (c.contains(x, y))
 					return c;
@@ -164,44 +155,23 @@ class Element extends PhysicalObject<Element> {
 	}
 
 	function render(target:Texture) {
-		final ctx = target.ctx2D;
+		if (visible) {
+			final ctx = target.ctx2D;
 
-		if (layer.enabled) {
-			final _ctx = layer.texture.ctx2D;
-			final sr = layer.sourceRect;
+			ctx.style.color = color;
+			ctx.style.pushOpacity(opacity);
+			ctx.pushTransformation(transform);
 
-			ctx.end();
-			// to layer texture
-			_ctx.begin();
-			if (sr != null)
-				_ctx.scissor(sr.x, sr.y, sr.width, sr.height);
-			renderTree(layer.texture);
-			_ctx.disableScissor();
-			_ctx.end();
-			// to target
-			ctx.begin();
-			if (layer.effect != null)
-				layer.effect.apply(layer.texture, target);
-			else
-				ctx.drawScaledImage(layer.texture, 0, 0, target.width, target.height);
-		} else
-			renderTree(target);
-	}
-
-	function renderTree(target:Texture) {
-		draw(target);
-		for (c in children)
-			if (c.visible)
+			draw(target);
+			for (c in children)
 				c.render(target);
+
+			ctx.style.popOpacity();
+			ctx.popTransformation();
+		}
 	}
 
-	function draw(target:Texture):Void {
-		final ctx = target.ctx2D;
-
-		ctx.transform = transform;
-		ctx.style.color = color;
-		ctx.style.opacity = finalOpacity;
-	}
+	function draw(target:Texture):Void {}
 
 	private inline function get_anchors():Anchors {
 		return this;
@@ -212,14 +182,12 @@ class Element extends PhysicalObject<Element> {
 	}
 
 	private inline function set_x(value:Float):Float {
-		if (!left.isBinded) {
-			final d = value - x;
-			left.position = value;
-			if (anchors.right == null)
-				right.position += d;
-			for (c in children)
-				c.x += d;
-		}
+		final d = value - x;
+		left.position = value;
+		if (anchors.right == null)
+			right.position += d;
+		for (c in children)
+			c.x += d;
 		return value;
 	}
 
@@ -228,14 +196,12 @@ class Element extends PhysicalObject<Element> {
 	}
 
 	private inline function set_y(value:Float):Float {
-		if (!top.isBinded) {
-			final d = value - y;
-			top.position = value;
-			if (anchors.bottom == null)
-				bottom.position += d;
-			for (c in children)
-				c.y += d;
-		}
+		final d = value - y;
+		top.position = value;
+		if (anchors.bottom == null)
+			bottom.position += d;
+		for (c in children)
+			c.y += d;
 		return value;
 	}
 
@@ -244,8 +210,7 @@ class Element extends PhysicalObject<Element> {
 	}
 
 	private inline function set_width(value:Float):Float {
-		if (!right.isBinded)
-			right.position = x + clamp(value, minWidth, maxWidth);
+		right.position = x + clamp(value, minWidth, maxWidth);
 		return value;
 	}
 
@@ -254,9 +219,40 @@ class Element extends PhysicalObject<Element> {
 	}
 
 	private inline function set_height(value:Float):Float {
-		if (!bottom.isBinded)
-			bottom.position = y + clamp(value, minHeight, maxHeight);
+		bottom.position = y + clamp(value, minHeight, maxHeight);
 		return value;
+	}
+
+	private inline function set_minWidth(value:Float):Float {
+		if (value != minWidth) {
+			minWidth = value;
+			width = width;
+		}
+		return minWidth;
+	}
+
+	private inline function set_maxWidth(value:Float):Float {
+		if (value != maxWidth) {
+			maxWidth = value;
+			width = width;
+		}
+		return maxWidth;
+	}
+
+	private inline function set_minHeight(value:Float):Float {
+		if (value != minHeight) {
+			minHeight = value;
+			height = height;
+		}
+		return minHeight;
+	}
+
+	private inline function set_maxHeight(value:Float):Float {
+		if (value != maxHeight) {
+			maxHeight = value;
+			height = height;
+		}
+		return maxHeight;
 	}
 
 	private inline function get_rect():Rect {
@@ -316,9 +312,5 @@ class Element extends PhysicalObject<Element> {
 		right.padding = value;
 		bottom.padding = value;
 		return value;
-	}
-
-	private inline function get_finalOpacity():Float {
-		return parent == null ? opacity : parent.finalOpacity * opacity;
 	}
 }

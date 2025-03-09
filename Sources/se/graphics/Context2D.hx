@@ -4,31 +4,12 @@ import kha.graphics2.Graphics;
 import s2d.Alignment;
 import se.math.Vec2;
 import se.math.Mat3;
-import se.math.VectorMath.vec2;
+import se.math.VectorMath;
 
 @:forward(pipeline, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)
 extern abstract Context2D(Graphics) from Graphics {
 	public var style(get, never):Context2DStyle;
 	public var transform(get, set):Mat3;
-
-	private inline function get_style():Context2DStyle {
-		return this;
-	}
-
-	private inline function get_transform():Mat3 {
-		return this.transformation;
-	}
-
-	private inline function set_transform(value:Mat3):Mat3 {
-		return this.transformation = value;
-	}
-
-	public inline function render(?clear:Bool, ?clearColor:Color = Transparent, commands:Array<Context2D->Void>) {
-		this.begin(clear, clearColor);
-		for (c in commands)
-			c(this);
-		this.end();
-	}
 
 	public inline function begin() {
 		this.begin(false);
@@ -36,6 +17,20 @@ extern abstract Context2D(Graphics) from Graphics {
 
 	public inline function clear(color:Color) {
 		this.clear(color);
+	}
+
+	public inline function render(?clear:Bool, ?clearColor:Color = Transparent, commands:Context2D->Void) {
+		this.begin(clear, clearColor);
+		commands(this);
+		this.end();
+	}
+
+	public inline function pushTransformation(value:Mat3):Void {
+		this.pushTransformation(value * transform);
+	}
+
+	public inline function popTransformation():Mat3 {
+		return this.popTransformation();
 	}
 
 	public inline function drawImage(img:Image, x:Float, y:Float) {
@@ -456,12 +451,32 @@ extern abstract Context2D(Graphics) from Graphics {
 		}
 		this.drawCharacters(text, start, length, x + xoffset, y + yoffset);
 	}
+
+	private inline function get_style():Context2DStyle {
+		return this;
+	}
+
+	private inline function get_transform():Mat3 {
+		return this.transformation;
+	}
+
+	private inline function set_transform(value:Mat3):Mat3 {
+		return this.transformation = value;
+	}
 }
 
 @:dox(show)
 @:forward(opacity, font, fontSize)
 extern private abstract Context2DStyle(Graphics) from Graphics {
 	public var color(get, set):Color;
+
+	public inline function pushOpacity(value:Float):Void {
+		this.pushOpacity(this.opacity * value);
+	}
+
+	public inline function popOpacity():Float {
+		return this.popOpacity();
+	}
 
 	private inline function get_color():Color {
 		return this.color;

@@ -1,5 +1,6 @@
 package s2d.stage;
 
+import s2d.elements.Canvas;
 #if (S2D_LIGHTING_ENVIRONMENT == 1)
 import kha.Image;
 #end
@@ -9,14 +10,12 @@ import se.math.Mat3;
 import se.math.VectorMath;
 
 @:access(s2d.stage.objects.Object)
-class Stage {
+class Stage extends Canvas {
 	public static var current:Stage;
 
 	public var layers:Array<Layer> = [];
 	public var camera:Camera = new Camera();
 	public var viewProjection:Mat3;
-
-	public function new() {}
 
 	public function updateViewProjection() {
 		viewProjection = SEngine.projection * camera.view;

@@ -218,6 +218,11 @@ extern abstract Set<T>(Array<T>) from Array<T> to Array<T> {
 		return this.splice(pos, len);
 	}
 
+	public inline function traverse(f:T->Void):Void {
+		for (e in this)
+			f(e);
+	}
+
 	@:to
 	public inline function toArray():Array<T> {
 		return this;

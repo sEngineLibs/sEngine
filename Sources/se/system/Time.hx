@@ -48,10 +48,6 @@ class Time {
 		return Time.realTime - start;
 	}
 
-	static function init() {
-		App.notifyOnUpdate(update);
-	}
-
 	static function update() {
 		final rt = System.time;
 		delta = (rt - realTime) * scale;
