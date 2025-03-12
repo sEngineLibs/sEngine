@@ -3,7 +3,7 @@ package s2d.elements;
 import se.Texture;
 import se.math.Mat3;
 
-class Canvas extends UISceneElement {
+class Canvas extends Element {
 	@:signal function paint(target:Texture):Void;
 
 	override inline function draw(target:Texture) {

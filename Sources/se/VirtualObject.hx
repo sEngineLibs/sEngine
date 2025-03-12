@@ -5,8 +5,10 @@ package se;
 @:autoBuild(se.macro.SMacro.build())
 #end
 abstract class VirtualObject<This:VirtualObject<This>> {
-	@:track @:isVar public var parent(default, set):This;
-	@:track public var index(get, set):Int;
+	var _flatten:Set<This> = [];
+
+	@track @:isVar public var parent(default, set):This;
+	@track public var index(get, set):Int;
 	public var children:Set<This> = [];
 	public var siblings(get, never):Set<This>;
 

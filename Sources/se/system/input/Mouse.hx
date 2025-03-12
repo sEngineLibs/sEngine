@@ -15,10 +15,10 @@ class Mouse {
 	public var clickInterval = 0.3;
 	public var doubleClickInterval = 0.5;
 
-	@:track public var x:Int = 0;
-	@:track public var y:Int = 0;
-	@:track public var locked:Bool = false;
-	@:track public var cursor:MouseCursor = MouseCursor.Default;
+	@track public var x:Int = 0;
+	@track public var y:Int = 0;
+	@track public var locked:Bool = false;
+	@track public var cursor:MouseCursor = MouseCursor.Default;
 
 	@:signal function left();
 
@@ -30,21 +30,21 @@ class Mouse {
 
 	@:signal function up(button:MouseButton, x:Int, y:Int);
 
-	@:signal function hold(button:MouseButton);
+	@:signal function hold(button:MouseButton, x:Int, y:Int);
 
-	@:signal function clicked(button:MouseButton);
+	@:signal function clicked(button:MouseButton, x:Int, y:Int);
 
-	@:signal function doubleClicked(button:MouseButton);
+	@:signal function doubleClicked(button:MouseButton, x:Int, y:Int);
 
 	@:signal(button) function buttonDown(button:MouseButton, x:Int, y:Int);
 
 	@:signal(button) function buttonUp(button:MouseButton, x:Int, y:Int);
 
-	@:signal(button) function buttonHold(button:MouseButton);
+	@:signal(button) function buttonHold(button:MouseButton, x:Int, y:Int);
 
-	@:signal(button) function buttonClicked(button:MouseButton);
+	@:signal(button) function buttonClicked(button:MouseButton, x:Int, y:Int);
 
-	@:signal(button) function buttonDoubleClicked(button:MouseButton);
+	@:signal(button) function buttonDoubleClicked(button:MouseButton, x:Int, y:Int);
 
 	public function new(id:Int = 0) {
 		var mouse = kha.input.Mouse.get(id);
@@ -70,7 +70,7 @@ class Mouse {
 		}, clickInterval));
 		buttonHoldTimers.set(button, Timer.set(() -> {
 			if (buttonHoldTimers.exists(button))
-				hold(button);
+				hold(button, this.x, this.y);
 		}, holdInterval));
 	}
 
@@ -78,18 +78,18 @@ class Mouse {
 		buttonUp(button, x, y);
 
 		if (recentPressed.exists(button))
-			clicked(button);
+			clicked(button, x, y);
 
 		buttonHoldTimers.get(button)?.stop();
 		buttonHoldTimers.remove(button);
 		buttonsDown.remove(button);
 	}
 
-	@:slot(clicked) function _clicked(button:MouseButton) {
-		buttonClicked(button);
+	@:slot(clicked) function _clicked(button:MouseButton, x:Int, y:Int) {
+		buttonClicked(button, x, y);
 
 		if (recentClicked.exists(button))
-			doubleClicked(button);
+			doubleClicked(button, x, y);
 
 		recentClicked.set(button, Timer.set(() -> recentClicked.remove(button), doubleClickInterval));
 	}
@@ -103,12 +103,6 @@ class Mouse {
 		this.x = x;
 		this.y = y;
 	}
-}
-
-typedef MouseEvent = {
-	button:MouseButton,
-	x:Int,
-	y:Int
 }
 
 enum abstract MouseButton(Int) from Int to Int {

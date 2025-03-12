@@ -1,8 +1,8 @@
 package se;
 
+import s2d.WindowScene;
 import kha.Assets;
 import kha.System;
-import kha.Window;
 import se.system.Time;
 import se.system.input.Mouse;
 import se.system.input.Keyboard;
@@ -11,11 +11,11 @@ import se.system.input.Keyboard;
 class App {
 	@:signal static function update();
 
-	public static var windows(get, never):Array<Window>;
 	public static var input:{
 		var mouse:Mouse;
 		var keyboard:Keyboard;
 	};
+	public static var scenes:Array<WindowScene>;
 
 	public static function start(options:SystemOptions, setup:Void->Void) {
 		onUpdate(Time.update);
@@ -25,19 +25,17 @@ class App {
 				mouse: new Mouse(),
 				keyboard: new Keyboard()
 			}
+
+			scenes = [new WindowScene(window)];
 			SEngine.start(window);
+
 			Assets.loadEverything(function() {
 				setup();
 
 				System.notifyOnFrames(function(frames) {
 					update();
-
-					var frame = SEngine.render();
-
-					final g2 = frames[0].g2;
-					g2.begin();
-					g2.drawImage(frame, 0, 0);
-					g2.end();
+					for (i in 0...frames.length)
+						scenes[i].render(frames[i]);
 				});
 			});
 		});
@@ -46,9 +44,5 @@ class App {
 	public static function stop() {
 		if (!System.stop())
 			trace("This application can't be stopped!");
-	}
-
-	static private inline function get_windows() {
-		return Window.all;
 	}
 }

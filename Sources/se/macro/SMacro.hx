@@ -65,7 +65,7 @@ class SMacro extends Builder {
 						buildInjection(field, injections);
 
 					default:
-						if (meta.name.startsWith(":track")) {
+						if (meta.name.startsWith("track")) {
 							var isPublic = false;
 							var ms = meta.name.split(".");
 							if (ms.length == 2)
@@ -78,11 +78,10 @@ class SMacro extends Builder {
 							if (ms.length == 2)
 								isPublic = ms[1] != "private";
 
-							var mask = [];
-							for (param in extractMetaParams(meta).keys())
-								mask.push(param);
-
-							buildSignal(field, isPublic, field.access.contains(AStatic), mask);
+							buildSignal(field, isPublic, field.access.contains(AStatic), [
+								for (param in extractMetaParams(meta).keys())
+									param
+							]);
 						}
 				}
 			}
@@ -261,16 +260,17 @@ class SMacro extends Builder {
 
 				for (arg in f.args)
 					arg.type = resolve(arg.type ?? expected());
-				var maskedArgs = [];
-				var maskKeys = [];
+				var sArgs = [];
+				var sKeys = [];
 				for (arg in f.args)
-					if (!mask.contains(arg.name))
-						maskedArgs.push(arg);
+					if (mask.contains(arg.name))
+						sKeys.push(arg);
 					else
-						maskKeys.push(arg);
+						sArgs.push(arg);
+
 				// define underlying type
 				var _t = ComplexType.TFunction([
-					for (arg in maskedArgs) {
+					for (arg in sArgs) {
 						var t = TNamed(arg.name, arg.type);
 						if (arg.opt) TOptional(t) else t;
 					}
@@ -284,7 +284,7 @@ class SMacro extends Builder {
 							TPType(toComplex(param.t))
 					]
 				};
-				if (maskKeys.length == 0) {
+				if (sKeys.length == 0) {
 					Context.defineType(tdAbstract(cls.pack, typeName, macro :Array<$_t>, [
 						method("emit", fun(f.args, macro :Void,
 							macro {
@@ -341,9 +341,9 @@ class SMacro extends Builder {
 				}
 				// masked signal
 				else {
-					var _m = anon(maskKeys.map(k -> variable(k.name, k.type)));
+					var _m = anon(sKeys.map(k -> variable(k.name, k.type)));
 					var underlying = macro :Map<$_m, Array<$_t>>;
-					var sidents = maskKeys.map(k -> k.name);
+					var sidents = sKeys.map(k -> k.name);
 					var sidentsExpr = idents(sidents);
 					var cond = eqChain(idents([
 						for (k in sidents)
@@ -363,7 +363,7 @@ class SMacro extends Builder {
 								if ($cond) {
 									for (slot in p.value) {
 										slot(${
-											for (arg in maskedArgs)
+											for (arg in sArgs)
 												macro $i{arg.name}
 										});
 										break;
@@ -372,7 +372,7 @@ class SMacro extends Builder {
 							}
 						}), [APublic, AInline],
 							[meta(":op", [macro a()])]),
-						method("connect", fun(args(maskKeys).concat([arg("slot", _t)]), macro :Void, macro {
+						method("connect", fun(args(sKeys).concat([arg("slot", _t)]), macro :Void, macro {
 							var flag = false;
 							for (p in this.keyValueIterator())
 								if ($cond) {
@@ -383,7 +383,7 @@ class SMacro extends Builder {
 							if (!flag)
 								this.set(${
 									obj([
-										for (k in maskKeys)
+										for (k in sKeys)
 											objField(k.name, macro $i{k.name})
 									])
 								}, [slot]);
@@ -408,7 +408,7 @@ class SMacro extends Builder {
 						}), true));
 					// docs
 					var maskValuesDoc = "";
-					for (key in maskKeys)
+					for (key in sKeys)
 						maskValuesDoc += '`${key.name}:${key.type.toString()}`';
 					var callDoc = "";
 					for (arg in f.args)
@@ -423,15 +423,16 @@ class SMacro extends Builder {
 					field.access = isPublic ? [APublic] : [APrivate];
 					if (isStatic)
 						field.access.push(AStatic);
+
 					// add connector
 					var cargs = sidentsExpr.concat([macro slot]);
-					var connector = method('on${field.name.capitalize()}', fun(args(maskKeys).concat([arg("slot", _t)]), macro {
+					var connector = method('on${field.name.capitalize()}', fun(args(sKeys).concat([arg("slot", _t)]), macro {
 						$i{field.name}.connect($a{cargs});
 					}), [APublic, AInline]);
 					if (isStatic)
 						connector.access.push(AStatic);
 					var maskDoc = "";
-					for (key in maskKeys)
+					for (key in sKeys)
 						maskDoc += '\n@param ${key.name} Mask parameter of the slot';
 					connector.doc = '
 					Shortcut for `${field.name}` signal\'s function `connect` which connects slots to it.
@@ -455,7 +456,7 @@ class SMacro extends Builder {
 
 				signalsOG.push(fieldOG);
 			default:
-				err("Signal must be declared as a function. Use `:track` meta to track this field", field.pos);
+				err("Signal must be declared as a function. Use `track` meta to track this field", field.pos);
 		}
 	}
 

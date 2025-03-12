@@ -9,7 +9,7 @@ using se.extensions.VectorExt;
 class Sprite extends LayerObject {
 	var _id:UInt;
 
-	@:track public var mesh:Mesh;
+	@track public var mesh:Mesh;
 	public var cropRect:Vec4 = new Vec4(0.0, 0.0, 1.0, 1.0);
 	#if (S2D_SPRITE_INSTANCING == 1)
 	@:isVar public var atlas(default, set):SpriteAtlas;

@@ -7,7 +7,7 @@ import s2d.Alignment;
 
 using kha.StringExtensions;
 
-class TextElement extends UISceneElement {
+class TextElement extends Element {
 	var textWidth:Float;
 	var textHeight:Float;
 

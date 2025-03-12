@@ -1,18 +1,20 @@
 package s2d;
 
-import se.math.Mat3;
 import se.Color;
 import se.Texture;
 import se.math.Vec2;
 import se.math.Vec4;
+import se.math.Mat3;
 import se.math.VectorMath;
+import se.system.input.Mouse;
 import s2d.Anchors;
 import s2d.geometry.Size;
 import s2d.geometry.Rect;
 import s2d.geometry.Bounds;
 import s2d.geometry.Position;
+import se.events.MouseEvents;
 
-@:allow(s2d.UIScene)
+@:allow(s2d.WindowScene)
 class Element extends PhysicalObject<Element> {
 	overload extern public static inline function mapToElement(element:Element, x:Float, y:Float):Position {
 		return element.mapFromGlobal(x, y);
@@ -30,8 +32,6 @@ class Element extends PhysicalObject<Element> {
 		return element.mapToGlobal(p.x, p.y);
 	}
 
-	public var layout:Layout = new Layout();
-
 	public var left:AnchorLine = new AnchorLine(1.0);
 	public var top:AnchorLine = new AnchorLine(1.0);
 	public var right:AnchorLine = new AnchorLine(-1.0);
@@ -39,16 +39,17 @@ class Element extends PhysicalObject<Element> {
 	public var anchors(get, never):Anchors;
 	public var padding(never, set):Float;
 
+	public var layout:Layout = new Layout();
 	public var visible:Bool = true;
 	public var focused:Bool = false;
-	public var enabled:Bool = true;
 	public var opacity:Float = 1.0;
 	public var color:Color = White;
+	public var enabled:Bool = true;
 
-	@:track public var x(get, set):Float;
-	@:track public var y(get, set):Float;
-	@:track public var width(get, set):Float;
-	@:track public var height(get, set):Float;
+	@track public var x(get, set):Float;
+	@track public var y(get, set):Float;
+	@track public var width(get, set):Float;
+	@track public var height(get, set):Float;
 	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
 	@:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
 	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
@@ -61,8 +62,40 @@ class Element extends PhysicalObject<Element> {
 	public var childrenRect(get, never):Rect;
 	public var childrenBounds(get, never):Bounds;
 
+	@:signal function mouseMoved(m:MouseMoveEvent);
+
+	@:signal function mouseScrolled(m:MouseScrollEvent);
+
+	@:signal function mouseDown(m:MouseButtonEvent);
+
+	@:signal function mouseUp(m:MouseButtonEvent);
+
+	@:signal function mouseHold(m:MouseButtonEvent);
+
+	@:signal function mouseClicked(m:MouseButtonEvent);
+
+	@:signal function mouseDoubleClicked(m:MouseButtonEvent);
+
+	@:signal(button) function mouseButtonDown(button:MouseButton, m:MouseButtonEvent);
+
+	@:signal(button) function mouseButtonUp(button:MouseButton, m:MouseButtonEvent);
+
+	@:signal(button) function mouseButtonHold(button:MouseButton, m:MouseButtonEvent);
+
+	@:signal(button) function mouseButtonClicked(button:MouseButton, m:MouseButtonEvent);
+
+	@:signal(button) function mouseButtonDoubleClicked(button:MouseButton, m:MouseButtonEvent);
+
 	public function new(?parent:Element) {
 		super(parent);
+		if (parent == null)
+			WindowScene.current.elements.push(this);
+
+		onMouseDown(m -> mouseButtonDown.emit(m.button, m));
+		onMouseUp(m -> mouseButtonUp.emit(m.button, m));
+		onMouseHold(m -> mouseButtonHold.emit(m.button, m));
+		onMouseClicked(m -> mouseButtonClicked.emit(m.button, m));
+		onMouseDoubleClicked(m -> mouseButtonDoubleClicked.emit(m.button, m));
 	}
 
 	public function setPadding(value:Float):Void {
@@ -70,7 +103,7 @@ class Element extends PhysicalObject<Element> {
 	}
 
 	overload extern public inline function mapFromGlobal(p:Position):Position {
-		return transform * p;
+		return _transform * p;
 	}
 
 	overload extern public inline function mapFromGlobal(x:Float, y:Float):Position {
@@ -78,7 +111,7 @@ class Element extends PhysicalObject<Element> {
 	}
 
 	overload extern public inline function mapToGlobal(p:Position):Position {
-		return inverse(transform) * p;
+		return inverse(_transform) * p;
 	}
 
 	overload extern public inline function mapToGlobal(x:Float, y:Float):Position {
@@ -136,8 +169,20 @@ class Element extends PhysicalObject<Element> {
 	}
 
 	public function childAt(x:Float, y:Float):Element {
-		for (c in children.reversed()) {
-			var cat = c.childAt(x, y);
+		var i = children.length;
+		while (0 < i) {
+			final c = children[--i];
+			if (c.contains(x, y))
+				return c;
+		}
+		return null;
+	}
+
+	public function descendantAt(x:Float, y:Float):Element {
+		var i = children.length;
+		while (0 < i) {
+			final c = children[--i];
+			var cat = c.descendantAt(x, y);
 			if (cat == null) {
 				if (c.contains(x, y))
 					return c;
@@ -148,11 +193,11 @@ class Element extends PhysicalObject<Element> {
 	}
 
 	public function contains(x:Float, y:Float):Bool {
-		final _p = mapToGlobal(x, y);
-		final _x = _p.x - this.x;
-		final _y = _p.y - this.y;
-		return 0.0 <= _x && _x <= width && 0.0 <= _y && _y <= height;
+		final p = mapToGlobal(x, y);
+		return this.x <= p.x && p.x <= width && this.y <= p.y && p.y <= height;
 	}
+
+	function draw(target:Texture):Void {}
 
 	function render(target:Texture) {
 		if (visible) {
@@ -161,6 +206,7 @@ class Element extends PhysicalObject<Element> {
 			ctx.style.color = color;
 			ctx.style.pushOpacity(opacity);
 			ctx.pushTransformation(transform);
+			_transform.copyFrom(ctx.transform);
 
 			draw(target);
 			for (c in children)
@@ -171,10 +217,16 @@ class Element extends PhysicalObject<Element> {
 		}
 	}
 
-	function draw(target:Texture):Void {}
-
 	private inline function get_anchors():Anchors {
 		return this;
+	}
+
+	private inline function set_padding(value:Float) {
+		left.padding = value;
+		top.padding = value;
+		right.padding = value;
+		bottom.padding = value;
+		return value;
 	}
 
 	private inline function get_x():Float {
@@ -304,13 +356,5 @@ class Element extends PhysicalObject<Element> {
 
 	private inline function get_childrenRect():Vec4 {
 		return childrenBounds.toRect();
-	}
-
-	private inline function set_padding(value:Float) {
-		left.padding = value;
-		top.padding = value;
-		right.padding = value;
-		bottom.padding = value;
-		return value;
 	}
 }

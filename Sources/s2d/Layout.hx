@@ -2,19 +2,23 @@ package s2d;
 
 import s2d.Alignment;
 
+#if !macro
+@:build(se.macro.SMacro.build())
+#end
 class Layout {
-	public var alignment:Alignment = Center;
-	public var leftMargin:Float = 0.0;
-	public var topMargin:Float = 0.0;
-	public var rightMargin:Float = 0.0;
-	public var bottomMargin:Float = 0.0;
+	@track public var row:Int = 0;
+	@track public var rowSpan:Int = 1;
+	@track public var column:Int = 0;
+	@track public var columnSpan:Int = 1;
+	@track public var fillWidth:Bool = false;
+	@track public var fillHeight:Bool = false;
+	@track public var leftMargin:Float = 0.0;
+	@track public var topMargin:Float = 0.0;
+	@track public var rightMargin:Float = 0.0;
+	@track public var bottomMargin:Float = 0.0;
+	@track public var alignment:Alignment = Center;
+
 	public var margins(never, set):Float;
-	public var row:Int = 0;
-	public var rowSpan:Int = 1;
-	public var column:Int = 0;
-	public var columnSpan:Int = 1;
-	public var fillHeight:Bool = false;
-	public var fillWidth:Bool = false;
 
 	public function new() {}
 

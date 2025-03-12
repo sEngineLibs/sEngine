@@ -13,7 +13,7 @@ import se.graphics.Context2D;
 import se.animation.Action;
 import s2d.stage.Stage;
 import s2d.stage.graphics.Renderer;
-import s2d.UIScene;
+import s2d.WindowScene;
 import s2d.graphics.Drawers;
 
 @:allow(se.App)
@@ -32,7 +32,6 @@ class SEngine {
 	@:access(s2d.stage.graphics.Renderer)
 	public static function start(window:Window) {
 		Stage.current = new Stage();
-		UIScene.current = new UIScene(window);
 
 		Renderer.compile(width, height);
 		Drawers.compile();
@@ -107,7 +106,6 @@ class SEngine {
 	@:access(s2d.stage.graphics.Renderer)
 	public static inline function render():Texture {
 		var frame = Renderer.render();
-		UIScene.current.render(frame);
 		#if S2D_DEBUG_FPS
 		showFPS(frame.ctx2D);
 		#end
