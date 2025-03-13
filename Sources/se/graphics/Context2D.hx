@@ -6,7 +6,7 @@ import se.math.Vec2;
 import se.math.Mat3;
 import se.math.VectorMath;
 
-@:forward(pipeline, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)
+@:forward(pipeline, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString)
 extern abstract Context2D(Graphics) from Graphics {
 	public var style(get, never):Context2DStyle;
 	public var transform(get, set):Mat3;
@@ -31,6 +31,10 @@ extern abstract Context2D(Graphics) from Graphics {
 
 	public inline function popTransformation():Mat3 {
 		return this.popTransformation();
+	}
+
+	public inline function drawChars(chars:Chars, x:Float, y:Float) {
+		this.drawCharacters(chars, 0, chars.length, x, y);
 	}
 
 	public inline function drawImage(img:Image, x:Float, y:Float) {

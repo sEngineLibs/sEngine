@@ -11,8 +11,6 @@ import se.graphics.Context2D;
 import se.events.MouseEvents;
 import se.input.Mouse;
 
-using kha.StringExtensions;
-
 @:structInit
 @:allow(se.App)
 @:allow(se.SEngine)
@@ -35,7 +33,10 @@ class WindowScene {
 
 		var m = App.input.mouse;
 		m.onMoved(mouseMoved);
-		m.onScrolled(mouseScrolled);
+		m.onScrolled(d -> {
+			mouseScrolled(d);
+			adjustWheelFocus(d);
+		});
 		m.onDown(mouseDown);
 		m.onUp(mouseUp);
 		m.onHold(mouseHold);
@@ -43,7 +44,7 @@ class WindowScene {
 		m.onDoubleClicked(mouseDoubleClicked);
 
 		var k = App.input.keyboard;
-		k.onKeyDown(Tab, adjustFocus);
+		k.onKeyDown(Tab, adjustTabFocus);
 
 		k.onDown(key -> if (focused != null) focused.keyboardDown(key));
 		k.onUp(key -> if (focused != null) focused.keyboardUp(key));
@@ -65,17 +66,24 @@ class WindowScene {
 		return null;
 	}
 
-	function adjustFocus() {
-		if (focused == null)
-			focused = interactives[0];
-		else {
-			final i = interactives.indexOf(focused);
-			for (j in 1...interactives.length) {
-				var e = interactives[(i + j) % interactives.length];
-				if (e.enabled && (e.focusPolicy | FocusPolicy.TabFocus != 0)) {
-					focused = e;
-					return;
-				}
+	function adjustTabFocus() {
+		final i = focused == null ? -1 : interactives.indexOf(focused);
+		for (j in 1...interactives.length) {
+			var e = interactives[(i + j) % interactives.length];
+			if (e.enabled && (e.focusPolicy & TabFocus != 0)) {
+				focused = e;
+				return;
+			}
+		}
+	}
+
+	function adjustWheelFocus(d:Int) {
+		final i = interactives.length + (focused == null ? -1 : interactives.indexOf(focused));
+		for (j in 1...interactives.length) {
+			var e = interactives[(i + (d > 0 ? j : -j)) % interactives.length];
+			if (e.enabled && (e.focusPolicy & WheelFocus != 0)) {
+				focused = e;
+				return;
 			}
 		}
 	}

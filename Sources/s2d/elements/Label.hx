@@ -2,6 +2,7 @@ package s2d.elements;
 
 import kha.Font;
 import kha.Assets;
+import se.Chars;
 import se.Texture;
 import s2d.Alignment;
 
@@ -11,9 +12,13 @@ class Label extends InteractiveElement {
 	var textWidth:Float;
 	var textHeight:Float;
 
-	@:inject(updateTextWidth) public var text:String;
-	@:inject(updateTextSize) public var font:Font;
-	@:inject(updateTextSize) @:isVar public var fontSize(default, set):Int = 14;
+	@:inject(updateTextWidth)
+	@track public var text:Chars;
+	@:inject(updateTextSize)
+	public var font:Font;
+	@:inject(updateTextSize)
+	@track @:isVar public var fontSize(default, set):Int = 14;
+
 	public var alignment:Alignment = Alignment.Left | Alignment.Top;
 
 	public function new(?text:String = "Text", ?parent:Element) {
@@ -42,12 +47,12 @@ class Label extends InteractiveElement {
 		else if ((alignment & Alignment.Bottom) != 0)
 			drawY += height - textHeight;
 
-		ctx.drawString(text, drawX, drawY);
+		ctx.drawChars(text, drawX, drawY);
 	}
 
 	function updateTextWidth() {
 		if (font != null && text != null)
-			textWidth = font.widthOfCharacters(fontSize, text.toCharArray(), 0, text.length);
+			textWidth = font.widthOfCharacters(fontSize, text, 0, text.length);
 	}
 
 	function updateTextHeight() {

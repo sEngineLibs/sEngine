@@ -210,8 +210,6 @@ class Element extends PhysicalObject<Element> {
 		left.position = value;
 		if (anchors.right == null)
 			right.position += d;
-		for (c in children)
-			c.x += d;
 		return value;
 	}
 
@@ -224,8 +222,6 @@ class Element extends PhysicalObject<Element> {
 		top.position = value;
 		if (anchors.bottom == null)
 			bottom.position += d;
-		for (c in children)
-			c.y += d;
 		return value;
 	}
 

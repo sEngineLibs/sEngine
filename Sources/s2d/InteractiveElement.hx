@@ -5,7 +5,7 @@ import se.input.Mouse;
 import se.events.MouseEvents;
 
 class InteractiveElement extends Element {
-	public var focusPolicy:FocusPolicy = StrongFocus;
+	public var focusPolicy:FocusPolicy = FocusPolicy.ClickFocus | FocusPolicy.TabFocus;
 	@track public var focused:Bool = false;
 	@track public var enabled:Bool = true;
 
@@ -61,15 +61,18 @@ class InteractiveElement extends Element {
 		onMouseDown(m -> mouseButtonDown.emit(m.button, m));
 		onMouseUp(m -> mouseButtonUp.emit(m.button, m));
 		onMouseHold(m -> mouseButtonHold.emit(m.button, m));
-		onMouseClicked(m -> mouseButtonClicked.emit(m.button, m));
+		onMouseClicked(m -> {
+			mouseButtonClicked.emit(m.button, m);
+			if (!focused && (focusPolicy & ClickFocus != 0))
+				scene.focused = this;
+		});
 		onMouseDoubleClicked(m -> mouseButtonDoubleClicked.emit(m.button, m));
 	}
 }
 
 enum abstract FocusPolicy(Int) from Int to Int {
-	var NoFocus;
-	var TabFocus;
-	var ClickFocus;
-	var StrongFocus = TabFocus | ClickFocus;
-	var WheelFocus = StrongFocus | 4;
+	var NoFocus = 0;
+	var TabFocus = 1;
+	var ClickFocus = 2;
+	var WheelFocus = 4;
 }
