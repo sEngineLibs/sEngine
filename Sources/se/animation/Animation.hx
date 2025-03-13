@@ -1,6 +1,6 @@
 package se.animation;
 
-import se.system.Time;
+import se.Time;
 import se.animation.Action.Actuator;
 
 @:access(se.animation.Action)

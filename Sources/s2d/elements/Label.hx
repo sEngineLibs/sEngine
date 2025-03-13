@@ -7,7 +7,7 @@ import s2d.Alignment;
 
 using kha.StringExtensions;
 
-class TextElement extends InteractiveElement {
+class Label extends InteractiveElement {
 	var textWidth:Float;
 	var textHeight:Float;
 

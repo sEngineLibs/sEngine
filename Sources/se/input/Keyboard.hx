@@ -1,13 +1,12 @@
-package se.system.input;
+package se.input;
 
-import kha.input.KeyCode;
+typedef KeyCode = kha.input.KeyCode;
 
 #if !macro
 @:build(se.macro.SMacro.build())
 #end
 class Keyboard {
 	var keysTimers:Map<KeyCode, Timer> = [];
-	var hotkeyListeners:Map<Set<KeyCode>, Array<Void->Void>> = [];
 
 	public var keysDown:Set<KeyCode> = [];
 	public var holdInterval = 0.8;
@@ -28,11 +27,22 @@ class Keyboard {
 
 	@:signal(char) function charPressed(char:String);
 
+	var hotkeyListeners:Map<Set<KeyCode>, Array<Void->Void>> = [];
+
 	public function new(id:Int = 0) {
 		kha.input.Keyboard.get(id).notify(down.emit, up.emit, pressed.emit);
 
 		onPressed(charPressed.emit);
 		onHold(keyHold.emit);
+	}
+
+	public function onHotkeyDown(hotkey:Set<KeyCode>, slot:Void->Void) {
+		for (hkl in hotkeyListeners.keys())
+			if (hkl == hotkey) {
+				hotkeyListeners.get(hkl).push(slot);
+				return;
+			}
+		hotkeyListeners.set(hotkey, [slot]);
 	}
 
 	@:slot(down) function _down(key:KeyCode) {
@@ -53,15 +63,8 @@ class Keyboard {
 
 		hotkeyDown(keysDown);
 
-		keysTimers.get(key).stop();
+		keysTimers.get(key)?.stop();
 		keysTimers.remove(key);
-	}
-
-	public function onHotkeyDown(hotkey:Set<KeyCode>, slot:Void->Void) {
-		if (hotkeyListeners.exists(hotkey))
-			hotkeyListeners.get(hotkey).push(slot);
-		else
-			hotkeyListeners.set(hotkey, [slot]);
 	}
 
 	function hotkeyDown(hotkey:Set<KeyCode>) {

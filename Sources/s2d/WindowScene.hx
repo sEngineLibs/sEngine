@@ -1,15 +1,15 @@
 package s2d;
 
+import s2d.InteractiveElement.FocusPolicy;
 import kha.Window;
 import kha.Assets;
 import kha.Framebuffer;
 import se.App;
 import se.Color;
-import se.Stack;
 import se.Texture;
 import se.graphics.Context2D;
 import se.events.MouseEvents;
-import se.system.input.Mouse;
+import se.input.Mouse;
 
 using kha.StringExtensions;
 
@@ -22,7 +22,8 @@ class WindowScene {
 
 	var backbuffer:Texture;
 	var elements:Array<Element> = [];
-	var interactives:Stack<InteractiveElement> = [];
+	var interactives:Array<InteractiveElement> = [];
+	@:isVar var focused(default, set):InteractiveElement = null;
 
 	public var color:Color = White;
 
@@ -40,6 +41,14 @@ class WindowScene {
 		m.onHold(mouseHold);
 		m.onClicked(mouseClicked);
 		m.onDoubleClicked(mouseDoubleClicked);
+
+		var k = App.input.keyboard;
+		k.onKeyDown(Tab, adjustFocus);
+
+		k.onDown(key -> if (focused != null) focused.keyboardDown(key));
+		k.onUp(key -> if (focused != null) focused.keyboardUp(key));
+		k.onHold(key -> if (focused != null) focused.keyboardHold(key));
+		k.onPressed(char -> if (focused != null) focused.keyboardPressed(char));
 	}
 
 	public function elementAt(x:Float, y:Float):Element {
@@ -54,6 +63,21 @@ class WindowScene {
 				return cat;
 		};
 		return null;
+	}
+
+	function adjustFocus() {
+		if (focused == null)
+			focused = interactives[0];
+		else {
+			final i = interactives.indexOf(focused);
+			for (j in 1...interactives.length) {
+				var e = interactives[(i + j) % interactives.length];
+				if (e.enabled && (e.focusPolicy | FocusPolicy.TabFocus != 0)) {
+					focused = e;
+					return;
+				}
+			}
+		}
 	}
 
 	function processMouseEvent<T:MouseEvent>(event:T, f:(InteractiveElement, T) -> Void) {
@@ -244,4 +268,14 @@ class WindowScene {
 			+ style.fontSize);
 	}
 	#end
+
+	inline function set_focused(value:InteractiveElement):InteractiveElement {
+		if (focused != value) {
+			if (focused != null)
+				focused.focused = false;
+			value.focused = true;
+			focused = value;
+		}
+		return focused;
+	}
 }

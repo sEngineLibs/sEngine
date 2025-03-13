@@ -6,7 +6,7 @@ import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
 import se.App;
-import se.system.Time;
+import se.Time;
 import se.math.Mat3;
 import se.math.VectorMath;
 import se.graphics.Context2D;

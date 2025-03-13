@@ -1,5 +1,8 @@
 package se.events;
 
+import se.input.Keyboard.KeyCode;
+import se.input.Mouse.MouseButton;
+
 typedef MouseEvent = {
 	var ?accepted:Bool;
 }
@@ -19,7 +22,7 @@ typedef MouseMoveEvent = {
 
 typedef MouseButtonEvent = {
 	> MouseEvent,
-	var button:Int;
+	var button:MouseButton;
 	var x:Int;
 	var y:Int;
 }

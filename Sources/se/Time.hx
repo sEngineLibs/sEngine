@@ -1,4 +1,4 @@
-package se.system;
+package se;
 
 import kha.System;
 

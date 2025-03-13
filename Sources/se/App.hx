@@ -3,9 +3,9 @@ package se;
 import s2d.WindowScene;
 import kha.Assets;
 import kha.System;
-import se.system.Time;
-import se.system.input.Mouse;
-import se.system.input.Keyboard;
+import se.Time;
+import se.input.Mouse;
+import se.input.Keyboard;
 
 @:build(se.macro.SMacro.build())
 class App {

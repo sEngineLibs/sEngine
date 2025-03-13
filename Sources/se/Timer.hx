@@ -1,8 +1,8 @@
 package se;
 
-import se.system.Time;
+import se.Time;
 
-@:access(se.system.Time)
+@:access(se.Time)
 class Timer {
 	var listener:{
 		f:Void->Void,

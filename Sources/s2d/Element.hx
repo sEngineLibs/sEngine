@@ -41,10 +41,8 @@ class Element extends PhysicalObject<Element> {
 
 	public var layout:Layout = new Layout();
 	public var visible:Bool = true;
-	public var focused:Bool = false;
 	public var opacity:Float = 1.0;
 	public var color:Color = White;
-	public var enabled:Bool = true;
 
 	@track public var x(get, set):Float;
 	@track public var y(get, set):Float;

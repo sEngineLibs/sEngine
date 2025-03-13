@@ -310,12 +310,48 @@ extern abstract Set<T>(Array<T>) from Array<T> to Array<T> {
 	/**
 		Returns a shallow copy of `this` Set.
 
-		The elements are not copied and retain their identity, so
-		`a[i] == a.copy()[i]` is true for any valid `i`. However,
-		`a == a.copy()` is always false.
+		The elements are not copied and retain their identity.
 	**/
 	public inline function copy():Set<T> {
 		return this.copy();
+	}
+
+	@:op(a == b)
+	public inline function equals(b:Set<T>):Bool {
+		if (this.length != b.length)
+			return false;
+		var f = true;
+		for (e in this)
+			if (!b.contains(e)) {
+				f = false;
+				break;
+			}
+		return f;
+	}
+
+	@:op(a != b)
+	public inline function nequals(b:Set<T>):Bool {
+		return !equals(b);
+	}
+
+	@:op(a < b)
+	public inline function lt(b:Set<T>):Bool {
+		return this.length < b.length;
+	}
+
+	@:op(a <= b)
+	public inline function ltequals(b:Set<T>):Bool {
+		return lt(b) || equals(b);
+	}
+
+	@:op(a > b)
+	public inline function gt(b:Set<T>):Bool {
+		return this.length > b.length;
+	}
+
+	@:op(a >= b)
+	public inline function gtequals(b:Set<T>):Bool {
+		return gt(b) || equals(b);
 	}
 
 	/**

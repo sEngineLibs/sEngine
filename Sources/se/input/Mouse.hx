@@ -1,4 +1,4 @@
-package se.system.input;
+package se.input;
 
 import kha.input.Mouse.MouseCursor;
 

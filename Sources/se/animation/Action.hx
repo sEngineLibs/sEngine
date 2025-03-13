@@ -1,6 +1,6 @@
 package se.animation;
 
-import se.system.Time;
+import se.Time;
 
 /**
 	This class manages tween animations, allowing smooth transitions over time.
