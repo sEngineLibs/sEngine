@@ -6,13 +6,11 @@ import se.math.Vec2;
 import se.math.Vec4;
 import se.math.Mat3;
 import se.math.VectorMath;
-import se.system.input.Mouse;
 import s2d.Anchors;
 import s2d.geometry.Size;
 import s2d.geometry.Rect;
 import s2d.geometry.Bounds;
 import s2d.geometry.Position;
-import se.events.MouseEvents;
 
 @:allow(s2d.WindowScene)
 class Element extends PhysicalObject<Element> {
@@ -31,6 +29,8 @@ class Element extends PhysicalObject<Element> {
 	overload extern public static inline function mapFromElement(element:Element, p:Position):Position {
 		return element.mapToGlobal(p.x, p.y);
 	}
+
+	var scene:WindowScene;
 
 	public var left:AnchorLine = new AnchorLine(1.0);
 	public var top:AnchorLine = new AnchorLine(1.0);
@@ -62,40 +62,14 @@ class Element extends PhysicalObject<Element> {
 	public var childrenRect(get, never):Rect;
 	public var childrenBounds(get, never):Bounds;
 
-	@:signal function mouseMoved(m:MouseMoveEvent);
-
-	@:signal function mouseScrolled(m:MouseScrollEvent);
-
-	@:signal function mouseDown(m:MouseButtonEvent);
-
-	@:signal function mouseUp(m:MouseButtonEvent);
-
-	@:signal function mouseHold(m:MouseButtonEvent);
-
-	@:signal function mouseClicked(m:MouseButtonEvent);
-
-	@:signal function mouseDoubleClicked(m:MouseButtonEvent);
-
-	@:signal(button) function mouseButtonDown(button:MouseButton, m:MouseButtonEvent);
-
-	@:signal(button) function mouseButtonUp(button:MouseButton, m:MouseButtonEvent);
-
-	@:signal(button) function mouseButtonHold(button:MouseButton, m:MouseButtonEvent);
-
-	@:signal(button) function mouseButtonClicked(button:MouseButton, m:MouseButtonEvent);
-
-	@:signal(button) function mouseButtonDoubleClicked(button:MouseButton, m:MouseButtonEvent);
-
 	public function new(?parent:Element) {
 		super(parent);
-		if (parent == null)
-			WindowScene.current.elements.push(this);
 
-		onMouseDown(m -> mouseButtonDown.emit(m.button, m));
-		onMouseUp(m -> mouseButtonUp.emit(m.button, m));
-		onMouseHold(m -> mouseButtonHold.emit(m.button, m));
-		onMouseClicked(m -> mouseButtonClicked.emit(m.button, m));
-		onMouseDoubleClicked(m -> mouseButtonDoubleClicked.emit(m.button, m));
+		if (parent == null) {
+			scene = WindowScene.current;
+			scene.elements.push(this);
+		} else
+			scene = parent.scene;
 	}
 
 	public function setPadding(value:Float):Void {

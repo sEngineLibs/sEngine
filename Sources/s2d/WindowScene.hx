@@ -1,10 +1,11 @@
 package s2d;
 
-import se.Color;
-import kha.Framebuffer;
 import kha.Window;
 import kha.Assets;
+import kha.Framebuffer;
 import se.App;
+import se.Color;
+import se.Stack;
 import se.Texture;
 import se.graphics.Context2D;
 import se.events.MouseEvents;
@@ -21,6 +22,7 @@ class WindowScene {
 
 	var backbuffer:Texture;
 	var elements:Array<Element> = [];
+	var interactives:Stack<InteractiveElement> = [];
 
 	public var color:Color = White;
 
@@ -31,35 +33,41 @@ class WindowScene {
 		window.notifyOnResize((w, h) -> backbuffer = new Texture(w, h));
 
 		var m = App.input.mouse;
-		m.onMoved(_moved);
-		m.onScrolled(_scrolled);
-		m.onDown(_down);
-		m.onUp(_up);
-		m.onHold(_hold);
-		m.onClicked(_clicked);
-		m.onDoubleClicked(_doubleClicked);
+		m.onMoved(mouseMoved);
+		m.onScrolled(mouseScrolled);
+		m.onDown(mouseDown);
+		m.onUp(mouseUp);
+		m.onHold(mouseHold);
+		m.onClicked(mouseClicked);
+		m.onDoubleClicked(mouseDoubleClicked);
 	}
 
-	function traverse(e:Array<Element>, f:Element->Bool) {
-		var i = e.length;
-		while (0 < i) {
-			final c = e[--i];
-			if (!traverse(c.children, f) && c.contains(App.input.mouse.x, App.input.mouse.x) && f(c))
-				return true;
-		}
-		return false;
+	public function elementAt(x:Float, y:Float):Element {
+		var i = elements.length;
+		while (--i >= 0) {
+			final c = elements[i];
+			var cat = c.descendantAt(x, y);
+			if (cat == null) {
+				if (c.contains(x, y))
+					return c;
+			} else
+				return cat;
+		};
+		return null;
 	}
 
-	function process<T:MouseEvent>(event:T, f:(Element, T) -> Void) {
-		traverse(this.elements, c -> {
-			f(c, event);
-			event.accepted;
-		});
+	function processMouseEvent<T:MouseEvent>(event:T, f:(InteractiveElement, T) -> Void) {
+		event.accepted = true;
+		for (e in interactives)
+			if (e.visible && e.enabled && e.contains(App.input.mouse.x, App.input.mouse.y)) {
+				f(e, event);
+				if (event.accepted)
+					break;
+			}
 	}
 
-	function _moved(x:Int, y:Int, dx:Int, dy:Int):Void {
-		process({
-			accepted: false,
+	function mouseMoved(x:Int, y:Int, dx:Int, dy:Int):Void {
+		inline processMouseEvent({
 			x: x,
 			y: y,
 			dx: dx,
@@ -67,52 +75,46 @@ class WindowScene {
 		}, (c, m) -> c.mouseMoved.emit(m));
 	}
 
-	function _scrolled(d:Int):Void {
-		process({
-			accepted: false,
+	function mouseScrolled(d:Int):Void {
+		inline processMouseEvent({
 			delta: d
 		}, (c, m) -> c.mouseScrolled.emit(m));
 	}
 
-	function _down(b:MouseButton, x:Int, y:Int):Void {
-		process({
-			accepted: false,
+	function mouseDown(b:MouseButton, x:Int, y:Int):Void {
+		inline processMouseEvent({
 			button: b,
 			x: x,
 			y: y
 		}, (c, m) -> c.mouseDown.emit(m));
 	}
 
-	function _up(b:MouseButton, x:Int, y:Int):Void {
-		process({
-			accepted: false,
+	function mouseUp(b:MouseButton, x:Int, y:Int):Void {
+		inline processMouseEvent({
 			button: b,
 			x: x,
 			y: y
 		}, (c, m) -> c.mouseUp.emit(m));
 	}
 
-	function _hold(b:MouseButton, x:Int, y:Int):Void {
-		process({
-			accepted: false,
+	function mouseHold(b:MouseButton, x:Int, y:Int):Void {
+		inline processMouseEvent({
 			button: b,
 			x: x,
 			y: y
 		}, (c, m) -> c.mouseHold.emit(m));
 	}
 
-	function _clicked(b:MouseButton, x:Int, y:Int):Void {
-		process({
-			accepted: false,
+	function mouseClicked(b:MouseButton, x:Int, y:Int):Void {
+		inline processMouseEvent({
 			button: b,
 			x: x,
 			y: y
 		}, (c, m) -> c.mouseClicked.emit(m));
 	}
 
-	function _doubleClicked(b:MouseButton, x:Int, y:Int):Void {
-		process({
-			accepted: false,
+	function mouseDoubleClicked(b:MouseButton, x:Int, y:Int):Void {
+		inline processMouseEvent({
 			button: b,
 			x: x,
 			y: y
@@ -123,11 +125,11 @@ class WindowScene {
 		backbuffer.ctx2D.render(true, color, ctx -> {
 			for (e in elements)
 				e.render(backbuffer);
-			// #if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-			// var e = descendantAt(App.input.mouse.x, App.input.mouse.y);
-			// if (e != null)
-			// 	drawBounds(e, ctx);
-			// #end
+			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
+			var e = elementAt(App.input.mouse.x, App.input.mouse.y);
+			if (e != null)
+				drawBounds(e, ctx);
+			#end
 		});
 
 		final g2 = target.g2;

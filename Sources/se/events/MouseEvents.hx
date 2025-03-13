@@ -1,7 +1,7 @@
 package se.events;
 
 typedef MouseEvent = {
-	var accepted:Bool;
+	var ?accepted:Bool;
 }
 
 typedef MouseScrollEvent = {

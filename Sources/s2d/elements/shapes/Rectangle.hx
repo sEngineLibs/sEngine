@@ -2,7 +2,7 @@ package s2d.elements.shapes;
 
 import se.Texture;
 
-class Rectangle extends Element {
+class Rectangle extends InteractiveElement {
 	public function new(?parent:Element) {
 		super(parent);
 	}

@@ -4,7 +4,6 @@
 -cp ../Sources
 --macro include('se')
 --macro include('s2d')
---macro include('s3d')
 # sengine flags
 -D S2D_DEBUG_FPS -> enables FPS debugging
 -D S2D_SPRITE_INSTANCING
@@ -46,4 +45,6 @@
 
 # html generation
 --next
---cmd haxelib run dox -i build -o build/html/pages -in "se|s2d|s3d" --title "sEngine API" -D version 1.0.0a -D description "sEngine libraries APIs" -D source-path https://github.com/sEngineLibs/sEngine/tree/main/Sources
+--cmd if exist "build/html/pages" rd /s /q "build/html/pages"
+--next
+--cmd haxelib run dox -i build -o build/html/pages -in "se|s2d" --title "sEngine API" -D version 1.0.0a -D description "sEngine libraries APIs" -D source-path https://github.com/sEngineLibs/sEngine/tree/main/Sources

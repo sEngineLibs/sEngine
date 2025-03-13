@@ -3,7 +3,7 @@ package s2d.elements.shapes;
 import se.Texture;
 import s2d.graphics.Drawers;
 
-class RoundedRectangle extends Element {
+class RoundedRectangle extends InteractiveElement {
 	public var radius:Float;
 	public var softness:Float;
 
