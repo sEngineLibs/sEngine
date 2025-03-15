@@ -6,7 +6,7 @@ import se.math.Vec2;
 import se.math.Mat3;
 import se.math.VectorMath;
 
-@:forward(pipeline, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString)
+@:forward(pipeline, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)
 extern abstract Context2D(Graphics) from Graphics {
 	public var style(get, never):Context2DStyle;
 	public var transform(get, set):Mat3;
@@ -31,10 +31,6 @@ extern abstract Context2D(Graphics) from Graphics {
 
 	public inline function popTransformation():Mat3 {
 		return this.popTransformation();
-	}
-
-	public inline function drawChars(chars:Chars, x:Float, y:Float) {
-		this.drawCharacters(chars, 0, chars.length, x, y);
 	}
 
 	public inline function drawImage(img:Image, x:Float, y:Float) {
@@ -418,17 +414,17 @@ extern abstract Context2D(Graphics) from Graphics {
 
 	public inline function drawAlignedString(text:String, x:Float, y:Float, alignment:Alignment):Void {
 		var xoffset = 0.0;
-		if (alignment & HCenter != 0 || alignment & Right != 0) {
+		if (alignment & AlignHCenter != 0 || alignment & AlignRight != 0) {
 			var width = this.font.width(this.fontSize, text);
-			if (alignment & HCenter != 0)
+			if (alignment & AlignHCenter != 0)
 				xoffset = -width * 0.5;
 			else
 				xoffset = -width;
 		}
 		var yoffset = 0.0;
-		if (alignment & VCenter != 0 || alignment & Bottom != 0) {
+		if (alignment & AlignVCenter != 0 || alignment & AlignBottom != 0) {
 			var height = this.font.height(this.fontSize);
-			if (alignment & VCenter != 0)
+			if (alignment & AlignVCenter != 0)
 				yoffset = -height * 0.5;
 			else
 				yoffset = -height;
@@ -438,17 +434,17 @@ extern abstract Context2D(Graphics) from Graphics {
 
 	public inline function drawAlignedCharacters(text:Array<Int>, start:Int, length:Int, x:Float, y:Float, alignment:Alignment):Void {
 		var xoffset = 0.0;
-		if (alignment & HCenter != 0 || alignment & Right != 0) {
+		if (alignment & AlignHCenter != 0 || alignment & AlignRight != 0) {
 			var width = this.font.widthOfCharacters(this.fontSize, text, start, length);
-			if (alignment & HCenter != 0)
+			if (alignment & AlignHCenter != 0)
 				xoffset = -width * 0.5;
 			else
 				xoffset = -width;
 		}
 		var yoffset = 0.0;
-		if (alignment & VCenter != 0 || alignment & Bottom != 0) {
+		if (alignment & AlignVCenter != 0 || alignment & AlignBottom != 0) {
 			var height = this.font.height(this.fontSize);
-			if (alignment & VCenter != 0)
+			if (alignment & AlignVCenter != 0)
 				yoffset = -height * 0.5;
 			else
 				yoffset = -height;

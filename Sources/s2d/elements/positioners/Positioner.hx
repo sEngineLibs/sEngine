@@ -12,14 +12,12 @@ abstract class Positioner extends Element {
 	abstract function position(element:Element):Void;
 
 	override function render(target:Texture) {
-		if (visible) {
-			prevBounds = new Vec4(0.0, 0.0, left.padding, top.padding);
-			for (child in children) {
-				if (child.visible) {
-					position(child);
-					prevBounds = child.bounds;
-					child.render(target);
-				}
+		prevBounds = new Vec4(0.0, 0.0, left.padding, top.padding);
+		for (child in children) {
+			if (child.visible) {
+				position(child);
+				prevBounds = child.bounds;
+				child.render(target);
 			}
 		}
 	}

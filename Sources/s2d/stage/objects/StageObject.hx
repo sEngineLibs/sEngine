@@ -9,4 +9,8 @@ class StageObject extends PhysicalObject<StageObject> {
 	public function new() {
 		super(null);
 	}
+
+	function childRemoved(child:StageObject):Void {}
+
+	function childAdded(child:StageObject):Void {}
 }

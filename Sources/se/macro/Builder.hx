@@ -7,6 +7,8 @@ import haxe.macro.Type.Ref;
 import haxe.macro.TypeTools;
 import haxe.macro.ComplexTypeTools;
 
+using haxe.macro.ExprTools;
+
 abstract class Builder {
 	static var built:Map<String, {sup:String, fields:Array<Field>}> = [];
 
@@ -256,8 +258,8 @@ function toComplex(type:haxe.macro.Type) {
 	return TypeTools.toComplexType(type);
 }
 
-function expected():ComplexType {
-	return toComplex(Context.getExpectedType() ?? toType(macro :Void));
+function expected(expr:Expr):ComplexType {
+	return expr != null ? toComplex(Context.typeof(macro $e{expr})) : macro :Void;
 }
 
 function withLocalImports(code:Void->Void) {
@@ -313,5 +315,9 @@ function ident(name:String):Expr {
 
 function idents(names:Array<String>) {
 	return names.map(name -> ident(name));
+}
+
+function traverse(expr:Expr, f:Expr->Expr):Expr {
+	return expr.map(e -> f(traverse(e, f)));
 }
 #end

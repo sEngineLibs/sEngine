@@ -1,35 +1,45 @@
 package s2d;
 
-import s2d.InteractiveElement.FocusPolicy;
 import kha.Window;
 import kha.Assets;
 import kha.Framebuffer;
 import se.App;
 import se.Color;
 import se.Texture;
+import se.input.Mouse;
 import se.graphics.Context2D;
 import se.events.MouseEvents;
-import se.input.Mouse;
+import s2d.FocusPolicy;
+
+using se.extensions.StringExt;
 
 @:structInit
 @:allow(se.App)
 @:allow(se.SEngine)
 @:allow(s2d.Element)
+#if !macro
+@:build(se.macro.SMacro.build())
+#end
 class WindowScene {
-	static var current:WindowScene;
+	public static var current:WindowScene;
 
+	var window:Window;
 	var backbuffer:Texture;
 	var elements:Array<Element> = [];
 	var interactives:Array<InteractiveElement> = [];
 	@:isVar var focused(default, set):InteractiveElement = null;
 
 	public var color:Color = White;
+	@alias public var width:Int = window.width;
+	@alias public var height:Int = window.height;
 
 	public function new(window:Window) {
 		WindowScene.current = this;
 
-		backbuffer = new Texture(window.width, window.height);
-		window.notifyOnResize((w, h) -> backbuffer = new Texture(w, h));
+		this.window = window;
+		onResized((x, y) -> backbuffer = new Texture(window.width, window.height));
+		window.notifyOnResize(resized.emit);
+		window.resize(window.width, window.height);
 
 		var m = App.input.mouse;
 		m.onMoved(mouseMoved);
@@ -52,6 +62,8 @@ class WindowScene {
 		k.onPressed(char -> if (focused != null) focused.keyboardPressed(char));
 	}
 
+	@:signal function resized(x:Int, y:Int):Void;
+
 	public function elementAt(x:Float, y:Float):Element {
 		var i = elements.length;
 		while (--i >= 0) {
@@ -64,6 +76,27 @@ class WindowScene {
 				return cat;
 		};
 		return null;
+	}
+
+	public function resize(width:Int, height:Int) {
+		window.resize(width, height);
+	}
+
+	function render(target:Framebuffer) {
+		backbuffer.ctx2D.render(true, color, ctx -> {
+			for (e in elements)
+				e.render(backbuffer);
+			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
+			var e = elementAt(App.input.mouse.x, App.input.mouse.y);
+			if (e != null)
+				drawBounds(e, ctx);
+			#end
+		});
+
+		final g2 = target.g2;
+		g2.begin(true, color);
+		g2.drawImage(backbuffer, 0, 0);
+		g2.end();
 	}
 
 	function adjustTabFocus() {
@@ -151,23 +184,6 @@ class WindowScene {
 			x: x,
 			y: y
 		}, (c, m) -> c.mouseDoubleClicked.emit(m));
-	}
-
-	function render(target:Framebuffer) {
-		backbuffer.ctx2D.render(true, color, ctx -> {
-			for (e in elements)
-				e.render(backbuffer);
-			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-			var e = elementAt(App.input.mouse.x, App.input.mouse.y);
-			if (e != null)
-				drawBounds(e, ctx);
-			#end
-		});
-
-		final g2 = target.g2;
-		g2.begin(true, color);
-		g2.drawImage(backbuffer, 0, 0);
-		g2.end();
 	}
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)

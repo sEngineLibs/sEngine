@@ -12,31 +12,16 @@ using se.extensions.StringExt;
 
 @:dox(hide)
 class SMacro extends Builder {
-	var signalsOG:Array<Field> = [];
+	static var signalsTypes:Map<String, Array<{name:String, args:Array<FunctionArg>}>> = [];
+	static var slotsSignals:Map<String, Map<String, Position>>;
 
 	macro public static function build():Array<Field> {
 		return new SMacro().export();
 	}
 
 	function run() {
-		function extractMetaParams(meta:MetadataEntry):Map<String, Position> {
-			var params:Map<String, Position> = [];
-			for (param in meta.params ?? [])
-				switch (param.expr) {
-					case EConst(c):
-						switch c {
-							case CIdent(s):
-								params.set(s, param.pos);
-							default:
-								err("Identifier expected", param.pos);
-								continue;
-						}
-					default:
-						err("Identifier expected", param.pos);
-						continue;
-				}
-			return params;
-		}
+		slotsSignals = [];
+		signalsTypes.set(cls.name, []);
 
 		for (field in fields) {
 			for (meta in field.meta ?? []) {
@@ -58,11 +43,12 @@ class SMacro extends Builder {
 									default:
 										err('Slot ${slotIdent.key} must be function', slotIdent.value);
 								}
-							} else {
+							} else
 								err('Can\'t find slot ${slotIdent.key}', slotIdent.value);
-							}
 						}
 						buildInjection(field, injections);
+					case ":slot":
+						slotsSignals.set(field.name, extractMetaParams(meta));
 
 					default:
 						if (meta.name.startsWith("track")) {
@@ -87,65 +73,7 @@ class SMacro extends Builder {
 			}
 		}
 
-		var slotsSignals:Map<String, Map<String, Position>> = [];
-
-		for (field in fields) {
-			for (meta in field.meta ?? []) {
-				if (meta.name == ":slot")
-					switch field.kind {
-						case FFun(f):
-							for (signalIdent in extractMetaParams(meta).keyValueIterator()) {
-								// find signal
-								var signal;
-								for (s in signalsOG)
-									if (s.name == signalIdent.key) {
-										signal = s;
-										break;
-									}
-
-								if (signal != null) {
-									var isSignal = false;
-									for (m in signal.meta)
-										if (m.name == ":signal") {
-											var argsMatch = true;
-											switch signal.kind {
-												case FFun(sf):
-													if (sf.args.length == f.args.length) {
-														for (i in 0...f.args.length) {
-															var t = resolve(f.args[i].type).toString();
-															var st = resolve(sf.args[i].type).toString();
-															if (t != st) {
-																argsMatch = false;
-																err('Arguments mismatch with ${signalIdent.key}', signalIdent.value);
-															}
-														}
-													} else {
-														err('Arguments mismatch with ${signalIdent.key}', signalIdent.value);
-													}
-												default:
-													err('Can\'t find signal ${signalIdent.key}', signalIdent.value);
-											}
-
-											if (argsMatch)
-												slotsSignals.set(field.name, extractMetaParams(meta));
-
-											isSignal = true;
-											break;
-										}
-									if (!isSignal)
-										err('${signalIdent.key} is not signal', signalIdent.value);
-								} else {
-									err('Can\'t find signal ${signalIdent.key}', signalIdent.value);
-								}
-							}
-
-						default:
-							err("Slot must be function", field.pos);
-					}
-			}
-		}
-
-		if (slotsSignals.iterator().hasNext()) {
+		if (slotsSignals.keys().hasNext()) {
 			var constructor = find("new");
 			if (constructor == null)
 				err("This class must have a constructor");
@@ -157,19 +85,19 @@ class SMacro extends Builder {
 
 			for (slot in slotsSignals.keyValueIterator()) {
 				var conns = [
-					for (signal in slot.value.keys())
-						macro $i{signal}.connect($i{slot.key})
+					for (signal in slot.value.keys()) {
+						var p = signal.split(".");
+						p[p.length - 1] = 'on${p[p.length - 1].capitalize()}';
+						if (p.length == 1) {
+							macro $i{p[0]}($i{slot.key});
+						} else {
+							macro $p{p}($i{slot.key});
+						}
+					}
 				];
 				cf.expr = switch cf.expr.expr {
-					case EBlock(exprs): {
-							expr: EBlock(exprs.concat(conns)),
-							pos: Context.currentPos()
-						}
-					default:
-						{
-							expr: EBlock([macro ${cf.expr}].concat(conns)),
-							pos: Context.currentPos()
-						}
+					case EBlock(exprs): macro $b{exprs.concat(conns)};
+					default: macro $b{[macro ${cf.expr}].concat(conns)};
 				}
 			}
 		}
@@ -251,22 +179,20 @@ class SMacro extends Builder {
 	}
 
 	function buildSignal(field:Field, isPublic:Bool, isStatic:Bool, mask:Array<String>):Void {
-		var fieldOG = copy(field);
-
 		switch (field.kind) {
 			case FFun(f):
 				if (f.expr != null)
 					warn("Signals are not real functions and its body will never be used.", f.expr.pos);
 
-				for (arg in f.args)
-					arg.type = resolve(arg.type ?? expected());
 				var sArgs = [];
 				var sKeys = [];
-				for (arg in f.args)
+				for (arg in f.args) {
+					arg.type = resolve(arg.type);
 					if (mask.contains(arg.name))
 						sKeys.push(arg);
 					else
 						sArgs.push(arg);
+				}
 
 				// define underlying type
 				var _t = ComplexType.TFunction([
@@ -275,6 +201,12 @@ class SMacro extends Builder {
 						if (arg.opt) TOptional(t) else t;
 					}
 				], macro :Void);
+
+				signalsTypes.get(cls.name).push({
+					name: field.name,
+					args: sArgs
+				});
+
 				var typeName = '${cls.name}_${field.name}_Signal';
 				var stypepath = {
 					pack: cls.pack,
@@ -453,45 +385,87 @@ class SMacro extends Builder {
 					@param slot a callback to remove from `${field.name}`\'s list
 					';
 				add(disconnector);
-
-				signalsOG.push(fieldOG);
 			default:
 				err("Signal must be declared as a function. Use `track` meta to track this field", field.pos);
 		}
 	}
 
 	function buildTrack(field:Field, isPublic:Bool):Void {
-		// generate signal
-		var signalName;
-		var signalFun;
-
 		switch (field.kind) {
 			case FVar(t, e):
-				signalName = '${field.name}Changed';
-				signalFun = fun([arg(field.name, t)]);
+				field.meta.push(meta(":isVar"));
+				field.kind = FProp("default", "set", t, e);
+				buildTrack(field, isPublic);
 			case FProp(get, set, t, e):
-				signalName = '${field.name}Changed';
-				signalFun = fun([arg(field.name, t)]);
+				switch set {
+					case "set", "null":
+						var _setter = find('set_${field.name}');
+						if (_setter == null) {
+							add(setter(field, {
+								args: [arg("value", t)],
+								expr: macro {
+									$i{field.name} = value;
+									return $i{field.name};
+								}
+							}));
+							buildTrack(field, isPublic);
+						} else {
+							switch _setter.kind {
+								case FFun(f):
+									var signalName = '${field.name}Changed';
+									var signal = add(method(signalName, fun([arg(field.name, t)])));
+									buildSignal(signal, isPublic, field.access.contains(AStatic), []);
+									f.expr = macro {
+										var __previous__ = $i{field.name};
+										${inject(f.expr, macro $i{signalName}(__previous__))};
+									}
+									field.doc = '_This property is **tracked**. Whenever the property changes, the previous value of it is emitted on connected `$signalName` slots. 
+									The corresponding connector is_ `on${signalName.capitalize()}`\n\n'
+										+ (field.doc ?? "");
+								default: err("Setter must be function", _setter.pos);
+							}
+						}
+					default: err('Can\'t track property with `$set` set access', field.pos);
+				}
 			case FFun(f):
-				f.ret = f.ret ?? expected();
-				signalName = '${field.name}Called';
-				signalFun = fun(switch (f.ret) {
+				var signalName = '${field.name}Called';
+				var signalFun = fun(switch (f.ret) {
 					case TPath(p):
 						p.name == "Void" ? [] : [arg("value", f.ret)];
 					default: [arg("value", f.ret)];
 				});
+				buildInjection(field, [signalName => signalFun]);
+				field.doc = '_This function is **tracked**. The result of every function invocation is emitted on connected `$signalName` slots. 
+					The corresponding connector is_ `on${signalName.capitalize()}`\n\n'
+					+ (field.doc ?? "");
 		}
+	}
 
-		buildSignal(add(method(signalName, signalFun, [meta(":signal")])), isPublic, field.access.contains(AStatic), []);
-		buildInjection(field, [signalName => signalFun]);
-		field.doc = '_This field is **tracked**. The corresponding connector is_ `on${signalName.capitalize()}`\n\n' + (field.doc ?? "");
+	static function inject(expr1:Expr, expr2:Expr):Expr {
+		var injected = false;
+		var e = traverse(expr1, e -> switch e.expr {
+			case EReturn(e):
+				injected = true;
+				macro {
+					final __result__ = $e;
+					${expr2};
+					return __result__;
+				}
+			default: e;
+		});
+		if (!injected)
+			e = macro {
+				$e;
+				${expr2};
+			}
+		return e;
 	}
 
 	function buildInjection(field:Field, injections:Map<String, Function>) {
 		function injectCalls(f:Function, injections:Map<String, Function>) {
 			var injected = false;
 
-			if ((f.ret ?? expected()).toString() == "Void") {
+			if (f.ret != null && f?.ret.toString() != "Void") {
 				var block = [];
 				for (func in injections.keyValueIterator()) {
 					if (func.value.args.length == 0)
@@ -516,15 +490,7 @@ class SMacro extends Builder {
 						err('Invalid number of arguments. Expected 1, got ${args.length}', find(func.key).pos);
 				}
 
-				f.expr = f.expr.map(expr -> switch expr.expr {
-					case EReturn(e):
-						macro {
-							var res = $e;
-							$b{block};
-							return res;
-						}
-					default: expr;
-				});
+				f.expr = inject(f.expr, macro $b{block});
 			}
 		}
 
@@ -554,6 +520,31 @@ class SMacro extends Builder {
 			case FFun(f):
 				injectCalls(f, injections);
 		}
+	}
+
+	function extractMetaParams(meta:MetadataEntry):Map<String, Position> {
+		function parseField(expr:Expr):String {
+			return switch expr.expr {
+				case EConst(c):
+					switch c {
+						case CIdent(s):
+							s;
+						default:
+							err("Identifier expected", expr.pos);
+							null;
+					}
+				case EField(e, field, kind):
+					parseField(e) + "." + field;
+				default:
+					err("Identifier expected", expr.pos);
+					null;
+			}
+		}
+		var params:Map<String, Position> = [
+			for (param in meta.params ?? [])
+				parseField(param) => param.pos
+		];
+		return params;
 	}
 }
 #end

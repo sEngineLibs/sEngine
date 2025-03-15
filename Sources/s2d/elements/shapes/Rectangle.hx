@@ -2,14 +2,12 @@ package s2d.elements.shapes;
 
 import se.Texture;
 
-class Rectangle extends InteractiveElement {
+class Rectangle extends DrawableElement {
 	public function new(?parent:Element) {
 		super(parent);
 	}
 
-	override inline function draw(target:Texture) {
-		super.draw(target);
-
+	inline function draw(target:Texture) {
 		target.ctx2D.fillRect(x, y, width, height);
 	}
 }

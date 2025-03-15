@@ -3,9 +3,10 @@ package s2d;
 import kha.input.KeyCode;
 import se.input.Mouse;
 import se.events.MouseEvents;
+import s2d.FocusPolicy;
 
 class InteractiveElement extends Element {
-	public var focusPolicy:FocusPolicy = FocusPolicy.ClickFocus | FocusPolicy.TabFocus;
+	public var focusPolicy:FocusPolicy = ClickFocus | TabFocus;
 	@track public var focused:Bool = false;
 	@track public var enabled:Bool = true;
 
@@ -68,11 +69,4 @@ class InteractiveElement extends Element {
 		});
 		onMouseDoubleClicked(m -> mouseButtonDoubleClicked.emit(m.button, m));
 	}
-}
-
-enum abstract FocusPolicy(Int) from Int to Int {
-	var NoFocus = 0;
-	var TabFocus = 1;
-	var ClickFocus = 2;
-	var WheelFocus = 4;
 }

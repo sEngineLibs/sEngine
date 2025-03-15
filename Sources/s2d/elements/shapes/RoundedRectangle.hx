@@ -3,7 +3,7 @@ package s2d.elements.shapes;
 import se.Texture;
 import s2d.graphics.Drawers;
 
-class RoundedRectangle extends InteractiveElement {
+class RoundedRectangle extends DrawableElement {
 	public var radius:Float;
 	public var softness:Float;
 
@@ -14,9 +14,7 @@ class RoundedRectangle extends InteractiveElement {
 		this.softness = softness;
 	}
 
-	override inline function draw(target:Texture) {
-		super.draw(target);
-
+	inline function draw(target:Texture) {
 		@:privateAccess Drawers.rectDrawer.render(target, this);
 	}
 }

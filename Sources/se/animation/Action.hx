@@ -46,6 +46,7 @@ class Action {
 	@see `Action`
  */
 @:allow(se.animation.Action)
+@:allow(se.animation.Animation)
 @:access(se.animation.Action)
 class Actuator {
 	var start:Float = 0.0;

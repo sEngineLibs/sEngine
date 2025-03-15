@@ -2,7 +2,7 @@ package s2d;
 
 import s2d.Element;
 
-abstract Anchors(Element) from Element {
+extern abstract Anchors(Element) from Element {
 	public var left(get, set):AnchorLine;
 	public var top(get, set):AnchorLine;
 	public var right(get, set):AnchorLine;
@@ -43,7 +43,7 @@ abstract Anchors(Element) from Element {
 		margins = value;
 	}
 
-	private inline function set_margins(value:Float) {
+	inline function set_margins(value:Float) {
 		this.left.margin = value;
 		this.top.margin = value;
 		this.right.margin = value;
@@ -51,136 +51,113 @@ abstract Anchors(Element) from Element {
 		return value;
 	}
 
-	private inline function get_left():AnchorLine {
+	inline function get_left():AnchorLine {
 		return this.left.bindedTo;
 	}
 
-	private inline function set_left(value:AnchorLine):AnchorLine {
+	inline function set_left(value:AnchorLine):AnchorLine {
 		this.left.bindTo(value);
-		return value;
+		return left;
 	}
 
-	private inline function get_top():AnchorLine {
+	inline function get_top():AnchorLine {
 		return this.top.bindedTo;
 	}
 
-	private inline function set_top(value:AnchorLine):AnchorLine {
+	inline function set_top(value:AnchorLine):AnchorLine {
 		this.top.bindTo(value);
-		return value;
+		return top;
 	}
 
-	private inline function get_right():AnchorLine {
+	inline function get_right():AnchorLine {
 		return this.right.bindedTo;
 	}
 
-	private inline function set_right(value:AnchorLine):AnchorLine {
+	inline function set_right(value:AnchorLine):AnchorLine {
 		this.right.bindTo(value);
-		return value;
+		return right;
 	}
 
-	private inline function get_bottom():AnchorLine {
+	inline function get_bottom():AnchorLine {
 		return this.bottom.bindedTo;
 	}
 
-	private inline function set_bottom(value:AnchorLine):AnchorLine {
+	inline function set_bottom(value:AnchorLine):AnchorLine {
 		this.bottom.bindTo(value);
-		return value;
+		return bottom;
 	}
 }
 
-@:forward.new
-abstract AnchorLine(AnchorLineData) from AnchorLineData to AnchorLineData {
-	public var bindedTo(get, set):AnchorLine;
-	public var isBinded(get, never):Bool;
-
-	public var position(get, set):Float;
-	public var margin(get, set):Float;
-	public var padding(get, set):Float;
-
-	public inline function bind(value:AnchorLineData) {
-		value.bindedTo = this;
-		value.position = value.margin + position + padding * this.m;
-		this.binded.push(value);
-	}
-
-	public inline function unbind(value:AnchorLineData) {
-		value.bindedTo = null;
-		this.binded.remove(value);
-	}
-
-	public inline function bindTo(value:AnchorLine) {
-		value.bind(this);
-	}
-
-	public inline function unbindFrom() {
-		bindedTo.unbind(this);
-	}
-
-	private inline function get_bindedTo():AnchorLine {
-		return this.bindedTo;
-	}
-
-	private inline function set_bindedTo(value:AnchorLine):AnchorLine {
-		if (value != null)
-			value.bind(this);
-		else if (isBinded)
-			bindedTo.unbind(this);
-		return value;
-	}
-
-	private inline function get_position():Float {
-		return this.position;
-	}
-
-	private inline function set_position(value:Float) {
-		if (!isBinded) {
-			final d = value - position;
-			this.position = value;
-			for (b in this.binded)
-				b.position += d;
-		}
-		return value;
-	}
-
-	private inline function get_isBinded() {
-		return bindedTo != null;
-	}
-
-	private inline function get_margin():Float {
-		return this.margin;
-	}
-
-	private inline function set_margin(value:Float) {
-		this.margin = value;
-		if (bindedTo != null)
-			position = bindedTo.position + (bindedTo.padding + margin) * this.m;
-		return value;
-	}
-
-	private inline function get_padding():Float {
-		return this.padding;
-	}
-
-	private inline function set_padding(value:Float) {
-		final d = value * this.m - padding;
-		this.padding = value;
-		for (b in this.binded)
-			b.position += d;
-		return value;
-	}
-}
-
+#if !macro
+@:build(se.macro.SMacro.build())
+#end
 @:allow(s2d.Anchors)
-private class AnchorLineData {
-	var bindedTo:AnchorLine = null;
-	var binded:Array<AnchorLine> = [];
-
+class AnchorLine {
 	var m:Float;
-	var position:Float = 0.0;
-	var margin:Float = 0.0;
-	var padding:Float = 0.0;
+	var binded:Array<AnchorLine> = [];
+	@:isVar var bindedTo(default, set):AnchorLine = null;
 
-	public inline function new(m:Float) {
+	public var isBinded(get, never):Bool;
+	@track public var position:Float = 0.0;
+	@track public var margin:Float = 0.0;
+	@track public var padding:Float = 0.0;
+
+	public function new(m:Float) {
 		this.m = m;
+	}
+
+	public function bind(line:AnchorLine) {
+		line.bindedTo = this;
+	}
+
+	public function unbind(line:AnchorLine) {
+		line.bindedTo = null;
+	}
+
+	public function bindTo(line:AnchorLine) {
+		bindedTo = line;
+	}
+
+	public function unbindFrom() {
+		bindedTo = null;
+	}
+
+	@:slot(positionChanged)
+	function _positionChanged(previous:Float) {
+		final d = position - previous;
+		for (b in binded)
+			b.position += d;
+	}
+
+	@:slot(marginChanged)
+	function _marginChanged(previous:Float) {
+		if (isBinded)
+			position = bindedTo.position + (bindedTo.padding + margin) * m;
+	}
+
+	@:slot(positionChanged)
+	function _paddingChanged(previous:Float) {
+		final d = (previous - padding) * m;
+		for (b in binded)
+			b.position += d;
+	}
+
+	inline function set_bindedTo(line:AnchorLine):AnchorLine {
+		if (bindedTo != line) {
+			if (bindedTo != null && bindedTo.binded.contains(this)) {
+				bindedTo.binded.remove(this);
+				position = bindedTo.position;
+			}
+			if (line != null && !line.binded.contains(this)) {
+				line.binded.push(this);
+				position = line.position + m * (line.padding + margin);
+			}
+			bindedTo = line;
+		}
+		return bindedTo;
+	}
+
+	inline function get_isBinded() {
+		return bindedTo != null;
 	}
 }

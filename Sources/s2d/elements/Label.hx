@@ -2,24 +2,23 @@ package s2d.elements;
 
 import kha.Font;
 import kha.Assets;
-import se.Chars;
 import se.Texture;
 import s2d.Alignment;
 
-using kha.StringExtensions;
+using se.extensions.StringExt;
 
-class Label extends InteractiveElement {
+class Label extends DrawableElement {
 	var textWidth:Float;
 	var textHeight:Float;
 
 	@:inject(updateTextWidth)
-	@track public var text:Chars;
+	@track public var text:String;
 	@:inject(updateTextSize)
 	public var font:Font;
 	@:inject(updateTextSize)
 	@track @:isVar public var fontSize(default, set):Int = 14;
 
-	public var alignment:Alignment = Alignment.Left | Alignment.Top;
+	public var alignment:Alignment = AlignLeft | AlignTop;
 
 	public function new(?text:String = "Text", ?parent:Element) {
 		super(parent);
@@ -27,32 +26,30 @@ class Label extends InteractiveElement {
 		this.text = text;
 	}
 
-	override inline function draw(target:Texture) {
-		super.draw(target);
-
+	function draw(target:Texture) {
 		final ctx = target.ctx2D;
 
 		ctx.style.font = font;
 		ctx.style.fontSize = fontSize;
 
 		var drawX = x;
-		if ((alignment & Alignment.HCenter) != 0)
+		if ((alignment & AlignHCenter) != 0)
 			drawX += (width - textWidth) / 2.0;
-		else if ((alignment & Alignment.Right) != 0)
+		else if ((alignment & AlignRight) != 0)
 			drawX += width - textWidth;
 
 		var drawY = y;
-		if ((alignment & Alignment.VCenter) != 0)
+		if ((alignment & AlignVCenter) != 0)
 			drawY += (height - textHeight) / 2.0;
-		else if ((alignment & Alignment.Bottom) != 0)
+		else if ((alignment & AlignBottom) != 0)
 			drawY += height - textHeight;
 
-		ctx.drawChars(text, drawX, drawY);
+		ctx.drawString(text, drawX, drawY);
 	}
 
 	function updateTextWidth() {
 		if (font != null && text != null)
-			textWidth = font.widthOfCharacters(fontSize, text, 0, text.length);
+			textWidth = font.widthOfCharacters(fontSize, text.toCharArray(), 0, text.length);
 	}
 
 	function updateTextHeight() {

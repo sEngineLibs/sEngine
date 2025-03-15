@@ -42,4 +42,11 @@ class StringExt {
 	public static function strip(str:String):String {
 		return str.replace('\n', ' ');
 	}
+
+	public static function toCharArray(s:String):Array<Int> {
+		return [
+			for (i in 0...s.length)
+				s.charCodeAt(i)
+		];
+	}
 }

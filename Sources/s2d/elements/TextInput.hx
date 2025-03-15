@@ -2,6 +2,7 @@ package s2d.elements;
 
 import s2d.elements.shapes.Rectangle;
 
+using se.extensions.StringExt;
 
 class TextInput extends Label {
 	public var cursor:Rectangle;
@@ -24,7 +25,7 @@ class TextInput extends Label {
 		});
 
 		onKeyboardPressed(c -> editText(() -> text += c));
-		onKeyboardKeyDown(Backspace, () -> editText(() -> text = text.sub(0, text.length - 1)));
+		onKeyboardKeyDown(Backspace, () -> editText(() -> text = text.substring(0, text.length - 1)));
 	}
 
 	inline function editText(f:Void->Void) {
@@ -33,6 +34,6 @@ class TextInput extends Label {
 	}
 
 	inline function setCursorPosition(pos:Int) {
-		cursor.x = x + font.widthOfCharacters(fontSize, text, 0, pos);
+		cursor.x = x + font.widthOfCharacters(fontSize, text.toCharArray(), 0, pos);
 	}
 }
