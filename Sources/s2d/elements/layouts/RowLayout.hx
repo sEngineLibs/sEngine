@@ -5,8 +5,6 @@ import se.math.VectorMath;
 import s2d.Alignment;
 
 class RowLayout extends Element {
-	var effective:Array<Element> = [];
-
 	public var spacing:Float = 0.0;
 	public var direction:Direction = RightToLeft;
 
@@ -92,7 +90,8 @@ class RowLayout extends Element {
 		ctx.style.pushOpacity(opacity);
 		ctx.transform = globalTransform;
 		for (c in children)
-			c.render(target);
+			if (c.visible)
+				c.render(target);
 		ctx.style.popOpacity();
 	}
 }

@@ -2,7 +2,7 @@ package s2d.geometry;
 
 import se.math.Vec2I;
 
-abstract SizeI(Vec2I) from Vec2I to Vec2I {
+extern abstract SizeI(Vec2I) from Vec2I to Vec2I {
 	public var width(get, set):Int;
 	public var height(get, set):Int;
 
@@ -22,7 +22,7 @@ abstract SizeI(Vec2I) from Vec2I to Vec2I {
 	}
 
 	@:to
-	public inline function toSize():Size {
+	private inline function toSize():Size {
 		return new Size(width, height);
 	}
 

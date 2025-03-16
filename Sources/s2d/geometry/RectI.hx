@@ -4,7 +4,7 @@ import se.math.Vec4I;
 
 @:forward(x, y)
 @:forward.new
-abstract RectI(Vec4I) from Vec4I to Vec4I {
+extern abstract RectI(Vec4I) from Vec4I to Vec4I {
 	public var width(get, set):Int;
 	public var height(get, set):Int;
 	public var position(get, set):PositionI;
@@ -21,12 +21,12 @@ abstract RectI(Vec4I) from Vec4I to Vec4I {
 	}
 
 	@:to
-	public inline function toBoundsI():BoundsI {
+	private inline function toBoundsI():BoundsI {
 		return BoundsI.fromRectI(this);
 	}
 
 	@:to
-	public inline function toRect():Rect {
+	private inline function toRect():Rect {
 		return new Rect(this.x, this.y, width, height);
 	}
 

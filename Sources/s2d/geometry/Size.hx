@@ -1,13 +1,13 @@
 package s2d.geometry;
 
-import kha.FastFloat;
 import se.math.Vec2;
+import se.math.VectorMath;
 
-abstract Size(Vec2) from Vec2 to Vec2 {
-	public var width(get, set):FastFloat;
-	public var height(get, set):FastFloat;
+extern abstract Size(Vec2) from Vec2 to Vec2 {
+	public var width(get, set):Float;
+	public var height(get, set):Float;
 
-	public inline function new(width:FastFloat, height:FastFloat):Size {
+	public inline function new(width:Float, height:Float):Size {
 		this = new Vec2(width, height);
 	}
 
@@ -18,7 +18,7 @@ abstract Size(Vec2) from Vec2 to Vec2 {
 	}
 
 	@:to
-	public inline function toSizeI():SizeI {
+	private inline function toSizeI():SizeI {
 		return SizeI.fromSize(this);
 	}
 
@@ -27,20 +27,20 @@ abstract Size(Vec2) from Vec2 to Vec2 {
 		return '${width}x${height}';
 	}
 
-	private inline function get_width():FastFloat {
+	private inline function get_width():Float {
 		return this.x;
 	}
 
-	private inline function set_width(value:FastFloat):FastFloat {
+	private inline function set_width(value:Float):Float {
 		this.x = value;
 		return value;
 	}
 
-	private inline function get_height():FastFloat {
+	private inline function get_height():Float {
 		return this.y;
 	}
 
-	private inline function set_height(value:FastFloat):FastFloat {
+	private inline function set_height(value:Float):Float {
 		this.y = value;
 		return value;
 	}

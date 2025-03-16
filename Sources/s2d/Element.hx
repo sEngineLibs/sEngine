@@ -1,11 +1,9 @@
 package s2d;
 
+import s2d.geometry.Size;
 import se.Texture;
-import se.math.Vec2;
-import se.math.Vec4;
 import se.math.VectorMath;
 import s2d.Anchors;
-import s2d.geometry.Size;
 import s2d.geometry.Rect;
 import s2d.geometry.Bounds;
 import s2d.geometry.Position;
@@ -41,6 +39,7 @@ class Element extends Object2D<Element> {
 	public var visible:Bool = true;
 	public var opacity:Float = 1.0;
 
+	// geometry
 	@track public var x(get, set):Float;
 	@track public var y(get, set):Float;
 	@track public var width(get, set):Float;
@@ -50,12 +49,12 @@ class Element extends Object2D<Element> {
 	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
 	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
 
-	public var rect(get, set):Rect;
+	public var size(get, set):Size;
+	public var position(get, set):Position;
 	public var bounds(get, set):Bounds;
-	public var contentRect(get, set):Rect;
 	public var contentBounds(get, set):Bounds;
-	public var childrenRect(get, never):Rect;
-	public var childrenBounds(get, never):Bounds;
+	@alias public var rect:Rect = bounds;
+	@alias public var contentRect:Rect = contentBounds;
 
 	public function new(?parent:Element) {
 		super(parent);
@@ -69,6 +68,38 @@ class Element extends Object2D<Element> {
 
 	public function setPadding(value:Float):Void {
 		padding = value;
+	}
+
+	public function setBounds(bounds:Bounds) {
+		this.bounds = bounds;
+	}
+
+	overload extern public inline function setSize(width:Float, height:Float):Void {
+		setSize(new Size(width, height));
+	}
+
+	overload extern public inline function setSize(size:Size):Void {
+		this.size = size;
+	}
+
+	overload extern public inline function setPosition(x:Float, y:Float):Void {
+		setPosition(new Position(width, height));
+	}
+
+	overload extern public inline function setPosition(position:Position):Void {
+		this.position = position;
+	}
+
+	overload extern public inline function setRect(position:Position, size:Size):Void {
+		setRect(position.x, position.y, size.width, size.height);
+	}
+
+	overload extern public inline function setRect(x:Float, y:Float, width:Float, height:Float):Void {
+		setRect(new Rect(x, y, width, height));
+	}
+
+	overload extern public inline function setRect(rect:Rect):Void {
+		this.rect = rect;
 	}
 
 	overload extern public inline function mapFromGlobal(p:Position):Position {
@@ -85,56 +116,6 @@ class Element extends Object2D<Element> {
 
 	overload extern public inline function mapToGlobal(x:Float, y:Float):Position {
 		return mapToGlobal(vec2(x, y));
-	}
-
-	overload extern public inline function setPosition(x:Float, y:Float):Void {
-		this.x = x;
-		this.y = y;
-	}
-
-	overload extern public inline function setPosition(value:Vec2):Void {
-		this.x = value.x;
-		this.y = value.y;
-	}
-
-	overload extern public inline function setSize(width:Float, height:Float) {
-		this.width = width;
-		this.height = height;
-	}
-
-	overload extern public inline function setSize(value:Vec2) {
-		this.width = value.x;
-		this.height = value.y;
-	}
-
-	overload extern public inline function setRect(value:Rect):Void {
-		setPosition(rect.position);
-		setSize(rect.size);
-	}
-
-	overload extern public inline function setRect(position:Position, size:Size):Void {
-		setPosition(position);
-		setSize(size);
-	}
-
-	overload extern public inline function setRect(x:Float, y:Float, width:Float, height:Float):Void {
-		setPosition(x, y);
-		setSize(width, height);
-	}
-
-	public function setContentRect(value:Rect):Void {
-		left.padding = value.x - x;
-		top.padding = value.y - y;
-		right.padding = width - left.padding - value.width;
-		bottom.padding = height - top.padding - value.height;
-	}
-
-	public function setBounds(value:Bounds):Void {
-		setRect(value.toRect());
-	}
-
-	public function setContentBounds(value:Bounds):Void {
-		setContentRect(value.toRect());
 	}
 
 	public function childAt(x:Float, y:Float):Element {
@@ -162,12 +143,11 @@ class Element extends Object2D<Element> {
 	}
 
 	public function contains(x:Float, y:Float):Bool {
-		final p = mapToGlobal(x, y);
-		return this.x <= p.x && p.x <= width && this.y <= p.y && p.y <= height;
+		return bounds.contains(mapToGlobal(x, y));
 	}
 
 	@:slot(parentChanged)
-	function syncXY(previous:Element) {
+	function syncWithParent(previous:Element) {
 		x += (parent?.x ?? 0.0) - (previous?.x ?? 0.0);
 		y += (parent?.y ?? 0.0) - (previous?.y ?? 0.0);
 	}
@@ -272,54 +252,51 @@ class Element extends Object2D<Element> {
 		return maxHeight;
 	}
 
-	inline function get_rect():Rect {
-		return new Rect(x, y, width, height);
+	inline function get_size():Size {
+		return new Size(width, height);
 	}
 
-	inline function set_rect(value:Rect):Rect {
-		setRect(value);
+	inline function set_size(value:Size):Size {
+		width = value.width;
+		height = value.height;
+		return value;
+	}
+
+	inline function get_position():Position {
+		return new Position(x, y);
+	}
+
+	inline function set_position(value:Position):Position {
+		x = value.x;
+		y = value.y;
 		return value;
 	}
 
 	inline function get_bounds():Bounds {
-		return rect.toBounds();
+		return new Bounds(left.position, top.position, right.position, bottom.position);
 	}
 
 	inline function set_bounds(value:Bounds):Bounds {
-		setBounds(value);
-		return value;
-	}
-
-	inline function get_contentRect():Rect {
-		return new Rect(x + left.padding, y + top.padding, width - left.padding - right.padding, height - top.padding - bottom.padding);
-	}
-
-	inline function set_contentRect(value:Rect):Rect {
-		setContentRect(value);
+		left.position = value.left;
+		top.position = value.top;
+		right.position = value.right;
+		bottom.position = value.bottom;
 		return value;
 	}
 
 	inline function get_contentBounds():Bounds {
-		return contentRect.toBounds();
+		return new Bounds(left.position
+			+ left.padding, top.position
+			+ top.padding, right.position
+			- right.padding, bottom.position
+			- bottom.padding);
 	}
 
 	inline function set_contentBounds(value:Bounds):Bounds {
-		setContentBounds(value);
+		left.position = value.left - left.padding;
+		top.position = value.top - top.padding;
+		right.position = value.right + right.padding;
+		bottom.position = value.bottom + bottom.padding;
 		return value;
-	}
-
-	inline function get_childrenBounds():Vec4 {
-		var b = bounds;
-		for (child in children) {
-			b.left = Math.min(b.left, child.left.position);
-			b.top = Math.min(b.top, child.top.position);
-			b.right = Math.max(b.right, child.right.position);
-			b.bottom = Math.max(b.bottom, child.bottom.position);
-		}
-		return b;
-	}
-
-	inline function get_childrenRect():Vec4 {
-		return childrenBounds.toRect();
 	}
 }

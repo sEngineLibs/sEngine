@@ -38,7 +38,7 @@ class WindowScene {
 
 		this.window = window;
 		window.notifyOnResize(resized.emit);
-		
+
 		onResized((x, y) -> backbuffer = new Texture(window.width, window.height));
 		resized(window.width, window.height);
 
@@ -124,12 +124,13 @@ class WindowScene {
 
 	function processMouseEvent<T:MouseEvent>(event:T, f:(InteractiveElement, T) -> Void) {
 		event.accepted = true;
-		for (e in interactives)
+		for (e in interactives) {
 			if (e.visible && e.enabled && e.contains(App.input.mouse.x, App.input.mouse.y)) {
 				f(e, event);
 				if (event.accepted)
 					break;
 			}
+		}
 	}
 
 	function mouseMoved(x:Int, y:Int, dx:Int, dy:Int):Void {
@@ -138,13 +139,13 @@ class WindowScene {
 			y: y,
 			dx: dx,
 			dy: dy
-		}, (c, m) -> c.mouseMoved.emit(m));
+		}, (c, m) -> c.mouseMoved(m));
 	}
 
 	function mouseScrolled(d:Int):Void {
 		inline processMouseEvent({
 			delta: d
-		}, (c, m) -> c.mouseScrolled.emit(m));
+		}, (c, m) -> c.mouseScrolled(m));
 	}
 
 	function mouseDown(b:MouseButton, x:Int, y:Int):Void {
@@ -152,7 +153,7 @@ class WindowScene {
 			button: b,
 			x: x,
 			y: y
-		}, (c, m) -> c.mouseDown.emit(m));
+		}, (c, m) -> c.mouseDown(m));
 	}
 
 	function mouseUp(b:MouseButton, x:Int, y:Int):Void {
@@ -160,7 +161,7 @@ class WindowScene {
 			button: b,
 			x: x,
 			y: y
-		}, (c, m) -> c.mouseUp.emit(m));
+		}, (c, m) -> c.mouseUp(m));
 	}
 
 	function mouseHold(b:MouseButton, x:Int, y:Int):Void {
@@ -168,7 +169,7 @@ class WindowScene {
 			button: b,
 			x: x,
 			y: y
-		}, (c, m) -> c.mouseHold.emit(m));
+		}, (c, m) -> c.mouseHold(m));
 	}
 
 	function mouseClicked(b:MouseButton, x:Int, y:Int):Void {
@@ -176,7 +177,7 @@ class WindowScene {
 			button: b,
 			x: x,
 			y: y
-		}, (c, m) -> c.mouseClicked.emit(m));
+		}, (c, m) -> c.mouseClicked(m));
 	}
 
 	function mouseDoubleClicked(b:MouseButton, x:Int, y:Int):Void {
@@ -184,7 +185,7 @@ class WindowScene {
 			button: b,
 			x: x,
 			y: y
-		}, (c, m) -> c.mouseDoubleClicked.emit(m));
+		}, (c, m) -> c.mouseDoubleClicked(m));
 	}
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)

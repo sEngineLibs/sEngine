@@ -1,16 +1,16 @@
 package s2d.geometry;
 
-import kha.FastFloat;
 import se.math.Vec4;
+import se.math.VectorMath;
 
 @:forward.new
-abstract Bounds(Vec4) from Vec4 to Vec4 {
-	public var left(get, set):FastFloat;
-	public var top(get, set):FastFloat;
-	public var right(get, set):FastFloat;
-	public var bottom(get, set):FastFloat;
+extern abstract Bounds(Vec4) from Vec4 to Vec4 {
+	public var left(get, set):Float;
+	public var top(get, set):Float;
+	public var right(get, set):Float;
+	public var bottom(get, set):Float;
 
-	public inline function new(left:FastFloat, top:FastFloat, right:FastFloat, bottom:FastFloat) {
+	public inline function new(left:Float, top:Float, right:Float, bottom:Float) {
 		this = new Vec4(left, top, right, bottom);
 	}
 
@@ -20,12 +20,12 @@ abstract Bounds(Vec4) from Vec4 to Vec4 {
 	}
 
 	@:to
-	public inline function toBoundsI():BoundsI {
+	private inline function toBoundsI():BoundsI {
 		return BoundsI.fromBounds(this);
 	}
 
 	@:to
-	public inline function toRect():Rect {
+	private inline function toRect():Rect {
 		return Rect.fromBounds(this);
 	}
 
@@ -34,38 +34,42 @@ abstract Bounds(Vec4) from Vec4 to Vec4 {
 		return '($left, $top, $right, $bottom)';
 	}
 
-	private inline function get_left():FastFloat {
+	public inline function contains(p:Position):Bool {
+		return left <= p.x && p.x <= right && top <= p.y && p.y <= bottom;
+	}
+
+	private inline function get_left():Float {
 		return this.x;
 	}
 
-	private inline function set_left(value:FastFloat):FastFloat {
+	private inline function set_left(value:Float):Float {
 		this.x = value;
 		return value;
 	}
 
-	private inline function get_top():FastFloat {
+	private inline function get_top():Float {
 		return this.y;
 	}
 
-	private inline function set_top(value:FastFloat):FastFloat {
+	private inline function set_top(value:Float):Float {
 		this.y = value;
 		return value;
 	}
 
-	private inline function get_right():FastFloat {
+	private inline function get_right():Float {
 		return this.z;
 	}
 
-	private inline function set_right(value:FastFloat):FastFloat {
+	private inline function set_right(value:Float):Float {
 		this.z = value;
 		return value;
 	}
 
-	private inline function get_bottom():FastFloat {
+	private inline function get_bottom():Float {
 		return this.w;
 	}
 
-	private inline function set_bottom(value:FastFloat):FastFloat {
+	private inline function set_bottom(value:Float):Float {
 		this.w = value;
 		return value;
 	}

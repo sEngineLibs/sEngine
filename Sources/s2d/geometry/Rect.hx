@@ -1,13 +1,13 @@
 package s2d.geometry;
 
-import kha.FastFloat;
 import se.math.Vec4;
+import se.math.VectorMath;
 
 @:forward(x, y)
 @:forward.new
-abstract Rect(Vec4) from Vec4 to Vec4 {
-	public var width(get, set):FastFloat;
-	public var height(get, set):FastFloat;
+extern abstract Rect(Vec4) from Vec4 to Vec4 {
+	public var width(get, set):Float;
+	public var height(get, set):Float;
 	public var position(get, set):Position;
 	public var size(get, set):Size;
 
@@ -17,12 +17,12 @@ abstract Rect(Vec4) from Vec4 to Vec4 {
 	}
 
 	@:to
-	public inline function toBounds():Bounds {
+	private inline function toBounds():Bounds {
 		return Bounds.fromRect(this);
 	}
 
 	@:to
-	public inline function toRectI():RectI {
+	private inline function toRectI():RectI {
 		return RectI.fromRect(this);
 	}
 
@@ -31,20 +31,24 @@ abstract Rect(Vec4) from Vec4 to Vec4 {
 		return '$size at $position';
 	}
 
-	private inline function get_width():FastFloat {
+	public inline function contains(p:Position):Bool {
+		return (this : Bounds).contains(p);
+	}
+
+	private inline function get_width():Float {
 		return this.z;
 	}
 
-	private inline function set_width(value:FastFloat):FastFloat {
+	private inline function set_width(value:Float):Float {
 		this.z = value;
 		return value;
 	}
 
-	private inline function get_height():FastFloat {
+	private inline function get_height():Float {
 		return this.w;
 	}
 
-	private inline function set_height(value:FastFloat):FastFloat {
+	private inline function set_height(value:Float):Float {
 		this.w = value;
 		return value;
 	}

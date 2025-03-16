@@ -3,7 +3,7 @@ package s2d.geometry;
 import se.math.Vec4I;
 
 @:forward.new
-abstract BoundsI(Vec4I) from Vec4I to Vec4I {
+extern abstract BoundsI(Vec4I) from Vec4I to Vec4I {
 	public var left(get, set):Int;
 	public var top(get, set):Int;
 	public var right(get, set):Int;
@@ -24,12 +24,12 @@ abstract BoundsI(Vec4I) from Vec4I to Vec4I {
 	}
 
 	@:to
-	public inline function toBounds():Bounds {
+	private inline function toBounds():Bounds {
 		return new Bounds(left, top, right, bottom);
 	}
 
 	@:to
-	public inline function toRect():Rect {
+	private inline function toRect():Rect {
 		return Rect.fromBounds(toBounds());
 	}
 

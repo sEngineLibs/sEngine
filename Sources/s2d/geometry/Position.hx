@@ -4,9 +4,9 @@ import se.math.Vec2;
 
 @:forward.new
 @:forward(x, y)
-abstract Position(Vec2) from Vec2 to Vec2 {
+extern abstract Position(Vec2) from Vec2 to Vec2 {
 	@:to
-	public inline function toPositionI():PositionI {
+	private inline function toPositionI():PositionI {
 		return PositionI.fromPosition(this);
 	}
 
