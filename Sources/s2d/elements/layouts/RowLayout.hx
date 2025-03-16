@@ -10,12 +10,18 @@ class RowLayout extends Element {
 	public var spacing:Float = 0.0;
 	public var direction:Direction = RightToLeft;
 
-	override function childAdded(child:Element) {
+	public function new(?parent:Element) {
+		super(parent);
+	}
+
+	@:slot(childAdded)
+	function addToLayout(child:Element):Void {
 		child.layout.onDirty(update);
 		update();
 	}
 
-	override function childRemoved(child:Element) {
+	@:slot(childRemoved)
+	function removeFromLayout(child:Element):Void {
 		child.layout.offDirty(update);
 		update();
 	}

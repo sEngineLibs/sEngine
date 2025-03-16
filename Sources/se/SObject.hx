@@ -1,9 +1,16 @@
 package se;
 
 #if !macro
+@:build(se.macro.SMacro.build())
 @:autoBuild(se.macro.SMacro.build())
 #end
 abstract class SObject<This:SObject<This>> {
+	@:signal function parentChanged(previous:This):Void;
+
+	@:signal function childAdded(child:This):Void;
+
+	@:signal function childRemoved(child:This):Void;
+
 	@:isVar public var parent(default, set):This;
 	public var index(get, set):Int;
 	public var children:Set<This> = [];
@@ -34,22 +41,12 @@ abstract class SObject<This:SObject<This>> {
 		return Type.getClassName(Type.getClass(this));
 	}
 
-	abstract function parentChanged(previous:This):Void;
-
-	abstract function childRemoved(child:This):Void;
-
-	abstract function childAdded(child:This):Void;
-
 	inline function set_parent(value:This):This {
 		if (value != parent) {
-			if (parent != null && parent.children.contains(cast this)) {
-				parent.children.remove(cast this);
+			if (parent != null && parent.children.remove(cast this))
 				parent.childRemoved(cast this);
-			}
-			if (value != null && !value.children.contains(cast this)) {
-				value.children.push(cast this);
+			if (value != null && value.children.push(cast this) != -1)
 				value.childAdded(cast this);
-			}
 			var prev = parent;
 			parent = value;
 			parentChanged(prev);

@@ -1,16 +1,12 @@
 package s2d.stage.objects;
 
-import s2d.PhysicalObject;
+import s2d.Object2D;
 
-class StageObject extends PhysicalObject<StageObject> {
+class StageObject extends Object2D<StageObject> {
 	@alias public var x:Float = this.transform._20;
 	@alias public var y:Float = this.transform._21;
 
 	public function new() {
-		super(null);
+		super();
 	}
-
-	function childRemoved(child:StageObject):Void {}
-
-	function childAdded(child:StageObject):Void {}
 }

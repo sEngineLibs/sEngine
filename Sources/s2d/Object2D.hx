@@ -4,7 +4,7 @@ import se.math.Vec2;
 import se.math.Mat3;
 import se.math.VectorMath;
 
-abstract class PhysicalObject<This:PhysicalObject<This>> extends se.SObject<This> {
+abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 	var globalTransform:Mat3 = Mat3.identity();
 
 	public var origin:Vec2 = vec2(0.0, 0.0);
@@ -19,6 +19,12 @@ abstract class PhysicalObject<This:PhysicalObject<This>> extends se.SObject<This
 	public var scaleY(get, set):Float;
 	public var scale(get, set):Vec2;
 	public var rotation(get, set):Float;
+
+	public function new(?parent:This) {
+		super(parent);
+
+		onParentChanged(_ -> sync());
+	}
 
 	extern overload public inline function translate(x:Float, y:Float) {
 		transform *= Mat3.translation(x, y);
@@ -48,14 +54,6 @@ abstract class PhysicalObject<This:PhysicalObject<This>> extends se.SObject<This
 
 	public inline function rotate(value:Float) {
 		transform *= Mat3.rotation(value);
-		sync();
-	}
-
-	function parentChanged(previous:This) {
-		sync();
-	}
-
-	inline function applyTransform(m:Mat3) {
 		sync();
 	}
 

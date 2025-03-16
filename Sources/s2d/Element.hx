@@ -11,7 +11,7 @@ import s2d.geometry.Bounds;
 import s2d.geometry.Position;
 
 @:allow(s2d.WindowScene)
-class Element extends PhysicalObject<Element> {
+class Element extends Object2D<Element> {
 	overload extern public static inline function mapToElement(element:Element, x:Float, y:Float):Position {
 		return element.mapFromGlobal(x, y);
 	}
@@ -166,16 +166,11 @@ class Element extends PhysicalObject<Element> {
 		return this.x <= p.x && p.x <= width && this.y <= p.y && p.y <= height;
 	}
 
-	override function parentChanged(previous:Element) {
-		super.parentChanged(previous);
-
+	@:slot(parentChanged)
+	function syncXY(previous:Element) {
 		x += (parent?.x ?? 0.0) - (previous?.x ?? 0.0);
 		y += (parent?.y ?? 0.0) - (previous?.y ?? 0.0);
 	}
-
-	function childAdded(child:Element):Void {}
-
-	function childRemoved(child:Element):Void {}
 
 	function render(target:Texture) {
 		final ctx = target.ctx2D;

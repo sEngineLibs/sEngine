@@ -37,9 +37,10 @@ class WindowScene {
 		WindowScene.current = this;
 
 		this.window = window;
-		onResized((x, y) -> backbuffer = new Texture(window.width, window.height));
 		window.notifyOnResize(resized.emit);
-		window.resize(window.width, window.height);
+		
+		onResized((x, y) -> backbuffer = new Texture(window.width, window.height));
+		resized(window.width, window.height);
 
 		var m = App.input.mouse;
 		m.onMoved(mouseMoved);
