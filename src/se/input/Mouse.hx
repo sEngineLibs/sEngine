@@ -9,7 +9,7 @@ class Mouse {
 	var buttonHoldTimers:Map<MouseButton, Timer> = [];
 	var recentPressed:Map<MouseButton, Timer> = [];
 	var recentClicked:Map<MouseButton, Timer> = [];
-	var buttonsDown:Set<MouseButton> = [];
+	var buttonsDown:Array<MouseButton> = [];
 
 	public var holdInterval = 0.8;
 	public var clickInterval = 0.3;

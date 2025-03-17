@@ -13,8 +13,8 @@ abstract class SObject<This:SObject<This>> {
 
 	@:isVar public var parent(default, set):This;
 	public var index(get, set):Int;
-	public var children:Set<This> = [];
-	public var siblings(get, never):Set<This>;
+	public var children:Array<This> = [];
+	public var siblings(get, never):Array<This>;
 
 	public function new(?parent:This) {
 		parent?.addChild(cast this);
@@ -43,24 +43,28 @@ abstract class SObject<This:SObject<This>> {
 
 	inline function set_parent(value:This):This {
 		if (value != parent) {
-			if (parent != null && parent.children.remove(cast this))
-				parent.childRemoved(cast this);
-			if (value != null && value.children.push(cast this) != -1)
-				value.childAdded(cast this);
 			var prev = parent;
 			parent = value;
+			if (prev != null && prev.children.remove(cast this))
+				prev.childRemoved(cast this);
+			if (parent != null && !parent.children.contains(cast this)) {
+				parent.children.push(cast this);
+				parent.childAdded(cast this);
+			}
 			parentChanged(prev);
 		}
 		return value;
 	}
 
 	inline function get_index():Int {
-		return parent.children.indexOf(cast this);
+		return parent?.children.indexOf(cast this);
 	}
 
 	inline function set_index(value:Int):Int {
-		parent.children.remove(cast this);
-		parent.children.insert(value, cast this);
+		if (parent != null) {
+			parent.children.remove(cast this);
+			parent.children.insert(value, cast this);
+		}
 		return value;
 	}
 

@@ -9,9 +9,9 @@ class Column extends Positioner<ColumnSlots> {
 
 	function addToPositioning(child:Element):ColumnSlots {
 		var childSlots = {
-			heightChanged: (h:Float) -> adjustElementYPositioning(child, BottomToTop, h - child.height),
-			topMarginChanged: (m:Float) -> adjustElementYPositioning(child, BottomToTop, m - child.top.margin),
-			bottomMarginChanged: (m:Float) -> adjustElementYPositioning(child, TopToBottom, child.top.margin - m)
+			heightChanged: (h:Float) -> adjustElement(child, BottomToTop, h - child.height),
+			topMarginChanged: (m:Float) -> adjustElement(child, TopToBottom, child.top.margin - m),
+			bottomMarginChanged: (m:Float) -> adjustElement(child, BottomToTop, m - child.bottom.margin)
 		};
 		child.onHeightChanged(childSlots.heightChanged);
 		child.top.onMarginChanged(childSlots.topMarginChanged);
@@ -26,33 +26,76 @@ class Column extends Positioner<ColumnSlots> {
 		child.bottom.offMarginChanged(childSlots.bottomMarginChanged);
 	}
 
-	function position(el:Element, prev:Element) {
-		if (prev != null) {
-			if (direction & TopToBottom != 0)
-				el.y = prev.bottom.position + prev.bottom.margin + spacing + el.top.margin;
+	function position(c:Element, prev:Element) {
+		if (prev == null) {
+			if (direction & BottomToTop != 0)
+				c.y = bottom.position - c.bottom.margin - c.height;
 			else
-				el.y = prev.top.position - prev.top.margin - spacing - el.bottom.margin - el.width;
+				c.y = c.top.margin;
 		} else {
-			if (direction & TopToBottom != 0)
-				el.y = spacing + el.top.margin;
+			if (direction & BottomToTop != 0)
+				c.y = prev.top.position - (prev.top.margin + spacing + c.bottom.margin + c.height);
 			else
-				el.y = bottom.position - spacing - el.bottom.margin - el.width;
+				c.y = prev.bottom.position + prev.bottom.margin + spacing + c.top.margin;
 		}
 	}
 
 	@:slot(heightChanged)
 	function __heightChanged(v:Float) {
-		adjustYPositioning(BottomToTop, height - v);
+		adjust(BottomToTop, height - v);
 	}
 
 	@:slot(top.paddingChanged)
 	function __topPaddingChanged(v:Float) {
-		adjustYPositioning(TopToBottom, top.padding - v);
+		adjust(TopToBottom, top.padding - v);
 	}
 
 	@:slot(bottom.paddingChanged)
 	function __bottomPaddingChanged(v:Float) {
-		adjustYPositioning(BottomToTop, bottom.padding - v);
+		adjust(BottomToTop, bottom.padding - v);
+	}
+
+	function rebuild() {
+		var prev = children[0];
+		if (direction & BottomToTop != 0) {
+			prev.y = bottom.position - prev.bottom.margin - prev.height;
+			for (c in children.slice(1)) {
+				c.y = prev.top.position - (prev.top.margin + spacing + c.bottom.margin + c.height);
+				prev = c;
+			}
+		} else {
+			prev.y = prev.top.margin;
+			for (c in children.slice(1)) {
+				c.y = bottom.position - c.bottom.margin - c.height;
+				prev = c;
+			}
+		}
+	}
+
+	function adjustSpacing(d:Float) {
+		if (direction & BottomToTop != 0)
+			d = -d;
+
+		var offset = 0.0;
+		for (c in children) {
+			c.y += offset;
+			offset += d;
+		}
+	}
+
+	function adjust(dir:Direction, d:Float) {
+		if (direction & dir != 0)
+			for (c in children)
+				c.y += d;
+	}
+
+	function adjustElement(e:Element, dir:Alignment, d:Float) {
+		if (direction & dir != 0)
+			for (c in children.slice(e.index))
+				c.y += d;
+		else
+			for (c in children.slice(e.index + 1))
+				c.y -= d;
 	}
 }
 

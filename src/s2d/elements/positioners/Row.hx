@@ -9,9 +9,9 @@ class Row extends Positioner<RowSlots> {
 
 	function addToPositioning(child:Element):RowSlots {
 		var childSlots = {
-			widthChanged: (w:Float) -> adjustElementXPositioning(child, LeftToRight, w - child.width),
-			leftMarginChanged: (m:Float) -> adjustElementXPositioning(child, RightToLeft, m - child.left.margin),
-			rightMarginChanged: (m:Float) -> adjustElementXPositioning(child, LeftToRight, child.left.margin - m)
+			widthChanged: (w:Float) -> adjustElement(child, RightToLeft, w - child.width),
+			leftMarginChanged: (m:Float) -> adjustElement(child, LeftToRight, child.left.margin - m),
+			rightMarginChanged: (m:Float) -> adjustElement(child, RightToLeft, m - child.right.margin)
 		};
 		child.onWidthChanged(childSlots.widthChanged);
 		child.left.onMarginChanged(childSlots.leftMarginChanged);
@@ -26,33 +26,76 @@ class Row extends Positioner<RowSlots> {
 		child.right.offMarginChanged(childSlots.rightMarginChanged);
 	}
 
-	function position(el:Element, prev:Element) {
-		if (prev != null) {
-			if (direction & LeftToRight != 0)
-				el.x = prev.right.position + prev.right.margin + spacing + el.left.margin;
+	function position(c:Element, prev:Element) {
+		if (prev == null) {
+			if (direction & RightToLeft != 0)
+				c.x = right.position - c.right.margin - c.width;
 			else
-				el.x = prev.left.position - prev.left.margin - spacing - el.right.margin - el.width;
+				c.x = c.left.margin;
 		} else {
-			if (direction & LeftToRight != 0)
-				el.x = spacing + el.left.margin;
+			if (direction & RightToLeft != 0)
+				c.x = prev.left.position - (prev.left.margin + spacing + c.right.margin + c.width);
 			else
-				el.x = right.position - spacing - el.right.margin - el.width;
+				c.x = prev.right.position + prev.right.margin + spacing + c.left.margin;
 		}
 	}
 
 	@:slot(widthChanged)
 	function __widthChanged(v:Float) {
-		adjustXPositioning(RightToLeft, width - v);
+		adjust(RightToLeft, width - v);
 	}
 
 	@:slot(left.paddingChanged)
 	function __leftPaddingChanged(v:Float) {
-		adjustXPositioning(LeftToRight, left.padding - v);
+		adjust(LeftToRight, left.padding - v);
 	}
 
 	@:slot(right.paddingChanged)
 	function __rightPaddingChanged(v:Float) {
-		adjustXPositioning(RightToLeft, right.padding - v);
+		adjust(RightToLeft, right.padding - v);
+	}
+
+	function rebuild() {
+		var prev = children[0];
+		if (direction & RightToLeft != 0) {
+			prev.x = right.position - prev.right.margin - prev.width;
+			for (c in children.slice(1)) {
+				c.x = prev.left.position - (prev.left.margin + spacing + c.right.margin + c.width);
+				prev = c;
+			}
+		} else {
+			prev.x = prev.left.margin;
+			for (c in children.slice(1)) {
+				c.x = right.position - c.right.margin - c.width;
+				prev = c;
+			}
+		}
+	}
+
+	function adjustSpacing(d:Float) {
+		if (direction & RightToLeft != 0)
+			d = -d;
+
+		var offset = 0.0;
+		for (c in children) {
+			c.x += offset;
+			offset += d;
+		}
+	}
+
+	function adjust(dir:Direction, d:Float) {
+		if (direction & dir != 0)
+			for (c in children)
+				c.x += d;
+	}
+
+	function adjustElement(e:Element, dir:Alignment, d:Float) {
+		if (direction & dir != 0)
+			for (c in children.slice(e.index))
+				c.x += d;
+		else
+			for (c in children.slice(e.index + 1))
+				c.x -= d;
 	}
 }
 
