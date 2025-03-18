@@ -3,6 +3,7 @@ package s2d.geometry;
 import haxe.ds.Vector;
 import se.math.Vec2;
 
+@:forward(length)
 extern abstract Mesh(Vector<Vec2>) {
 	public inline function new(value:Vector<Vec2>) {
 		this = value;
