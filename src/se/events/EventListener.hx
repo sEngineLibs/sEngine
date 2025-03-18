@@ -2,7 +2,7 @@ package se.events;
 
 @:forward.new
 @:forward(callback, breakable)
-extern abstract EventListener(__EventListener__) from __EventListener__ to __EventListener__ {
+extern abstract EventListener(EventListenerData) from EventListenerData to EventListenerData {
 	@:from
 	overload public static inline function fromCallback(callback:Dynamic->Void) {
 		return new EventListener(callback);
@@ -31,8 +31,8 @@ extern abstract EventListener(__EventListener__) from __EventListener__ to __Eve
 	}
 }
 
-class __EventListener__ {
-	var event:Event = null;
+class EventListenerData {
+	var event:Event;
 
 	public var breakable:Bool;
 	public var callback:Dynamic<Void>->Void;

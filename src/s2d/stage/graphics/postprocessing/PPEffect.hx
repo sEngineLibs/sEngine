@@ -13,16 +13,6 @@ abstract class PPEffect {
 
 	public function new() {}
 
-	private inline function get_enabled():Bool {
-		return Renderer.commands.contains(command);
-	}
-
-	private inline function set_enabled(value:Bool):Bool {
-		if (!enabled)
-			Renderer.commands.insert(index, command);
-		return value;
-	}
-
 	public function enable() {
 		enabled = true;
 	}
@@ -50,5 +40,15 @@ abstract class PPEffect {
 	public function command():Void {
 		Renderer.buffer.swap();
 		render(Renderer.buffer.tgt);
+	}
+
+	function get_enabled():Bool {
+		return Renderer.commands.contains(command);
+	}
+
+	function set_enabled(value:Bool):Bool {
+		if (!enabled && value)
+			Renderer.commands.insert(index, command);
+		return enabled;
 	}
 }

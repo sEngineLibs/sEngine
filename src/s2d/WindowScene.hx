@@ -134,7 +134,7 @@ class WindowScene {
 	}
 
 	function mouseMoved(x:Int, y:Int, dx:Int, dy:Int):Void {
-		inline processMouseEvent({
+		processMouseEvent({
 			x: x,
 			y: y,
 			dx: dx,
@@ -143,13 +143,13 @@ class WindowScene {
 	}
 
 	function mouseScrolled(d:Int):Void {
-		inline processMouseEvent({
+		processMouseEvent({
 			delta: d
 		}, (c, m) -> c.mouseScrolled(m));
 	}
 
 	function mouseDown(b:MouseButton, x:Int, y:Int):Void {
-		inline processMouseEvent({
+		processMouseEvent({
 			button: b,
 			x: x,
 			y: y
@@ -157,7 +157,7 @@ class WindowScene {
 	}
 
 	function mouseUp(b:MouseButton, x:Int, y:Int):Void {
-		inline processMouseEvent({
+		processMouseEvent({
 			button: b,
 			x: x,
 			y: y
@@ -165,7 +165,7 @@ class WindowScene {
 	}
 
 	function mouseHold(b:MouseButton, x:Int, y:Int):Void {
-		inline processMouseEvent({
+		processMouseEvent({
 			button: b,
 			x: x,
 			y: y
@@ -173,7 +173,7 @@ class WindowScene {
 	}
 
 	function mouseClicked(b:MouseButton, x:Int, y:Int):Void {
-		inline processMouseEvent({
+		processMouseEvent({
 			button: b,
 			x: x,
 			y: y
@@ -181,7 +181,7 @@ class WindowScene {
 	}
 
 	function mouseDoubleClicked(b:MouseButton, x:Int, y:Int):Void {
-		inline processMouseEvent({
+		processMouseEvent({
 			button: b,
 			x: x,
 			y: y
@@ -189,7 +189,7 @@ class WindowScene {
 	}
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-	private inline function drawBounds(e:Element, ctx:Context2D) {
+	private function drawBounds(e:Element, ctx:Context2D) {
 		final style = ctx.style;
 
 		style.font = Assets.fonts.get("Roboto_Regular");
@@ -295,7 +295,7 @@ class WindowScene {
 	}
 	#end
 
-	inline function set_focused(value:InteractiveElement):InteractiveElement {
+	function set_focused(value:InteractiveElement):InteractiveElement {
 		if (focused != value) {
 			if (focused != null)
 				focused.focused = false;

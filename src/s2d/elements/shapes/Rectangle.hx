@@ -7,7 +7,7 @@ class Rectangle extends DrawableElement {
 		super(parent);
 	}
 
-	inline function draw(target:Texture) {
-		target.ctx2D.fillRect(x, y, width, height);
+	function draw(target:Texture) {
+		target.ctx2D.fillRect(left, top, width, height);
 	}
 }

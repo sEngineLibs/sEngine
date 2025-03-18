@@ -1,11 +1,12 @@
 package se;
 
-import s2d.WindowScene;
 import kha.Assets;
 import kha.System;
 import se.Time;
 import se.input.Mouse;
 import se.input.Keyboard;
+import s2d.WindowScene;
+import s2d.graphics.Drawers;
 
 @:build(se.macro.SMacro.build())
 class App {
@@ -27,11 +28,10 @@ class App {
 			}
 
 			scenes = [new WindowScene(window)];
-			SEngine.start(window);
 
 			Assets.loadEverything(function() {
+				Drawers.compile();
 				setup();
-
 				System.notifyOnFrames(function(frames) {
 					update();
 					for (i in 0...frames.length)

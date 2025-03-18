@@ -41,7 +41,7 @@ abstract class SObject<This:SObject<This>> {
 		return Type.getClassName(Type.getClass(this));
 	}
 
-	inline function set_parent(value:This):This {
+	function set_parent(value:This):This {
 		if (value != parent) {
 			var prev = parent;
 			parent = value;
@@ -56,11 +56,11 @@ abstract class SObject<This:SObject<This>> {
 		return value;
 	}
 
-	inline function get_index():Int {
+	function get_index():Int {
 		return parent?.children.indexOf(cast this);
 	}
 
-	inline function set_index(value:Int):Int {
+	function set_index(value:Int):Int {
 		if (parent != null) {
 			parent.children.remove(cast this);
 			parent.children.insert(value, cast this);
@@ -68,7 +68,7 @@ abstract class SObject<This:SObject<This>> {
 		return value;
 	}
 
-	inline function get_siblings() {
+	function get_siblings() {
 		if (parent != null) {
 			var s = parent.children.copy();
 			s.remove(cast this);

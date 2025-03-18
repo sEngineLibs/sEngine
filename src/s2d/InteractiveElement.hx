@@ -50,7 +50,7 @@ class InteractiveElement extends Element {
 
 	@:signal(button) function mouseButtonDoubleClicked(button:MouseButton, m:MouseButtonEvent);
 
-	public inline function new(?parent:Element) {
+	public function new(?parent:Element) {
 		super(parent);
 		scene.interactives.unshift(this);
 
@@ -59,14 +59,14 @@ class InteractiveElement extends Element {
 		onKeyboardHold(keyboardKeyHold.emit);
 		onKeyboardPressed(keyboardCharPressed.emit);
 
-		onMouseDown(m -> mouseButtonDown.emit(m.button, m));
-		onMouseUp(m -> mouseButtonUp.emit(m.button, m));
-		onMouseHold(m -> mouseButtonHold.emit(m.button, m));
+		onMouseDown(m -> mouseButtonDown(m.button, m));
+		onMouseUp(m -> mouseButtonUp(m.button, m));
+		onMouseHold(m -> mouseButtonHold(m.button, m));
 		onMouseClicked(m -> {
-			mouseButtonClicked.emit(m.button, m);
+			mouseButtonClicked(m.button, m);
 			if (!focused && (focusPolicy & ClickFocus != 0))
 				scene.focused = this;
 		});
-		onMouseDoubleClicked(m -> mouseButtonDoubleClicked.emit(m.button, m));
+		onMouseDoubleClicked(m -> mouseButtonDoubleClicked(m.button, m));
 	}
 }

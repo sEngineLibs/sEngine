@@ -9,7 +9,7 @@ class Column extends Positioner<ColumnSlots> {
 
 	function addToPositioning(child:Element):ColumnSlots {
 		var childSlots = {
-			heightChanged: (h:Float) -> adjustElement(child, BottomToTop, h - child.height),
+			heightChanged: (w:Float) -> adjustElement(child, BottomToTop, w - child.height),
 			topMarginChanged: (m:Float) -> adjustElement(child, TopToBottom, child.top.margin - m),
 			bottomMarginChanged: (m:Float) -> adjustElement(child, BottomToTop, m - child.bottom.margin)
 		};
@@ -29,14 +29,14 @@ class Column extends Positioner<ColumnSlots> {
 	function position(c:Element, prev:Element) {
 		if (prev == null) {
 			if (direction & BottomToTop != 0)
-				c.y = bottom.position - c.bottom.margin - c.height;
+				c.y = height - (c.height + c.bottom.margin + bottom.padding);
 			else
-				c.y = c.top.margin;
+				c.y = top.padding + c.top.margin;
 		} else {
 			if (direction & BottomToTop != 0)
-				c.y = prev.top.position - (prev.top.margin + spacing + c.bottom.margin + c.height);
+				c.y = prev.y - (prev.top.margin + spacing + c.bottom.margin + c.height);
 			else
-				c.y = prev.bottom.position + prev.bottom.margin + spacing + c.top.margin;
+				c.y = prev.y + prev.height + prev.bottom.margin + spacing + c.top.margin;
 		}
 	}
 
@@ -52,23 +52,15 @@ class Column extends Positioner<ColumnSlots> {
 
 	@:slot(bottom.paddingChanged)
 	function __bottomPaddingChanged(v:Float) {
-		adjust(BottomToTop, bottom.padding - v);
+		adjust(BottomToTop, v - bottom.padding);
 	}
 
 	function rebuild() {
 		var prev = children[0];
-		if (direction & BottomToTop != 0) {
-			prev.y = bottom.position - prev.bottom.margin - prev.height;
-			for (c in children.slice(1)) {
-				c.y = prev.top.position - (prev.top.margin + spacing + c.bottom.margin + c.height);
-				prev = c;
-			}
-		} else {
-			prev.y = prev.top.margin;
-			for (c in children.slice(1)) {
-				c.y = bottom.position - c.bottom.margin - c.height;
-				prev = c;
-			}
+		position(prev, null);
+		for (c in children.slice(1)) {
+			position(c, prev);
+			prev = c;
 		}
 	}
 

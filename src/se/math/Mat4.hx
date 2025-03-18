@@ -64,14 +64,16 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 	}
 
 	public inline function matrixCompMult(n:Mat4):Mat4 {
-		return new Mat4(this._00 * n._00, this._10 * n._10, this._20 * n._20, this._30 * n._30, this._01 * n._01, this._11 * n._11, this._21 * n._21, this._31 * n._31, this._02 * n._02,
-			this._12 * n._12, this._22 * n._22, this._32 * n._32, this._03 * n._03, this._13 * n._13, this._23 * n._23, this._33 * n._33);
+		return new Mat4(this._00 * n._00, this._10 * n._10, this._20 * n._20, this._30 * n._30, this._01 * n._01, this._11 * n._11, this._21 * n._21,
+			this._31 * n._31, this._02 * n._02, this._12 * n._12, this._22 * n._22, this._32 * n._32, this._03 * n._03, this._13 * n._13, this._23 * n._23,
+			this._33 * n._33);
 	}
 
 	// extended methods
 
 	public inline function transpose():Mat4 {
-		return new Mat4(this._00, this._01, this._02, this._03, this._10, this._11, this._12, this._13, this._20, this._21, this._22, this._23, this._30, this._31, this._32, this._33);
+		return new Mat4(this._00, this._01, this._02, this._03, this._10, this._11, this._12, this._13, this._20, this._21, this._22, this._23, this._30,
+			this._31, this._32, this._33);
 	}
 
 	public inline function determinant():Float {
@@ -108,10 +110,12 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 		var f = 1.0 / det;
 
 		return new Mat4((this._11 * b11 - this._21 * b10 + this._31 * b09) * f, (this._20 * b10 - this._10 * b11 - this._30 * b09) * f,
-			(this._13 * b05 - this._23 * b04 + this._33 * b03) * f, (this._22 * b04 - this._12 * b05 - this._32 * b03) * f, (this._21 * b08 - this._01 * b11 - this._31 * b07) * f,
-			(this._00 * b11 - this._20 * b08 + this._30 * b07) * f, (this._23 * b02 - this._03 * b05 - this._33 * b01) * f, (this._02 * b05 - this._22 * b02 + this._32 * b01) * f,
-			(this._01 * b10 - this._11 * b08 + this._31 * b06) * f, (this._10 * b08 - this._00 * b10 - this._30 * b06) * f, (this._03 * b04 - this._13 * b02 + this._33 * b00) * f,
-			(this._12 * b02 - this._02 * b04 - this._32 * b00) * f, (this._11 * b07 - this._01 * b09 - this._21 * b06) * f, (this._00 * b09 - this._10 * b07 + this._20 * b06) * f,
+			(this._13 * b05 - this._23 * b04 + this._33 * b03) * f, (this._22 * b04 - this._12 * b05 - this._32 * b03) * f,
+			(this._21 * b08 - this._01 * b11 - this._31 * b07) * f, (this._00 * b11 - this._20 * b08 + this._30 * b07) * f,
+			(this._23 * b02 - this._03 * b05 - this._33 * b01) * f, (this._02 * b05 - this._22 * b02 + this._32 * b01) * f,
+			(this._01 * b10 - this._11 * b08 + this._31 * b06) * f, (this._10 * b08 - this._00 * b10 - this._30 * b06) * f,
+			(this._03 * b04 - this._13 * b02 + this._33 * b00) * f, (this._12 * b02 - this._02 * b04 - this._32 * b00) * f,
+			(this._11 * b07 - this._01 * b09 - this._21 * b06) * f, (this._00 * b09 - this._10 * b07 + this._20 * b06) * f,
 			(this._13 * b01 - this._03 * b03 - this._23 * b00) * f, (this._02 * b03 - this._12 * b01 + this._22 * b00) * f);
 	}
 
@@ -132,12 +136,13 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 			- this._21 * b10
 			+ this._31 * b09, this._20 * b10
 			- this._10 * b11
-			- this._30 * b09, this._13 * b05
+			- this._30 * b09,
+			this._13 * b05
 			- this._23 * b04
-			+ this._33 * b03,
-			this._22 * b04
+			+ this._33 * b03, this._22 * b04
 			- this._12 * b05
-			- this._32 * b03, this._21 * b08
+			- this._32 * b03,
+			this._21 * b08
 			- this._01 * b11
 			- this._31 * b07, this._00 * b11
 			- this._20 * b08
@@ -146,12 +151,13 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 			- this._03 * b05
 			- this._33 * b01, this._02 * b05
 			- this._22 * b02
-			+ this._32 * b01, this._01 * b10
+			+ this._32 * b01,
+			this._01 * b10
 			- this._11 * b08
-			+ this._31 * b06,
-			this._10 * b08
+			+ this._31 * b06, this._10 * b08
 			- this._00 * b10
-			- this._30 * b06, this._03 * b04
+			- this._30 * b06,
+			this._03 * b04
 			- this._13 * b02
 			+ this._33 * b00, this._12 * b02
 			- this._02 * b04
@@ -160,10 +166,10 @@ extern abstract Mat4(KhaMat4) from KhaMat4 to KhaMat4 {
 			- this._01 * b09
 			- this._21 * b06, this._00 * b09
 			- this._10 * b07
-			+ this._20 * b06, this._13 * b01
+			+ this._20 * b06,
+			this._13 * b01
 			- this._03 * b03
-			- this._23 * b00,
-			this._02 * b03
+			- this._23 * b00, this._02 * b03
 			- this._12 * b01
 			+ this._22 * b00);
 	}

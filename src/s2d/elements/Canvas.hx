@@ -6,9 +6,9 @@ import se.math.Mat3;
 class Canvas extends DrawableElement {
 	@:signal function paint(target:Texture):Void;
 
-	inline function draw(target:Texture) {
-		target.ctx2D.transform *= Mat3.translation(x, y);
+	function draw(target:Texture) {
+		target.ctx2D.transform *= Mat3.translation(left, top);
 		paint(target);
-		target.ctx2D.transform *= Mat3.translation(-x, -y);
+		target.ctx2D.transform *= Mat3.translation(-left, -top);
 	}
 }

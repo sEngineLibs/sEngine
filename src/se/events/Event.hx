@@ -12,7 +12,7 @@ extern abstract Event(Array<EventListener>) from Array<EventListener> {
 	 */
 	public inline function addListener(listener:EventListener):EventListener @:privateAccess {
 		this.push(listener);
-		(listener : se.events.EventListener.__EventListener__).event = this;
+		(listener : se.events.EventListener.EventListenerData).event = this;
 		return listener;
 	}
 

@@ -52,12 +52,12 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 		upscale(value, value);
 	}
 
-	public inline function rotate(value:Float) {
+	public function rotate(value:Float) {
 		transform *= Mat3.rotation(value);
 		sync();
 	}
 
-	inline function sync():Void {
+	function sync():Void {
 		globalTransform = Mat3.translation(-origin.x, -origin.y);
 		globalTransform *= parent != null ? transform * parent.globalTransform : transform;
 		globalTransform *= Mat3.translation(origin.x, origin.y);
@@ -65,7 +65,7 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 			c.sync();
 	}
 
-	inline function set_z(value:Float):Float {
+	function set_z(value:Float):Float {
 		final d = value - z;
 		for (c in children)
 			c.z += d;
@@ -77,42 +77,42 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 		return z;
 	}
 
-	inline function get_translationX():Float {
+	function get_translationX():Float {
 		return transform._20;
 	}
 
-	inline function set_translationX(value:Float) {
+	function set_translationX(value:Float) {
 		transform._20 = value;
 		sync();
 		return value;
 	}
 
-	inline function get_translationY():Float {
+	function get_translationY():Float {
 		return transform._21;
 	}
 
-	inline function set_translationY(value:Float) {
+	function set_translationY(value:Float) {
 		transform._21 = value;
 		sync();
 		return value;
 	}
 
-	inline function get_translation():Vec2 {
+	function get_translation():Vec2 {
 		return vec2(translationX, translationY);
 	}
 
-	inline function set_translation(value:Vec2) {
+	function set_translation(value:Vec2) {
 		transform._20 = value.x;
 		transform._21 = value.y;
 		sync();
 		return value;
 	}
 
-	inline function get_scaleX():Float {
+	function get_scaleX():Float {
 		return Math.sqrt(transform._00 * transform._00 + transform._10 * transform._10);
 	}
 
-	inline function set_scaleX(value:Float) {
+	function set_scaleX(value:Float) {
 		var s = scaleX;
 		if (s != 0) {
 			var d = value / s;
@@ -126,11 +126,11 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 		return value;
 	}
 
-	inline function get_scaleY():Float {
+	function get_scaleY():Float {
 		return Math.sqrt(transform._01 * transform._01 + transform._11 * transform._11);
 	}
 
-	inline function set_scaleY(value:Float) {
+	function set_scaleY(value:Float) {
 		var s = scaleY;
 		if (s != 0) {
 			var d = value / s;
@@ -144,11 +144,11 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 		return value;
 	}
 
-	inline function get_scale():Vec2 {
+	function get_scale():Vec2 {
 		return vec2(scaleX, scaleY);
 	}
 
-	inline function set_scale(value:Vec2) {
+	function set_scale(value:Vec2) {
 		var sx = scaleX;
 		var sy = scaleY;
 		if (sx != 0) {
@@ -171,11 +171,11 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 		return value;
 	}
 
-	inline function get_rotation():Float {
+	function get_rotation():Float {
 		return Math.atan2(transform._10, transform._00);
 	}
 
-	inline function set_rotation(value:Float) {
+	function set_rotation(value:Float) {
 		var c = Math.cos(value);
 		var s = Math.sin(value);
 		var sx = scaleX;

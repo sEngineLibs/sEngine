@@ -62,7 +62,7 @@ class Label extends DrawableElement {
 		updateTextHeight();
 	}
 
-	private inline function set_fontSize(value:Int) {
+	private function set_fontSize(value:Int) {
 		fontSize = value < 0 ? 0 : value;
 		return value;
 	}

@@ -31,10 +31,7 @@ class SEngine {
 	@:access(s2d.graphics.Drawers)
 	@:access(s2d.stage.graphics.Renderer)
 	public static function start(window:Window) {
-		Stage.current = new Stage();
-
 		Renderer.compile(width, height);
-		Drawers.compile();
 
 		// init structure
 		var structure = new VertexStructure();
@@ -83,13 +80,13 @@ class SEngine {
 		Renderer.resize(width, height);
 	}
 
-	static private inline function set_scale(value:Float):Float {
+	static private function set_scale(value:Float):Float {
 		scale = value;
 		updateProjection();
 		return value;
 	}
 
-	static private inline function set_aspectRatio(value:Float):Float {
+	static private function set_aspectRatio(value:Float):Float {
 		aspectRatio = value;
 		updateProjection();
 		return value;
@@ -104,7 +101,7 @@ class SEngine {
 	}
 
 	@:access(s2d.stage.graphics.Renderer)
-	public static inline function render():Texture {
+	public static function render():Texture {
 		var frame = Renderer.render();
 		#if S2D_DEBUG_FPS
 		showFPS(frame.ctx2D);

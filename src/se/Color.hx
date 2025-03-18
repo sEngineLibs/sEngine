@@ -6,18 +6,18 @@ import se.math.VectorMath;
 
 @:forward.new
 extern enum abstract Color(Int) from Int to Int {
-	inline final Black = 0xff000000;
-	inline final White = 0xffffffff;
-	inline final Red = 0xffff0000;
-	inline final Blue = 0xff0000ff;
-	inline final Green = 0xff00ff00;
-	inline final Magenta = 0xffff00ff;
-	inline final Yellow = 0xffffff00;
-	inline final Cyan = 0xff00ffff;
-	inline final Purple = 0xff800080;
-	inline final Pink = 0xffffc0cb;
-	inline final Orange = 0xffffa500;
-	inline final Transparent = 0x00000000;
+	final Black = 0xff000000;
+	final White = 0xffffffff;
+	final Red = 0xffff0000;
+	final Blue = 0xff0000ff;
+	final Green = 0xff00ff00;
+	final Magenta = 0xffff00ff;
+	final Yellow = 0xffffff00;
+	final Cyan = 0xff00ffff;
+	final Purple = 0xff800080;
+	final Pink = 0xffffc0cb;
+	final Orange = 0xffffa500;
+	final Transparent = 0x00000000;
 
 	public var r(get, set):Float;
 	public var g(get, set):Float;

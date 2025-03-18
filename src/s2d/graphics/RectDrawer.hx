@@ -12,23 +12,23 @@ class RectDrawer extends ElementDrawer<RoundedRectangle> {
 	var rectCL:ConstantLocation;
 	var rectDataCL:ConstantLocation;
 
-	private inline function initStructure() {
+	function initStructure() {
 		structure = new VertexStructure();
 		structure.add("vertexPosition", VertexData.Float32_3X);
 		structure.add("vertexColor", VertexData.UInt8_4X_Normalized);
 	}
 
-	private inline function setShaders() {
+	function setShaders() {
 		pipeline.vertexShader = Reflect.field(Shaders, "drawer_colored_vert");
 		pipeline.fragmentShader = Reflect.field(Shaders, "rectangle_frag");
 	}
 
-	private inline function getUniforms() {
+	function getUniforms() {
 		rectCL = pipeline.getConstantLocation("rect");
 		rectDataCL = pipeline.getConstantLocation("rectData");
 	}
 
-	private inline function draw(target:Texture, rectangle:RoundedRectangle) {
+	function draw(target:Texture, rectangle:RoundedRectangle) {
 		final ctx = target.ctx2D, ctx3d = target.ctx3D;
 
 		final radius = clamp(rectangle.radius, 0.0, min(rectangle.width, rectangle.height) * 0.5);
@@ -37,6 +37,6 @@ class RectDrawer extends ElementDrawer<RoundedRectangle> {
 		ctx3d.setFloat4(rectCL, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 		ctx3d.setFloat2(rectDataCL, radius, rectangle.softness);
 
-		ctx.fillRect(rectangle.x - offset, rectangle.y - offset, rectangle.width + offset * 2.0, rectangle.height + offset * 2.0);
+		ctx.fillRect(rectangle.left - offset, rectangle.top - offset, rectangle.width + offset * 2.0, rectangle.height + offset * 2.0);
 	}
 }

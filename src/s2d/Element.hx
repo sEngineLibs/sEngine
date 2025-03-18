@@ -40,10 +40,10 @@ class Element extends Object2D<Element> {
 	public var opacity:Float = 1.0;
 
 	// geometry
-	@track public var x(get, set):Float;
-	@track public var y(get, set):Float;
-	@track public var width(get, set):Float;
-	@track public var height(get, set):Float;
+	@track @:isVar public var x(default, set):Float = 0.0;
+	@track @:isVar public var y(default, set):Float = 0.0;
+	@track @:isVar public var width(default, set):Float = 0.0;
+	@track @:isVar public var height(default, set):Float = 0.0;
 	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
 	@:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
 	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
@@ -58,6 +58,7 @@ class Element extends Object2D<Element> {
 
 	public function new(?parent:Element) {
 		super(parent);
+		syncWithParent(null);
 
 		if (parent == null) {
 			scene = WindowScene.current;
@@ -146,12 +147,6 @@ class Element extends Object2D<Element> {
 		return bounds.contains(mapToGlobal(x, y));
 	}
 
-	@:slot(parentChanged)
-	function syncWithParent(previous:Element) {
-		x += (parent?.x ?? 0.0) - (previous?.x ?? 0.0);
-		y += (parent?.y ?? 0.0) - (previous?.y ?? 0.0);
-	}
-
 	function render(target:Texture) {
 		final ctx = target.ctx2D;
 		ctx.style.pushOpacity(opacity);
@@ -162,11 +157,11 @@ class Element extends Object2D<Element> {
 		ctx.style.popOpacity();
 	}
 
-	inline function get_anchors():Anchors {
+	function get_anchors():Anchors {
 		return this;
 	}
 
-	inline function set_padding(value:Float) {
+	function set_padding(value:Float) {
 		left.padding = value;
 		top.padding = value;
 		right.padding = value;
@@ -174,53 +169,51 @@ class Element extends Object2D<Element> {
 		return value;
 	}
 
-	inline function get_x():Float {
-		return left.position;
+	@:slot(parentChanged)
+	function syncWithParent(previous:Element) {
+		if (previous != null) {
+			left -= previous.left;
+			top -= previous.top;
+		}
+		if (parent != null) {
+			left += parent.left;
+			top += parent.top;
+		}
 	}
 
-	inline function set_x(value:Float):Float {
+	function set_x(value:Float) {
 		final d = value - x;
-		left.position = value;
-		if (anchors.right == null)
-			right.position += d;
+		x = value;
+		left += d;
+		right += d;
 		for (c in children)
-			c.x += d;
-		return value;
+			c.left += d;
+		return x;
 	}
 
-	inline function get_y():Float {
-		return top.position;
-	}
-
-	inline function set_y(value:Float):Float {
+	function set_y(value:Float) {
 		final d = value - y;
-		top.position = value;
-		if (anchors.bottom == null)
-			bottom.position += d;
+		y = value;
+		top += d;
+		bottom += d;
 		for (c in children)
-			c.y += d;
-		return value;
+			c.top += d;
+		return y;
 	}
 
-	inline function get_width():Float {
-		return right.position - x;
+	function set_width(value:Float) {
+		width = clamp(value, minWidth, maxWidth);
+		right.position = left + width;
+		return width;
 	}
 
-	inline function set_width(value:Float):Float {
-		right.position = x + clamp(value, minWidth, maxWidth);
-		return value;
+	function set_height(value:Float) {
+		height = clamp(value, minHeight, maxHeight);
+		bottom.position = top + height;
+		return height;
 	}
 
-	inline function get_height():Float {
-		return bottom.position - y;
-	}
-
-	inline function set_height(value:Float):Float {
-		bottom.position = y + clamp(value, minHeight, maxHeight);
-		return value;
-	}
-
-	inline function set_minWidth(value:Float):Float {
+	function set_minWidth(value:Float):Float {
 		if (value != minWidth) {
 			minWidth = value;
 			width = width;
@@ -228,7 +221,7 @@ class Element extends Object2D<Element> {
 		return minWidth;
 	}
 
-	inline function set_maxWidth(value:Float):Float {
+	function set_maxWidth(value:Float):Float {
 		if (value != maxWidth) {
 			maxWidth = value;
 			width = width;
@@ -236,7 +229,7 @@ class Element extends Object2D<Element> {
 		return maxWidth;
 	}
 
-	inline function set_minHeight(value:Float):Float {
+	function set_minHeight(value:Float):Float {
 		if (value != minHeight) {
 			minHeight = value;
 			height = height;
@@ -244,7 +237,7 @@ class Element extends Object2D<Element> {
 		return minHeight;
 	}
 
-	inline function set_maxHeight(value:Float):Float {
+	function set_maxHeight(value:Float):Float {
 		if (value != maxHeight) {
 			maxHeight = value;
 			height = height;
@@ -252,51 +245,47 @@ class Element extends Object2D<Element> {
 		return maxHeight;
 	}
 
-	inline function get_size():Size {
+	function get_size():Size {
 		return new Size(width, height);
 	}
 
-	inline function set_size(value:Size):Size {
+	function set_size(value:Size):Size {
 		width = value.width;
 		height = value.height;
 		return value;
 	}
 
-	inline function get_position():Position {
+	function get_position():Position {
 		return new Position(x, y);
 	}
 
-	inline function set_position(value:Position):Position {
+	function set_position(value:Position):Position {
 		x = value.x;
 		y = value.y;
 		return value;
 	}
 
-	inline function get_bounds():Bounds {
-		return new Bounds(left.position, top.position, right.position, bottom.position);
+	function get_bounds():Bounds {
+		return new Bounds(x, y, x + width, y + height);
 	}
 
-	inline function set_bounds(value:Bounds):Bounds {
-		left.position = value.left;
-		top.position = value.top;
-		right.position = value.right;
-		bottom.position = value.bottom;
+	function set_bounds(value:Bounds):Bounds {
+		x = value.left;
+		y = value.top;
+		width = value.right - value.left;
+		height = value.bottom - value.top;
 		return value;
 	}
 
-	inline function get_contentBounds():Bounds {
-		return new Bounds(left.position
-			+ left.padding, top.position
-			+ top.padding, right.position
-			- right.padding, bottom.position
-			- bottom.padding);
+	function get_contentBounds():Bounds {
+		return new Bounds(x + left.padding, y + top.padding, x + width - right.padding, y + height - bottom.padding);
 	}
 
-	inline function set_contentBounds(value:Bounds):Bounds {
-		left.position = value.left - left.padding;
-		top.position = value.top - top.padding;
-		right.position = value.right + right.padding;
-		bottom.position = value.bottom + bottom.padding;
+	function set_contentBounds(value:Bounds):Bounds {
+		x = value.left - left.padding;
+		y = value.top - top.padding;
+		width = value.right - value.left + right.padding;
+		height = value.bottom - value.top + bottom.padding;
 		return value;
 	}
 }

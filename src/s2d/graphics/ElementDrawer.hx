@@ -27,7 +27,7 @@ abstract class ElementDrawer<T> {
 		getUniforms();
 	}
 
-	private inline function render(target:Texture, element:T) {
+	function render(target:Texture, element:T) {
 		final ctx = target.ctx2D, ctx3d = target.ctx3D;
 
 		ctx.pipeline = pipeline;

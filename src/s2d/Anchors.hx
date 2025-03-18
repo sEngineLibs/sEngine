@@ -88,76 +88,174 @@ extern abstract Anchors(Element) from Element {
 	}
 }
 
+@:allow(s2d.Anchors)
+@:forward.new
+@:forward(binded, bindedTo, onPositionChanged, offPositionChanged, onMarginChanged, offMarginChanged, onPaddingChanged, offPaddingChanged)
+extern abstract AnchorLine(AnchorLineData) from AnchorLineData {
+	public var bindedTo(get, set):AnchorLine;
+	public var isBinded(get, never):Bool;
+
+	public var position(get, set):Float;
+	public var margin(get, set):Float;
+	public var padding(get, set):Float;
+
+	public inline function new(m:Float) {
+		this = new AnchorLineData(m);
+	}
+
+	public inline function bind(line:AnchorLine) {
+		line.bindedTo = this;
+	}
+
+	public inline function unbind(line:AnchorLine) {
+		line.bindedTo = null;
+	}
+
+	public inline function bindTo(line:AnchorLine) {
+		bindedTo = line;
+	}
+
+	public inline function unbindFrom() {
+		bindedTo = null;
+	}
+
+	@:to
+	private inline function toFloat():Float {
+		return this.position;
+	}
+
+	@:op(-a)
+	private inline function neg() {
+		return -this.position;
+	}
+
+	@:op(a + b)
+	private inline function add(b:Float) {
+		return this.position + b;
+	}
+
+	@:op(a - b)
+	private inline function sub(b:Float) {
+		return this.position - b;
+	}
+
+	@:op(a * b)
+	private inline function mul(b:Float) {
+		return this.position * b;
+	}
+
+	@:op(a / b)
+	private inline function div(b:Float) {
+		return this.position / b;
+	}
+
+	@:op(a % b)
+	private inline function mod(b:Float) {
+		return this.position % b;
+	}
+
+	@:op(a += b)
+	private inline function addassign(b:Float) {
+		return this.position += b;
+	}
+
+	@:op(a -= b)
+	private inline function subassign(b:Float) {
+		return this.position -= b;
+	}
+
+	@:op(a *= b)
+	private inline function mulassign(b:Float) {
+		return this.position *= b;
+	}
+
+	@:op(a /= b)
+	private inline function divassign(b:Float) {
+		return this.position /= b;
+	}
+
+	@:op(a %= b)
+	private inline function modassign(b:Float) {
+		return this.position %= b;
+	}
+
+	private inline function get_bindedTo() @:privateAccess {
+		return this.bindedTo;
+	}
+
+	private inline function set_bindedTo(value:AnchorLine):AnchorLine @:privateAccess {
+		if (bindedTo != value) {
+			if (isBinded && bindedTo.binded.contains(this)) {
+				bindedTo.binded.remove(this);
+				this.position = bindedTo.position;
+			}
+			if (value != null && !value.binded.contains(this)) {
+				value.binded.push(this);
+				this.position = value + this.m * (value.padding + margin);
+			}
+			bindedTo = value;
+		}
+		return bindedTo;
+	}
+
+	private inline function get_isBinded() {
+		return bindedTo != null;
+	}
+
+	private inline function get_position() {
+		return this.position;
+	}
+
+	private inline function set_position(value:Float) @:privateAccess {
+		if (!isBinded) {
+			final d = value - this.position;
+			this.position = value;
+			for (b in this.binded)
+				b += d;
+		}
+		return value;
+	}
+
+	private inline function get_margin() {
+		return this.margin;
+	}
+
+	private inline function set_margin(value:Float) @:privateAccess {
+		value = Math.max(0.0, value);
+		if (isBinded)
+			this.position += (value - margin) * this.m;
+		this.margin = value;
+		return value;
+	}
+
+	private inline function get_padding() {
+		return this.padding;
+	}
+
+	private inline function set_padding(value:Float) @:privateAccess {
+		value = Math.max(0.0, value);
+		final d = (padding - value) * this.m;
+		this.padding = value;
+		for (b in this.binded)
+			b += d;
+		return value;
+	}
+}
+
 #if !macro
 @:build(se.macro.SMacro.build())
 #end
-@:allow(s2d.Anchors)
-class AnchorLine {
+@:dox(hide)
+class AnchorLineData {
 	var m:Float;
 	var binded:Array<AnchorLine> = [];
-	@:isVar var bindedTo(default, set):AnchorLine = null;
+	var bindedTo:AnchorLine = null;
 
-	public var isBinded(get, never):Bool;
 	@track public var position:Float = 0.0;
 	@track public var margin:Float = 0.0;
 	@track public var padding:Float = 0.0;
 
 	public function new(m:Float) {
 		this.m = m;
-	}
-
-	public function bind(line:AnchorLine) {
-		line.bindedTo = this;
-	}
-
-	public function unbind(line:AnchorLine) {
-		line.bindedTo = null;
-	}
-
-	public function bindTo(line:AnchorLine) {
-		bindedTo = line;
-	}
-
-	public function unbindFrom() {
-		bindedTo = null;
-	}
-
-	@:slot(positionChanged)
-	function _positionChanged(previous:Float) {
-		final d = position - previous;
-		for (b in binded)
-			b.position += d;
-	}
-
-	@:slot(marginChanged)
-	function _marginChanged(previous:Float) {
-		if (isBinded)
-			position = bindedTo.position + (bindedTo.padding + margin) * m;
-	}
-
-	@:slot(positionChanged)
-	function _paddingChanged(previous:Float) {
-		final d = (previous - padding) * m;
-		for (b in binded)
-			b.position += d;
-	}
-
-	inline function set_bindedTo(line:AnchorLine):AnchorLine {
-		if (bindedTo != line) {
-			if (bindedTo != null && bindedTo.binded.contains(this)) {
-				bindedTo.binded.remove(this);
-				position = bindedTo.position;
-			}
-			if (line != null && !line.binded.contains(this)) {
-				line.binded.push(this);
-				position = line.position + m * (line.padding + margin);
-			}
-			bindedTo = line;
-		}
-		return bindedTo;
-	}
-
-	inline function get_isBinded() {
-		return bindedTo != null;
 	}
 }

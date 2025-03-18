@@ -29,14 +29,14 @@ class Row extends Positioner<RowSlots> {
 	function position(c:Element, prev:Element) {
 		if (prev == null) {
 			if (direction & RightToLeft != 0)
-				c.x = right.position - c.right.margin - c.width;
+				c.x = width - (c.width + c.right.margin + right.padding);
 			else
-				c.x = c.left.margin;
+				c.x = left.padding + c.left.margin;
 		} else {
 			if (direction & RightToLeft != 0)
-				c.x = prev.left.position - (prev.left.margin + spacing + c.right.margin + c.width);
+				c.x = prev.x - (prev.left.margin + spacing + c.right.margin + c.width);
 			else
-				c.x = prev.right.position + prev.right.margin + spacing + c.left.margin;
+				c.x = prev.x + prev.width + prev.right.margin + spacing + c.left.margin;
 		}
 	}
 
@@ -52,23 +52,15 @@ class Row extends Positioner<RowSlots> {
 
 	@:slot(right.paddingChanged)
 	function __rightPaddingChanged(v:Float) {
-		adjust(RightToLeft, right.padding - v);
+		adjust(RightToLeft, v - right.padding);
 	}
 
 	function rebuild() {
 		var prev = children[0];
-		if (direction & RightToLeft != 0) {
-			prev.x = right.position - prev.right.margin - prev.width;
-			for (c in children.slice(1)) {
-				c.x = prev.left.position - (prev.left.margin + spacing + c.right.margin + c.width);
-				prev = c;
-			}
-		} else {
-			prev.x = prev.left.margin;
-			for (c in children.slice(1)) {
-				c.x = right.position - c.right.margin - c.width;
-				prev = c;
-			}
+		position(prev, null);
+		for (c in children.slice(1)) {
+			position(c, prev);
+			prev = c;
 		}
 	}
 

@@ -32,7 +32,7 @@ abstract class Animation<T> {
 	public function new(from:T, to:T, duration:Float, onTick:T->Void) {
 		this.from = from;
 		this.to = to;
-		
+
 		_tick = onTick;
 		actuator = new Actuator(duration, tick);
 	}
@@ -129,11 +129,11 @@ abstract class Animation<T> {
 
 	abstract function update(t:Float):T;
 
-	inline function get_running() {
+	function get_running() {
 		return isRunning;
 	}
 
-	inline function set_running(value:Bool) {
+	function set_running(value:Bool) {
 		if (!running && value)
 			start();
 		else if (running && !value)
@@ -141,11 +141,11 @@ abstract class Animation<T> {
 		return value;
 	}
 
-	inline function get_paused() {
+	function get_paused() {
 		return isPaused;
 	}
 
-	inline function set_paused(value:Bool) {
+	function set_paused(value:Bool) {
 		if (!paused && value)
 			pause();
 		else if (paused && !value)

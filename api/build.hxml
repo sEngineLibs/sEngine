@@ -1,7 +1,5 @@
 # xml generation
--cp ../Kha/Sources
--cp ../Kha/Backends/HTML5
--cp ../Sources
+-cp ../src
 --macro include('se')
 --macro include('s2d')
 # sengine flags

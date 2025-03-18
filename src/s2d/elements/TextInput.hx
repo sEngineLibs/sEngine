@@ -28,12 +28,12 @@ class TextInput extends Label {
 		onKeyboardKeyDown(Backspace, () -> editText(() -> text = text.substring(0, text.length - 1)));
 	}
 
-	inline function editText(f:Void->Void) {
+	function editText(f:Void->Void) {
 		f();
 		setCursorPosition(text.length);
 	}
 
-	inline function setCursorPosition(pos:Int) {
+	function setCursorPosition(pos:Int) {
 		cursor.x = x + font.widthOfCharacters(fontSize, text.toCharArray(), 0, pos);
 	}
 }

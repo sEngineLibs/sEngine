@@ -113,7 +113,7 @@ enum abstract MouseButton(Int) from Int to Int {
 	var Forward;
 
 	@:to
-	extern public inline function toString():String {
+	public function toString():String {
 		final map = [
 			Left => "Left",
 			Right => "Right",

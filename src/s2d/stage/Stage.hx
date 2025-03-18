@@ -50,7 +50,7 @@ class Stage extends Canvas {
 	#if (S2D_LIGHTING_ENVIRONMENT == 1)
 	@:isVar public var environmentMap(default, set):Image;
 
-	private inline function set_environmentMap(value:Image):Image {
+	private function set_environmentMap(value:Image):Image {
 		environmentMap = value;
 		environmentMap.generateMipmaps(4);
 		return value;

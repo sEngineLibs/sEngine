@@ -30,15 +30,15 @@ class Layout extends Element {
 				if (child.layout.alignment & AlignLeft != 0)
 					child.x = left.padding + child.left.margin;
 				else if (child.layout.alignment & AlignRight != 0)
-					child.x = right.position - right.padding - child.width;
+					child.x = right - right.padding - child.width;
 				else if (child.layout.alignment & AlignHCenter != 0)
-					child.x = left.padding + (right.position - child.width) / 2 - right.padding;
+					child.x = left.padding + (right - child.width) / 2 - right.padding;
 				if (child.layout.alignment & AlignTop != 0)
 					child.y = top.padding + child.top.margin;
 				else if (child.layout.alignment & AlignBottom != 0)
-					child.y = bottom.position - bottom.padding - child.height;
+					child.y = bottom - bottom.padding - child.height;
 				else if (child.layout.alignment & AlignVCenter != 0)
-					child.y = top.padding + (bottom.position - child.height) / 2 - bottom.padding;
+					child.y = top.padding + (bottom - child.height) / 2 - bottom.padding;
 			}
 		};
 		slots.set(child, childSlots);

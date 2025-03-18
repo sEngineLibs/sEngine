@@ -70,7 +70,8 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 	}
 
 	public inline function determinant():Float {
-		return (this._00 * (this._22 * this._11 - this._21 * this._12) + this._10 * (-this._22 * this._01 + this._21 * this._02) + this._20 * (this._12 * this._01 - this._11 * this._02));
+		return (this._00 * (this._22 * this._11 - this._21 * this._12) + this._10 * (-this._22 * this._01 + this._21 * this._02)
+			+ this._20 * (this._12 * this._01 - this._11 * this._02));
 	}
 
 	public inline function inverse():Mat3 {
@@ -83,8 +84,9 @@ extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {
 
 		var f = 1.0 / det;
 
-		return new Mat3(b01 * f, (-this._22 * this._10 + this._20 * this._12) * f, (this._21 * this._10 - this._20 * this._11) * f, b11 * f, (this._22 * this._00 - this._20 * this._02) * f,
-			(-this._21 * this._00 + this._20 * this._01) * f, b21 * f, (-this._12 * this._00 + this._10 * this._02) * f, (this._11 * this._00 - this._10 * this._01) * f);
+		return new Mat3(b01 * f, (-this._22 * this._10 + this._20 * this._12) * f, (this._21 * this._10 - this._20 * this._11) * f, b11 * f,
+			(this._22 * this._00 - this._20 * this._02) * f, (-this._21 * this._00 + this._20 * this._01) * f, b21 * f,
+			(-this._12 * this._00 + this._10 * this._02) * f, (this._11 * this._00 - this._10 * this._01) * f);
 	}
 
 	public inline function adjoint():Mat3 {
