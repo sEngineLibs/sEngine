@@ -2,9 +2,23 @@ package s2d.elements.positioners;
 
 import s2d.Direction;
 
-class Row extends Positioner<RowSlots> {
+class Row extends DirectionalPositioner<RowSlots> {
 	public function new(?parent:Element) {
 		super(parent);
+	}
+
+	function position(c:Element, prev:Element) {
+		if (prev == null) {
+			if (direction & RightToLeft != 0)
+				c.x = width - (c.width + c.right.margin + right.padding);
+			else
+				c.x = left.padding + c.left.margin;
+		} else {
+			if (direction & RightToLeft != 0)
+				c.x = prev.x - (prev.left.margin + spacing + c.right.margin + c.width);
+			else
+				c.x = prev.x + prev.width + prev.right.margin + spacing + c.left.margin;
+		}
 	}
 
 	function addToPositioning(child:Element):RowSlots {
@@ -26,42 +40,19 @@ class Row extends Positioner<RowSlots> {
 		child.right.offMarginChanged(childSlots.rightMarginChanged);
 	}
 
-	function position(c:Element, prev:Element) {
-		if (prev == null) {
-			if (direction & RightToLeft != 0)
-				c.x = width - (c.width + c.right.margin + right.padding);
-			else
-				c.x = left.padding + c.left.margin;
-		} else {
-			if (direction & RightToLeft != 0)
-				c.x = prev.x - (prev.left.margin + spacing + c.right.margin + c.width);
-			else
-				c.x = prev.x + prev.width + prev.right.margin + spacing + c.left.margin;
-		}
-	}
-
 	@:slot(widthChanged)
-	function __widthChanged(v:Float) {
+	function syncWidth(v:Float) {
 		adjust(RightToLeft, width - v);
 	}
 
 	@:slot(left.paddingChanged)
-	function __leftPaddingChanged(v:Float) {
+	function syncLeftPadding(v:Float) {
 		adjust(LeftToRight, left.padding - v);
 	}
 
 	@:slot(right.paddingChanged)
-	function __rightPaddingChanged(v:Float) {
+	function syncRightPadding(v:Float) {
 		adjust(RightToLeft, v - right.padding);
-	}
-
-	function rebuild() {
-		var prev = children[0];
-		position(prev, null);
-		for (c in children.slice(1)) {
-			position(c, prev);
-			prev = c;
-		}
 	}
 
 	function adjustSpacing(d:Float) {

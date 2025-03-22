@@ -17,7 +17,7 @@ abstract class SObject<This:SObject<This>> {
 	public var siblings(get, never):Array<This>;
 
 	public function new(?parent:This) {
-		parent?.addChild(cast this);
+		this.parent = parent;
 	}
 
 	public function setParent(value:This):Void {
@@ -43,15 +43,14 @@ abstract class SObject<This:SObject<This>> {
 
 	function set_parent(value:This):This {
 		if (value != parent) {
-			var prev = parent;
+			if (parent != null && parent.children.remove(cast this))
+				parent.childRemoved(cast this);
 			parent = value;
-			if (prev != null && prev.children.remove(cast this))
-				prev.childRemoved(cast this);
+			parentChanged(parent);
 			if (parent != null && !parent.children.contains(cast this)) {
 				parent.children.push(cast this);
 				parent.childAdded(cast this);
 			}
-			parentChanged(prev);
 		}
 		return value;
 	}

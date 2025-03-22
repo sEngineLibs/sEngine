@@ -1,9 +1,9 @@
 package s2d;
 
-import s2d.geometry.Size;
 import se.Texture;
 import se.math.VectorMath;
 import s2d.Anchors;
+import s2d.geometry.Size;
 import s2d.geometry.Rect;
 import s2d.geometry.Bounds;
 import s2d.geometry.Position;
@@ -36,25 +36,20 @@ class Element extends Object2D<Element> {
 	public var padding(never, set):Float;
 
 	public var layout:ElementLayout = new ElementLayout();
-	public var visible:Bool = true;
 	public var opacity:Float = 1.0;
+	@track public var visible:Bool = true;
+	public var visibleChildren:Array<Element> = [];
 
 	// geometry
 	@track @:isVar public var x(default, set):Float = 0.0;
 	@track @:isVar public var y(default, set):Float = 0.0;
 	@track @:isVar public var width(default, set):Float = 0.0;
 	@track @:isVar public var height(default, set):Float = 0.0;
-	@:isVar public var minWidth(default, set):Float = Math.NEGATIVE_INFINITY;
-	@:isVar public var maxWidth(default, set):Float = Math.POSITIVE_INFINITY;
-	@:isVar public var minHeight(default, set):Float = Math.NEGATIVE_INFINITY;
-	@:isVar public var maxHeight(default, set):Float = Math.POSITIVE_INFINITY;
 
-	public var size(get, set):Size;
-	public var position(get, set):Position;
 	public var bounds(get, set):Bounds;
 	public var contentBounds(get, set):Bounds;
-	@alias public var rect:Rect = bounds;
-	@alias public var contentRect:Rect = contentBounds;
+	public var rect(get, set):Rect;
+	public var contentRect(get, set):Rect;
 
 	public function new(?parent:Element) {
 		super(parent);
@@ -80,7 +75,8 @@ class Element extends Object2D<Element> {
 	}
 
 	overload extern public inline function setSize(size:Size):Void {
-		this.size = size;
+		width = size.width;
+		height = size.height;
 	}
 
 	overload extern public inline function setPosition(x:Float, y:Float):Void {
@@ -88,7 +84,8 @@ class Element extends Object2D<Element> {
 	}
 
 	overload extern public inline function setPosition(position:Position):Void {
-		this.position = position;
+		x = position.x;
+		y = position.y;
 	}
 
 	overload extern public inline function setRect(position:Position, size:Size):Void {
@@ -151,22 +148,9 @@ class Element extends Object2D<Element> {
 		final ctx = target.ctx2D;
 		ctx.style.pushOpacity(opacity);
 		ctx.transform = globalTransform;
-		for (c in children)
-			if (c.visible)
-				c.render(target);
+		for (c in visibleChildren)
+			c.render(target);
 		ctx.style.popOpacity();
-	}
-
-	function get_anchors():Anchors {
-		return this;
-	}
-
-	function set_padding(value:Float) {
-		left.padding = value;
-		top.padding = value;
-		right.padding = value;
-		bottom.padding = value;
-		return value;
 	}
 
 	@:slot(parentChanged)
@@ -181,7 +165,36 @@ class Element extends Object2D<Element> {
 		}
 	}
 
-	function set_x(value:Float) {
+	@:slot(childAdded)
+	function __childAdded__(child:Element) {
+		function insert(child:Element) {
+			for (c in visibleChildren)
+				if (c.index > child.index) {
+					visibleChildren.insert(c.index, child);
+					return;
+				}
+			visibleChildren.push(child);
+		}
+		if (child.visible)
+			insert(child);
+
+		var slot = v -> {
+			if (!v && child.visible)
+				insert(child);
+			else if (v && !child.visible)
+				visibleChildren.remove(child);
+		};
+		child.onVisibleChanged(slot);
+		child.onParentChanged(_ -> child.offVisibleChanged(slot));
+	}
+
+	@:slot(childRemoved)
+	function __childRemoved__(child:Element) {
+		if (child.visible)
+			visibleChildren.remove(child);
+	}
+
+	function set_x(value:Float):Float {
 		final d = value - x;
 		x = value;
 		left += d;
@@ -202,66 +215,26 @@ class Element extends Object2D<Element> {
 	}
 
 	function set_width(value:Float) {
-		width = clamp(value, minWidth, maxWidth);
+		width = value;
 		right.position = left + width;
 		return width;
 	}
 
 	function set_height(value:Float) {
-		height = clamp(value, minHeight, maxHeight);
+		height = value;
 		bottom.position = top + height;
 		return height;
 	}
 
-	function set_minWidth(value:Float):Float {
-		if (value != minWidth) {
-			minWidth = value;
-			width = width;
-		}
-		return minWidth;
+	function get_anchors():Anchors {
+		return this;
 	}
 
-	function set_maxWidth(value:Float):Float {
-		if (value != maxWidth) {
-			maxWidth = value;
-			width = width;
-		}
-		return maxWidth;
-	}
-
-	function set_minHeight(value:Float):Float {
-		if (value != minHeight) {
-			minHeight = value;
-			height = height;
-		}
-		return minHeight;
-	}
-
-	function set_maxHeight(value:Float):Float {
-		if (value != maxHeight) {
-			maxHeight = value;
-			height = height;
-		}
-		return maxHeight;
-	}
-
-	function get_size():Size {
-		return new Size(width, height);
-	}
-
-	function set_size(value:Size):Size {
-		width = value.width;
-		height = value.height;
-		return value;
-	}
-
-	function get_position():Position {
-		return new Position(x, y);
-	}
-
-	function set_position(value:Position):Position {
-		x = value.x;
-		y = value.y;
+	function set_padding(value:Float) {
+		left.padding = value;
+		top.padding = value;
+		right.padding = value;
+		bottom.padding = value;
 		return value;
 	}
 
@@ -286,6 +259,30 @@ class Element extends Object2D<Element> {
 		y = value.top - top.padding;
 		width = value.right - value.left + right.padding;
 		height = value.bottom - value.top + bottom.padding;
+		return value;
+	}
+
+	function get_rect():Rect {
+		return new Rect(x, y, width, height);
+	}
+
+	function set_rect(value:Rect):Rect {
+		x = value.x;
+		y = value.y;
+		width = value.width;
+		height = value.height;
+		return value;
+	}
+
+	function get_contentRect():Rect {
+		return new Rect(x + left.padding, y + top.padding, width - left.padding - right.padding, height - top.padding - bottom.padding);
+	}
+
+	function set_contentRect(value:Rect):Rect {
+		x = value.x - left.padding;
+		y = value.y - top.padding;
+		width = value.width + right.padding;
+		height = value.height + bottom.padding;
 		return value;
 	}
 }

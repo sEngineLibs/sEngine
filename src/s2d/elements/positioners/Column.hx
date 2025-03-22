@@ -2,9 +2,23 @@ package s2d.elements.positioners;
 
 import s2d.Direction;
 
-class Column extends Positioner<ColumnSlots> {
+class Column extends DirectionalPositioner<ColumnSlots> {
 	public function new(?parent:Element) {
 		super(parent);
+	}
+
+	function position(c:Element, prev:Element) {
+		if (prev == null) {
+			if (direction & BottomToTop != 0)
+				c.y = height - (c.height + c.bottom.margin + bottom.padding);
+			else
+				c.y = top.padding + c.top.margin;
+		} else {
+			if (direction & BottomToTop != 0)
+				c.y = prev.y - (prev.top.margin + spacing + c.bottom.margin + c.height);
+			else
+				c.y = prev.y + prev.height + prev.bottom.margin + spacing + c.top.margin;
+		}
 	}
 
 	function addToPositioning(child:Element):ColumnSlots {
@@ -26,42 +40,19 @@ class Column extends Positioner<ColumnSlots> {
 		child.bottom.offMarginChanged(childSlots.bottomMarginChanged);
 	}
 
-	function position(c:Element, prev:Element) {
-		if (prev == null) {
-			if (direction & BottomToTop != 0)
-				c.y = height - (c.height + c.bottom.margin + bottom.padding);
-			else
-				c.y = top.padding + c.top.margin;
-		} else {
-			if (direction & BottomToTop != 0)
-				c.y = prev.y - (prev.top.margin + spacing + c.bottom.margin + c.height);
-			else
-				c.y = prev.y + prev.height + prev.bottom.margin + spacing + c.top.margin;
-		}
-	}
-
 	@:slot(heightChanged)
-	function __heightChanged(v:Float) {
+	function syncHeight(v:Float) {
 		adjust(BottomToTop, height - v);
 	}
 
 	@:slot(top.paddingChanged)
-	function __topPaddingChanged(v:Float) {
+	function syncTopPadding(v:Float) {
 		adjust(TopToBottom, top.padding - v);
 	}
 
 	@:slot(bottom.paddingChanged)
-	function __bottomPaddingChanged(v:Float) {
+	function syncBottomPadding(v:Float) {
 		adjust(BottomToTop, v - bottom.padding);
-	}
-
-	function rebuild() {
-		var prev = children[0];
-		position(prev, null);
-		for (c in children.slice(1)) {
-			position(c, prev);
-			prev = c;
-		}
 	}
 
 	function adjustSpacing(d:Float) {

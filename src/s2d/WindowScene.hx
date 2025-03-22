@@ -63,7 +63,7 @@ class WindowScene {
 		k.onPressed(char -> if (focused != null) focused.keyboardPressed(char));
 	}
 
-	@:signal function resized(x:Int, y:Int):Void;
+	@:signal function resized(width:Int, height:Int):Void;
 
 	public function elementAt(x:Float, y:Float):Element {
 		var i = elements.length;
