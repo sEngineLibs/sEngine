@@ -12,6 +12,7 @@ class ElementLayout {
 	@track @:isVar public var column(default, set):Int = 0;
 	@track @:isVar public var columnSpan(default, set):Int = 1;
 	@track public var alignment:Alignment = AlignCenter;
+	@track public var weight:Float = 1.0;
 	@track public var fillWidth:Bool = false;
 	@track public var fillHeight:Bool = false;
 	@track public var minimumWidth:Float = Math.NEGATIVE_INFINITY;

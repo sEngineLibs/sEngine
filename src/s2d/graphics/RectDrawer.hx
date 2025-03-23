@@ -37,6 +37,10 @@ class RectDrawer extends ElementDrawer<RoundedRectangle> {
 		ctx3d.setFloat4(rectCL, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 		ctx3d.setFloat2(rectDataCL, radius, rectangle.softness);
 
-		ctx.fillRect(rectangle.left - offset, rectangle.top - offset, rectangle.width + offset * 2.0, rectangle.height + offset * 2.0);
+		ctx.fillRect(rectangle.left.position
+			- offset, rectangle.top.position
+			- offset, rectangle.width
+			+ offset * 2.0, rectangle.height
+			+ offset * 2.0);
 	}
 }

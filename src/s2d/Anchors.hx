@@ -2,7 +2,7 @@ package s2d;
 
 import s2d.Element;
 
-extern abstract Anchors(Element) from Element {
+abstract Anchors(Element) from Element {
 	public var left(get, set):AnchorLine;
 	public var top(get, set):AnchorLine;
 	public var right(get, set):AnchorLine;
@@ -91,7 +91,7 @@ extern abstract Anchors(Element) from Element {
 @:allow(s2d.Anchors)
 @:forward.new
 @:forward(binded, bindedTo, onPositionChanged, offPositionChanged, onMarginChanged, offMarginChanged, onPaddingChanged, offPaddingChanged)
-extern abstract AnchorLine(AnchorLineData) from AnchorLineData {
+abstract AnchorLine(AnchorLineData) from AnchorLineData to AnchorLineData {
 	public var bindedTo(get, set):AnchorLine;
 	public var isBinded(get, never):Bool;
 
@@ -119,125 +119,74 @@ extern abstract AnchorLine(AnchorLineData) from AnchorLineData {
 		bindedTo = null;
 	}
 
+	public inline function copy():AnchorLine @:privateAccess {
+		final a = new AnchorLineData(this.m);
+		a.binded = this.binded;
+		a.bindedTo = this.bindedTo;
+		a.position = this.position;
+		a.margin = this.margin;
+		a.padding = this.padding;
+		return a;
+	}
+
 	@:to
-	private inline function toFloat():Float {
+	inline function toFloat():Float {
 		return this.position;
 	}
 
-	@:op(-a)
-	private inline function neg() {
-		return -this.position;
-	}
-
-	@:op(a + b)
-	private inline function add(b:Float) {
-		return this.position + b;
-	}
-
-	@:op(a - b)
-	private inline function sub(b:Float) {
-		return this.position - b;
-	}
-
-	@:op(a * b)
-	private inline function mul(b:Float) {
-		return this.position * b;
-	}
-
-	@:op(a / b)
-	private inline function div(b:Float) {
-		return this.position / b;
-	}
-
-	@:op(a % b)
-	private inline function mod(b:Float) {
-		return this.position % b;
-	}
-
-	@:op(a += b)
-	private inline function addassign(b:Float) {
-		return this.position += b;
-	}
-
-	@:op(a -= b)
-	private inline function subassign(b:Float) {
-		return this.position -= b;
-	}
-
-	@:op(a *= b)
-	private inline function mulassign(b:Float) {
-		return this.position *= b;
-	}
-
-	@:op(a /= b)
-	private inline function divassign(b:Float) {
-		return this.position /= b;
-	}
-
-	@:op(a %= b)
-	private inline function modassign(b:Float) {
-		return this.position %= b;
-	}
-
-	private inline function get_bindedTo() @:privateAccess {
+	inline function get_bindedTo() @:privateAccess {
 		return this.bindedTo;
 	}
 
-	private inline function set_bindedTo(value:AnchorLine):AnchorLine @:privateAccess {
+	inline function set_bindedTo(value:AnchorLine):AnchorLine @:privateAccess {
 		if (bindedTo != value) {
-			if (isBinded && bindedTo.binded.contains(this)) {
+			if (isBinded && bindedTo.binded.contains(this))
 				bindedTo.binded.remove(this);
-				this.position = bindedTo.position;
-			}
 			if (value != null && !value.binded.contains(this)) {
 				value.binded.push(this);
-				this.position = value + this.m * (value.padding + margin);
+				position = value.position + (value.padding + margin) * this.m;
 			}
-			bindedTo = value;
+			this.bindedTo = value;
 		}
 		return bindedTo;
 	}
 
-	private inline function get_isBinded() {
+	inline function get_isBinded() {
 		return bindedTo != null;
 	}
 
-	private inline function get_position() {
+	inline function get_position() {
 		return this.position;
 	}
 
-	private inline function set_position(value:Float) @:privateAccess {
-		if (!isBinded) {
-			final d = value - this.position;
-			this.position = value;
-			for (b in this.binded)
-				b += d;
-		}
+	inline function set_position(value:Float) @:privateAccess {
+		final d = value - position;
+		this.position = value;
+		for (b in this.binded)
+			b.position += d;
 		return value;
 	}
 
-	private inline function get_margin() {
+	inline function get_margin() {
 		return this.margin;
 	}
 
-	private inline function set_margin(value:Float) @:privateAccess {
-		value = Math.max(0.0, value);
+	inline function set_margin(value:Float) @:privateAccess {
 		if (isBinded)
-			this.position += (value - margin) * this.m;
+			position += (value - margin) * this.m;
 		this.margin = value;
 		return value;
 	}
 
-	private inline function get_padding() {
+	inline function get_padding() {
 		return this.padding;
 	}
 
-	private inline function set_padding(value:Float) @:privateAccess {
-		value = Math.max(0.0, value);
-		final d = (padding - value) * this.m;
+	inline function set_padding(value:Float) @:privateAccess {
+		final d = (value - padding) * this.m;
 		this.padding = value;
 		for (b in this.binded)
-			b += d;
+			b.position += d;
 		return value;
 	}
 }

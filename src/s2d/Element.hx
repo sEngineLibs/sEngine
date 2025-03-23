@@ -41,10 +41,23 @@ class Element extends Object2D<Element> {
 	public var visibleChildren:Array<Element> = [];
 
 	// geometry
-	@track @:isVar public var x(default, set):Float = 0.0;
-	@track @:isVar public var y(default, set):Float = 0.0;
-	@track @:isVar public var width(default, set):Float = 0.0;
-	@track @:isVar public var height(default, set):Float = 0.0;
+	@:isVar var _x(default, set):Float = 0.0;
+	@:isVar var _y(default, set):Float = 0.0;
+	@:isVar var _width(default, set):Float = 0.0;
+	@:isVar var _height(default, set):Float = 0.0;
+
+	public var x(get, set):Float;
+	public var y(get, set):Float;
+	public var width(get, set):Float;
+	public var height(get, set):Float;
+
+	@:signal function xChanged(x:Float):Void;
+
+	@:signal function yChanged(y:Float):Void;
+
+	@:signal function widthChanged(width:Float):Void;
+
+	@:signal function heightChanged(height:Float):Void;
 
 	public var bounds(get, set):Bounds;
 	public var contentBounds(get, set):Bounds;
@@ -60,6 +73,21 @@ class Element extends Object2D<Element> {
 			scene.elements.push(this);
 		} else
 			scene = parent.scene;
+
+		left.onPositionChanged(previous -> {
+			final d = left.position - previous;
+			_x += d;
+			if (right.isBinded)
+				_width -= d;
+		});
+		top.onPositionChanged(previous -> {
+			final d = top.position - previous;
+			_y += d;
+			if (bottom.isBinded)
+				_height -= d;
+		});
+		right.onPositionChanged(previous -> _width = right.position - left.position);
+		bottom.onPositionChanged(previous -> _height = bottom.position - top.position);
 	}
 
 	public function setPadding(value:Float):Void {
@@ -156,12 +184,12 @@ class Element extends Object2D<Element> {
 	@:slot(parentChanged)
 	function syncWithParent(previous:Element) {
 		if (previous != null) {
-			left -= previous.left;
-			top -= previous.top;
+			left.position -= previous.left.position;
+			top.position -= previous.top.position;
 		}
 		if (parent != null) {
-			left += parent.left;
-			top += parent.top;
+			left.position += parent.left.position;
+			top.position += parent.top.position;
 		}
 	}
 
@@ -194,35 +222,91 @@ class Element extends Object2D<Element> {
 			visibleChildren.remove(child);
 	}
 
+	function set__x(value:Float) {
+		if (value != _x) {
+			final prev = _x;
+			_x = value;
+			xChanged(prev);
+		}
+		return _x;
+	}
+
+	function set__y(value:Float) {
+		if (value != _y) {
+			final prev = _y;
+			_y = value;
+			yChanged(prev);
+		}
+		return _y;
+	}
+
+	function set__width(value:Float) {
+		if (value != _width) {
+			final prev = _width;
+			_width = value;
+			widthChanged(prev);
+		}
+		return _width;
+	}
+
+	function set__height(value:Float) {
+		if (value != _height) {
+			final prev = _height;
+			_height = value;
+			heightChanged(prev);
+		}
+		return _height;
+	}
+
+	function get_x():Float {
+		return _x;
+	}
+
 	function set_x(value:Float):Float {
-		final d = value - x;
-		x = value;
-		left += d;
-		right += d;
-		for (c in children)
-			c.left += d;
+		if (!left.isBinded) {
+			final d = value - x;
+			left.position += d;
+			if (!right.isBinded)
+				right.position += d;
+			for (c in children)
+				c.left.position += d;
+		}
 		return x;
 	}
 
+	function get_y():Float {
+		return _y;
+	}
+
 	function set_y(value:Float) {
-		final d = value - y;
-		y = value;
-		top += d;
-		bottom += d;
-		for (c in children)
-			c.top += d;
+		if (!top.isBinded) {
+			final d = value - y;
+			top.position += d;
+			if (!bottom.isBinded)
+				bottom.position += d;
+			for (c in children)
+				c.top.position += d;
+		}
 		return y;
 	}
 
+	function get_width():Float {
+		return _width;
+	}
+
 	function set_width(value:Float) {
-		width = value;
-		right.position = left + width;
+		if (!right.isBinded)
+			right.position = left.position + value;
 		return width;
 	}
 
+	function get_height():Float {
+		return _height;
+	}
+
 	function set_height(value:Float) {
-		height = value;
-		bottom.position = top + height;
+		if (!bottom.isBinded)
+			bottom.position = top.position + value;
 		return height;
 	}
 

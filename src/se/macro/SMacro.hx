@@ -449,7 +449,12 @@ class SMacro extends Builder {
 									buildSignal(signal, isPublic, field.access.contains(AStatic), isSingle, []);
 									f.expr = macro {
 										var __previous__ = $i{field.name};
-										${inject(f.expr, macro $i{signalName}(__previous__))};
+										${
+											inject(f.expr, macro {
+												if ($i{field.name} != __previous__)
+													$i{signalName}(__previous__);
+											})
+										};
 									}
 									field.doc = '_This property is **tracked**. Whenever the property changes, the previous value of it is emitted on connected `$signalName` slots. 
 									The corresponding connector is_ `on${signalName.capitalize()}`\n\n'

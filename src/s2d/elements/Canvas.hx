@@ -7,8 +7,8 @@ class Canvas extends DrawableElement {
 	@:signal function paint(target:Texture):Void;
 
 	function draw(target:Texture) {
-		target.ctx2D.transform *= Mat3.translation(left, top);
+		target.ctx2D.transform *= Mat3.translation(left.position, top.position);
 		paint(target);
-		target.ctx2D.transform *= Mat3.translation(-left, -top);
+		target.ctx2D.transform *= Mat3.translation(-left.position, -top.position);
 	}
 }

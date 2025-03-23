@@ -11,6 +11,8 @@ abstract class SObject<This:SObject<This>> {
 
 	@:signal function childRemoved(child:This):Void;
 
+	@:signal function childMoved(child:This):Void;
+
 	@:isVar public var parent(default, set):This;
 	public var index(get, set):Int;
 	public var children:Array<This> = [];
@@ -63,6 +65,7 @@ abstract class SObject<This:SObject<This>> {
 		if (parent != null) {
 			parent.children.remove(cast this);
 			parent.children.insert(value, cast this);
+			parent.childMoved(cast this);
 		}
 		return value;
 	}
