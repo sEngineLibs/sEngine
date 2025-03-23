@@ -3,7 +3,7 @@ package s2d.elements.layouts;
 import se.math.VectorMath;
 import s2d.Anchors;
 import s2d.Direction;
-import s2d.elements.layouts.BoxLayout;
+import s2d.Box.SingleElementBox;
 
 class HBoxlayout extends Element {
 	var cells:Array<SingleElementBox> = [];
