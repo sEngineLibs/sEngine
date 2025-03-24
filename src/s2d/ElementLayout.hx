@@ -15,9 +15,9 @@ class ElementLayout {
 	@track public var weight:Float = 1.0;
 	@track public var fillWidth:Bool = false;
 	@track public var fillHeight:Bool = false;
-	@track public var minimumWidth:Float = Math.NEGATIVE_INFINITY;
+	@track public var minimumWidth:Float = 0.0;
 	@track public var maximumWidth:Float = Math.POSITIVE_INFINITY;
-	@track public var minimumHeight:Float = Math.NEGATIVE_INFINITY;
+	@track public var minimumHeight:Float = 0.0;
 	@track public var maximumHeight:Float = Math.POSITIVE_INFINITY;
 	@track public var preferredWidth:Float = Math.NaN;
 	@track public var preferredHeight:Float = Math.NaN;

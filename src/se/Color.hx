@@ -33,6 +33,10 @@ extern enum abstract Color(Int) from Int to Int {
 	public var HSL(get, set):Vec3;
 	public var HSLA(get, set):Vec4;
 
+	public static inline function random():Color {
+		return rgba(Math.random(), Math.random(), Math.random());
+	}
+
 	public static inline function rgb(r:Float, g:Float, b:Float):Color {
 		return rgba(r, g, b, 1.0);
 	}

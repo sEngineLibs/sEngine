@@ -1,6 +1,5 @@
 package s2d;
 
-import se.math.VectorMath;
 import s2d.Anchors;
 import s2d.Alignment;
 
@@ -54,18 +53,18 @@ abstract class Box {
 				alignmentChanged: a -> fit(el),
 				fillWidthChanged: fw -> {
 					if (!fw && el.layout.fillWidth)
-						fillWidth(el);
+						fillH(el);
 					else if (fw && !el.layout.fillWidth) {
-						unfillWidth(el);
-						fitWidth(el);
+						unfillH(el);
+						fitH(el);
 					}
 				},
 				fillHeightChanged: fh -> {
 					if (!fh && el.layout.fillHeight)
-						fillHeight(el);
+						fillV(el);
 					else if (fh && !el.layout.fillHeight) {
-						unfillHeight(el);
-						fitHeight(el);
+						unfillV(el);
+						fitV(el);
 					}
 				}
 			}
@@ -115,12 +114,12 @@ abstract class Box {
 
 	public function fit(el:Element) {
 		if (!el.layout.fillWidth)
-			fitWidth(el);
+			fitH(el);
 		if (!el.layout.fillHeight)
-			fitHeight(el);
+			fitV(el);
 	}
 
-	public function fitWidth(el:Element) {
+	public function fitH(el:Element) {
 		var l = left.position + left.padding + el.left.margin;
 		var r = right.position - right.padding - el.right.margin - el.width;
 
@@ -134,7 +133,7 @@ abstract class Box {
 		el.right.position = el.left.position + el.width;
 	}
 
-	public function fitHeight(el:Element) {
+	public function fitV(el:Element) {
 		var t = top.position + top.padding + el.top.margin;
 		var b = bottom.position - bottom.padding - el.bottom.margin - el.height;
 
@@ -150,34 +149,34 @@ abstract class Box {
 
 	public function fill(el:Element) {
 		if (el.layout.fillWidth)
-			fillWidth(el);
+			fillH(el);
 		if (el.layout.fillHeight)
-			fillHeight(el);
+			fillV(el);
 	}
 
 	public function unfill(el:Element) {
 		if (el.layout.fillWidth)
-			unfillWidth(el);
+			unfillH(el);
 		if (el.layout.fillHeight)
-			unfillHeight(el);
+			unfillV(el);
 	}
 
-	public function fillWidth(el:Element) {
+	public function fillH(el:Element) {
 		left.bind(el.left);
 		right.bind(el.right);
 	}
 
-	public function fillHeight(el:Element) {
+	public function fillV(el:Element) {
 		top.bind(el.top);
 		bottom.bind(el.bottom);
 	}
 
-	public function unfillWidth(el:Element) {
+	public function unfillH(el:Element) {
 		left.unbind(el.left);
 		right.unbind(el.right);
 	}
 
-	public function unfillHeight(el:Element) {
+	public function unfillV(el:Element) {
 		top.unbind(el.top);
 		bottom.unbind(el.bottom);
 	}
@@ -188,85 +187,91 @@ abstract class Box {
 #end
 class SingleElementBox extends Box {
 	var dirtyWidthSlot:Float->Void;
+	var dirtyLayoutWidthSlot:Float->Void;
 	var dirtyHeightSlot:Float->Void;
+	var dirtyLayoutHeightSlot:Float->Void;
 
 	public var element:Element;
 	public var slots:ElementSlots;
-	@track public var availableWidth:Float = 0.0;
-	@track public var availableHeight:Float = 0.0;
+
+	@track.single public var requiredWidth:Float;
+	@track.single public var requiredHeight:Float;
+
+	@alias public var fillWidth:Bool = element.layout.fillWidth;
+	@alias public var minimumWidth:Float = element.layout.minimumWidth;
+	@alias public var maximumWidth:Float = element.layout.maximumWidth;
+	@alias public var preferredWidth:Float = element.layout.preferredWidth;
+	@alias public var fillHeight:Bool = element.layout.fillHeight;
+	@alias public var minimumHeight:Float = element.layout.minimumHeight;
+	@alias public var maximumHeight:Float = element.layout.maximumHeight;
+	@alias public var preferredHeight:Float = element.layout.preferredHeight;
 
 	public function new(el:Element, left:AnchorLine, top:AnchorLine, right:AnchorLine, bottom:AnchorLine) {
 		super(left, top, right, bottom);
 		element = el;
-		dirtyWidthSlot = (_:Float) -> updateAvaialableWidth();
-		dirtyHeightSlot = (_:Float) -> updateAvaialableHeight();
+		dirtyWidthSlot = (v:Float) -> if (!fillWidth) syncRequiredWidth();
+		dirtyLayoutWidthSlot = (v:Float) -> syncRequiredWidth();
+		dirtyHeightSlot = (v:Float) -> if (!fillHeight) syncRequiredHeight();
+		dirtyLayoutHeightSlot = (v:Float) -> syncRequiredHeight();
 
 		if (element.visible)
 			add(element);
 	}
 
+	override function add(el:Element) {
+		syncRequiredWidth();
+		syncRequiredHeight();
+		return super.add(el);
+	}
+
 	function addElementSlots(el:Element, slots:ElementSlots) {
 		el.onWidthChanged(dirtyWidthSlot);
-		el.layout.onMinimumWidthChanged(dirtyWidthSlot);
-		el.layout.onMaximumWidthChanged(dirtyWidthSlot);
-		el.layout.onPreferredWidthChanged(dirtyWidthSlot);
+		el.layout.onMinimumWidthChanged(dirtyLayoutWidthSlot);
+		el.layout.onMaximumWidthChanged(dirtyLayoutWidthSlot);
+		el.layout.onPreferredWidthChanged(dirtyLayoutWidthSlot);
 		el.onHeightChanged(dirtyHeightSlot);
-		el.layout.onMinimumHeightChanged(dirtyHeightSlot);
-		el.layout.onMaximumHeightChanged(dirtyHeightSlot);
-		el.layout.onPreferredHeightChanged(dirtyHeightSlot);
+		el.layout.onMinimumHeightChanged(dirtyLayoutHeightSlot);
+		el.layout.onMaximumHeightChanged(dirtyLayoutHeightSlot);
+		el.layout.onPreferredHeightChanged(dirtyLayoutHeightSlot);
 		this.slots = slots;
 	}
 
 	function removeElementSlots(el:Element):ElementSlots {
 		el.offWidthChanged(dirtyWidthSlot);
-		el.layout.offMinimumWidthChanged(dirtyWidthSlot);
-		el.layout.offMaximumWidthChanged(dirtyWidthSlot);
-		el.layout.offPreferredWidthChanged(dirtyWidthSlot);
-		el.offHeightChanged(dirtyWidthSlot);
-		el.layout.offMinimumHeightChanged(dirtyHeightSlot);
-		el.layout.offMaximumHeightChanged(dirtyHeightSlot);
-		el.layout.offPreferredHeightChanged(dirtyHeightSlot);
-		return slots;
+		el.layout.offMinimumWidthChanged(dirtyLayoutWidthSlot);
+		el.layout.offMaximumWidthChanged(dirtyLayoutWidthSlot);
+		el.layout.offPreferredWidthChanged(dirtyLayoutWidthSlot);
+		el.offHeightChanged(dirtyHeightSlot);
+		el.layout.offMinimumHeightChanged(dirtyLayoutHeightSlot);
+		el.layout.offMaximumHeightChanged(dirtyLayoutHeightSlot);
+		el.layout.offPreferredHeightChanged(dirtyLayoutHeightSlot);
+		return this.slots;
 	}
 
-	function updateAvaialableWidth() {
-		if (!element.layout.fillWidth)
-			availableWidth = right.position - left.position - getPreferredWidth();
+	public function syncRequiredWidth() {
+		if (!Math.isNaN(preferredWidth))
+			requiredWidth = clampWidth(preferredWidth);
+		else if (!fillWidth)
+			requiredWidth = clampWidth(element.width);
 		else
-			availableWidth = 0.0;
+			requiredWidth = 0.0;
 	}
 
-	function updateAvaialableHeight() {
-		if (!element.layout.fillHeight)
-			availableHeight = bottom.position - top.position - getPreferredHeight();
+	public function syncRequiredHeight() {
+		if (!Math.isNaN(preferredHeight))
+			requiredHeight = clampHeight(preferredHeight);
+		else if (!fillHeight)
+			requiredHeight = clampHeight(element.height);
 		else
-			availableHeight = 0.0;
-	}
-
-	public function getPreferredWidth(?preferred:Float) {
-		if (element.layout.fillWidth)
-			return preferred == null ? null : clampWidth(preferred);
-		var l = element.layout;
-		var cellWidth = Math.isNaN(l.preferredWidth) ? element.width : l.preferredWidth;
-		return clampWidth(cellWidth);
-	}
-
-	public function getPreferredHeight(?preferred:Float) {
-		if (element.layout.fillHeight)
-			return preferred == null ? null : clampHeight(preferred);
-		var l = element.layout;
-		var cellHeight = Math.isNaN(l.preferredHeight) ? element.height : l.preferredHeight;
-		return clampHeight(cellHeight);
+			requiredHeight = 0.0;
 	}
 
 	public function clampWidth(width:Float) {
-		var l = element.layout;
-		return element.left.margin + clamp(width, l.minimumWidth, l.maximumWidth) + element.right.margin;
+		return element.left.margin + Math.max(Math.min(width, maximumWidth), minimumWidth) + element.right.margin;
 	}
 
 	public function clampHeight(height:Float) {
-		var l = element.layout;
-		return element.top.margin + clamp(height, l.minimumHeight, l.maximumHeight) + element.bottom.margin;
+		return element.top.margin + Math.max(Math.min(height, maximumHeight), minimumHeight) + element.bottom.margin;
 	}
 
 	function adjustWidth(alignment:Alignment, d:Float) {
