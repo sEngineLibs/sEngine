@@ -4,13 +4,22 @@ import se.math.Vec2;
 import se.math.Mat3;
 import se.math.VectorMath;
 
-abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
+abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualObject<This> {
+	@track public var visible:Bool = true;
+	public var vChildren:Array<This> = [];
+	public var index(get, never):Int;
+	@:isVar public var z(default, set):Float = 0.0;
+
+	@:signal function vChildAdded(child:This):Void;
+
+	@:signal function vChildMoved(child:This):Void;
+
+	@:signal function vChildRemoved(child:This):Void;
+
 	var globalTransform:Mat3 = Mat3.identity();
 
 	public var origin:Vec2 = vec2(0.0, 0.0);
 	public var transform:Mat3 = Mat3.identity();
-
-	@:isVar public var z(default, set):Float = 0.0;
 
 	public var translationX(get, set):Float;
 	public var translationY(get, set):Float;
@@ -20,15 +29,65 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 	public var scale(get, set):Vec2;
 	public var rotation(get, set):Float;
 
-	public function new(?parent:This) {
-		super(parent);
+	public function new() {
+		onParentChanged(_ -> syncTransform());
+	}
 
-		onParentChanged(_ -> sync());
+	function insertVChild(el:This) {
+		for (i in 0...vChildren.length)
+			if (vChildren[i].z > el.z) {
+				vChildren.insert(i, el);
+				return;
+			}
+		vChildren.push(el);
+	}
+
+	function removeVChild(el:This) {
+		vChildren.remove(el);
+	}
+
+	@:slot(childAdded)
+	function __childAdded__(child:This) {
+		if (child.visible) {
+			insertVChild(child);
+			vChildAdded(child);
+		}
+		var slot = v -> {
+			if (!v && child.visible) {
+				insertVChild(child);
+				vChildAdded(child);
+			} else if (v && !child.visible) {
+				removeVChild(child);
+				vChildRemoved(child);
+			}
+		};
+		child.onVisibleChanged(slot);
+		child.onParentChanged(_ -> child.offVisibleChanged(slot));
+	}
+
+	@:slot(childRemoved)
+	function __childRemoved__(child:This) {
+		if (child.visible)
+			removeVChild(child);
+	}
+
+	function get_index():Int {
+		return parent?.vChildren.indexOf(cast this);
+	}
+
+	function set_z(value:Float):Float {
+		z = value;
+		if (visible && parent != null) {
+			parent.removeVChild(cast this);
+			parent.insertVChild(cast this);
+			parent.vChildMoved(cast this);
+		}
+		return z;
 	}
 
 	extern overload public inline function translate(x:Float, y:Float) {
 		transform *= Mat3.translation(x, y);
-		sync();
+		syncTransform();
 	}
 
 	extern overload public inline function translate(value:Vec2) {
@@ -41,7 +100,7 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 
 	extern overload public inline function upscale(x:Float, y:Float) {
 		transform *= Mat3.scale(x, y);
-		sync();
+		syncTransform();
 	}
 
 	extern overload public inline function upscale(value:Vec2) {
@@ -54,27 +113,15 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 
 	public function rotate(value:Float) {
 		transform *= Mat3.rotation(value);
-		sync();
+		syncTransform();
 	}
 
-	function sync():Void {
+	function syncTransform():Void {
 		globalTransform = Mat3.translation(-origin.x, -origin.y);
 		globalTransform *= parent != null ? transform * parent.globalTransform : transform;
 		globalTransform *= Mat3.translation(origin.x, origin.y);
 		for (c in children)
-			c.sync();
-	}
-
-	function set_z(value:Float):Float {
-		final d = value - z;
-		for (c in children)
-			c.z += d;
-		for (s in siblings)
-			if (s.z <= z) {
-				index = s.index - 1;
-				break;
-			}
-		return z;
+			c.syncTransform();
 	}
 
 	function get_translationX():Float {
@@ -83,7 +130,7 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 
 	function set_translationX(value:Float) {
 		transform._20 = value;
-		sync();
+		syncTransform();
 		return value;
 	}
 
@@ -93,7 +140,7 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 
 	function set_translationY(value:Float) {
 		transform._21 = value;
-		sync();
+		syncTransform();
 		return value;
 	}
 
@@ -104,7 +151,7 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 	function set_translation(value:Vec2) {
 		transform._20 = value.x;
 		transform._21 = value.y;
-		sync();
+		syncTransform();
 		return value;
 	}
 
@@ -122,7 +169,7 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 			transform._00 = value;
 			transform._10 = value;
 		}
-		sync();
+		syncTransform();
 		return value;
 	}
 
@@ -140,7 +187,7 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 			transform._01 = value;
 			transform._11 = value;
 		}
-		sync();
+		syncTransform();
 		return value;
 	}
 
@@ -167,7 +214,7 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 			transform._01 = value.y;
 			transform._11 = value.y;
 		}
-		sync();
+		syncTransform();
 		return value;
 	}
 
@@ -186,7 +233,7 @@ abstract class Object2D<This:Object2D<This>> extends se.SObject<This> {
 		transform._01 = -s * sy;
 		transform._11 = c * sy;
 
-		sync();
+		syncTransform();
 		return value;
 	}
 }

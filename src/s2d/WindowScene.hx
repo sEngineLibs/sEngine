@@ -10,6 +10,7 @@ import se.input.Mouse;
 import se.graphics.Context2D;
 import se.events.MouseEvents;
 import s2d.FocusPolicy;
+import s2d.anchors.AnchorLine;
 
 using se.extensions.StringExt;
 
@@ -33,11 +34,30 @@ class WindowScene {
 	@alias public var width:Int = window.width;
 	@alias public var height:Int = window.height;
 
+	public var left:AnchorLineHorizontal;
+	public var top:AnchorLineVertical;
+	public var right:AnchorLineHorizontal;
+	public var bottom:AnchorLineVertical;
+	public var hCenter:AnchorLineHorizontal;
+	public var vCenter:AnchorLineVertical;
+
 	public function new(window:Window) {
 		WindowScene.current = this;
 
 		this.window = window;
-		window.notifyOnResize(resized.emit);
+		window.notifyOnResize((w, h) -> {
+			right.position = left.position + w;
+			hCenter.position = left.position + w * 0.5;
+			bottom.position = top.position + h;
+			vCenter.position = top.position + h * 0.5;
+			resized(w, h);
+		});
+		left = new AnchorLineLeft(window.x);
+		top = new AnchorLineTop(window.y);
+		right = new AnchorLineRight(window.x + window.width);
+		bottom = new AnchorLineBottom(window.y + window.height);
+		hCenter = new AnchorLineHCenter(window.x + window.width * 0.5);
+		vCenter = new AnchorLineVCenter(window.y + window.height * 0.5);
 
 		onResized((x, y) -> backbuffer = new Texture(window.width, window.height));
 		resized(window.width, window.height);

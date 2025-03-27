@@ -7,8 +7,8 @@ class RoundedRectangle extends DrawableElement {
 	public var radius:Float;
 	public var softness:Float;
 
-	public function new(?radius:Float = 0.0, ?softness:Float = 0.5, ?parent:Element) {
-		super(parent);
+	public function new(?radius:Float = 0.0, ?softness:Float = 0.5,) {
+		super();
 
 		this.radius = radius;
 		this.softness = softness;

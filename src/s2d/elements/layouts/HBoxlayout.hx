@@ -1,12 +1,11 @@
 package s2d.elements.layouts;
 
-import s2d.Anchors;
 import s2d.Direction;
-import s2d.Box.SingleElementBox;
+import s2d.anchors.Anchors;
 
 class HBoxLayout extends Element {
-	var cells:Array<SingleElementBox> = [];
-	var cellsSlots:Map<SingleElementBox, CellSlots> = [];
+	var cells:Array<LayoutCell> = [];
+	var cellsSlots:Map<LayoutCell, CellSlots> = [];
 
 	@:inject(syncFreeSpacePerCell) var fillCells:Int = 0;
 	@:inject(syncFreeSpacePerCell) var freeSpace:Float = 0.0;
@@ -15,13 +14,13 @@ class HBoxLayout extends Element {
 	@:isVar public var spacing(default, set):Float = 10.0;
 	@:inject(syncLayout) public var direction:Direction = LeftToRight;
 
-	public function new(?parent:Element) {
-		super(parent);
+	public function new() {
+		super();
 	}
 
 	@:slot(childAdded)
 	function addCell(child:Element) {
-		var cell = new SingleElementBox(child, new AnchorLine(1.0), this.top, new AnchorLine(-1.0), this.bottom);
+		var cell = new LayoutCell(child, new AnchorLeft(child), this.top, new AnchorRight(child), this.bottom);
 		var slots = {
 			requiredWidthChanged: (rw:Float) -> {
 				if (!cell.fillWidth)

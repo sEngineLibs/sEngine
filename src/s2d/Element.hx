@@ -2,14 +2,16 @@ package s2d;
 
 import se.Texture;
 import se.math.VectorMath;
-import s2d.Anchors;
+import s2d.anchors.Anchors;
+import s2d.anchors.AnchorLine;
 import s2d.geometry.Size;
 import s2d.geometry.Rect;
 import s2d.geometry.Bounds;
 import s2d.geometry.Position;
 
 @:allow(s2d.WindowScene)
-class Element extends Object2D<Element> {
+@:access(s2d.anchors.AnchorLine)
+class Element extends PhysicalObject2D<Element> {
 	overload extern public static inline function mapToElement(element:Element, x:Float, y:Float):Position {
 		return element.mapFromGlobal(x, y);
 	}
@@ -27,67 +29,71 @@ class Element extends Object2D<Element> {
 	}
 
 	var scene:WindowScene;
+	var anchoring:Bool = false;
 
-	public var left:AnchorLine = new AnchorLine(1.0);
-	public var top:AnchorLine = new AnchorLine(1.0);
-	public var right:AnchorLine = new AnchorLine(-1.0);
-	public var bottom:AnchorLine = new AnchorLine(-1.0);
-	public var anchors(get, never):Anchors;
+	public var left:AnchorLineHorizontal;
+	public var top:AnchorLineVertical;
+	public var right:AnchorLineHorizontal;
+	public var bottom:AnchorLineVertical;
+	public var hCenter:AnchorLineHorizontal;
+	public var vCenter:AnchorLineVertical;
+	public var anchors:Anchors;
 	public var padding(never, set):Float;
 
 	public var layout:ElementLayout = new ElementLayout();
 	public var opacity:Float = 1.0;
-	@track public var visible:Bool = true;
-	public var visibleChildren:Array<Element> = [];
 
-	// geometry
-	@:isVar var _x(default, set):Float = 0.0;
-	@:isVar var _y(default, set):Float = 0.0;
-	@:isVar var _width(default, set):Float = 0.0;
-	@:isVar var _height(default, set):Float = 0.0;
+	@:isVar var _absX(default, set):Float = 0.0;
+	@:isVar var _absY(default, set):Float = 0.0;
 
-	public var x(get, set):Float;
-	public var y(get, set):Float;
-	public var width(get, set):Float;
-	public var height(get, set):Float;
+	public var absX(get, set):Float;
+	public var absY(get, set):Float;
+
+	@:isVar public var x(default, set):Float = 0.0;
+	@:isVar public var y(default, set):Float = 0.0;
+	@:isVar public var width(default, set):Float = 0.0;
+	@:isVar public var height(default, set):Float = 0.0;
 
 	@:signal function xChanged(x:Float):Void;
 
-	@:signal function yChanged(y:Float):Void;
+	@:signal function yChanged(x:Float):Void;
 
-	@:signal function widthChanged(width:Float):Void;
+	@:signal function widthChanged(x:Float):Void;
 
-	@:signal function heightChanged(height:Float):Void;
+	@:signal function heightChanged(x:Float):Void;
 
 	public var bounds(get, set):Bounds;
 	public var contentBounds(get, set):Bounds;
 	public var rect(get, set):Rect;
 	public var contentRect(get, set):Rect;
 
-	public function new(?parent:Element) {
-		super(parent);
-		syncWithParent(null);
+	public function new() {
+		left = new AnchorLeft(this);
+		top = new AnchorTop(this);
+		right = new AnchorRight(this);
+		bottom = new AnchorBottom(this);
+		hCenter = new AnchorHCenter(this);
+		vCenter = new AnchorVCenter(this);
+		anchors = new Anchors(this);
 
+		super();
 		if (parent == null) {
 			scene = WindowScene.current;
 			scene.elements.push(this);
 		} else
 			scene = parent.scene;
+	}
 
-		left.onPositionChanged(previous -> {
-			final d = left.position - previous;
-			_x += d;
-			if (right.isBinded)
-				_width -= d;
-		});
-		top.onPositionChanged(previous -> {
-			final d = top.position - previous;
-			_y += d;
-			if (bottom.isBinded)
-				_height -= d;
-		});
-		right.onPositionChanged(previous -> _width = right.position - left.position);
-		bottom.onPositionChanged(previous -> _height = bottom.position - top.position);
+	override function __childAdded__(child:Element) {
+		child.absX += absX;
+		child.absY += absY;
+		super.__childAdded__(child);
+	}
+
+	override function __childRemoved__(child:Element) {
+		child.absX -= absX;
+		child.absY -= absY;
+		super.__childRemoved__(child);
 	}
 
 	public function setPadding(value:Float):Void {
@@ -176,142 +182,155 @@ class Element extends Object2D<Element> {
 		final ctx = target.ctx2D;
 		ctx.style.pushOpacity(opacity);
 		ctx.transform = globalTransform;
-		for (c in visibleChildren)
+		for (c in vChildren)
 			c.render(target);
 		ctx.style.popOpacity();
 	}
 
-	@:slot(parentChanged)
-	function syncWithParent(previous:Element) {
-		if (previous != null) {
-			left.position -= previous.left.position;
-			top.position -= previous.top.position;
+	var _x:Float = 0.0;
+	var _y:Float = 0.0;
+	var _width:Float = 0.0;
+	var _height:Float = 0.0;
+
+	function geometryChanged() {
+		if (_x != x) {
+			xChanged(_x);
+			_x = x;
 		}
-		if (parent != null) {
-			left.position += parent.left.position;
-			top.position += parent.top.position;
+		if (_y != y) {
+			yChanged(_y);
+			_y = y;
+		}
+		if (_width != width) {
+			widthChanged(_width);
+			_width = width;
+		}
+		if (_height != height) {
+			heightChanged(_height);
+			_height = height;
 		}
 	}
 
-	@:slot(childAdded)
-	function __childAdded__(child:Element) {
-		function insert(child:Element) {
-			for (c in visibleChildren)
-				if (c.index > child.index) {
-					visibleChildren.insert(c.index, child);
-					return;
-				}
-			visibleChildren.push(child);
-		}
-		if (child.visible)
-			insert(child);
-
-		var slot = v -> {
-			if (!v && child.visible)
-				insert(child);
-			else if (v && !child.visible)
-				visibleChildren.remove(child);
-		};
-		child.onVisibleChanged(slot);
-		child.onParentChanged(_ -> child.offVisibleChanged(slot));
+	function set__absX(value:Float):Float {
+		final d = value - _absX;
+		_absX = value;
+		for (c in children)
+			c._absX += d;
+		return _absX;
 	}
 
-	@:slot(childRemoved)
-	function __childRemoved__(child:Element) {
-		if (child.visible)
-			visibleChildren.remove(child);
+	function set__absY(value:Float):Float {
+		final d = value - _absY;
+		_absY = value;
+		for (c in children)
+			c._absY += d;
+		return _absY;
 	}
 
-	function set__x(value:Float) {
-		if (value != _x) {
-			final prev = _x;
-			_x = value;
-			xChanged(prev);
-		}
-		return _x;
+	function get_absX() {
+		return _absX;
 	}
 
-	function set__y(value:Float) {
-		if (value != _y) {
-			final prev = _y;
-			_y = value;
-			yChanged(prev);
-		}
-		return _y;
+	function set_absX(value:Float):Float {
+		x += value - absX;
+		return absX;
 	}
 
-	function set__width(value:Float) {
-		if (value != _width) {
-			final prev = _width;
-			_width = value;
-			widthChanged(prev);
-		}
-		return _width;
+	function get_absY() {
+		return _absY;
 	}
 
-	function set__height(value:Float) {
-		if (value != _height) {
-			final prev = _height;
-			_height = value;
-			heightChanged(prev);
-		}
-		return _height;
-	}
-
-	function get_x():Float {
-		return _x;
+	function set_absY(value:Float):Float {
+		y += value - absY;
+		return absY;
 	}
 
 	function set_x(value:Float):Float {
-		if (!left.isBinded) {
+		if (!(left.isBinded || right.isBinded || hCenter.isBinded) || anchoring) {
 			final d = value - x;
-			left.position += d;
-			if (!right.isBinded)
-				right.position += d;
-			for (c in children)
-				c.left.position += d;
+			x = value;
+			_absX += d;
+			if (!anchoring) {
+				left.adjust(d);
+				hCenter.adjust(d);
+				right.adjust(d);
+				geometryChanged();
+			}
 		}
 		return x;
 	}
 
-	function get_y():Float {
-		return _y;
-	}
-
-	function set_y(value:Float) {
-		if (!top.isBinded) {
+	function set_y(value:Float):Float {
+		if (!(top.isBinded || bottom.isBinded || vCenter.isBinded) || anchoring) {
 			final d = value - y;
-			top.position += d;
-			if (!bottom.isBinded)
-				bottom.position += d;
-			for (c in children)
-				c.top.position += d;
+			y = value;
+			_absY += d;
+			if (!anchoring) {
+				top.adjust(d);
+				vCenter.adjust(d);
+				bottom.adjust(d);
+				geometryChanged();
+			}
 		}
 		return y;
 	}
 
-	function get_width():Float {
-		return _width;
-	}
-
-	function set_width(value:Float) {
-		if (!right.isBinded)
-			right.position = left.position + value;
+	function set_width(value:Float):Float {
+		if (!((left.isBinded && right.isBinded) || (left.isBinded && hCenter.isBinded) || (right.isBinded && hCenter.isBinded))
+			|| anchoring) {
+			final prev = width;
+			width = value;
+			if (!anchoring) {
+				final d = width - prev;
+				if (!hCenter.isBinded && !right.isBinded) {
+					hCenter.adjust(d * 0.5);
+					right.adjust(d);
+				} else if (!left.isBinded && !hCenter.isBinded && right.isBinded) {
+					anchoring = true;
+					x -= d;
+					anchoring = false;
+					left.adjust(-d);
+					hCenter.adjust(-d * 0.5);
+				} else if (!left.isBinded && hCenter.isBinded && !right.isBinded) {
+					anchoring = true;
+					x -= d * 0.5;
+					anchoring = false;
+					left.adjust(-d * 0.5);
+					right.adjust(-d);
+				}
+				geometryChanged();
+			}
+		}
 		return width;
 	}
 
-	function get_height():Float {
-		return _height;
-	}
-
-	function set_height(value:Float) {
-		if (!bottom.isBinded)
-			bottom.position = top.position + value;
+	function set_height(value:Float):Float {
+		if (!((top.isBinded && bottom.isBinded) || (top.isBinded && vCenter.isBinded) || (bottom.isBinded && vCenter.isBinded))
+			|| anchoring) {
+			final prev = height;
+			height = value;
+			if (!anchoring) {
+				final d = height - prev;
+				if (!vCenter.isBinded && !bottom.isBinded) {
+					vCenter.adjust(d * 0.5);
+					bottom.adjust(d);
+				} else if (!top.isBinded && !vCenter.isBinded && bottom.isBinded) {
+					anchoring = true;
+					y -= d;
+					anchoring = false;
+					top.adjust(-d);
+					vCenter.adjust(-d * 0.5);
+				} else if (!top.isBinded && vCenter.isBinded && !bottom.isBinded) {
+					anchoring = true;
+					y -= d * 0.5;
+					anchoring = false;
+					top.adjust(-d * 0.5);
+					bottom.adjust(-d);
+				}
+				geometryChanged();
+			}
+		}
 		return height;
-	}
-
-	function get_anchors():Anchors {
-		return this;
 	}
 
 	function set_padding(value:Float) {

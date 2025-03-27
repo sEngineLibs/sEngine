@@ -2,6 +2,8 @@ package s2d.elements;
 
 import s2d.Direction;
 
+using se.extensions.ArrayExt;
+
 class Positioner extends Element {
 	var slots:Map<Element, {
 		widthChanged:Float->Void,
@@ -13,152 +15,175 @@ class Positioner extends Element {
 	}> = [];
 
 	@:isVar public var spacing(default, set):Float = 0.0;
-	@:inject(rebuild) public var direction:Direction = TopToBottom | LeftToRight;
-	@:inject(rebuild) public var axis:Axis = Horizontal;
+	@:isVar public var direction(default, set):Direction = TopToBottom | LeftToRight;
+	@:isVar public var axis(default, set):Axis;
 
-	public function new(?parent:Element) {
-		super(parent);
+	public function new(axis:Axis = Horizontal) {
+		super();
+		this.axis = axis;
 	}
 
-	@:slot(childAdded)
-	function addToPositioning(child:Element) {
-		if (axis == Vertical)
-			positionV(child, children[child.index - 1]);
-		else
-			positionH(child, children[child.index - 1]);
-
-		var childSlots = {
+	override function __childAdded__(child:Element) {
+		slots.set(child, {
 			widthChanged: (w:Float) -> adjustElementH(child, RightToLeft, w - child.width),
 			leftMarginChanged: (m:Float) -> adjustElementH(child, LeftToRight, child.left.margin - m),
 			rightMarginChanged: (m:Float) -> adjustElementH(child, RightToLeft, m - child.right.margin),
 			heightChanged: (w:Float) -> adjustElementV(child, BottomToTop, w - child.height),
 			topMarginChanged: (m:Float) -> adjustElementV(child, TopToBottom, child.top.margin - m),
 			bottomMarginChanged: (m:Float) -> adjustElementV(child, BottomToTop, m - child.bottom.margin)
-		};
-		slots.set(child, childSlots);
-
-		child.onWidthChanged(childSlots.widthChanged);
-		child.left.onMarginChanged(childSlots.leftMarginChanged);
-		child.right.onMarginChanged(childSlots.rightMarginChanged);
-		child.onHeightChanged(childSlots.heightChanged);
-		child.top.onMarginChanged(childSlots.topMarginChanged);
-		child.bottom.onMarginChanged(childSlots.bottomMarginChanged);
+		});
+		super.__childAdded__(child);
 	}
 
-	@:slot(childRemoved)
-	function removeFromPositioning(child:Element) {
-		var childSlots = slots.get(child);
+	override function __childRemoved__(child:Element) {
+		super.__childRemoved__(child);
 		slots.remove(child);
-
-		child.offWidthChanged(childSlots.widthChanged);
-		child.left.offMarginChanged(childSlots.leftMarginChanged);
-		child.right.offMarginChanged(childSlots.rightMarginChanged);
-		child.offHeightChanged(childSlots.heightChanged);
-		child.top.offMarginChanged(childSlots.topMarginChanged);
-		child.bottom.offMarginChanged(childSlots.bottomMarginChanged);
 	}
 
-	@:slot(widthChanged)
+	@:slot(vChildAdded)
+	function trackElement(el:Element) {
+		rebuild(vChildren.indexOf(el));
+		if (axis == Vertical)
+			trackElementV(el);
+		else
+			trackElementH(el);
+	}
+
+	@:slot(vChildRemoved)
+	function untrackElement(el:Element) {
+		if (axis == Vertical)
+			untrackElementV(el);
+		else
+			untrackElementH(el);
+	}
+
+	function trackElementH(el:Element) {
+		var childSlots = slots.get(el);
+		el.onWidthChanged(childSlots.widthChanged);
+		el.left.onMarginChanged(childSlots.leftMarginChanged);
+		el.right.onMarginChanged(childSlots.rightMarginChanged);
+	}
+
+	function trackElementV(el:Element) {
+		var childSlots = slots.get(el);
+		el.onHeightChanged(childSlots.heightChanged);
+		el.top.onMarginChanged(childSlots.topMarginChanged);
+		el.bottom.onMarginChanged(childSlots.bottomMarginChanged);
+	}
+
+	function untrackElementH(el:Element) {
+		var childSlots = slots.get(el);
+		el.offWidthChanged(childSlots.widthChanged);
+		el.left.offMarginChanged(childSlots.leftMarginChanged);
+		el.right.offMarginChanged(childSlots.rightMarginChanged);
+	}
+
+	function untrackElementV(el:Element) {
+		var childSlots = slots.get(el);
+		el.offWidthChanged(childSlots.widthChanged);
+		el.left.offMarginChanged(childSlots.leftMarginChanged);
+		el.right.offMarginChanged(childSlots.rightMarginChanged);
+	}
+
 	function syncWidth(v:Float) {
 		adjustH(RightToLeft, width - v);
 	}
 
-	@:slot(left.paddingChanged)
 	function syncLeftPadding(v:Float) {
 		adjustH(LeftToRight, left.padding - v);
 	}
 
-	@:slot(right.paddingChanged)
 	function syncRightPadding(v:Float) {
 		adjustH(RightToLeft, v - right.padding);
 	}
 
-	@:slot(heightChanged)
 	function syncHeight(v:Float) {
 		adjustV(BottomToTop, height - v);
 	}
 
-	@:slot(top.paddingChanged)
 	function syncTopPadding(v:Float) {
 		adjustV(TopToBottom, top.padding - v);
 	}
 
-	@:slot(bottom.paddingChanged)
 	function syncBottomPadding(v:Float) {
-		if (axis == Vertical)
-			adjustV(BottomToTop, v - bottom.padding);
+		adjustV(BottomToTop, v - bottom.padding);
 	}
 
-	function positionH(c:Element, prev:Element) {
+	function positionH(el:Element, prev:Element) {
 		if (prev == null) {
 			if (direction & RightToLeft != 0)
-				c.x = width - (c.width + c.right.margin + right.padding);
+				el.x = width - (el.width + el.right.margin + right.padding);
 			else
-				c.x = left.padding + c.left.margin;
+				el.x = el.left.margin;
 		} else {
 			if (direction & RightToLeft != 0)
-				c.x = prev.x - (prev.left.margin + spacing + c.right.margin + c.width);
+				el.x = prev.x - (prev.left.margin + spacing + el.right.margin + el.width);
 			else
-				c.x = prev.x + prev.width + prev.right.margin + spacing + c.left.margin;
+				el.x = prev.x + prev.width + prev.right.margin + spacing + el.left.margin;
 		}
 	}
 
-	function positionV(c:Element, prev:Element) {
+	function positionV(el:Element, prev:Element) {
 		if (prev == null) {
 			if (direction & BottomToTop != 0)
-				c.y = height - (c.height + c.bottom.margin + bottom.padding);
+				el.y = height - (el.height + el.bottom.margin + bottom.padding);
 			else
-				c.y = top.padding + c.top.margin;
+				el.y = el.top.margin;
 		} else {
 			if (direction & BottomToTop != 0)
-				c.y = prev.y - (prev.top.margin + spacing + c.bottom.margin + c.height);
+				el.y = prev.y - (prev.top.margin + spacing + el.bottom.margin + el.height);
 			else
-				c.y = prev.y + prev.height + prev.bottom.margin + spacing + c.top.margin;
+				el.y = prev.y + prev.height + prev.bottom.margin + spacing + el.top.margin;
 		}
 	}
 
 	function adjustH(dir:Direction, d:Float) {
-		if (axis == Horizontal)
-			if (direction & dir != 0)
-				for (c in children)
-					c.x += d;
+		if (direction & dir != 0)
+			for (c in vChildren)
+				c.x += d;
 	}
 
 	function adjustV(dir:Direction, d:Float) {
+		if (direction & dir != 0)
+			for (c in vChildren)
+				c.y += d;
+	}
+
+	function adjustElementH(el:Element, dir:Alignment, d:Float) {
+		if (direction & dir != 0)
+			for (i in el.index...vChildren.length)
+				vChildren[i].x += d;
+		else
+			for (i in (el.index + 1)...vChildren.length)
+				vChildren[i].x -= d;
+	}
+
+	function adjustElementV(el:Element, dir:Alignment, d:Float) {
+		if (direction & dir != 0)
+			for (i in el.index...vChildren.length)
+				vChildren[i].y += d;
+		else
+			for (i in (el.index + 1)...vChildren.length)
+				vChildren[i].y -= d;
+	}
+
+	function rebuild(offset:Int = 0) {
 		if (axis == Vertical)
-			if (direction & dir != 0)
-				for (c in children)
-					c.y += d;
+			rebuildV(offset);
+		else
+			rebuildH(offset);
 	}
 
-	function adjustElementH(e:Element, dir:Alignment, d:Float) {
-		if (axis == Horizontal)
-			if (direction & dir != 0)
-				for (c in children.slice(e.index))
-					c.x += d;
-			else
-				for (c in children.slice(e.index + 1))
-					c.x -= d;
+	function rebuildH(offset:Int = 0) {
+		if (vChildren.length > 0)
+			for (i in offset...vChildren.length)
+				positionH(vChildren[i], vChildren[i - 1]);
 	}
 
-	function adjustElementV(e:Element, dir:Alignment, d:Float) {
-		if (axis == Vertical)
-			if (direction & dir != 0)
-				for (c in children.slice(e.index))
-					c.y += d;
-			else
-				for (c in children.slice(e.index + 1))
-					c.y -= d;
-	}
-
-	function rebuild() {
-		if (children.length > 0)
-			if (axis == Vertical)
-				for (i in 0...visibleChildren.length)
-					positionV(visibleChildren[i], visibleChildren[i - 1]);
-			else
-				for (i in 0...visibleChildren.length)
-					positionH(visibleChildren[i], visibleChildren[i - 1]);
+	function rebuildV(offset:Int = 0) {
+		if (vChildren.length > 0)
+			for (i in offset...vChildren.length)
+				positionV(vChildren[i], vChildren[i - 1]);
 	}
 
 	function set_spacing(value:Float):Float {
@@ -169,19 +194,54 @@ class Positioner extends Element {
 		if (axis == Vertical) {
 			if (direction & RightToLeft != 0)
 				d = -d;
-			for (c in children) {
+			for (c in vChildren) {
 				c.x += offset;
 				offset += d;
 			}
 		} else {
 			if (direction & BottomToTop != 0)
 				d = -d;
-			for (c in children) {
+			for (c in vChildren) {
 				c.y += offset;
 				offset += d;
 			}
 		}
 		return spacing;
+	}
+
+	function set_direction(value:Direction):Direction {
+		direction = value;
+		rebuild();
+		return direction;
+	}
+
+	function set_axis(value:Axis) {
+		axis = value;
+		if (axis == Vertical) {
+			for (c in vChildren) {
+				untrackElementH(c);
+				trackElementV(c);
+			}
+			offWidthChanged(syncWidth);
+			left.offPaddingChanged(syncLeftPadding);
+			right.offPaddingChanged(syncRightPadding);
+			onHeightChanged(syncHeight);
+			top.onPaddingChanged(syncTopPadding);
+			bottom.onPaddingChanged(syncBottomPadding);
+		} else {
+			for (c in vChildren) {
+				untrackElementV(c);
+				trackElementH(c);
+			}
+			offHeightChanged(syncHeight);
+			top.offPaddingChanged(syncTopPadding);
+			bottom.offPaddingChanged(syncBottomPadding);
+			onWidthChanged(syncWidth);
+			left.onPaddingChanged(syncLeftPadding);
+			right.onPaddingChanged(syncRightPadding);
+		}
+		rebuild();
+		return axis;
 	}
 }
 

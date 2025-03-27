@@ -1,12 +1,11 @@
 package s2d.elements.layouts;
 
-import s2d.Anchors;
 import s2d.Direction;
-import s2d.Box.SingleElementBox;
+import s2d.anchors.Anchors;
 
 class VBoxLayout extends Element {
-	var cells:Array<SingleElementBox> = [];
-	var cellsSlots:Map<SingleElementBox, CellSlots> = [];
+	var cells:Array<LayoutCell> = [];
+	var cellsSlots:Map<LayoutCell, CellSlots> = [];
 
 	@:inject(syncFreeSpacePerCell) var fillCells:Int = 0;
 	@:inject(syncFreeSpacePerCell) var freeSpace:Float = 0.0;
@@ -15,13 +14,13 @@ class VBoxLayout extends Element {
 	@:isVar public var spacing(default, set):Float = 10.0;
 	@:inject(syncLayout) public var direction:Direction = TopToBottom;
 
-	public function new(?parent:Element) {
-		super(parent);
+	public function new() {
+		super();
 	}
 
 	@:slot(childAdded)
 	function addCell(child:Element) {
-		var cell = new SingleElementBox(child, this.left, new AnchorLine(1.0), this.right, new AnchorLine(-1.0));
+		var cell = new LayoutCell(child, this.left, new AnchorTop(child), this.right, new AnchorBottom(child));
 		var slots = {
 			requiredHeightChanged: (rh:Float) -> {
 				if (!cell.fillHeight)

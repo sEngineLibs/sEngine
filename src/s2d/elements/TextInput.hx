@@ -8,15 +8,16 @@ class TextInput extends Label {
 	public var cursor:Rectangle;
 	public var selection:Rectangle;
 
-	public function new(?parent:Element) {
-		super(parent);
+	public function new() {
+		super();
 
-		cursor = new Rectangle(this);
+		cursor = new Rectangle();
 		cursor.color = Black;
 		cursor.visible = false;
 		cursor.enabled = false;
 		cursor.width = fontSize / 10;
 		cursor.height = textHeight * 2;
+		addChild(cursor);
 
 		onFocusedChanged(f -> cursor.visible = f);
 		onFontSizeChanged(s -> {
