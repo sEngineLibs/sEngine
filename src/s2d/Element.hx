@@ -30,12 +30,12 @@ class Element extends PhysicalObject2D<Element> {
 	var scene:WindowScene;
 	var anchoring:Int = 0;
 
-	public var left:AnchorLineH = new AnchorLineH_S();
-	public var hCenter:AnchorLineH = new AnchorLineH_S();
-	public var right:AnchorLineH = new AnchorLineH_E();
-	public var top:AnchorLineV = new AnchorLineV_S();
-	public var vCenter:AnchorLineV = new AnchorLineV_S();
-	public var bottom:AnchorLineV = new AnchorLineV_E();
+	public var left:HorizontalAnchor = new LeftAnchor();
+	public var hCenter:HorizontalAnchor = new HCenterAnchor();
+	public var right:HorizontalAnchor = new RightAnchor();
+	public var top:VerticalAnchor = new TopAnchor();
+	public var vCenter:VerticalAnchor = new VCenterAnchor();
+	public var bottom:VerticalAnchor = new BottomAnchor();
 	public var anchors:ElementAnchors;
 	public var padding(never, set):Float;
 

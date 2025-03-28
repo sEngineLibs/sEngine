@@ -6,12 +6,12 @@ import s2d.Element;
 class ElementAnchors {
 	var el:Element;
 
-	public var left(get, set):AnchorLineH;
-	public var hCenter(get, set):AnchorLineH;
-	public var right(get, set):AnchorLineH;
-	public var top(get, set):AnchorLineV;
-	public var vCenter(get, set):AnchorLineV;
-	public var bottom(get, set):AnchorLineV;
+	public var left(get, set):HorizontalAnchor;
+	public var hCenter(get, set):HorizontalAnchor;
+	public var right(get, set):HorizontalAnchor;
+	public var top(get, set):VerticalAnchor;
+	public var vCenter(get, set):VerticalAnchor;
+	public var bottom(get, set):VerticalAnchor;
 
 	public var margins(never, set):Float;
 
@@ -25,7 +25,7 @@ class ElementAnchors {
 		vCenter = null;
 	}
 
-	overload extern public inline function fill(left:AnchorLineH, right:AnchorLineH, top:AnchorLineV, bottom:AnchorLineV) {
+	overload extern public inline function fill(left:HorizontalAnchor, right:HorizontalAnchor, top:VerticalAnchor, bottom:VerticalAnchor) {
 		fillWidth(left, right);
 		fillHeight(top, bottom);
 	}
@@ -34,7 +34,7 @@ class ElementAnchors {
 		fill(element.left, element.right, element.top, element.bottom);
 	}
 
-	overload extern public inline function fillWidth(left:AnchorLineH, right:AnchorLineH) {
+	overload extern public inline function fillWidth(left:HorizontalAnchor, right:HorizontalAnchor) {
 		this.left = left;
 		this.right = right;
 	}
@@ -43,7 +43,7 @@ class ElementAnchors {
 		fillWidth(element.left, element.right);
 	}
 
-	overload extern public inline function fillHeight(top:AnchorLineV, bottom:AnchorLineV) {
+	overload extern public inline function fillHeight(top:VerticalAnchor, bottom:VerticalAnchor) {
 		this.top = top;
 		this.bottom = bottom;
 	}
@@ -67,7 +67,7 @@ class ElementAnchors {
 		bottom = null;
 	}
 
-	overload extern public inline function centerIn(hCenter:AnchorLineH, vCenter:AnchorLineV) {
+	overload extern public inline function centerIn(hCenter:HorizontalAnchor, vCenter:VerticalAnchor) {
 		this.hCenter = hCenter;
 		this.vCenter = vCenter;
 	}
@@ -87,7 +87,7 @@ class ElementAnchors {
 		setMargins(value, value, value, value);
 	}
 
-	function bindH(ela:AnchorLineH, a:AnchorLineH) @:privateAccess {
+	function bindH(ela:HorizontalAnchor, a:HorizontalAnchor) @:privateAccess {
 		final el_x = el.x;
 		final el_width = el.width;
 		ela.bindTo(a);
@@ -99,7 +99,7 @@ class ElementAnchors {
 		}
 	}
 
-	function bindV(ea:AnchorLineV, a:AnchorLineV) @:privateAccess {
+	function bindV(ea:VerticalAnchor, a:VerticalAnchor) @:privateAccess {
 		final el_y = el.y;
 		final el_height = el.height;
 		ea.bindTo(a);
@@ -175,7 +175,7 @@ class ElementAnchors {
 @:build(se.macro.SMacro.build())
 @:autoBuild(se.macro.SMacro.build())
 #end
-abstract class AnchorLine<A:AnchorLine<A>> {
+abstract class Anchor<A:Anchor<A>> {
 	var lines:Array<A> = [];
 	var updating:Bool = false;
 	var _position:Float = 0.0;
@@ -240,24 +240,25 @@ abstract class AnchorLine<A:AnchorLine<A>> {
 	}
 
 	function set_bindedTo(value:A):A {
-		if (value != bindedTo && !hasLoop(value)) {
-			var offset = 0.0;
-			if (isBinded) {
-				bindedTo.lines.remove(cast this);
-				offset -= bindedTo.padding + margin;
-			}
-			if (value != null) {
-				value.lines.push(cast this);
-				position = value.position;
-				offset += value.padding + margin;
-			}
-			bindedTo = value;
-			if (isBinded)
-				bindedTo.session(() -> syncOffset(offset));
-			else
-				syncOffset(offset);
-		} else
-			Log.warning("Anchor binding loop detected!");
+		if (value != bindedTo)
+			if (!hasLoop(value)) {
+				var offset = 0.0;
+				if (isBinded) {
+					bindedTo.lines.remove(cast this);
+					offset -= bindedTo.padding + margin;
+				}
+				if (value != null) {
+					value.lines.push(cast this);
+					position = value.position;
+					offset += value.padding + margin;
+				}
+				bindedTo = value;
+				if (isBinded)
+					bindedTo.session(() -> syncOffset(offset));
+				else
+					syncOffset(offset);
+			} else
+				Log.warning("Anchor binding loop detected!");
 		return bindedTo;
 	}
 
@@ -287,29 +288,41 @@ abstract class AnchorLine<A:AnchorLine<A>> {
 	}
 }
 
-abstract class AnchorLineH extends AnchorLine<AnchorLineH> {}
+abstract class HorizontalAnchor extends Anchor<HorizontalAnchor> {}
 
-class AnchorLineH_S extends AnchorLineH {
+class LeftAnchor extends HorizontalAnchor {
 	function syncOffset(d:Float) {
 		position += d;
 	}
 }
 
-class AnchorLineH_E extends AnchorLineH {
+class HCenterAnchor extends HorizontalAnchor {
+	function syncOffset(d:Float) {
+		position += d;
+	}
+}
+
+class RightAnchor extends HorizontalAnchor {
 	function syncOffset(d:Float) {
 		position -= d;
 	}
 }
 
-abstract class AnchorLineV extends AnchorLine<AnchorLineV> {}
+abstract class VerticalAnchor extends Anchor<VerticalAnchor> {}
 
-class AnchorLineV_S extends AnchorLineV {
+class TopAnchor extends VerticalAnchor {
 	function syncOffset(d:Float) {
 		position += d;
 	}
 }
 
-class AnchorLineV_E extends AnchorLineV {
+class VCenterAnchor extends VerticalAnchor {
+	function syncOffset(d:Float) {
+		position += d;
+	}
+}
+
+class BottomAnchor extends VerticalAnchor {
 	function syncOffset(d:Float) {
 		position -= d;
 	}

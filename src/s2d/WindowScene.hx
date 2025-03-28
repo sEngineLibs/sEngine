@@ -34,12 +34,12 @@ class WindowScene {
 	@alias public var width:Int = window.width;
 	@alias public var height:Int = window.height;
 
-	public var left:AnchorLineH;
-	public var hCenter:AnchorLineH;
-	public var right:AnchorLineH;
-	public var top:AnchorLineV;
-	public var vCenter:AnchorLineV;
-	public var bottom:AnchorLineV;
+	public var left:HorizontalAnchor;
+	public var hCenter:HorizontalAnchor;
+	public var right:HorizontalAnchor;
+	public var top:VerticalAnchor;
+	public var vCenter:VerticalAnchor;
+	public var bottom:VerticalAnchor;
 
 	public function new(window:Window) {
 		WindowScene.current = this;
@@ -52,12 +52,12 @@ class WindowScene {
 			vCenter.position = top.position + h * 0.5;
 			resized(w, h);
 		});
-		left = new AnchorLineH_S(window.x);
-		hCenter = new AnchorLineH_S(window.x + window.width * 0.5);
-		right = new AnchorLineH_E(window.x + window.width);
-		top = new AnchorLineV_S(window.y);
-		vCenter = new AnchorLineV_S(window.y + window.height * 0.5);
-		bottom = new AnchorLineV_E(window.y + window.height);
+		left = new LeftAnchor(window.x);
+		hCenter = new HCenterAnchor(window.x + window.width * 0.5);
+		right = new RightAnchor(window.x + window.width);
+		top = new TopAnchor(window.y);
+		vCenter = new VCenterAnchor(window.y + window.height * 0.5);
+		bottom = new BottomAnchor(window.y + window.height);
 
 		onResized((x, y) -> backbuffer = new Texture(window.width, window.height));
 		resized(window.width, window.height);

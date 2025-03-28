@@ -16,12 +16,12 @@ class LayoutCell {
 	public var element:Element;
 	public var slots:ElementSlots;
 
-	public var left:AnchorLineH;
-	public var hCenter:AnchorLineH;
-	public var right:AnchorLineH;
-	public var top:AnchorLineV;
-	public var vCenter:AnchorLineV;
-	public var bottom:AnchorLineV;
+	public var left:HorizontalAnchor;
+	public var hCenter:HorizontalAnchor;
+	public var right:HorizontalAnchor;
+	public var top:VerticalAnchor;
+	public var vCenter:VerticalAnchor;
+	public var bottom:VerticalAnchor;
 
 	@track.single public var requiredWidth:Float;
 	@track.single public var requiredHeight:Float;
@@ -35,14 +35,14 @@ class LayoutCell {
 	@alias public var maximumHeight:Float = element.layout.maximumHeight;
 	@alias public var preferredHeight:Float = element.layout.preferredHeight;
 
-	public function new(el:Element, left:AnchorLineH, top:AnchorLineV, right:AnchorLineH, bottom:AnchorLineV) {
+	public function new(el:Element, left:HorizontalAnchor, top:VerticalAnchor, right:HorizontalAnchor, bottom:VerticalAnchor) {
 		element = el;
 		this.left = left;
 		this.top = top;
 		this.right = right;
 		this.bottom = bottom;
-		hCenter = new AnchorLineH_S(left.position + right.position * 0.5);
-		vCenter = new AnchorLineV_E(top.position + bottom.position * 0.5);
+		hCenter = new LeftAnchor(left.position + right.position * 0.5);
+		vCenter = new BottomAnchor(top.position + bottom.position * 0.5);
 
 		dirtyWidthSlot = (v:Float) -> if (!fillWidth) syncRequiredWidth();
 		dirtyLayoutWidthSlot = (v:Float) -> syncRequiredWidth();

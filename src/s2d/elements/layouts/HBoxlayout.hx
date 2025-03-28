@@ -23,7 +23,7 @@ class HBoxLayout extends Element {
 
 	@:slot(vChildAdded)
 	function add(child:Element) {
-		var cell = new LayoutCell(child, new AnchorLineH_S(), this.top, new AnchorLineH_E(), this.bottom);
+		var cell = new LayoutCell(child, new LeftAnchor(), this.top, new RightAnchor(), this.bottom);
 		var slots = {
 			requiredWidthChanged: (rw:Float) -> {
 				if (!cell.fillWidth)

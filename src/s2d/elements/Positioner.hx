@@ -192,17 +192,17 @@ class Positioner extends Element {
 
 		var offset = 0.0;
 		if (axis == Vertical) {
-			if (direction & RightToLeft != 0)
-				d = -d;
-			for (c in vChildren) {
-				c.x += offset;
-				offset += d;
-			}
-		} else {
 			if (direction & BottomToTop != 0)
 				d = -d;
 			for (c in vChildren) {
 				c.y += offset;
+				offset += d;
+			}
+		} else {
+			if (direction & RightToLeft != 0)
+				d = -d;
+			for (c in vChildren) {
+				c.x += offset;
 				offset += d;
 			}
 		}

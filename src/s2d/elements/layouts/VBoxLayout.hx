@@ -20,7 +20,7 @@ class VBoxLayout extends Element {
 
 	@:slot(childAdded)
 	function addCell(child:Element) {
-		var cell = new LayoutCell(child, this.left, new AnchorLineV_S(), this.right, new AnchorLineV_E());
+		var cell = new LayoutCell(child, this.left, new TopAnchor(), this.right, new BottomAnchor());
 		var slots = {
 			requiredHeightChanged: (rh:Float) -> {
 				if (!cell.fillHeight)
