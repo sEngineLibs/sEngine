@@ -65,7 +65,7 @@ class InteractiveElement extends Element {
 		onMouseClicked(m -> {
 			mouseButtonClicked(m.button, m);
 			if (!focused && (focusPolicy & ClickFocus != 0))
-				scene.focused = this;
+				this.scene.focused = this;
 		});
 		onMouseDoubleClicked(m -> mouseButtonDoubleClicked(m.button, m));
 	}

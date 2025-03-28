@@ -1,6 +1,5 @@
 package se.events;
 
-import se.input.Keyboard.KeyCode;
 import se.input.Mouse.MouseButton;
 
 typedef MouseEvent = {

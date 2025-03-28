@@ -60,17 +60,19 @@ class LayoutCell {
 		slots = {
 			alignmentChanged: a -> fit(el),
 			fillWidthChanged: fw -> {
-				if (!fw && el.layout.fillWidth)
+				if (!fw && el.layout.fillWidth) {
+					el.anchors.hCenter = null;
 					el.anchors.fillWidth(left, right);
-				else if (fw && !el.layout.fillWidth) {
+				} else if (fw && !el.layout.fillWidth) {
 					el.anchors.unfillWidth();
 					fitH(el);
 				}
 			},
 			fillHeightChanged: fh -> {
-				if (!fh && el.layout.fillHeight)
+				if (!fh && el.layout.fillHeight) {
+					el.anchors.vCenter = null;
 					el.anchors.fillHeight(top, bottom);
-				else if (fh && !el.layout.fillHeight) {
+				} else if (fh && !el.layout.fillHeight) {
 					el.anchors.unfillHeight();
 					fitV(el);
 				}

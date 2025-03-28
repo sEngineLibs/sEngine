@@ -17,17 +17,19 @@ class BoxLayout extends Element {
 		slots.set(child, {
 			alignmentChanged: a -> fit(child),
 			fillWidthChanged: fw -> {
-				if (!fw && child.layout.fillWidth)
+				if (!fw && child.layout.fillWidth) {
+					child.anchors.hCenter = null;
 					child.anchors.fillWidth(this);
-				else if (fw && !child.layout.fillWidth) {
+				} else if (fw && !child.layout.fillWidth) {
 					child.anchors.unfillWidth();
 					fitH(child);
 				}
 			},
 			fillHeightChanged: fh -> {
-				if (!fh && child.layout.fillHeight)
+				if (!fh && child.layout.fillHeight) {
+					child.anchors.vCenter = null;
 					child.anchors.fillHeight(this);
-				else if (fh && !child.layout.fillHeight) {
+				} else if (fh && !child.layout.fillHeight) {
 					child.anchors.unfillHeight();
 					fitV(child);
 				}

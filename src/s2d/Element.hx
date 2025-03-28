@@ -215,11 +215,11 @@ class Element extends PhysicalObject2D<Element> {
 			Log.warning("Anchor binding loop detected!");
 	}
 
-	@:slot(parentChanged)
-	function __parentChanged__(p:Element) {
-		if (p != null && parent == null)
+	override function __parentChanged__(previous:Element) {
+		super.__parentChanged__(previous);
+		if (previous != null && parent == null)
 			scene.elements.push(this);
-		else if (p == null && parent != null)
+		else if (previous == null && parent != null)
 			scene.elements.remove(this);
 	}
 

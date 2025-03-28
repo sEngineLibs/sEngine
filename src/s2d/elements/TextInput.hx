@@ -10,7 +10,7 @@ class TextInput extends Label {
 
 	public function new(?scene:WindowScene) {
 		super(scene);
-		
+
 		cursor = new Rectangle();
 		cursor.color = Black;
 		cursor.visible = false;

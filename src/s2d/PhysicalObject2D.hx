@@ -29,9 +29,7 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 	public var scale(get, set):Vec2;
 	public var rotation(get, set):Float;
 
-	public function new() {
-		onParentChanged(_ -> syncTransform());
-	}
+	public function new() {}
 
 	function insertVChild(el:This) {
 		for (i in 0...vChildren.length)
@@ -44,6 +42,11 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 
 	function removeVChild(el:This) {
 		vChildren.remove(el);
+	}
+
+	@:slot(parentChanged)
+	function __parentChanged__(previous:This) {
+		syncTransform();
 	}
 
 	@:slot(childAdded)
