@@ -104,6 +104,7 @@ class WindowScene {
 	}
 
 	function render(target:Framebuffer) {
+		final g2 = target.g2;
 		backbuffer.ctx2D.render(true, color, ctx -> {
 			for (e in elements)
 				e.render(backbuffer);
@@ -113,8 +114,6 @@ class WindowScene {
 				drawBounds(e, ctx);
 			#end
 		});
-
-		final g2 = target.g2;
 		g2.begin(true, color);
 		g2.drawImage(backbuffer, 0, 0);
 		g2.end();

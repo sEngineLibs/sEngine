@@ -1,4 +1,4 @@
-package s2d.elements.layouts;
+package s2d.layouts;
 
 import s2d.Alignment;
 
@@ -9,12 +9,13 @@ class BoxLayout extends Element {
 		alignmentChanged:Float->Void
 	}> = [];
 
-	public function new() {
-		super();
+	public function new(?scene:WindowScene) {
+		super(scene);
 	}
 
 	override function __childAdded__(child:Element) {
 		slots.set(child, {
+			alignmentChanged: a -> fit(child),
 			fillWidthChanged: fw -> {
 				if (!fw && child.layout.fillWidth)
 					child.anchors.fillWidth(this);
@@ -30,17 +31,6 @@ class BoxLayout extends Element {
 					child.anchors.unfillHeight();
 					fitV(child);
 				}
-			},
-			alignmentChanged: a -> {
-				unbind(child);
-				if (child.layout.fillWidth)
-					child.anchors.fillWidth(this);
-				else
-					fitH(child);
-				if (child.layout.fillHeight)
-					child.anchors.fillHeight(this);
-				else
-					fitV(child);
 			}
 		});
 		super.__childAdded__(child);
@@ -63,20 +53,11 @@ class BoxLayout extends Element {
 
 	@:slot(vChildRemoved)
 	function remove(child:Element) {
-		unbind(child);
 		var childSlots = slots.get(child);
+		child.anchors.clear();
 		child.layout.offFillWidthChanged(childSlots.fillWidthChanged);
 		child.layout.offFillHeightChanged(childSlots.fillHeightChanged);
 		child.layout.offAlignmentChanged(childSlots.alignmentChanged);
-	}
-
-	function unbind(el:Element) {
-		left.unbind(el.left);
-		top.unbind(el.top);
-		left.unbind(el.left);
-		bottom.unbind(el.bottom);
-		hCenter.unbind(el.hCenter);
-		vCenter.unbind(el.vCenter);
 	}
 
 	function fit(el:Element) {

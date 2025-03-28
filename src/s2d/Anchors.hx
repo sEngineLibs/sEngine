@@ -184,8 +184,10 @@ abstract class Anchor<A:Anchor<A>> {
 	public var isBinded(get, never):Bool;
 
 	@track public var position(get, set):Float;
-	@track public var padding(default, set):Float = 0.0;
+	public var padding(default, set):Float = 0.0;
 	@track public var margin(default, set):Float = 0.0;
+
+	@:signal function paddingChanged(padding:Float):Void;
 
 	public function new(?position:Float) {
 		if (position != null)
@@ -273,17 +275,22 @@ abstract class Anchor<A:Anchor<A>> {
 	}
 
 	function set_padding(value:Float):Float {
-		final d = value - padding;
+		final prev = padding;
 		padding = value;
-		for (line in lines)
-			line.syncOffset(d);
+		session(() -> {
+			final d = padding - prev;
+			for (line in lines)
+				line.syncOffset(d);
+		});
+		paddingChanged(prev);
 		return padding;
 	}
 
 	function set_margin(value:Float):Float {
 		final d = value - margin;
 		margin = value;
-		syncOffset(d);
+		if (isBinded)
+			bindedTo.session(() -> syncOffset(d));
 		return margin;
 	}
 }

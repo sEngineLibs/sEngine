@@ -11,19 +11,19 @@ import se.animation.Action.Actuator;
 abstract class Animation<T> {
 	var actuator:Actuator;
 
-	var _started:Void->Void = () -> {};
-	var _stopped:Void->Void = () -> {};
-	var _paused:Void->Void = () -> {};
-	var _resumed:Void->Void = () -> {};
+	var _onStart:Void->Void = () -> {};
+	var _onStop:Void->Void = () -> {};
+	var _onPause:Void->Void = () -> {};
+	var _onResume:Void->Void = () -> {};
 	var _tick:T->Void;
 
-	var isRunning:Bool = false;
-	var isPaused:Bool = false;
+	var _started:Bool = false;
+	var _paused:Bool = false;
 	var dTime:Float = 0.0;
 
 	public var from:T;
 	public var to:T;
-	public var running(get, set):Bool;
+	public var started(get, set):Bool;
 	public var paused(get, set):Bool;
 
 	@alias public var duration:Float = actuator.duration;
@@ -38,40 +38,40 @@ abstract class Animation<T> {
 	}
 
 	public function start() {
-		if (!running) {
+		if (!started) {
 			actuator.start = Time.time;
 			Action.actuators.push(actuator);
 		}
-		isRunning = true;
-		_started();
+		_started = true;
+		_onStart();
 		return this;
 	}
 
 	public function stop() {
-		if (running)
+		if (started)
 			actuator.stop();
-		isRunning = false;
-		_stopped();
+		_started = false;
+		_onStop();
 		return this;
 	}
 
 	public function pause() {
-		if (running && !paused) {
+		if (started && !paused) {
 			actuator.stop();
 			dTime = Time.time - actuator.start;
 		}
 		paused = true;
-		_paused();
+		_onPause();
 		return this;
 	}
 
 	public function resume() {
-		if (running && paused) {
+		if (started && paused) {
 			actuator.start = Time.time - dTime;
 			Action.actuators.push(actuator);
 		}
 		paused = false;
-		_resumed();
+		_onResume();
 		return this;
 	}
 
@@ -82,9 +82,9 @@ abstract class Animation<T> {
 	}
 
 	public function complete() {
-		if (running)
+		if (started)
 			actuator.complete();
-		running = false;
+		started = false;
 		return this;
 	}
 
@@ -94,22 +94,22 @@ abstract class Animation<T> {
 	}
 
 	public function onStarted(f:Void->Void) {
-		_started = f;
+		_onStart = f;
 		return this;
 	}
 
 	public function onStopped(f:Void->Void) {
-		_stopped = f;
+		_onStop = f;
 		return this;
 	}
 
 	public function onPaused(f:Void->Void) {
-		_paused = f;
+		_onPause = f;
 		return this;
 	}
 
 	public function onResumed(f:Void->Void) {
-		_resumed = f;
+		_onResume = f;
 		return this;
 	}
 
@@ -129,20 +129,20 @@ abstract class Animation<T> {
 
 	abstract function update(t:Float):T;
 
-	function get_running() {
-		return isRunning;
+	function get_started() {
+		return _started;
 	}
 
-	function set_running(value:Bool) {
-		if (!running && value)
+	function set_started(value:Bool) {
+		if (!started && value)
 			start();
-		else if (running && !value)
+		else if (started && !value)
 			stop();
 		return value;
 	}
 
 	function get_paused() {
-		return isPaused;
+		return _paused;
 	}
 
 	function set_paused(value:Bool) {

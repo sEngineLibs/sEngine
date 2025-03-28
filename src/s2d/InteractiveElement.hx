@@ -50,9 +50,9 @@ class InteractiveElement extends Element {
 
 	@:signal(button) function mouseButtonDoubleClicked(button:MouseButton, m:MouseButtonEvent);
 
-	public function new() {
-		super();
-		scene.interactives.unshift(this);
+	public function new(?scene:WindowScene) {
+		super(scene);
+		this.scene.interactives.unshift(this);
 
 		onKeyboardDown(keyboardKeyDown.emit);
 		onKeyboardUp(keyboardKeyUp.emit);

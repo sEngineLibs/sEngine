@@ -1,6 +1,6 @@
 package s2d.elements;
 
-import s2d.elements.shapes.Rectangle;
+import s2d.shapes.Rectangle;
 
 using se.extensions.StringExt;
 
@@ -8,9 +8,9 @@ class TextInput extends Label {
 	public var cursor:Rectangle;
 	public var selection:Rectangle;
 
-	public function new() {
-		super();
-
+	public function new(?scene:WindowScene) {
+		super(scene);
+		
 		cursor = new Rectangle();
 		cursor.color = Black;
 		cursor.visible = false;

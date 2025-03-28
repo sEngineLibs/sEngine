@@ -1,4 +1,4 @@
-package s2d.elements.layouts;
+package s2d.layouts;
 
 import s2d.Anchors;
 import s2d.Alignment;
@@ -41,8 +41,12 @@ class LayoutCell {
 		this.top = top;
 		this.right = right;
 		this.bottom = bottom;
-		hCenter = new LeftAnchor(left.position + right.position * 0.5);
-		vCenter = new BottomAnchor(top.position + bottom.position * 0.5);
+		hCenter = new HCenterAnchor((left.position + right.position) * 0.5);
+		vCenter = new VCenterAnchor((top.position + bottom.position) * 0.5);
+		left.onPositionChanged(p -> hCenter.position += (left.position - p) * 0.5);
+		right.onPositionChanged(p -> hCenter.position += (right.position - p) * 0.5);
+		top.onPositionChanged(p -> vCenter.position += (top.position - p) * 0.5);
+		bottom.onPositionChanged(p -> vCenter.position += (bottom.position - p) * 0.5);
 
 		dirtyWidthSlot = (v:Float) -> if (!fillWidth) syncRequiredWidth();
 		dirtyLayoutWidthSlot = (v:Float) -> syncRequiredWidth();
@@ -53,22 +57,21 @@ class LayoutCell {
 	}
 
 	public function add(el:Element) {
-		fit(el);
 		slots = {
 			alignmentChanged: a -> fit(el),
 			fillWidthChanged: fw -> {
 				if (!fw && el.layout.fillWidth)
-					fillH(el);
+					el.anchors.fillWidth(left, right);
 				else if (fw && !el.layout.fillWidth) {
-					unfillH(el);
+					el.anchors.unfillWidth();
 					fitH(el);
 				}
 			},
 			fillHeightChanged: fh -> {
 				if (!fh && el.layout.fillHeight)
-					fillV(el);
+					el.anchors.fillHeight(top, bottom);
 				else if (fh && !el.layout.fillHeight) {
-					unfillV(el);
+					el.anchors.unfillHeight();
 					fitV(el);
 				}
 			}
@@ -85,6 +88,7 @@ class LayoutCell {
 		el.layout.onFillWidthChanged(slots.fillWidthChanged);
 		el.layout.onFillHeightChanged(slots.fillHeightChanged);
 
+		fit(el);
 		syncRequiredWidth();
 		syncRequiredHeight();
 	}
@@ -157,26 +161,6 @@ class LayoutCell {
 			el.anchors.vCenter = vCenter;
 		else
 			el.anchors.top = top;
-	}
-
-	public function fillH(el:Element) {
-		left.bind(el.left);
-		right.bind(el.right);
-	}
-
-	public function fillV(el:Element) {
-		top.bind(el.top);
-		bottom.bind(el.bottom);
-	}
-
-	public function unfillH(el:Element) {
-		left.unbind(el.left);
-		right.unbind(el.right);
-	}
-
-	public function unfillV(el:Element) {
-		top.unbind(el.top);
-		bottom.unbind(el.bottom);
 	}
 }
 

@@ -66,26 +66,28 @@ class Element extends PhysicalObject2D<Element> {
 	public var rect(get, set):Rect;
 	public var contentRect(get, set):Rect;
 
-	public function new() @:privateAccess {
-		anchors = new ElementAnchors(this);
-
+	public function new(?scene:WindowScene) @:privateAccess {
 		super();
-		if (parent == null) {
-			scene = WindowScene.current;
-			scene.elements.push(this);
-		} else
-			scene = parent.scene;
+		this.scene = scene ?? WindowScene.current;
+		this.scene.elements.push(this);
+		anchors = new ElementAnchors(this);
+		left = new LeftAnchor();
+		hCenter = new HCenterAnchor();
+		right = new RightAnchor();
+		top = new TopAnchor();
+		vCenter = new VCenterAnchor();
+		bottom = new BottomAnchor();
 	}
 
 	override function __childAdded__(child:Element) {
-		child.absX += absX;
-		child.absY += absY;
+		child._absX = absX + child.x;
+		child._absY = absY + child.y;
 		super.__childAdded__(child);
 	}
 
 	override function __childRemoved__(child:Element) {
-		child.absX -= absX;
-		child.absY -= absY;
+		child._absX = absX - child.x;
+		child._absY = absY - child.y;
 		super.__childRemoved__(child);
 	}
 
@@ -207,10 +209,18 @@ class Element extends PhysicalObject2D<Element> {
 	function anchor(f:Void->Void) {
 		if (++anchoring == 1) {
 			f();
-			geometryChanged();
 			--anchoring;
+			geometryChanged();
 		} else
 			Log.warning("Anchor binding loop detected!");
+	}
+
+	@:slot(parentChanged)
+	function __parentChanged__(p:Element) {
+		if (p != null && parent == null)
+			scene.elements.push(this);
+		else if (p == null && parent != null)
+			scene.elements.remove(this);
 	}
 
 	@:slot(left.positionChanged)
@@ -337,17 +347,29 @@ class Element extends PhysicalObject2D<Element> {
 			});
 	}
 
-	function set__absX(value:Float):Float {
+	function set__absX(value:Float):Float @:privateAccess {
 		final d = value - _absX;
 		_absX = value;
+		if (anchoring == 0)
+			anchor(() -> {
+				left.adjust(d);
+				hCenter.adjust(d);
+				right.adjust(d);
+			});
 		for (c in children)
 			c._absX += d;
 		return _absX;
 	}
 
-	function set__absY(value:Float):Float {
+	function set__absY(value:Float):Float @:privateAccess {
 		final d = value - _absY;
 		_absY = value;
+		if (anchoring == 0)
+			anchor(() -> {
+				top.adjust(d);
+				vCenter.adjust(d);
+				bottom.adjust(d);
+			});
 		for (c in children)
 			c._absY += d;
 		return _absY;
@@ -371,32 +393,20 @@ class Element extends PhysicalObject2D<Element> {
 		return absY;
 	}
 
-	function set_x(value:Float):Float @:privateAccess {
+	function set_x(value:Float):Float {
 		if (!(left.isBinded || right.isBinded || hCenter.isBinded) || anchoring > 0) {
 			final d = value - x;
 			x = value;
 			_absX += d;
-			if (anchoring == 0)
-				anchor(() -> {
-					left.adjust(d);
-					hCenter.adjust(d);
-					right.adjust(d);
-				});
 		}
 		return x;
 	}
 
-	function set_y(value:Float):Float @:privateAccess {
+	function set_y(value:Float):Float {
 		if (!(top.isBinded || bottom.isBinded || vCenter.isBinded) || anchoring > 0) {
 			final d = value - y;
 			y = value;
 			_absY += d;
-			if (anchoring == 0)
-				anchor(() -> {
-					top.adjust(d);
-					vCenter.adjust(d);
-					bottom.adjust(d);
-				});
 		}
 		return y;
 	}

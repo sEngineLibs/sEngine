@@ -1,5 +1,6 @@
 package se;
 
+import se.animation.Action;
 import kha.Assets;
 import kha.System;
 import se.Time;
@@ -19,7 +20,10 @@ class App {
 	public static var scenes:Array<WindowScene>;
 
 	public static function start(options:SystemOptions, setup:Void->Void) {
-		onUpdate(Time.update);
+		onUpdate(() -> @:privateAccess {
+			Time.update();
+			Action.update(Time.time);
+		});
 
 		System.start(options, function(window) {
 			App.input = {

@@ -6,7 +6,7 @@ import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 import se.Texture;
 import se.math.VectorMath;
-import s2d.elements.shapes.RoundedRectangle;
+import s2d.shapes.RoundedRectangle;
 
 @:access(s2d.Element)
 class RectDrawer extends ElementDrawer<RoundedRectangle> {

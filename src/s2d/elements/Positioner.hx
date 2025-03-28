@@ -14,12 +14,12 @@ class Positioner extends Element {
 		bottomMarginChanged:Float->Void
 	}> = [];
 
-	@:isVar public var spacing(default, set):Float = 0.0;
+	@:isVar public var spacing(default, set):Float = 10.0;
 	@:isVar public var direction(default, set):Direction = TopToBottom | LeftToRight;
 	@:isVar public var axis(default, set):Axis;
 
-	public function new(axis:Axis = Horizontal) {
-		super();
+	public function new(axis:Axis = Horizontal, ?scene:WindowScene) {
+		super(scene);
 		this.axis = axis;
 	}
 
