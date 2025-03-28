@@ -3,7 +3,11 @@ package s2d.elements.layouts;
 import s2d.Alignment;
 
 class BoxLayout extends Element {
-	var slots:Map<Element, LayoutSlots> = [];
+	var slots:Map<Element, {
+		fillWidthChanged:Bool->Void,
+		fillHeightChanged:Bool->Void,
+		alignmentChanged:Float->Void
+	}> = [];
 
 	public function new() {
 		super();
@@ -28,7 +32,7 @@ class BoxLayout extends Element {
 				}
 			},
 			alignmentChanged: a -> {
-				child.anchors.clear();
+				unbind(child);
 				if (child.layout.fillWidth)
 					child.anchors.fillWidth(this);
 				else
@@ -45,10 +49,11 @@ class BoxLayout extends Element {
 	override function __childRemoved__(child:Element) {
 		super.__childRemoved__(child);
 		slots.remove(child);
+		child.anchors.clear();
 	}
 
 	@:slot(vChildAdded)
-	function track(child:Element) {
+	function add(child:Element) {
 		fit(child);
 		var childSlots = slots.get(child);
 		child.layout.onFillWidthChanged(childSlots.fillWidthChanged);
@@ -57,41 +62,50 @@ class BoxLayout extends Element {
 	}
 
 	@:slot(vChildRemoved)
-	function untrack(child:Element) {
+	function remove(child:Element) {
+		unbind(child);
 		var childSlots = slots.get(child);
 		child.layout.offFillWidthChanged(childSlots.fillWidthChanged);
 		child.layout.offFillHeightChanged(childSlots.fillHeightChanged);
 		child.layout.offAlignmentChanged(childSlots.alignmentChanged);
 	}
 
+	function unbind(el:Element) {
+		left.unbind(el.left);
+		top.unbind(el.top);
+		left.unbind(el.left);
+		bottom.unbind(el.bottom);
+		hCenter.unbind(el.hCenter);
+		vCenter.unbind(el.vCenter);
+	}
+
 	function fit(el:Element) {
-		fitH(el);
-		fitV(el);
+		el.anchors.clear();
+		if (el.layout.fillWidth)
+			el.anchors.fillWidth(this);
+		else
+			fitH(el);
+		if (el.layout.fillHeight)
+			el.anchors.fillHeight(this);
+		else
+			fitV(el);
 	}
 
 	function fitH(el:Element) {
-		final a = el.layout.alignment;
-		if (a & AlignRight != 0)
+		if (el.layout.alignment & AlignRight != 0)
 			el.anchors.right = right;
-		else if (a & AlignHCenter != 0)
+		else if (el.layout.alignment & AlignHCenter != 0)
 			el.anchors.hCenter = hCenter;
 		else
 			el.anchors.left = left;
 	}
 
 	function fitV(el:Element) {
-		final a = el.layout.alignment;
-		if (a & AlignBottom != 0)
+		if (el.layout.alignment & AlignBottom != 0)
 			el.anchors.bottom = bottom;
-		else if (a & AlignVCenter != 0)
+		else if (el.layout.alignment & AlignVCenter != 0)
 			el.anchors.vCenter = vCenter;
 		else
 			el.anchors.top = top;
 	}
-}
-
-private typedef LayoutSlots = {
-	fillWidthChanged:Bool->Void,
-	fillHeightChanged:Bool->Void,
-	alignmentChanged:Float->Void
 }

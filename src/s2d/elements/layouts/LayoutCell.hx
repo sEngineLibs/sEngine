@@ -1,29 +1,13 @@
 package s2d.elements.layouts;
 
+import s2d.Anchors;
 import s2d.Alignment;
-import s2d.anchors.AnchorLine;
 
 #if !macro
 @:build(se.macro.SMacro.build())
 #end
 @:dox(hide)
 class LayoutCell {
-	static function adjustElementWidth(el:Element, alignment:Alignment, d:Float) {
-		if (!el.layout.fillWidth)
-			if (el.layout.alignment & alignment != 0)
-				el.x += d;
-			else if (el.layout.alignment & AlignHCenter != 0)
-				el.x += d * 0.5;
-	}
-
-	static function adjustElementHeight(el:Element, alignment:Alignment, d:Float) {
-		if (!el.layout.fillHeight)
-			if (el.layout.alignment & alignment != 0)
-				el.y += d;
-			else if (el.layout.alignment & AlignVCenter != 0)
-				el.y += d * 0.5;
-	}
-
 	var dirtyWidthSlot:Float->Void;
 	var dirtyLayoutWidthSlot:Float->Void;
 	var dirtyHeightSlot:Float->Void;
@@ -32,12 +16,12 @@ class LayoutCell {
 	public var element:Element;
 	public var slots:ElementSlots;
 
-	public var left:AnchorLineHorizontal;
-	public var top:AnchorLineVertical;
-	public var right:AnchorLineHorizontal;
-	public var bottom:AnchorLineVertical;
-	public var hCenter:AnchorLineHorizontal;
-	public var vCenter:AnchorLineVertical;
+	public var left:AnchorLineH;
+	public var hCenter:AnchorLineH;
+	public var right:AnchorLineH;
+	public var top:AnchorLineV;
+	public var vCenter:AnchorLineV;
+	public var bottom:AnchorLineV;
 
 	@track.single public var requiredWidth:Float;
 	@track.single public var requiredHeight:Float;
@@ -51,118 +35,72 @@ class LayoutCell {
 	@alias public var maximumHeight:Float = element.layout.maximumHeight;
 	@alias public var preferredHeight:Float = element.layout.preferredHeight;
 
-	public function new(el:Element, left:AnchorLineHorizontal, top:AnchorLineVertical, right:AnchorLineHorizontal, bottom:AnchorLineVertical) {
+	public function new(el:Element, left:AnchorLineH, top:AnchorLineV, right:AnchorLineH, bottom:AnchorLineV) {
 		element = el;
 		this.left = left;
 		this.top = top;
 		this.right = right;
 		this.bottom = bottom;
+		hCenter = new AnchorLineH_S(left.position + right.position * 0.5);
+		vCenter = new AnchorLineV_E(top.position + bottom.position * 0.5);
 
 		dirtyWidthSlot = (v:Float) -> if (!fillWidth) syncRequiredWidth();
 		dirtyLayoutWidthSlot = (v:Float) -> syncRequiredWidth();
 		dirtyHeightSlot = (v:Float) -> if (!fillHeight) syncRequiredHeight();
 		dirtyLayoutHeightSlot = (v:Float) -> syncRequiredHeight();
 
-		left.onPositionChanged((previous:Float) -> adjustWidth(AlignLeft, left.position - previous));
-		top.onPositionChanged((previous:Float) -> adjustHeight(AlignTop, top.position - previous));
-		right.onPositionChanged((previous:Float) -> adjustWidth(AlignRight, right.position - previous));
-		bottom.onPositionChanged((previous:Float) -> adjustHeight(AlignBottom, bottom.position - previous));
-
-		if (element.visible)
-			add(element);
+		add(el);
 	}
 
 	public function add(el:Element) {
-		syncRequiredWidth();
-		syncRequiredHeight();
 		fit(el);
-		fill(el);
-		var slots = {
-			widthChanged: (w:Float) -> {
-				LayoutCell.adjustElementWidth(el, AlignRight, w - el.width);
+		slots = {
+			alignmentChanged: a -> fit(el),
+			fillWidthChanged: fw -> {
+				if (!fw && el.layout.fillWidth)
+					fillH(el);
+				else if (fw && !el.layout.fillWidth) {
+					unfillH(el);
+					fitH(el);
+				}
 			},
-			heightChanged: (h:Float) -> LayoutCell.adjustElementHeight(el, AlignBottom, h - el.height),
-			leftMarginChanged: (m:Float) -> LayoutCell.adjustElementWidth(el, AlignLeft, el.left.margin - m),
-			topMarginChanged: (m:Float) -> LayoutCell.adjustElementHeight(el, AlignTop, el.top.margin - m),
-			rightMarginChanged: (m:Float) -> LayoutCell.adjustElementWidth(el, AlignRight, m - el.right.margin),
-			bottomMarginChanged: (m:Float) -> LayoutCell.adjustElementHeight(el, AlignBottom, m - el.bottom.margin),
-			layout: {
-				alignmentChanged: a -> fit(el),
-				fillWidthChanged: fw -> {
-					if (!fw && el.layout.fillWidth)
-						fillH(el);
-					else if (fw && !el.layout.fillWidth) {
-						unfillH(el);
-						fitH(el);
-					}
-				},
-				fillHeightChanged: fh -> {
-					if (!fh && el.layout.fillHeight)
-						fillV(el);
-					else if (fh && !el.layout.fillHeight) {
-						unfillV(el);
-						fitV(el);
-					}
+			fillHeightChanged: fh -> {
+				if (!fh && el.layout.fillHeight)
+					fillV(el);
+				else if (fh && !el.layout.fillHeight) {
+					unfillV(el);
+					fitV(el);
 				}
 			}
 		};
-		el.onWidthChanged(slots.widthChanged);
-		el.onHeightChanged(slots.heightChanged);
-		el.left.onMarginChanged(slots.leftMarginChanged);
-		el.top.onMarginChanged(slots.topMarginChanged);
-		el.right.onMarginChanged(slots.rightMarginChanged);
-		el.bottom.onMarginChanged(slots.bottomMarginChanged);
-		el.layout.onAlignmentChanged(slots.layout.alignmentChanged);
-		el.layout.onFillWidthChanged(slots.layout.fillWidthChanged);
-		el.layout.onFillHeightChanged(slots.layout.fillHeightChanged);
-		addElementSlots(el, slots);
-
-		var childSlot = v -> {
-			if (!v && el.visible)
-				add(el);
-			else if (v && !el.visible)
-				remove(el);
-		}
-		el.onVisibleChanged(childSlot);
-		el.onParentChanged(_ -> el.offVisibleChanged(childSlot));
-	}
-
-	public function remove(el:Element) {
-		unfill(el);
-		var slots = removeElementSlots(el);
-		el.offWidthChanged(slots.widthChanged);
-		el.offHeightChanged(slots.heightChanged);
-		el.left.offMarginChanged(slots.leftMarginChanged);
-		el.top.offMarginChanged(slots.topMarginChanged);
-		el.right.offMarginChanged(slots.rightMarginChanged);
-		el.bottom.offMarginChanged(slots.bottomMarginChanged);
-		el.layout.offAlignmentChanged(slots.layout.alignmentChanged);
-		el.layout.offFillWidthChanged(slots.layout.fillWidthChanged);
-		el.layout.offFillHeightChanged(slots.layout.fillHeightChanged);
-	}
-
-	function addElementSlots(el:Element, slots:ElementSlots) {
 		el.onWidthChanged(dirtyWidthSlot);
+		el.onHeightChanged(dirtyHeightSlot);
 		el.layout.onMinimumWidthChanged(dirtyLayoutWidthSlot);
 		el.layout.onMaximumWidthChanged(dirtyLayoutWidthSlot);
 		el.layout.onPreferredWidthChanged(dirtyLayoutWidthSlot);
-		el.onHeightChanged(dirtyHeightSlot);
 		el.layout.onMinimumHeightChanged(dirtyLayoutHeightSlot);
 		el.layout.onMaximumHeightChanged(dirtyLayoutHeightSlot);
 		el.layout.onPreferredHeightChanged(dirtyLayoutHeightSlot);
-		this.slots = slots;
+		el.layout.onAlignmentChanged(slots.alignmentChanged);
+		el.layout.onFillWidthChanged(slots.fillWidthChanged);
+		el.layout.onFillHeightChanged(slots.fillHeightChanged);
+
+		syncRequiredWidth();
+		syncRequiredHeight();
 	}
 
-	function removeElementSlots(el:Element):ElementSlots {
+	public function remove(el:Element) {
 		el.offWidthChanged(dirtyWidthSlot);
+		el.offHeightChanged(dirtyHeightSlot);
 		el.layout.offMinimumWidthChanged(dirtyLayoutWidthSlot);
 		el.layout.offMaximumWidthChanged(dirtyLayoutWidthSlot);
 		el.layout.offPreferredWidthChanged(dirtyLayoutWidthSlot);
-		el.offHeightChanged(dirtyHeightSlot);
 		el.layout.offMinimumHeightChanged(dirtyLayoutHeightSlot);
 		el.layout.offMaximumHeightChanged(dirtyLayoutHeightSlot);
 		el.layout.offPreferredHeightChanged(dirtyLayoutHeightSlot);
-		return this.slots;
+		el.layout.offAlignmentChanged(slots.alignmentChanged);
+		el.layout.offFillWidthChanged(slots.fillWidthChanged);
+		el.layout.offFillHeightChanged(slots.fillHeightChanged);
 	}
 
 	public function syncRequiredWidth() {
@@ -191,61 +129,34 @@ class LayoutCell {
 		return element.top.margin + Math.max(Math.min(height, maximumHeight), minimumHeight) + element.bottom.margin;
 	}
 
-	function adjustWidth(alignment:Alignment, d:Float) {
-		LayoutCell.adjustElementWidth(element, alignment, d);
-	}
-
-	function adjustHeight(alignment:Alignment, d:Float) {
-		LayoutCell.adjustElementHeight(element, alignment, d);
-	}
-
-	public function fit(el:Element) {
-		if (!el.layout.fillWidth)
+	function fit(el:Element) {
+		el.anchors.clear();
+		if (el.layout.fillWidth)
+			el.anchors.fillWidth(left, right);
+		else
 			fitH(el);
-		if (!el.layout.fillHeight)
+		if (el.layout.fillHeight)
+			el.anchors.fillHeight(top, bottom);
+		else
 			fitV(el);
 	}
 
-	public function fitH(el:Element) @:privateAccess {
-		var l = left.position + left.padding + el.left.margin;
-		var r = right.position - right.padding - el.right.margin - el.width;
-
+	function fitH(el:Element) {
 		if (el.layout.alignment & AlignRight != 0)
-			el.left.position = r;
+			el.anchors.right = right;
 		else if (el.layout.alignment & AlignHCenter != 0)
-			el.left.position = (l + r) * 0.5;
+			el.anchors.hCenter = hCenter;
 		else
-			el.left.position = l;
-
-		el.right.position = el.left.position + el.width;
+			el.anchors.left = left;
 	}
 
-	public function fitV(el:Element) {
-		var t = top.position + top.padding + el.top.margin;
-		var b = bottom.position - bottom.padding - el.bottom.margin - el.height;
-
+	function fitV(el:Element) {
 		if (el.layout.alignment & AlignBottom != 0)
-			el.top.position = b;
+			el.anchors.bottom = bottom;
 		else if (el.layout.alignment & AlignVCenter != 0)
-			el.top.position = (t + b) * 0.5;
+			el.anchors.vCenter = vCenter;
 		else
-			el.top.position = t;
-
-		el.bottom.position = el.top.position + el.height;
-	}
-
-	public function fill(el:Element) {
-		if (el.layout.fillWidth)
-			fillH(el);
-		if (el.layout.fillHeight)
-			fillV(el);
-	}
-
-	public function unfill(el:Element) {
-		if (el.layout.fillWidth)
-			unfillH(el);
-		if (el.layout.fillHeight)
-			unfillV(el);
+			el.anchors.top = top;
 	}
 
 	public function fillH(el:Element) {
@@ -270,13 +181,7 @@ class LayoutCell {
 }
 
 private typedef ElementSlots = {
-	widthChanged:Float->Void,
-	heightChanged:Float->Void,
-	leftMarginChanged:Float->Void,
-	topMarginChanged:Float->Void,
-	rightMarginChanged:Float->Void,
-	bottomMarginChanged:Float->Void,
-	layout:{
-		alignmentChanged:Alignment->Void, fillWidthChanged:Bool->Void, fillHeightChanged:Bool->Void
-	}
+	alignmentChanged:Alignment->Void,
+	fillWidthChanged:Bool->Void,
+	fillHeightChanged:Bool->Void
 }

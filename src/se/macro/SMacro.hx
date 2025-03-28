@@ -483,10 +483,14 @@ class SMacro extends Builder {
 		var e = traverse(expr1, e -> switch e.expr {
 			case EReturn(e):
 				injected = true;
+				// if (e != null) macro {
+				// 	final __result__ = $e;
+				// 	${expr2};
+				// 	return __result__;
+				// } else 
 				macro {
-					final __result__ = $e;
 					${expr2};
-					return __result__;
+					return $e;
 				}
 			default: e;
 		});

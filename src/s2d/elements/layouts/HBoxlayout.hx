@@ -1,11 +1,14 @@
 package s2d.elements.layouts;
 
+import s2d.Anchors;
 import s2d.Direction;
-import s2d.anchors.Anchors;
 
 class HBoxLayout extends Element {
 	var cells:Array<LayoutCell> = [];
-	var cellsSlots:Map<LayoutCell, CellSlots> = [];
+	var cellsSlots:Map<LayoutCell, {
+		requiredWidthChanged:Float->Void,
+		fillWidthChanged:Bool->Void
+	}> = [];
 
 	@:inject(syncFreeSpacePerCell) var fillCells:Int = 0;
 	@:inject(syncFreeSpacePerCell) var freeSpace:Float = 0.0;
@@ -18,9 +21,9 @@ class HBoxLayout extends Element {
 		super();
 	}
 
-	@:slot(childAdded)
-	function addCell(child:Element) {
-		var cell = new LayoutCell(child, new AnchorLeft(child), this.top, new AnchorRight(child), this.bottom);
+	@:slot(vChildAdded)
+	function add(child:Element) {
+		var cell = new LayoutCell(child, new AnchorLineH_S(), this.top, new AnchorLineH_E(), this.bottom);
 		var slots = {
 			requiredWidthChanged: (rw:Float) -> {
 				if (!cell.fillWidth)
@@ -43,20 +46,18 @@ class HBoxLayout extends Element {
 		freeSpace -= cell.requiredWidth + (cells.length > 1 ? spacing : 0.0);
 	}
 
-	@:slot(childRemoved)
-	function removeCell(child:Element) {
-		if (child.visible)
-			for (c in cells) {
-				if (c.element == child) {
-					var slots = cellsSlots.get(c);
-					c.remove(child);
-					c.offRequiredWidthChanged(slots.requiredWidthChanged);
-					child.layout.offFillWidthChanged(slots.fillWidthChanged);
-					cells.remove(c);
-					cellsSlots.remove(c);
-					freeSpace += c.requiredWidth + (cells.length > 1 ? spacing : 0.0);
-					return;
-				}
+	@:slot(vChildRemoved)
+	function remove(child:Element) {
+		for (cell in cells)
+			if (cell.element == child) {
+				var slots = cellsSlots.get(cell);
+				cell.remove(child);
+				cell.offRequiredWidthChanged(slots.requiredWidthChanged);
+				child.layout.offFillWidthChanged(slots.fillWidthChanged);
+				cells.remove(cell);
+				cellsSlots.remove(cell);
+				freeSpace += cell.requiredWidth + (cells.length > 1 ? spacing : 0.0);
+				return;
 			}
 	}
 
@@ -94,6 +95,7 @@ class HBoxLayout extends Element {
 					cell.left.position = prev.right.position + spacing;
 					cell.right.position = cell.left.position + cell.requiredWidth + freeSpacePerCell;
 					prev = cell;
+					trace(cell.requiredWidth);
 				}
 			}
 		}
@@ -120,9 +122,4 @@ class HBoxLayout extends Element {
 		freeSpace += d * (cells.length - 1);
 		return spacing;
 	}
-}
-
-private typedef CellSlots = {
-	requiredWidthChanged:Float->Void,
-	fillWidthChanged:Bool->Void
 }

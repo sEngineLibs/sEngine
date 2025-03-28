@@ -1,7 +1,7 @@
 package s2d.elements.layouts;
 
+import s2d.Anchors;
 import s2d.Direction;
-import s2d.anchors.Anchors;
 
 class VBoxLayout extends Element {
 	var cells:Array<LayoutCell> = [];
@@ -20,7 +20,7 @@ class VBoxLayout extends Element {
 
 	@:slot(childAdded)
 	function addCell(child:Element) {
-		var cell = new LayoutCell(child, this.left, new AnchorTop(child), this.right, new AnchorBottom(child));
+		var cell = new LayoutCell(child, this.left, new AnchorLineV_S(), this.right, new AnchorLineV_E());
 		var slots = {
 			requiredHeightChanged: (rh:Float) -> {
 				if (!cell.fillHeight)
