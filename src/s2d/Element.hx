@@ -39,7 +39,7 @@ class Element extends PhysicalObject2D<Element> {
 	public var anchors:ElementAnchors;
 	public var padding(never, set):Float;
 
-	public var layout:ElementLayout = new ElementLayout();
+	public var layout:Layout = new Layout();
 	public var opacity:Float = 1.0;
 
 	@:isVar var _absX(default, set):Float = 0.0;
@@ -212,7 +212,7 @@ class Element extends PhysicalObject2D<Element> {
 			--anchoring;
 			geometryChanged();
 		} else
-			Log.warning("Anchor binding loop detected!");
+			Log.warning("Possible anchor binding loop detected!");
 	}
 
 	override function __parentChanged__(previous:Element) {
@@ -225,153 +225,157 @@ class Element extends PhysicalObject2D<Element> {
 
 	@:slot(left.positionChanged)
 	function syncLeft(p:Float) @:privateAccess {
-		if (!(right.isBinded && hCenter.isBinded))
+		if (!(right.isBinded && hCenter.isBinded) && anchoring == 0)
 			anchor(() -> {
 				final d = left.position - p;
-				absX += d;
+				x += d;
 				if (!right.isBinded && !hCenter.isBinded) {
-					hCenter.adjust(d);
-					right.adjust(d);
+					hCenter.position += d;
+					right.position += d;
 				} else if (right.isBinded && !hCenter.isBinded) {
 					width -= d;
-					hCenter.adjust(d * 0.5);
+					hCenter.position += d * 0.5;
 				} else if (!right.isBinded && hCenter.isBinded) {
 					final d2 = d * 2;
 					width -= d2;
-					right.adjust(d2);
+					right.position += d2;
 				}
 			});
 	}
 
 	@:slot(hCenter.positionChanged)
 	function syncHCenter(p:Float) @:privateAccess {
-		if (!(left.isBinded && right.isBinded))
+		if (!(left.isBinded && right.isBinded) && anchoring == 0)
 			anchor(() -> {
 				final d = hCenter.position - p;
 				if (!left.isBinded && !right.isBinded) {
-					absX += d;
-					left.adjust(d);
-					right.adjust(d);
+					x += d;
+					left.position += d;
+					right.position += d;
 				} else if (left.isBinded && !right.isBinded) {
 					final d2 = d * 2;
 					width += d2;
-					right.adjust(d2);
+					right.position += d2;
 				} else if (!left.isBinded && right.isBinded) {
 					final d2 = d * 2;
-					absX += d2;
+					x += d2;
 					width -= d2;
-					left.adjust(d2);
+					left.position += d2;
 				}
 			});
 	}
 
 	@:slot(right.positionChanged)
 	function syncRight(p:Float) @:privateAccess {
-		if (!(left.isBinded && hCenter.isBinded))
+		if (!(left.isBinded && hCenter.isBinded) && anchoring == 0)
 			anchor(() -> {
 				final d = right.position - p;
 				if (!left.isBinded && !hCenter.isBinded) {
-					absX += d;
-					left.adjust(d);
-					hCenter.adjust(d);
+					x += d;
+					left.position += d;
+					hCenter.position += d;
 				} else if (left.isBinded && !hCenter.isBinded) {
 					width += d;
-					hCenter.adjust(d * 0.5);
+					hCenter.position += d * 0.5;
 				} else if (!left.isBinded && hCenter.isBinded) {
-					absX -= d;
+					x -= d;
 					width += d * 2;
-					left.adjust(-d);
+					left.position -= d;
 				}
 			});
 	}
 
 	@:slot(top.positionChanged)
 	function syncTop(p:Float) @:privateAccess {
-		if (!(bottom.isBinded && vCenter.isBinded))
+		if (!(bottom.isBinded && vCenter.isBinded) && anchoring == 0)
 			anchor(() -> {
 				final d = top.position - p;
-				absY += d;
+				y += d;
 				if (!bottom.isBinded && !vCenter.isBinded) {
-					vCenter.adjust(d);
-					bottom.adjust(d);
+					vCenter.position += d;
+					bottom.position += d;
 				} else if (bottom.isBinded && !vCenter.isBinded) {
 					height -= d;
-					vCenter.adjust(d * 0.5);
+					vCenter.position += d * 0.5;
 				} else if (!bottom.isBinded && vCenter.isBinded) {
 					final d2 = d * 2;
 					height -= d2;
-					bottom.adjust(d2);
+					bottom.position += d2;
 				}
 			});
 	}
 
 	@:slot(vCenter.positionChanged)
 	function syncVCenter(p:Float) @:privateAccess {
-		if (!(top.isBinded && bottom.isBinded))
+		if (!(top.isBinded && bottom.isBinded) && anchoring == 0)
 			anchor(() -> {
 				final d = vCenter.position - p;
 				if (!top.isBinded && !bottom.isBinded) {
-					absY += d;
-					top.adjust(d);
-					bottom.adjust(d);
+					y += d;
+					top.position += d;
+					bottom.position += d;
 				} else if (top.isBinded && !bottom.isBinded) {
 					final d2 = d * 2;
 					height += d2;
-					bottom.adjust(d2);
+					bottom.position += d2;
 				} else if (!top.isBinded && bottom.isBinded) {
 					final d2 = d * 2;
-					absY += d2;
+					y += d2;
 					height -= d2;
-					top.adjust(d2);
+					top.position += d2;
 				}
 			});
 	}
 
 	@:slot(bottom.positionChanged)
 	function syncBottom(p:Float) @:privateAccess {
-		if (!(top.isBinded && vCenter.isBinded))
+		if (!(top.isBinded && vCenter.isBinded) && anchoring == 0)
 			anchor(() -> {
 				final d = bottom.position - p;
 				if (!top.isBinded && !vCenter.isBinded) {
-					absY += d;
-					top.adjust(d);
-					vCenter.adjust(d);
+					y += d;
+					top.position += d;
+					vCenter.position += d;
 				} else if (top.isBinded && !vCenter.isBinded) {
 					height += d;
-					vCenter.adjust(d * 0.5);
+					vCenter.position += d * 0.5;
 				} else if (!top.isBinded && vCenter.isBinded) {
-					absY -= d;
+					y -= d;
 					height += d * 2;
-					top.adjust(-d);
+					top.position -= d;
 				}
 			});
 	}
 
 	function set__absX(value:Float):Float @:privateAccess {
-		final d = value - _absX;
-		_absX = value;
-		if (anchoring == 0)
-			anchor(() -> {
-				left.adjust(d);
-				hCenter.adjust(d);
-				right.adjust(d);
-			});
-		for (c in children)
-			c._absX += d;
+		if (!(left.isBinded || right.isBinded || hCenter.isBinded) || anchoring > 0) {
+			final d = value - _absX;
+			_absX = value;
+			if (anchoring == 0)
+				anchor(() -> {
+					left.position += d;
+					hCenter.position += d;
+					right.position += d;
+				});
+			for (c in children)
+				c._absX += d;
+		}
 		return _absX;
 	}
 
 	function set__absY(value:Float):Float @:privateAccess {
-		final d = value - _absY;
-		_absY = value;
-		if (anchoring == 0)
-			anchor(() -> {
-				top.adjust(d);
-				vCenter.adjust(d);
-				bottom.adjust(d);
-			});
-		for (c in children)
-			c._absY += d;
+		if (!(top.isBinded || bottom.isBinded || vCenter.isBinded) || anchoring > 0) {
+			final d = value - _absY;
+			_absY = value;
+			if (anchoring == 0)
+				anchor(() -> {
+					top.position += d;
+					vCenter.position += d;
+					bottom.position += d;
+				});
+			for (c in children)
+				c._absY += d;
+		}
 		return _absY;
 	}
 
@@ -394,20 +398,18 @@ class Element extends PhysicalObject2D<Element> {
 	}
 
 	function set_x(value:Float):Float {
-		if (!(left.isBinded || right.isBinded || hCenter.isBinded) || anchoring > 0) {
-			final d = value - x;
-			x = value;
-			_absX += d;
-		}
+		_absX += value - x;
+		x = absX;
+		if (parent != null)
+			x -= parent.absX;
 		return x;
 	}
 
 	function set_y(value:Float):Float {
-		if (!(top.isBinded || bottom.isBinded || vCenter.isBinded) || anchoring > 0) {
-			final d = value - y;
-			y = value;
-			_absY += d;
-		}
+		_absY += value - y;
+		y = absY;
+		if (parent != null)
+			y -= parent.absY;
 		return y;
 	}
 
@@ -420,16 +422,16 @@ class Element extends PhysicalObject2D<Element> {
 				anchor(() -> {
 					final d = width - prev;
 					if (!hCenter.isBinded && !right.isBinded) {
-						hCenter.adjust(d * 0.5);
-						right.adjust(d);
+						hCenter.position += d * 0.5;
+						right.position += d;
 					} else if (!left.isBinded && !hCenter.isBinded && right.isBinded) {
 						x -= d;
-						left.adjust(-d);
-						hCenter.adjust(-d * 0.5);
+						left.position -= d;
+						hCenter.position -= d;
 					} else if (!left.isBinded && hCenter.isBinded && !right.isBinded) {
 						x -= d * 0.5;
-						left.adjust(-d * 0.5);
-						right.adjust(-d);
+						left.position -= d;
+						right.position -= d;
 					}
 				});
 		}
@@ -445,16 +447,16 @@ class Element extends PhysicalObject2D<Element> {
 				anchor(() -> {
 					final d = height - prev;
 					if (!vCenter.isBinded && !bottom.isBinded) {
-						vCenter.adjust(d * 0.5);
-						bottom.adjust(d);
+						vCenter.position += d * 0.5;
+						bottom.position += d;
 					} else if (!top.isBinded && !vCenter.isBinded && bottom.isBinded) {
 						y -= d;
-						top.adjust(-d);
-						vCenter.adjust(-d * 0.5);
+						top.position -= d;
+						vCenter.position -= d;
 					} else if (!top.isBinded && vCenter.isBinded && !bottom.isBinded) {
 						y -= d * 0.5;
-						top.adjust(-d * 0.5);
-						bottom.adjust(-d);
+						top.position -= d;
+						bottom.position -= d;
 					}
 				});
 		}

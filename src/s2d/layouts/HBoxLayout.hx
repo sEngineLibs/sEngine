@@ -2,60 +2,45 @@ package s2d.layouts;
 
 import s2d.Anchors;
 import s2d.Direction;
+import s2d.layouts.DirLayout;
+import s2d.layouts.LayoutCell;
 
 using se.extensions.ArrayExt;
 
-class HBoxLayout extends Element {
-	var cells:Array<LayoutCell> = [];
-	var cellsSlots:Map<LayoutCell, {
-		requiredWidthChanged:Float->Void,
-		fillWidthChanged:Bool->Void
-	}> = [];
-
-	@:inject(syncFreeSpacePerCell) var fillCells:Int = 0;
-	@:inject(syncFreeSpacePerCell) var freeSpace:Float = 0.0;
-	@:inject(syncLayout) var freeSpacePerCell:Float = 0.0;
-
-	@:isVar public var spacing(default, set):Float = 10.0;
-	@:inject(syncLayout) public var direction:Direction = LeftToRight;
+class HBoxLayout extends DirLayout<ElementHSlots, HLayoutCell> {
+	var fillWidthCellsNum:Int = 0;
+	@:inject(syncAvailableWidthPerCell) var availableWidth:Float = 0.0;
+	@:inject(syncLayout) var availableWidthPerCell:Float = 0.0;
 
 	public function new(?scene:WindowScene) {
 		super(scene);
 	}
 
-	@:slot(vChildAdded)
-	function add(child:Element) {
-		var cell = getCell(child);
-		var slots = {
-			requiredWidthChanged: (rw:Float) -> {
-				if (!cell.fillWidth)
-					freeSpace += rw - cell.requiredWidth;
-			},
-			fillWidthChanged: (fw:Bool) -> {
-				if (!fw && cell.element.layout.fillWidth)
-					++fillCells;
-				else if (fw && !cell.element.layout.fillWidth)
-					--fillCells;
-			}
-		}
-		cell.onRequiredWidthChanged(slots.requiredWidthChanged);
-		child.layout.onFillWidthChanged(slots.fillWidthChanged);
-		cells.push(cell);
-		cellsSlots.set(cell, slots);
-
-		if (cell.fillWidth)
-			++fillCells;
-		freeSpace -= cell.requiredWidth + (cells.length > 1 ? spacing : 0.0);
+	@:slot(widthChanged)
+	function syncWidth(previous:Float) {
+		availableWidth += width - previous;
 	}
 
-	@:slot(vChildRemoved)
-	function remove(child:Element) {
-		for (cell in cells)
-			if (cell.element == child) {
-				removeCell(cell);
-				freeSpace += cell.requiredWidth + (cells.length > 1 ? spacing : 0.0);
-				return;
-			}
+	@:slot(left.positionChanged)
+	function syncLeftPosition(previous:Float) {
+		if (direction & LeftToRight != 0)
+			moveCells(left.position - previous);
+	}
+
+	@:slot(left.paddingChanged)
+	function syncLeftPadding(previous:Float) {
+		availableWidth += previous - left.padding;
+	}
+
+	@:slot(right.paddingChanged)
+	function syncRightPadding(previous:Float) {
+		availableWidth += previous - right.padding;
+	}
+
+	@:slot(right.positionChanged)
+	function syncRightPosition(previous:Float) {
+		if (direction & RightToLeft != 0)
+			moveCells(right.position - previous);
 	}
 
 	function getCell(el:Element) {
@@ -71,81 +56,108 @@ class HBoxLayout extends Element {
 				right.bindTo(this.right);
 			else {
 				right.margin = spacing;
-				right.bindTo(cells.last().left);
+				right.bindTo(cells.last().cell.left);
 			}
 		} else {
 			if (cells.length == 0)
 				left.bindTo(this.left);
 			else {
 				left.margin = spacing;
-				left.bindTo(cells.last().right);
+				left.bindTo(cells.last().cell.right);
 			}
 		}
-		return new LayoutCell(el, left, top, right, bottom);
+		return new HLayoutCell(el, left, top, right, bottom);
 	}
 
-	function removeCell(cell:LayoutCell) {
-		var slots = cellsSlots.get(cell);
-		cellsSlots.remove(cell);
-		cells.remove(cell);
-		var el = cell.element;
-		cell.remove(el);
-		cell.offRequiredWidthChanged(slots.requiredWidthChanged);
-		el.layout.offFillWidthChanged(slots.fillWidthChanged);
+	function setCellSlots(cell:HLayoutCell):CellSlots {
+		return {
+			requiredWidthChanged: (rw:Float) -> {
+				if (!updating) {
+					if (cell.fillWidth)
+						syncAvailableWidthPerCell();
+					else
+						availableWidth += rw - cell.requiredWidth;
+				}
+			},
+			fillWidthChanged: (fw:Bool) -> {
+				if (!fw && cell.el.layout.fillWidth) {
+					++fillWidthCellsNum;
+					availableWidth += cell.requiredWidth;
+				} else if (fw && !cell.el.layout.fillWidth) {
+					--fillWidthCellsNum;
+					@:privateAccess cell.syncRequiredWidth();
+				}
+			}
+		}
+	}
+
+	function initCell(cell:HLayoutCell) {
+		if (cell.fillWidth) {
+			++fillWidthCellsNum;
+			syncAvailableWidthPerCell();
+		} else
+			availableWidth -= cell.requiredWidth + (cells.length > 1 ? spacing : 0.0);
+	}
+
+	function cellRemoved(cell:HLayoutCell) {
+		availableWidth += cell.requiredWidth + (cells.length > 1 ? spacing : 0.0);
+	}
+
+	function syncAvailableWidthPerCell() {
+		if (cells.length > 0) {
+			var fs = availableWidth;
+			if (fillWidthCellsNum > 0) {
+				updating = true;
+				final perCell = availableWidth / fillWidthCellsNum;
+				for (cellSlots in cells) {
+					final cell = cellSlots.cell;
+					if (cell.fillWidth) {
+						final w = Layout.clampWidth(cell.el, perCell);
+						cell.requiredWidth = w;
+						fs -= w;
+					}
+				}
+				updating = false;
+			}
+			availableWidthPerCell = Math.max(0.0, fs / cells.length);
+		}
 	}
 
 	function syncLayout() {
 		if (direction & RightToLeft != 0)
-			for (cell in cells)
-				cell.left.position = cell.right.position - cell.requiredWidth - freeSpacePerCell;
+			for (cellSlots in cells) {
+				final cell = cellSlots.cell;
+				final cellWidth = cell.requiredWidth + availableWidthPerCell;
+				cell.left.position = cell.right.position - cellWidth;
+				if (cell.fillWidth)
+					cell.el.width = Layout.clampWidth(cell.el, cellWidth);
+			}
 		else
-			for (cell in cells)
-				cell.right.position = cell.left.position + cell.requiredWidth + freeSpacePerCell;
+			for (cellSlots in cells) {
+				final cell = cellSlots.cell;
+				final cellWidth = cell.requiredWidth + availableWidthPerCell;
+				cell.right.position = cell.left.position + cellWidth;
+				if (cell.fillWidth)
+					cell.el.width = Layout.clampWidth(cell.el, cellWidth);
+			}
 	}
 
-	function syncFreeSpacePerCell() {
-		if (cells.length > 0)
-			if (fillCells > 0) {
-				final perCell = freeSpace / fillCells;
-				var fw = freeSpace;
-				for (cell in cells)
-					if (cell.fillWidth) {
-						cell.requiredWidth = cell.clampWidth(perCell);
-						fw -= cell.requiredWidth;
-					}
-				freeSpacePerCell = Math.max(0.0, fw / cells.length);
-			} else
-				freeSpacePerCell = Math.max(0.0, freeSpace / cells.length);
+	function moveCells(d:Float) {
+		for (cellSlots in cells) {
+			cellSlots.cell.left.position += d;
+			cellSlots.cell.right.position += d;
+		}
 	}
 
-	@:slot(widthChanged)
-	function syncWidth(previous:Float) {
-		freeSpace += width - previous;
-	}
-
-	@:slot(left.paddingChanged)
-	function syncLeftPadding(previous:Float) {
-		freeSpace += previous - left.padding;
-	}
-
-	@:slot(right.paddingChanged)
-	function syncRightPadding(previous:Float) {
-		freeSpace += previous - right.padding;
-	}
-
-	function set_spacing(value:Float):Float {
-		value = Math.max(0.0, value);
-		final d = spacing - value;
-		spacing = value;
+	function syncSpacing(d:Float) {
 		if (cells.length > 1) {
 			if (direction & RightToLeft != 0)
-				for (cell in cells.slice(1))
-					cell.right.margin = spacing;
+				for (cellSlots in cells.slice(1))
+					cellSlots.cell.right.margin = spacing;
 			else
-				for (cell in cells.slice(1))
-					cell.left.margin = spacing;
-			freeSpace += d * (cells.length - 1);
+				for (cellSlots in cells.slice(1))
+					cellSlots.cell.left.margin = spacing;
+			availableWidth += d * (cells.length - 1);
 		}
-		return spacing;
 	}
 }

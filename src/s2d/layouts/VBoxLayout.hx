@@ -2,60 +2,45 @@ package s2d.layouts;
 
 import s2d.Anchors;
 import s2d.Direction;
+import s2d.layouts.DirLayout;
+import s2d.layouts.LayoutCell;
 
 using se.extensions.ArrayExt;
 
-class VBoxLayout extends Element {
-	var cells:Array<LayoutCell> = [];
-	var cellsSlots:Map<LayoutCell, {
-		requiredHeightChanged:Float->Void,
-		fillHeightChanged:Bool->Void
-	}> = [];
-
-	@:inject(syncFreeSpacePerCell) var fillCells:Int = 0;
-	@:inject(syncFreeSpacePerCell) var freeSpace:Float = 0.0;
-	@:inject(syncLayout) var freeSpacePerCell:Float = 0.0;
-
-	@:isVar public var spacing(default, set):Float = 10.0;
-	@:inject(syncLayout) public var direction:Direction = TopToBottom;
+class VBoxLayout extends DirLayout<ElementVSlots, VLayoutCell> {
+	var fillHeightCellsNum:Int = 0;
+	@:inject(syncAvailableHeightPerCell) var availableHeight:Float = 0.0;
+	@:inject(syncLayout) var availableHeightPerCell:Float = 0.0;
 
 	public function new(?scene:WindowScene) {
 		super(scene);
 	}
 
-	@:slot(vChildAdded)
-	function add(child:Element) {
-		var cell = getCell(child);
-		var slots = {
-			requiredHeightChanged: (rw:Float) -> {
-				if (!cell.fillHeight)
-					freeSpace += rw - cell.requiredHeight;
-			},
-			fillHeightChanged: (fw:Bool) -> {
-				if (!fw && cell.element.layout.fillHeight)
-					++fillCells;
-				else if (fw && !cell.element.layout.fillHeight)
-					--fillCells;
-			}
-		}
-		cell.onRequiredHeightChanged(slots.requiredHeightChanged);
-		child.layout.onFillHeightChanged(slots.fillHeightChanged);
-		cells.push(cell);
-		cellsSlots.set(cell, slots);
-
-		if (cell.fillHeight)
-			++fillCells;
-		freeSpace -= cell.requiredHeight + (cells.length > 1 ? spacing : 0.0);
+	@:slot(heightChanged)
+	function syncHeight(previous:Float) {
+		availableHeight += height - previous;
 	}
 
-	@:slot(vChildRemoved)
-	function remove(child:Element) {
-		for (cell in cells)
-			if (cell.element == child) {
-				removeCell(cell);
-				freeSpace += cell.requiredHeight + (cells.length > 1 ? spacing : 0.0);
-				return;
-			}
+	@:slot(top.positionChanged)
+	function syncTopPosition(previous:Float) {
+		if (direction & TopToBottom != 0)
+			moveCells(top.position - previous);
+	}
+
+	@:slot(top.paddingChanged)
+	function syncTopPadding(previous:Float) {
+		availableHeight += previous - top.padding;
+	}
+
+	@:slot(bottom.positionChanged)
+	function syncBottomPosition(previous:Float) {
+		if (direction & BottomToTop != 0)
+			moveCells(bottom.position - previous);
+	}
+
+	@:slot(bottom.paddingChanged)
+	function syncBottomPadding(previous:Float) {
+		availableHeight += previous - bottom.padding;
 	}
 
 	function getCell(el:Element) {
@@ -71,81 +56,108 @@ class VBoxLayout extends Element {
 				bottom.bindTo(this.bottom);
 			else {
 				bottom.margin = spacing;
-				bottom.bindTo(cells.last().top);
+				bottom.bindTo(cells.last().cell.top);
 			}
 		} else {
 			if (cells.length == 0)
 				top.bindTo(this.top);
 			else {
 				top.margin = spacing;
-				top.bindTo(cells.last().bottom);
+				top.bindTo(cells.last().cell.bottom);
 			}
 		}
-		return new LayoutCell(el, left, top, right, bottom);
+		return new VLayoutCell(el, left, top, right, bottom);
 	}
 
-	function removeCell(cell:LayoutCell) {
-		var slots = cellsSlots.get(cell);
-		cellsSlots.remove(cell);
-		cells.remove(cell);
-		var el = cell.element;
-		cell.remove(el);
-		cell.offRequiredHeightChanged(slots.requiredHeightChanged);
-		el.layout.offFillHeightChanged(slots.fillHeightChanged);
+	function setCellSlots(cell:VLayoutCell):CellSlots {
+		return {
+			requiredHeightChanged: (rw:Float) -> {
+				if (!updating) {
+					if (cell.fillHeight)
+						syncAvailableHeightPerCell();
+					else
+						availableHeight += rw - cell.requiredHeight;
+				}
+			},
+			fillHeightChanged: (fw:Bool) -> {
+				if (!fw && cell.el.layout.fillHeight) {
+					++fillHeightCellsNum;
+					availableHeight += cell.requiredHeight;
+				} else if (fw && !cell.el.layout.fillHeight) {
+					--fillHeightCellsNum;
+					@:privateAccess cell.syncRequiredHeight();
+				}
+			}
+		};
+	}
+
+	function initCell(cell:VLayoutCell) {
+		if (cell.fillHeight) {
+			++fillHeightCellsNum;
+			syncAvailableHeightPerCell();
+		} else
+			availableHeight -= cell.requiredHeight + (cells.length > 1 ? spacing : 0.0);
+	}
+
+	function cellRemoved(cell:VLayoutCell) {
+		availableHeight += cell.requiredHeight + (cells.length > 1 ? spacing : 0.0);
+	}
+
+	function syncAvailableHeightPerCell() {
+		if (cells.length > 0) {
+			var fs = availableHeight;
+			if (fillHeightCellsNum > 0) {
+				updating = true;
+				final perCell = availableHeight / fillHeightCellsNum;
+				for (cellSlots in cells) {
+					final cell = cellSlots.cell;
+					if (cell.fillHeight) {
+						final w = Layout.clampHeight(cell.el, perCell);
+						cell.requiredHeight = w;
+						fs -= w;
+					}
+				}
+				updating = false;
+			}
+			availableHeightPerCell = Math.max(0.0, fs / cells.length);
+		}
 	}
 
 	function syncLayout() {
-		if (direction & BottomToTop != 0)
-			for (cell in cells)
-				cell.top.position = cell.bottom.position - cell.requiredHeight - freeSpacePerCell;
+		if (direction & RightToLeft != 0)
+			for (cellSlots in cells) {
+				final cell = cellSlots.cell;
+				final cellHeight = cell.requiredHeight + availableHeightPerCell;
+				cell.top.position = cell.bottom.position - cellHeight;
+				if (cell.fillHeight)
+					cell.el.height = Layout.clampHeight(cell.el, cellHeight);
+			}
 		else
-			for (cell in cells)
-				cell.bottom.position = cell.top.position + cell.requiredHeight + freeSpacePerCell;
+			for (cellSlots in cells) {
+				final cell = cellSlots.cell;
+				final cellHeight = cell.requiredHeight + availableHeightPerCell;
+				cell.bottom.position = cell.top.position + cellHeight;
+				if (cell.fillHeight)
+					cell.el.height = Layout.clampHeight(cell.el, cellHeight);
+			}
 	}
 
-	function syncFreeSpacePerCell() {
-		if (cells.length > 0)
-			if (fillCells > 0) {
-				final perCell = freeSpace / fillCells;
-				var fh = freeSpace;
-				for (cell in cells)
-					if (cell.fillHeight) {
-						cell.requiredHeight = cell.clampHeight(perCell);
-						fh -= cell.requiredHeight;
-					}
-				freeSpacePerCell = Math.max(0.0, fh / cells.length);
-			} else
-				freeSpacePerCell = Math.max(0.0, freeSpace / cells.length);
-	}
-
-	@:slot(heightChanged)
-	function syncHeight(previous:Float) {
-		freeSpace += height - previous;
-	}
-
-	@:slot(top.paddingChanged)
-	function syncTopPadding(previous:Float) {
-		freeSpace += previous - top.padding;
-	}
-
-	@:slot(bottom.paddingChanged)
-	function syncBottomPadding(previous:Float) {
-		freeSpace += previous - bottom.padding;
-	}
-
-	function set_spacing(value:Float):Float {
-		value = Math.max(0.0, value);
-		final d = spacing - value;
-		spacing = value;
-		if (cells.length > 1) {
-			if (direction & BottomToTop != 0)
-				for (cell in cells.slice(1))
-					cell.bottom.margin = spacing;
-			else
-				for (cell in cells.slice(1))
-					cell.top.margin = spacing;
-			freeSpace += d * (cells.length - 1);
+	function moveCells(d:Float) {
+		for (cellSlots in cells) {
+			cellSlots.cell.top.position += d;
+			cellSlots.cell.bottom.position += d;
 		}
-		return spacing;
+	}
+
+	function syncSpacing(d:Float) {
+		if (cells.length > 1) {
+			if (direction & RightToLeft != 0)
+				for (cellSlots in cells.slice(1))
+					cellSlots.cell.bottom.margin = spacing;
+			else
+				for (cellSlots in cells.slice(1))
+					cellSlots.cell.top.margin = spacing;
+			availableHeight += d * (cells.length - 1);
+		}
 	}
 }

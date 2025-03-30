@@ -7,14 +7,10 @@ import s2d.Alignment;
 @:build(se.macro.SMacro.build())
 #end
 @:dox(hide)
-class LayoutCell {
-	var dirtyWidthSlot:Float->Void;
-	var dirtyLayoutWidthSlot:Float->Void;
-	var dirtyHeightSlot:Float->Void;
-	var dirtyLayoutHeightSlot:Float->Void;
+abstract class LayoutCell<S:ElementSlots> {
+	var slots:S;
 
-	public var element:Element;
-	public var slots:ElementSlots;
+	public var el:Element;
 
 	public var left:HorizontalAnchor;
 	public var hCenter:HorizontalAnchor;
@@ -23,20 +19,15 @@ class LayoutCell {
 	public var vCenter:VerticalAnchor;
 	public var bottom:VerticalAnchor;
 
-	@track.single public var requiredWidth:Float;
-	@track.single public var requiredHeight:Float;
+	@track.single public var requiredWidth:Float = 0.0;
+	@track.single public var requiredHeight:Float = 0.0;
 
-	@alias public var fillWidth:Bool = element.layout.fillWidth;
-	@alias public var minimumWidth:Float = element.layout.minimumWidth;
-	@alias public var maximumWidth:Float = element.layout.maximumWidth;
-	@alias public var preferredWidth:Float = element.layout.preferredWidth;
-	@alias public var fillHeight:Bool = element.layout.fillHeight;
-	@alias public var minimumHeight:Float = element.layout.minimumHeight;
-	@alias public var maximumHeight:Float = element.layout.maximumHeight;
-	@alias public var preferredHeight:Float = element.layout.preferredHeight;
+	@alias public var fillWidth:Bool = el.layout.fillWidth;
+	@alias public var fillHeight:Bool = el.layout.fillHeight;
 
 	public function new(el:Element, left:HorizontalAnchor, top:VerticalAnchor, right:HorizontalAnchor, bottom:VerticalAnchor) {
-		element = el;
+		this.el = el;
+
 		this.left = left;
 		this.top = top;
 		this.right = right;
@@ -48,115 +39,105 @@ class LayoutCell {
 		top.onPositionChanged(p -> vCenter.position += (top.position - p) * 0.5);
 		bottom.onPositionChanged(p -> vCenter.position += (bottom.position - p) * 0.5);
 
-		dirtyWidthSlot = (v:Float) -> if (!fillWidth) syncRequiredWidth();
-		dirtyLayoutWidthSlot = (v:Float) -> syncRequiredWidth();
-		dirtyHeightSlot = (v:Float) -> if (!fillHeight) syncRequiredHeight();
-		dirtyLayoutHeightSlot = (v:Float) -> syncRequiredHeight();
-
-		add(el);
+		fit();
+		add();
 	}
 
-	public function add(el:Element) {
-		slots = {
-			alignmentChanged: a -> fit(el),
-			fillWidthChanged: fw -> {
-				if (!fw && el.layout.fillWidth) {
-					el.anchors.hCenter = null;
-					el.anchors.fillWidth(left, right);
-				} else if (fw && !el.layout.fillWidth) {
-					el.anchors.unfillWidth();
-					fitH(el);
-				}
-			},
-			fillHeightChanged: fh -> {
-				if (!fh && el.layout.fillHeight) {
-					el.anchors.vCenter = null;
-					el.anchors.fillHeight(top, bottom);
-				} else if (fh && !el.layout.fillHeight) {
-					el.anchors.unfillHeight();
-					fitV(el);
-				}
-			}
+	abstract public function addSlots():Void;
+
+	abstract public function removeSlots():Void;
+
+	public function add():Void {
+		addSlots();
+		slots.alignmentChanged = a -> fit();
+		slots.fillWidthChanged = fw -> {
+			if (!fw && fillWidth)
+				bindH();
+			else if (fw && !fillWidth)
+				unbindH();
 		};
-		el.onWidthChanged(dirtyWidthSlot);
-		el.onHeightChanged(dirtyHeightSlot);
-		el.layout.onMinimumWidthChanged(dirtyLayoutWidthSlot);
-		el.layout.onMaximumWidthChanged(dirtyLayoutWidthSlot);
-		el.layout.onPreferredWidthChanged(dirtyLayoutWidthSlot);
-		el.layout.onMinimumHeightChanged(dirtyLayoutHeightSlot);
-		el.layout.onMaximumHeightChanged(dirtyLayoutHeightSlot);
-		el.layout.onPreferredHeightChanged(dirtyLayoutHeightSlot);
+		slots.fillHeightChanged = fh -> {
+			if (!fh && fillHeight)
+				bindV();
+			else if (fh && !fillHeight)
+				unbindV();
+		};
 		el.layout.onAlignmentChanged(slots.alignmentChanged);
 		el.layout.onFillWidthChanged(slots.fillWidthChanged);
 		el.layout.onFillHeightChanged(slots.fillHeightChanged);
-
-		fit(el);
-		syncRequiredWidth();
-		syncRequiredHeight();
+		if (fillWidth)
+			bindH();
+		if (fillHeight)
+			bindV();
 	}
 
-	public function remove(el:Element) {
-		el.offWidthChanged(dirtyWidthSlot);
-		el.offHeightChanged(dirtyHeightSlot);
-		el.layout.offMinimumWidthChanged(dirtyLayoutWidthSlot);
-		el.layout.offMaximumWidthChanged(dirtyLayoutWidthSlot);
-		el.layout.offPreferredWidthChanged(dirtyLayoutWidthSlot);
-		el.layout.offMinimumHeightChanged(dirtyLayoutHeightSlot);
-		el.layout.offMaximumHeightChanged(dirtyLayoutHeightSlot);
-		el.layout.offPreferredHeightChanged(dirtyLayoutHeightSlot);
+	public function remove():Void {
+		removeSlots();
 		el.layout.offAlignmentChanged(slots.alignmentChanged);
 		el.layout.offFillWidthChanged(slots.fillWidthChanged);
 		el.layout.offFillHeightChanged(slots.fillHeightChanged);
+		if (fillWidth)
+			unbindH();
+		if (fillHeight)
+			unbindV();
 	}
 
 	public function syncRequiredWidth() {
-		if (!Math.isNaN(preferredWidth))
-			requiredWidth = clampWidth(preferredWidth);
-		else if (!fillWidth)
-			requiredWidth = clampWidth(element.width);
+		if (!Math.isNaN(el.layout.preferredWidth))
+			requiredWidth = Layout.clampWidth(el, el.layout.preferredWidth);
+		else if (fillWidth)
+			requiredWidth = Layout.clampWidth(el, right.position - left.position);
 		else
-			requiredWidth = 0.0;
+			requiredWidth = Layout.clampWidth(el, el.width);
 	}
 
 	public function syncRequiredHeight() {
-		if (!Math.isNaN(preferredHeight))
-			requiredHeight = clampHeight(preferredHeight);
-		else if (!fillHeight)
-			requiredHeight = clampHeight(element.height);
+		if (!Math.isNaN(el.layout.preferredHeight))
+			requiredHeight = Layout.clampHeight(el, el.layout.preferredHeight);
+		else if (fillHeight)
+			requiredHeight = Layout.clampHeight(el, bottom.position - top.position);
 		else
-			requiredHeight = 0.0;
+			requiredHeight = Layout.clampHeight(el, el.height);
 	}
 
-	public function clampWidth(width:Float) {
-		return element.left.margin + Math.max(Math.min(width, maximumWidth), minimumWidth) + element.right.margin;
+	function fillH(_:Float) {
+		el.width = Layout.clampWidth(el, right.position - left.position);
 	}
 
-	public function clampHeight(height:Float) {
-		return element.top.margin + Math.max(Math.min(height, maximumHeight), minimumHeight) + element.bottom.margin;
+	function fillV(_:Float) {
+		el.height = Layout.clampHeight(el, bottom.position - top.position);
 	}
 
-	function fit(el:Element) {
+	function bindH() {
+		left.onPositionChanged(fillH);
+		right.onPositionChanged(fillH);
+	}
+
+	function unbindH() {
+		left.offPositionChanged(fillH);
+		right.offPositionChanged(fillH);
+	}
+
+	function bindV() {
+		el.height = Layout.clampHeight(el, bottom.position - top.position);
+		top.onPositionChanged(fillV);
+		bottom.onPositionChanged(fillV);
+	}
+
+	function unbindV() {
+		el.height = Layout.clampHeight(el, bottom.position - top.position);
+		top.offPositionChanged(fillV);
+		bottom.offPositionChanged(fillV);
+	}
+
+	function fit() {
 		el.anchors.clear();
-		if (el.layout.fillWidth)
-			el.anchors.fillWidth(left, right);
-		else
-			fitH(el);
-		if (el.layout.fillHeight)
-			el.anchors.fillHeight(top, bottom);
-		else
-			fitV(el);
-	}
-
-	function fitH(el:Element) {
 		if (el.layout.alignment & AlignRight != 0)
 			el.anchors.right = right;
 		else if (el.layout.alignment & AlignHCenter != 0)
 			el.anchors.hCenter = hCenter;
 		else
 			el.anchors.left = left;
-	}
-
-	function fitV(el:Element) {
 		if (el.layout.alignment & AlignBottom != 0)
 			el.anchors.bottom = bottom;
 		else if (el.layout.alignment & AlignVCenter != 0)
@@ -166,8 +147,65 @@ class LayoutCell {
 	}
 }
 
-private typedef ElementSlots = {
-	alignmentChanged:Alignment->Void,
-	fillWidthChanged:Bool->Void,
-	fillHeightChanged:Bool->Void
+@:dox(hide)
+class HLayoutCell extends LayoutCell<ElementHSlots> {
+	public function addSlots() {
+		slots = {
+			widthChanged: (_:Float) -> if (!fillWidth) syncRequiredWidth(),
+			widthLayoutChanged: (_:Float) -> syncRequiredWidth()
+		}
+		el.onWidthChanged(slots.widthChanged);
+		el.layout.onMinimumWidthChanged(slots.widthLayoutChanged);
+		el.layout.onMaximumWidthChanged(slots.widthLayoutChanged);
+		el.layout.onPreferredWidthChanged(slots.widthLayoutChanged);
+	}
+
+	public function removeSlots() {
+		el.offWidthChanged(slots.widthChanged);
+		el.layout.offMinimumWidthChanged(slots.widthLayoutChanged);
+		el.layout.offMaximumWidthChanged(slots.widthLayoutChanged);
+		el.layout.offPreferredWidthChanged(slots.widthLayoutChanged);
+	}
+}
+
+@:dox(hide)
+class VLayoutCell extends LayoutCell<ElementVSlots> {
+	public function addSlots() {
+		slots = {
+			heightChanged: (_:Float) -> if (!fillHeight) syncRequiredHeight(),
+			heightLayoutChanged: (_:Float) -> syncRequiredHeight()
+		}
+		el.onHeightChanged(slots.heightChanged);
+		el.layout.onMinimumHeightChanged(slots.heightLayoutChanged);
+		el.layout.onMaximumHeightChanged(slots.heightLayoutChanged);
+		el.layout.onPreferredHeightChanged(slots.heightLayoutChanged);
+	}
+
+	public function removeSlots() {
+		el.offHeightChanged(slots.heightChanged);
+		el.layout.offMinimumHeightChanged(slots.heightLayoutChanged);
+		el.layout.offMaximumHeightChanged(slots.heightLayoutChanged);
+		el.layout.offPreferredHeightChanged(slots.heightLayoutChanged);
+	}
+}
+
+@:dox(hide)
+typedef ElementSlots = {
+	?alignmentChanged:Alignment->Void,
+	?fillWidthChanged:Bool->Void,
+	?fillHeightChanged:Bool->Void
+}
+
+@:dox(hide)
+typedef ElementHSlots = {
+	> ElementSlots,
+	widthChanged:Float->Void,
+	widthLayoutChanged:Float->Void
+}
+
+@:dox(hide)
+typedef ElementVSlots = {
+	> ElementSlots,
+	heightChanged:Float->Void,
+	heightLayoutChanged:Float->Void
 }

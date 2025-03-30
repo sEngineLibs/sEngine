@@ -6,7 +6,17 @@ import s2d.Alignment;
 @:build(se.macro.SMacro.build())
 #end
 @:nullSafety(Strict)
-class ElementLayout {
+class Layout {
+	public static function clampWidth(el:Element, width:Float) {
+		final l = el.layout;
+		return Math.max(l.minimumWidth, Math.min(width, l.maximumWidth)) + el.left.margin + el.right.margin;
+	}
+
+	public static function clampHeight(el:Element, height:Float) {
+		final l = el.layout;
+		return Math.max(l.minimumHeight, Math.min(height, l.maximumHeight)) + el.top.margin + el.bottom.margin;
+	}
+
 	@track @:isVar public var row(default, set):Int = 0;
 	@track @:isVar public var rowSpan(default, set):Int = 1;
 	@track @:isVar public var column(default, set):Int = 0;

@@ -20,8 +20,17 @@ class ElementAnchors {
 	}
 
 	public function clear() {
-		unfill();
+		clearH();
+		clearV();
+	}
+
+	public function clearH() {
+		unfillWidth();
 		hCenter = null;
+	}
+
+	public function clearV() {
+		unfillHeight();
 		vCenter = null;
 	}
 
@@ -176,18 +185,22 @@ class ElementAnchors {
 @:autoBuild(se.macro.SMacro.build())
 #end
 abstract class Anchor<A:Anchor<A>> {
-	var lines:Array<A> = [];
+	var bindedLines:Array<A> = [];
 	var updating:Bool = false;
 	var _position:Float = 0.0;
 
 	@:isVar public var bindedTo(default, set):A = null;
 	public var isBinded(get, never):Bool;
 
-	@track public var position(get, set):Float;
+	public var position(get, set):Float;
 	public var padding(default, set):Float = 0.0;
-	@track public var margin(default, set):Float = 0.0;
+	public var margin(default, set):Float = 0.0;
+
+	@:signal function positionChanged(position:Float):Void;
 
 	@:signal function paddingChanged(padding:Float):Void;
+
+	@:signal function marginChanged(margin:Float):Void;
 
 	public function new(?position:Float) {
 		if (position != null)
@@ -199,7 +212,7 @@ abstract class Anchor<A:Anchor<A>> {
 	}
 
 	public function unbind(line:A) {
-		if (lines.contains(line))
+		if (bindedLines.contains(line))
 			line.unbindFrom();
 	}
 
@@ -227,14 +240,6 @@ abstract class Anchor<A:Anchor<A>> {
 		updating = false;
 	}
 
-	function adjust(d:Float) {
-		_position += d;
-		session(() -> {
-			for (l in lines)
-				l.position += d;
-		});
-	}
-
 	abstract function syncOffset(d:Float):Void;
 
 	function get_isBinded() {
@@ -246,11 +251,11 @@ abstract class Anchor<A:Anchor<A>> {
 			if (!hasLoop(value)) {
 				var offset = 0.0;
 				if (isBinded) {
-					bindedTo.lines.remove(cast this);
+					bindedTo.bindedLines.remove(cast this);
 					offset -= bindedTo.padding + margin;
 				}
 				if (value != null) {
-					value.lines.push(cast this);
+					value.bindedLines.push(cast this);
 					position = value.position;
 					offset += value.padding + margin;
 				}
@@ -269,8 +274,16 @@ abstract class Anchor<A:Anchor<A>> {
 	}
 
 	function set_position(value:Float):Float {
-		if (!isBinded || bindedTo.updating)
-			adjust(value - position);
+		if (!isBinded || bindedTo.updating) {
+			final prev = position;
+			_position = value;
+			final d = value - prev;
+			session(() -> {
+				for (l in bindedLines)
+					l.position += d;
+			});
+			positionChanged(prev);
+		}
 		return value;
 	}
 
@@ -279,7 +292,7 @@ abstract class Anchor<A:Anchor<A>> {
 		padding = value;
 		session(() -> {
 			final d = padding - prev;
-			for (line in lines)
+			for (line in bindedLines)
 				line.syncOffset(d);
 		});
 		paddingChanged(prev);
@@ -287,10 +300,12 @@ abstract class Anchor<A:Anchor<A>> {
 	}
 
 	function set_margin(value:Float):Float {
-		final d = value - margin;
+		final prev = margin;
 		margin = value;
+		final d = value - prev;
 		if (isBinded)
 			bindedTo.session(() -> syncOffset(d));
+		marginChanged(prev);
 		return margin;
 	}
 }
