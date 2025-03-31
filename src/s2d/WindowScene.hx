@@ -46,18 +46,18 @@ class WindowScene {
 
 		this.window = window;
 		window.notifyOnResize((w, h) -> {
-			right.position = left.position + w;
-			hCenter.position = left.position + w * 0.5;
-			bottom.position = top.position + h;
-			vCenter.position = top.position + h * 0.5;
+			right.position = w;
+			hCenter.position = w * 0.5;
+			bottom.position = h;
+			vCenter.position = h * 0.5;
 			resized(w, h);
 		});
-		left = new LeftAnchor(window.x);
-		hCenter = new HCenterAnchor(window.x + window.width * 0.5);
-		right = new RightAnchor(window.x + window.width);
-		top = new TopAnchor(window.y);
-		vCenter = new VCenterAnchor(window.y + window.height * 0.5);
-		bottom = new BottomAnchor(window.y + window.height);
+		left = new LeftAnchor();
+		hCenter = new HCenterAnchor(window.width * 0.5);
+		right = new RightAnchor(window.width);
+		top = new TopAnchor();
+		vCenter = new VCenterAnchor(window.height * 0.5);
+		bottom = new BottomAnchor(window.height);
 
 		onResized((x, y) -> backbuffer = new Texture(window.width, window.height));
 		resized(window.width, window.height);
@@ -114,7 +114,7 @@ class WindowScene {
 				drawBounds(e, ctx);
 			#end
 		});
-		g2.begin(true, color);
+		g2.begin(true, Transparent);
 		g2.drawImage(backbuffer, 0, 0);
 		g2.end();
 	}

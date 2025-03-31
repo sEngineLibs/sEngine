@@ -32,13 +32,13 @@ class Label extends DrawableElement {
 		ctx.style.font = font;
 		ctx.style.fontSize = fontSize;
 
-		var drawX = x;
+		var drawX = absX;
 		if ((alignment & AlignHCenter) != 0)
 			drawX += (width - textWidth) / 2.0;
 		else if ((alignment & AlignRight) != 0)
 			drawX += width - textWidth;
 
-		var drawY = y;
+		var drawY = absY;
 		if ((alignment & AlignVCenter) != 0)
 			drawY += (height - textHeight) / 2.0;
 		else if ((alignment & AlignBottom) != 0)

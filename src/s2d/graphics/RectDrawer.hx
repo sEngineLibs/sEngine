@@ -5,7 +5,6 @@ import kha.graphics4.VertexData;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 import se.Texture;
-import se.math.VectorMath;
 import s2d.shapes.RoundedRectangle;
 
 @:access(s2d.Element)
@@ -31,13 +30,10 @@ class RectDrawer extends ElementDrawer<RoundedRectangle> {
 
 	function draw(target:Texture, rectangle:RoundedRectangle) {
 		final ctx = target.ctx2D, ctx3d = target.ctx3D;
+		final rect = rectangle._rect;
 
-		final radius = clamp(rectangle.radius, 0.0, min(rectangle.width, rectangle.height) * 0.5);
-		final offset = max(rectangle.softness, 0.0);
-
-		ctx3d.setFloat4(rectCL, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-		ctx3d.setFloat2(rectDataCL, radius, rectangle.softness);
-
-		ctx.fillRect(rectangle.absX - offset, rectangle.absY - offset, rectangle.width + offset * 2.0, rectangle.height + offset * 2.0);
+		ctx3d.setFloat4(rectCL, rectangle.absX, rectangle.absY, rectangle.width, rectangle.height);
+		ctx3d.setFloat2(rectDataCL, rectangle._radius, rectangle.softness);
+		ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 }

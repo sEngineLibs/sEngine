@@ -2,6 +2,7 @@ package se.math;
 
 import kha.math.FastMatrix2 as KhaMat2;
 
+@:nullSafety
 @:forward.new
 @:forward(_00, _10, _01, _11)
 extern abstract Mat2(KhaMat2) from KhaMat2 to KhaMat2 {
@@ -161,7 +162,7 @@ extern abstract Mat2(KhaMat2) from KhaMat2 to KhaMat2 {
 
 	@:op(a * b)
 	static private inline function postMulVec2(m:Mat2, v:Vec2):Vec2 {
-		return new Vec2(m._00 * v[0] + m._01 * v[1], m._10 * v[0] + m._11 * v[1]);
+		return new Vec2(m._00 * v.x + m._01 * v.y, m._10 * v.x + m._11 * v.y);
 	}
 
 	@:op(a * b)

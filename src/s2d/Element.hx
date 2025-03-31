@@ -429,9 +429,10 @@ class Element extends PhysicalObject2D<Element> {
 						left.position -= d;
 						hCenter.position -= d;
 					} else if (!left.isBinded && hCenter.isBinded && !right.isBinded) {
-						x -= d * 0.5;
-						left.position -= d;
-						right.position -= d;
+						final d0 = d * 0.5;
+						x -= d0;
+						left.position -= d0;
+						right.position += d0;
 					}
 				});
 		}
@@ -454,9 +455,10 @@ class Element extends PhysicalObject2D<Element> {
 						top.position -= d;
 						vCenter.position -= d;
 					} else if (!top.isBinded && vCenter.isBinded && !bottom.isBinded) {
-						y -= d * 0.5;
-						top.position -= d;
-						bottom.position -= d;
+						final d0 = d * 0.5;
+						y -= d0;
+						top.position -= d0;
+						bottom.position += d0;
 					}
 				});
 		}

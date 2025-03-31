@@ -127,18 +127,12 @@ class HBoxLayout extends DirLayout<ElementHSlots, HLayoutCell> {
 		if (direction & RightToLeft != 0)
 			for (cellSlots in cells) {
 				final cell = cellSlots.cell;
-				final cellWidth = cell.requiredWidth + availableWidthPerCell;
-				cell.left.position = cell.right.position - cellWidth;
-				if (cell.fillWidth)
-					cell.el.width = Layout.clampWidth(cell.el, cellWidth);
+				cell.left.position = cell.right.position - cell.requiredWidth + availableWidthPerCell;
 			}
 		else
 			for (cellSlots in cells) {
 				final cell = cellSlots.cell;
-				final cellWidth = cell.requiredWidth + availableWidthPerCell;
-				cell.right.position = cell.left.position + cellWidth;
-				if (cell.fillWidth)
-					cell.el.width = Layout.clampWidth(cell.el, cellWidth);
+				cell.right.position = cell.left.position + cell.requiredWidth + availableWidthPerCell;
 			}
 	}
 

@@ -18,8 +18,6 @@ abstract class ElementDrawer<T> {
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];
 		pipeline.alphaBlendSource = SourceAlpha;
-		pipeline.alphaBlendDestination = InverseSourceAlpha;
-		pipeline.blendSource = SourceAlpha;
 		pipeline.blendDestination = InverseSourceAlpha;
 		setShaders();
 		pipeline.compile();

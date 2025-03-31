@@ -127,18 +127,12 @@ class VBoxLayout extends DirLayout<ElementVSlots, VLayoutCell> {
 		if (direction & RightToLeft != 0)
 			for (cellSlots in cells) {
 				final cell = cellSlots.cell;
-				final cellHeight = cell.requiredHeight + availableHeightPerCell;
-				cell.top.position = cell.bottom.position - cellHeight;
-				if (cell.fillHeight)
-					cell.el.height = Layout.clampHeight(cell.el, cellHeight);
+				cell.top.position = cell.bottom.position - cell.requiredHeight + availableHeightPerCell;
 			}
 		else
 			for (cellSlots in cells) {
 				final cell = cellSlots.cell;
-				final cellHeight = cell.requiredHeight + availableHeightPerCell;
-				cell.bottom.position = cell.top.position + cellHeight;
-				if (cell.fillHeight)
-					cell.el.height = Layout.clampHeight(cell.el, cellHeight);
+				cell.bottom.position = cell.top.position + cell.requiredHeight + availableHeightPerCell;
 			}
 	}
 

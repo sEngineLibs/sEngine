@@ -2,6 +2,7 @@ package se.math;
 
 import kha.math.FastMatrix3 as KhaMat3;
 
+@:nullSafety
 @:forward.new
 @:forward(_00, _10, _20, _01, _11, _21, _02, _12, _22)
 extern abstract Mat3(KhaMat3) from KhaMat3 to KhaMat3 {

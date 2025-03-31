@@ -100,15 +100,16 @@ abstract class LayoutCell<S:ElementSlots> {
 			requiredHeight = Layout.clampHeight(el, el.height);
 	}
 
-	function fillH(_:Float) {
+	function fillH(_:Float = 0.0) {
 		el.width = Layout.clampWidth(el, right.position - left.position);
 	}
 
-	function fillV(_:Float) {
+	function fillV(_:Float = 0.0) {
 		el.height = Layout.clampHeight(el, bottom.position - top.position);
 	}
 
 	function bindH() {
+		fillH();
 		left.onPositionChanged(fillH);
 		right.onPositionChanged(fillH);
 	}
@@ -119,13 +120,12 @@ abstract class LayoutCell<S:ElementSlots> {
 	}
 
 	function bindV() {
-		el.height = Layout.clampHeight(el, bottom.position - top.position);
+		fillV();
 		top.onPositionChanged(fillV);
 		bottom.onPositionChanged(fillV);
 	}
 
 	function unbindV() {
-		el.height = Layout.clampHeight(el, bottom.position - top.position);
 		top.offPositionChanged(fillV);
 		bottom.offPositionChanged(fillV);
 	}

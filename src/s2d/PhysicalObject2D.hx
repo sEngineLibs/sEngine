@@ -120,10 +120,12 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 	}
 
 	function syncTransform():Void {
-		globalTransform = Mat3.translation(-origin.x, -origin.y);
-		globalTransform *= parent != null ? transform * parent.globalTransform : transform;
+		globalTransform.copyFrom(Mat3.translation(-origin.x, -origin.y));
+		globalTransform *= transform;
 		globalTransform *= Mat3.translation(origin.x, origin.y);
-		for (c in children)
+		if (parent != null)
+			globalTransform *= parent.globalTransform;
+		for (c in vChildren)
 			c.syncTransform();
 	}
 
