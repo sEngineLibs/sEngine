@@ -12,8 +12,8 @@ class VBoxLayout extends DirLayout<ElementVSlots, VLayoutCell> {
 	@:inject(syncAvailableHeightPerCell) var availableHeight:Float = 0.0;
 	@:inject(syncLayout) var availableHeightPerCell:Float = 0.0;
 
-	public function new(?scene:WindowScene) {
-		super(scene);
+	public function new(name:String = "vBox", direction:Direction = TopToBottom, ?scene:WindowScene) {
+		super(name, direction, scene);
 	}
 
 	@:slot(heightChanged)

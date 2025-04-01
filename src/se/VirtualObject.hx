@@ -5,14 +5,19 @@ package se;
 @:autoBuild(se.macro.SMacro.build())
 #end
 abstract class VirtualObject<This:VirtualObject<This>> {
+	public var name:String;
+	public var children:Array<This> = [];
+	@:isVar public var parent(default, set):This;
+
 	@:signal function childAdded(child:This):Void;
 
 	@:signal function childRemoved(child:This):Void;
 
 	@:signal function parentChanged(previous:This):Void;
 
-	@:isVar public var parent(default, set):This;
-	public var children:Array<This> = [];
+	public function new(name:String = "object") {
+		this.name = name;
+	}
 
 	public function setParent(value:This):Void {
 		parent = value;
@@ -24,6 +29,25 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 
 	public function addChild(value:This):Void {
 		value.parent = cast this;
+	}
+
+	public function getChild(name:String):This {
+		for (c in children)
+			if (c.name == name)
+				return c;
+		return null;
+	}
+
+	public function findChild(name:String):This {
+		for (c in children)
+			if (c.name == name)
+				return c;
+			else {
+				var _c = c.findChild(name);
+				if (_c != null)
+					return _c;
+			}
+		return null;
 	}
 
 	public function removeChild(value:This):Void {

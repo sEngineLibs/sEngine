@@ -17,7 +17,7 @@ package se.math;
 /**
 	Overrides default haxe's 64-bit Float type to use 32-bit floats on platforms that support it.
 **/
-@:eager typedef Float = kha.FastFloat;
+// @:eager typedef Float = kha.FastFloat;
 
 // # Built-in Functions
 // trigonometric

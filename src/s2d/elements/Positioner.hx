@@ -18,8 +18,8 @@ class Positioner extends Element {
 	@:isVar public var direction(default, set):Direction = TopToBottom | LeftToRight;
 	@:isVar public var axis(default, set):Axis;
 
-	public function new(axis:Axis = Horizontal, ?scene:WindowScene) {
-		super(scene);
+	public function new(name:String = "positioner", axis:Axis = Horizontal, ?scene:WindowScene) {
+		super(name, scene);
 		this.axis = axis;
 	}
 
@@ -151,19 +151,19 @@ class Positioner extends Element {
 
 	function adjustElementH(el:Element, dir:Alignment, d:Float) {
 		if (direction & dir != 0)
-			for (i in el.index...vChildren.length)
+			for (i in vChildren.indexOf(el)...vChildren.length)
 				vChildren[i].x += d;
 		else
-			for (i in (el.index + 1)...vChildren.length)
+			for (i in (vChildren.indexOf(el) + 1)...vChildren.length)
 				vChildren[i].x -= d;
 	}
 
 	function adjustElementV(el:Element, dir:Alignment, d:Float) {
 		if (direction & dir != 0)
-			for (i in el.index...vChildren.length)
+			for (i in vChildren.indexOf(el)...vChildren.length)
 				vChildren[i].y += d;
 		else
-			for (i in (el.index + 1)...vChildren.length)
+			for (i in (vChildren.indexOf(el) + 1)...vChildren.length)
 				vChildren[i].y -= d;
 	}
 

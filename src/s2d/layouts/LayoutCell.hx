@@ -51,15 +51,15 @@ abstract class LayoutCell<S:ElementSlots> {
 		addSlots();
 		slots.alignmentChanged = a -> fit();
 		slots.fillWidthChanged = fw -> {
-			if (!fw && fillWidth)
+			if (fillWidth)
 				bindH();
-			else if (fw && !fillWidth)
+			else
 				unbindH();
 		};
 		slots.fillHeightChanged = fh -> {
-			if (!fh && fillHeight)
+			if (fillHeight)
 				bindV();
-			else if (fh && !fillHeight)
+			else
 				unbindV();
 		};
 		el.layout.onAlignmentChanged(slots.alignmentChanged);

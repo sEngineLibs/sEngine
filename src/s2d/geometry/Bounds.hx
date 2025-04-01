@@ -34,10 +34,6 @@ extern abstract Bounds(Vec4) from Vec4 to Vec4 {
 		return '($left, $top, $right, $bottom)';
 	}
 
-	public inline function contains(p:Position):Bool {
-		return left <= p.x && p.x <= right && top <= p.y && p.y <= bottom;
-	}
-
 	private inline function get_left():Float {
 		return this.x;
 	}

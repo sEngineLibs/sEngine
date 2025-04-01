@@ -11,10 +11,11 @@ abstract class DirLayout<S:ElementSlots, L:LayoutCell<S>> extends Element {
 	var cells:Array<CellsSlots<S, L>> = [];
 
 	@:isVar public var spacing(default, set):Float = 10.0;
-	@:inject(syncLayout) public var direction:Direction = TopToBottom | LeftToRight;
+	@:inject(syncLayout) public var direction:Direction;
 
-	public function new(?scene:WindowScene) {
-		super(scene);
+	public function new(name:String = "layout", ?direction:Direction, ?scene:WindowScene) {
+		super(name, scene);
+		this.direction = direction ?? TopToBottom | LeftToRight;
 	}
 
 	@:slot(vChildAdded)

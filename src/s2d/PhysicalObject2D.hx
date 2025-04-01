@@ -7,8 +7,7 @@ import se.math.VectorMath;
 abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualObject<This> {
 	@track public var visible:Bool = true;
 	public var vChildren:Array<This> = [];
-	public var index(get, never):Int;
-	@:isVar public var z(default, set):Float = 0.0;
+	@:isVar public var z(default, set):Float = 0;
 
 	@:signal function vChildAdded(child:This):Void;
 
@@ -16,11 +15,11 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 
 	@:signal function vChildRemoved(child:This):Void;
 
+	@:signal function zChanged(z:Float):Void;
+
 	var globalTransform:Mat3 = Mat3.identity();
 
-	public var origin:Vec2 = vec2(0.0, 0.0);
 	public var transform:Mat3 = Mat3.identity();
-
 	public var translationX(get, set):Float;
 	public var translationY(get, set):Float;
 	public var translation(get, set):Vec2;
@@ -29,19 +28,8 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 	public var scale(get, set):Vec2;
 	public var rotation(get, set):Float;
 
-	public function new() {}
-
-	function insertVChild(el:This) {
-		for (i in 0...vChildren.length)
-			if (vChildren[i].z > el.z) {
-				vChildren.insert(i, el);
-				return;
-			}
-		vChildren.push(el);
-	}
-
-	function removeVChild(el:This) {
-		vChildren.remove(el);
+	public function new(name:String = "object") {
+		super(name);
 	}
 
 	@:slot(parentChanged)
@@ -74,18 +62,51 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 			removeVChild(child);
 	}
 
-	function get_index():Int {
-		return parent?.vChildren.indexOf(cast this);
+	function insertVChild(el:This) {
+		for (i in 0...vChildren.length)
+			if (vChildren[i].z > el.z) {
+				vChildren.insert(i, el);
+				return;
+			}
+		vChildren.push(el);
+		vChildMoved(el);
+	}
+
+	function removeVChild(el:This) {
+		vChildren.remove(el);
 	}
 
 	function set_z(value:Float):Float {
-		z = value;
-		if (visible && parent != null) {
-			parent.removeVChild(cast this);
-			parent.insertVChild(cast this);
-			parent.vChildMoved(cast this);
+		if (value != z) {
+			final prev = z;
+			z = Math.max(0.0, value);
+			if (parent != null)
+				parent.insertVChild(cast this);
+			zChanged(prev);
 		}
 		return z;
+	}
+
+	function syncParentTransform():Void {
+		globalTransform *= parent.globalTransform;
+		for (c in vChildren)
+			c.syncParentTransform();
+	}
+
+	function syncTransform():Void {
+		globalTransform.copyFrom(transform);
+		if (parent != null)
+			globalTransform *= parent.globalTransform;
+		for (c in vChildren)
+			c.syncParentTransform();
+	}
+
+	function applyTransform(m:Mat3, ?o:Vec2) {
+		if (o == null)
+			transform *= m;
+		else
+			transform *= Mat3.translation(-o.x, -o.y) * m * Mat3.translation(o.x, o.y);
+		syncTransform();
 	}
 
 	extern overload public inline function translate(x:Float, y:Float) {
@@ -101,32 +122,20 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 		translate(value, value);
 	}
 
-	extern overload public inline function upscale(x:Float, y:Float) {
-		transform *= Mat3.scale(x, y);
-		syncTransform();
+	extern overload public inline function upscale(x:Float, y:Float, ?origin:Vec2) {
+		applyTransform(Mat3.scale(x, y), origin);
 	}
 
-	extern overload public inline function upscale(value:Vec2) {
-		upscale(value.x, value.y);
+	extern overload public inline function upscale(value:Vec2, ?origin:Vec2) {
+		upscale(value.x, value.y, origin);
 	}
 
-	extern overload public inline function upscale(value:Float) {
-		upscale(value, value);
+	extern overload public inline function upscale(value:Float, ?origin:Vec2) {
+		upscale(value, value, origin);
 	}
 
-	public function rotate(value:Float) {
-		transform *= Mat3.rotation(value);
-		syncTransform();
-	}
-
-	function syncTransform():Void {
-		globalTransform.copyFrom(Mat3.translation(-origin.x, -origin.y));
-		globalTransform *= transform;
-		globalTransform *= Mat3.translation(origin.x, origin.y);
-		if (parent != null)
-			globalTransform *= parent.globalTransform;
-		for (c in vChildren)
-			c.syncTransform();
+	public function rotate(value:Float, ?origin:Vec2) {
+		applyTransform(Mat3.rotation(value), origin);
 	}
 
 	function get_translationX():Float {
@@ -202,7 +211,6 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 
 	function set_scale(value:Vec2) {
 		var sx = scaleX;
-		var sy = scaleY;
 		if (sx != 0) {
 			var d = value.x / sx;
 			transform._00 *= d;
@@ -211,6 +219,7 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 			transform._00 = value.x;
 			transform._10 = value.x;
 		}
+		var sy = scaleY;
 		if (sy != 0) {
 			var d = value.y / sy;
 			transform._01 *= d;

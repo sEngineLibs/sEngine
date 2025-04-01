@@ -1,9 +1,15 @@
 package s2d;
 
+import kha.input.KeyCode;
 import se.Log;
 import se.Texture;
+import se.math.Vec2;
+import se.math.Mat3;
 import se.math.VectorMath;
+import se.input.Mouse;
+import se.events.MouseEvents;
 import s2d.Anchors;
+import s2d.FocusPolicy;
 import s2d.geometry.Size;
 import s2d.geometry.Rect;
 import s2d.geometry.Bounds;
@@ -30,6 +36,11 @@ class Element extends PhysicalObject2D<Element> {
 	var scene:WindowScene;
 	var anchoring:Int = 0;
 
+	@track public var enabled:Bool = true;
+	public var containsMouse:Bool = false;
+	@track public var focused:Bool = false;
+	public var focusPolicy:FocusPolicy = ClickFocus | TabFocus;
+
 	public var left:HorizontalAnchor = new LeftAnchor();
 	public var hCenter:HorizontalAnchor = new HCenterAnchor();
 	public var right:HorizontalAnchor = new RightAnchor();
@@ -48,10 +59,20 @@ class Element extends PhysicalObject2D<Element> {
 	public var absX(get, set):Float;
 	public var absY(get, set):Float;
 
+	// cached values
+	var _x:Float = 0.0;
+	var _y:Float = 0.0;
+	var _width:Float = 0.0;
+	var _height:Float = 0.0;
+
 	@:isVar public var x(default, set):Float = 0.0;
 	@:isVar public var y(default, set):Float = 0.0;
 	@:isVar public var width(default, set):Float = 0.0;
 	@:isVar public var height(default, set):Float = 0.0;
+
+	@:signal.private function absXChanged(x:Float):Void;
+
+	@:signal.private function absYChanged(x:Float):Void;
 
 	@:signal.private function xChanged(x:Float):Void;
 
@@ -61,15 +82,61 @@ class Element extends PhysicalObject2D<Element> {
 
 	@:signal.private function heightChanged(x:Float):Void;
 
+	@:signal function keyboardDown(key:KeyCode);
+
+	@:signal function keyboardUp(key:KeyCode);
+
+	@:signal function keyboardHold(key:KeyCode);
+
+	@:signal function keyboardPressed(char:String);
+
+	@:signal(key) function keyboardKeyDown(key:KeyCode);
+
+	@:signal(key) function keyboardKeyUp(key:KeyCode);
+
+	@:signal(key) function keyboardKeyHold(key:KeyCode);
+
+	@:signal(char) function keyboardCharPressed(char:String);
+
+	@:signal function mouseEntered(x:Float, y:Float);
+
+	@:signal function mouseExited(x:Float, y:Float);
+
+	@:signal function mouseMoved(m:MouseMoveEvent);
+
+	@:signal function mouseScrolled(m:MouseScrollEvent);
+
+	@:signal function mouseDown(m:MouseButtonEvent);
+
+	@:signal function mouseUp(m:MouseButtonEvent);
+
+	@:signal function mouseHold(m:MouseButtonEvent);
+
+	@:signal function mouseClicked(m:MouseButtonEvent);
+
+	@:signal function mouseDoubleClicked(m:MouseButtonEvent);
+
+	@:signal(button) function mouseButtonDown(button:MouseButton, m:MouseEvent);
+
+	@:signal(button) function mouseButtonUp(button:MouseButton, m:MouseEvent);
+
+	@:signal(button) function mouseButtonHold(button:MouseButton, m:MouseEvent);
+
+	@:signal(button) function mouseButtonClicked(button:MouseButton, m:MouseEvent);
+
+	@:signal(button) function mouseButtonDoubleClicked(button:MouseButton, m:MouseEvent);
+
 	public var bounds(get, set):Bounds;
 	public var contentBounds(get, set):Bounds;
 	public var rect(get, set):Rect;
 	public var contentRect(get, set):Rect;
 
-	public function new(?scene:WindowScene) @:privateAccess {
-		super();
+	public function new(name:String = "element", ?scene:WindowScene) @:privateAccess {
+		super(name);
+
 		this.scene = scene ?? WindowScene.current;
 		this.scene.elements.push(this);
+
 		anchors = new ElementAnchors(this);
 		left = new LeftAnchor();
 		hCenter = new HCenterAnchor();
@@ -77,6 +144,21 @@ class Element extends PhysicalObject2D<Element> {
 		top = new TopAnchor();
 		vCenter = new VCenterAnchor();
 		bottom = new BottomAnchor();
+
+		onKeyboardDown(keyboardKeyDown.emit);
+		onKeyboardUp(keyboardKeyUp.emit);
+		onKeyboardHold(keyboardKeyHold.emit);
+		onKeyboardPressed(keyboardCharPressed.emit);
+
+		onMouseDown(m -> mouseButtonDown(m.button, m));
+		onMouseUp(m -> mouseButtonUp(m.button, m));
+		onMouseHold(m -> mouseButtonHold(m.button, m));
+		onMouseClicked(m -> {
+			mouseButtonClicked(m.button, m);
+			if (!focused && (focusPolicy & ClickFocus != 0))
+				this.scene.focused = this;
+		});
+		onMouseDoubleClicked(m -> mouseButtonDoubleClicked(m.button, m));
 	}
 
 	override function __childAdded__(child:Element) {
@@ -170,7 +252,8 @@ class Element extends PhysicalObject2D<Element> {
 	}
 
 	public function contains(x:Float, y:Float):Bool {
-		return bounds.contains(mapToGlobal(x, y));
+		var p = mapToGlobal(x, y);
+		return left.position <= p.x && p.x <= right.position && top.position <= p.y && p.y <= bottom.position;
 	}
 
 	function render(target:Texture) {
@@ -181,11 +264,6 @@ class Element extends PhysicalObject2D<Element> {
 			c.render(target);
 		ctx.style.popOpacity();
 	}
-
-	var _x:Float = 0.0;
-	var _y:Float = 0.0;
-	var _width:Float = 0.0;
-	var _height:Float = 0.0;
 
 	function geometryChanged() {
 		if (_x != x) {
@@ -213,6 +291,15 @@ class Element extends PhysicalObject2D<Element> {
 			geometryChanged();
 		} else
 			Log.warning("Possible anchor binding loop detected!");
+	}
+
+	override function applyTransform(m:Mat3, ?o:Vec2) {
+		if (o == null)
+			o = vec2(x, y);
+		else
+			o += vec2(x, y);
+		transform *= Mat3.translation(-o.x, -o.y) * m * Mat3.translation(o.x, o.y);
+		syncTransform();
 	}
 
 	override function __parentChanged__(previous:Element) {
@@ -349,14 +436,16 @@ class Element extends PhysicalObject2D<Element> {
 
 	function set__absX(value:Float):Float @:privateAccess {
 		if (!(left.isBinded || right.isBinded || hCenter.isBinded) || anchoring > 0) {
-			final d = value - _absX;
+			final prev = _absX;
 			_absX = value;
+			final d = _absX - prev;
 			if (anchoring == 0)
 				anchor(() -> {
 					left.position += d;
 					hCenter.position += d;
 					right.position += d;
 				});
+			absXChanged(prev);
 			for (c in children)
 				c._absX += d;
 		}
@@ -365,14 +454,16 @@ class Element extends PhysicalObject2D<Element> {
 
 	function set__absY(value:Float):Float @:privateAccess {
 		if (!(top.isBinded || bottom.isBinded || vCenter.isBinded) || anchoring > 0) {
-			final d = value - _absY;
+			final prev = _absY;
 			_absY = value;
+			final d = _absY - prev;
 			if (anchoring == 0)
 				anchor(() -> {
 					top.position += d;
 					vCenter.position += d;
 					bottom.position += d;
 				});
+			absYChanged(prev);
 			for (c in children)
 				c._absY += d;
 		}

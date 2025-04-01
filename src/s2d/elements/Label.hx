@@ -20,8 +20,8 @@ class Label extends DrawableElement {
 
 	public var alignment:Alignment = AlignLeft | AlignTop;
 
-	public function new(?text:String = "Text", ?scene:WindowScene) {
-		super(scene);
+	public function new(name:String = "label", text:String = "Text", ?scene:WindowScene) {
+		super(name, scene);
 		this.font = Assets.fonts.get("Roboto_Regular");
 		this.text = text;
 	}

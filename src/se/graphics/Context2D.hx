@@ -6,7 +6,7 @@ import se.math.Vec2;
 import se.math.Mat3;
 import se.math.VectorMath;
 
-@:forward(pipeline, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)
+@:forward(pipeline, end, flush, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)
 extern abstract Context2D(Graphics) from Graphics {
 	public var style(get, never):Context2DStyle;
 	public var transform(get, set):Mat3;
@@ -23,6 +23,7 @@ extern abstract Context2D(Graphics) from Graphics {
 		this.begin(clear, clearColor);
 		commands(this);
 		this.end();
+		this.flush();
 	}
 
 	public inline function pushTransformation(value:Mat3):Void {

@@ -31,10 +31,6 @@ extern abstract Rect(Vec4) from Vec4 to Vec4 {
 		return '$size at $position';
 	}
 
-	public inline function contains(p:Position):Bool {
-		return (this : Bounds).contains(p);
-	}
-
 	private inline function get_width():Float {
 		return this.z;
 	}

@@ -86,10 +86,10 @@ class ElementAnchors {
 	}
 
 	overload extern public inline function setMargins(left:Float, top:Float, right:Float, bottom:Float):Void {
-		this.left.margin = left;
-		this.top.margin = top;
-		this.right.margin = right;
-		this.bottom.margin = bottom;
+		el.left.margin = left;
+		el.top.margin = top;
+		el.right.margin = right;
+		el.bottom.margin = bottom;
 	}
 
 	overload extern public inline function setMargins(value:Float):Void {
@@ -234,7 +234,7 @@ abstract class Anchor<A:Anchor<A>> {
 		return false;
 	}
 
-	function session(f:Void->Void) {
+	function update(f:Void->Void) {
 		updating = true;
 		f();
 		updating = false;
@@ -261,7 +261,7 @@ abstract class Anchor<A:Anchor<A>> {
 				}
 				bindedTo = value;
 				if (isBinded)
-					bindedTo.session(() -> syncOffset(offset));
+					bindedTo.update(() -> syncOffset(offset));
 				else
 					syncOffset(offset);
 			} else
@@ -278,7 +278,7 @@ abstract class Anchor<A:Anchor<A>> {
 			final prev = position;
 			_position = value;
 			final d = value - prev;
-			session(() -> {
+			update(() -> {
 				for (l in bindedLines)
 					l.position += d;
 			});
@@ -290,7 +290,7 @@ abstract class Anchor<A:Anchor<A>> {
 	function set_padding(value:Float):Float {
 		final prev = padding;
 		padding = value;
-		session(() -> {
+		update(() -> {
 			final d = padding - prev;
 			for (line in bindedLines)
 				line.syncOffset(d);
@@ -302,9 +302,8 @@ abstract class Anchor<A:Anchor<A>> {
 	function set_margin(value:Float):Float {
 		final prev = margin;
 		margin = value;
-		final d = value - prev;
 		if (isBinded)
-			bindedTo.session(() -> syncOffset(d));
+			bindedTo.update(() -> syncOffset(margin - prev));
 		marginChanged(prev);
 		return margin;
 	}
