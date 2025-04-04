@@ -42,7 +42,7 @@ class Positioner extends Element {
 
 	@:slot(vChildAdded)
 	function trackElement(el:Element) {
-		rebuild(vChildren.indexOf(el));
+		rebuild();
 		if (axis == Vertical)
 			trackElementV(el);
 		else
@@ -167,22 +167,22 @@ class Positioner extends Element {
 				vChildren[i].y -= d;
 	}
 
-	function rebuild(offset:Int = 0) {
+	function rebuild() {
 		if (axis == Vertical)
-			rebuildV(offset);
+			rebuildV();
 		else
-			rebuildH(offset);
+			rebuildH();
 	}
 
-	function rebuildH(offset:Int = 0) {
+	function rebuildH() {
 		if (vChildren.length > 0)
-			for (i in offset...vChildren.length)
+			for (i in 0...vChildren.length)
 				positionH(vChildren[i], vChildren[i - 1]);
 	}
 
-	function rebuildV(offset:Int = 0) {
+	function rebuildV() {
 		if (vChildren.length > 0)
-			for (i in offset...vChildren.length)
+			for (i in 0...vChildren.length)
 				positionV(vChildren[i], vChildren[i - 1]);
 	}
 

@@ -1,5 +1,6 @@
 package s2d;
 
+import s2d.graphics.Drawers;
 import kha.Window;
 import kha.Assets;
 import kha.Framebuffer;
@@ -40,6 +41,7 @@ final class WindowScene {
 	public var top:VerticalAnchor;
 	public var vCenter:VerticalAnchor;
 	public var bottom:VerticalAnchor;
+	public var padding(never, set):Float;
 
 	@:signal function resized(width:Int, height:Int):Void;
 
@@ -103,6 +105,10 @@ final class WindowScene {
 		window.resize(width, height);
 	}
 
+	public function setPadding(value:Float) {
+		padding = value;
+	}
+
 	function render(target:Framebuffer) {
 		final g2 = target.g2;
 		backbuffer.ctx2D.render(true, color, ctx -> {
@@ -114,6 +120,7 @@ final class WindowScene {
 				drawBounds(e, ctx);
 			#end
 		});
+
 		g2.begin(true, Transparent);
 		g2.drawImage(backbuffer, 0, 0);
 		g2.end();
@@ -152,7 +159,7 @@ final class WindowScene {
 		function f(el) {
 			for (i in 1...(el.vChildren.length + 1))
 				f(el.vChildren[el.vChildren.length - i]);
-			if (el.enabled)
+			if (el.enabled) {
 				if (el.contains(App.input.mouse.x, App.input.mouse.y)) {
 					if (!moved.accepted) {
 						if (!activeElements.contains(el)) {
@@ -160,18 +167,17 @@ final class WindowScene {
 							el.containsMouse = true;
 							el.mouseEntered(x, y);
 						}
+						moved.accepted = true;
+						el.mouseMoved(moved);
 					} else if (activeElements.remove(el)) {
 						el.containsMouse = false;
 						el.mouseExited(x, y);
-					}
-					if (!moved.accepted) {
-						moved.accepted = true;
-						el.mouseMoved(moved);
 					}
 				} else if (activeElements.remove(el)) {
 					el.containsMouse = false;
 					el.mouseExited(x, y);
 				}
+			}
 		};
 		for (i in 1...(elements.length + 1)) {
 			final el = elements[elements.length - i];
@@ -348,6 +354,14 @@ final class WindowScene {
 			+ style.fontSize);
 	}
 	#end
+
+	function set_padding(value:Float) {
+		left.padding = value;
+		top.padding = value;
+		right.padding = value;
+		bottom.padding = value;
+		return value;
+	}
 
 	function set_focused(value:Element):Element {
 		if (focused != value) {

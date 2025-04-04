@@ -31,7 +31,7 @@ class SEngine {
 	@:access(s2d.graphics.Drawers)
 	@:access(s2d.stage.graphics.Renderer)
 	public static function start(window:Window) {
-		Renderer.compile(width, height);
+		// Renderer.compile(width, height);
 
 		// init structure
 		var structure = new VertexStructure();
@@ -55,10 +55,10 @@ class SEngine {
 		ind[5] = 0;
 		indices.unlock();
 
-		App.onUpdate(update);
+		// App.onUpdate(update);
 
-		resize(window.width, window.height);
-		window.notifyOnResize(resize);
+		// resize(window.width, window.height);
+		// window.notifyOnResize(resize);
 	}
 
 	@:access(s2d.stage.SpriteAtlas)

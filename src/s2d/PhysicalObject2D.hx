@@ -88,15 +88,16 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 	}
 
 	function syncParentTransform():Void {
-		globalTransform *= parent.globalTransform;
+		globalTransform.copyFrom(parent.globalTransform * transform);
 		for (c in vChildren)
 			c.syncParentTransform();
 	}
 
 	function syncTransform():Void {
-		globalTransform.copyFrom(transform);
 		if (parent != null)
-			globalTransform *= parent.globalTransform;
+			globalTransform.copyFrom(parent.globalTransform * transform);
+		else
+			globalTransform.copyFrom(transform);
 		for (c in vChildren)
 			c.syncParentTransform();
 	}

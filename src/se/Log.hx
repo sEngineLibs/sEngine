@@ -1,42 +1,54 @@
 package se;
 
 class Log {
-	public static function log(msg:String, color:LogColor) {
-		#if js
-		js.Lib.global.console.log('%c$msg', color);
-		#else
-		Sys.println('$color$msg${LogColor.Reset}');
-		#end
-	}
-
-	public static function error(msg:String) {
-		log(msg, LogColor.Red);
-	}
-
-	public static function debug(msg:String) {
-		log(msg, LogColor.Green);
-	}
-
-	public static function warning(msg:String) {
-		log(msg, LogColor.Yellow);
-	}
-
-	public static function info(msg:String) {
-		log(msg, LogColor.Blue);
-	}
-}
-
-enum abstract LogColor(String) from String to String {
+	public static inline final INFO:Int = 1;
+	public static inline final DEBUG:Int = 2;
+	public static inline final ERROR:Int = 4;
+	public static inline final WARNING:Int = 8;
+	public static inline final ALL:Int = INFO | DEBUG | ERROR | WARNING;
 	#if js
-	var Red = "color: red;";
-	var Green = "color: green;";
-	var Yellow = "color: yellow;";
-	var Blue = "color: blue;";
+	public static inline final Red = "color: red;";
+	public static inline final Green = "color: green;";
+	public static inline final Yellow = "color: yellow;";
+	public static inline final Blue = "color: blue;";
 	#else
-	var Red = "\x1b[31m";
-	var Green = "\x1b[32m";
-	var Yellow = "\x1b[33m";
-	var Blue = "\x1b[34m";
-	var Reset = "\x1b[0m";
+	public static inline final Red = "\x1b[31m";
+	public static inline final Green = "\x1b[32m";
+	public static inline final Yellow = "\x1b[33m";
+	public static inline final Blue = "\x1b[34m";
+	public static inline final Reset = "\x1b[0m";
 	#end
+
+	public static var mask:Int = ALL;
+
+	public static function error(msg:String, stamp:Bool = true) {
+		log(msg, Red, stamp, ERROR);
+	}
+
+	public static function debug(msg:String, stamp:Bool = true) {
+		log(msg, Green, stamp, DEBUG);
+	}
+
+	public static function warning(msg:String, stamp:Bool = true) {
+		log(msg, Yellow, stamp, WARNING);
+	}
+
+	public static function info(msg:String, stamp:Bool = true) {
+		log(msg, Blue, stamp, INFO);
+	}
+
+	public static function fatal(msg:String, stamp:Bool = true) {
+		log(msg, Red, stamp, Log.mask);
+	}
+
+	public static function log(data:String, color:String, stamp:Bool = true, mask:Int = 0) {
+		if (Log.mask & mask != 0) {
+			var msg = stamp ? '[${DateTools.format(Date.now(), "%H:%M:%S")}]' : "";
+			#if js
+			js.Lib.global.console.log('$msg %c$data', color);
+			#else
+			Sys.println('$msg $color$data${Reset}');
+			#end
+		}
+	}
 }

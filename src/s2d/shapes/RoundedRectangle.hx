@@ -17,7 +17,7 @@ class RoundedRectangle extends DrawableElement {
 		this.softness = softness;
 	}
 
-	function draw(target:Texture) @:privateAccess {
+	function draw(target:Texture) {
 		Drawers.rectDrawer.render(target, this);
 	}
 

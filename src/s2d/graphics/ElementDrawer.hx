@@ -5,6 +5,7 @@ import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 
+@:allow(s2d.Element)
 abstract class ElementDrawer<T> {
 	public var pipeline:PipelineState;
 

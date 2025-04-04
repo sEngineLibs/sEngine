@@ -5,10 +5,10 @@ uniform sampler2D normalMap;
 uniform sampler2D emissionMap;
 uniform sampler2D ormMap;
 
-#if (S2D_SPRITE_INSTANCING != 1)
-uniform mat3 model;
-#else
+#if (S2D_SPRITE_INSTANCING == 1)
 in mat3 model;
+#else
+uniform mat3 model;
 #endif
 
 in vec2 fragUV;

@@ -4,23 +4,21 @@ import kha.Font;
 import kha.Assets;
 import se.Texture;
 import s2d.Alignment;
+import s2d.graphics.Drawers;
 
 using se.extensions.StringExt;
 
 class Label extends DrawableElement {
-	var textWidth:Float;
-	var textHeight:Float;
 
-	@:inject(updateTextWidth)
-	@track public var text:String;
-	@:inject(updateTextSize)
-	public var font:Font;
-	@:inject(updateTextSize)
-	@track @:isVar public var fontSize(default, set):Int = 14;
+	@:inject(updateTextWidth) @track public var text:String;
+	@:inject(updateTextSize) public var font:Font;
+	@:inject(updateTextSize) @track @:isVar public var fontSize(default, set):Int = 32;
 
 	public var alignment:Alignment = AlignLeft | AlignTop;
+	public var textWidth(default, null):Float;
+	public var textHeight(default, null):Float;
 
-	public function new(name:String = "label", text:String = "Text", ?scene:WindowScene) {
+	public function new(text:String = "Text", name:String = "label", ?scene:WindowScene) {
 		super(name, scene);
 		this.font = Assets.fonts.get("Roboto_Regular");
 		this.text = text;
@@ -28,9 +26,6 @@ class Label extends DrawableElement {
 
 	function draw(target:Texture) {
 		final ctx = target.ctx2D;
-
-		ctx.style.font = font;
-		ctx.style.fontSize = fontSize;
 
 		var drawX = absX;
 		if ((alignment & AlignHCenter) != 0)
@@ -44,6 +39,8 @@ class Label extends DrawableElement {
 		else if ((alignment & AlignBottom) != 0)
 			drawY += height - textHeight;
 
+		ctx.style.font = font;
+		ctx.style.fontSize = fontSize;
 		ctx.drawString(text, drawX, drawY);
 	}
 
