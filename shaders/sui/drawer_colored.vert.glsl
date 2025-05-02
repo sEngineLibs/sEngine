@@ -10,7 +10,8 @@ layout(location = 0) out vec4 color;
 layout(location = 1) out vec2 fragCoord;
 
 void main() {
+    vec2 size = textureSize(tex, 0);
     gl_Position = projectionMatrix * vec4(vertexPosition, 1.0);
+    fragCoord = (inverse(model) * vec3(vertexPosition.xy, 1.0)).xy;
     color = vertexColor;
-    fragCoord = (inverse(model) * vec3(vertexPosition.xy, 1.0)).xy * textureSize(tex, 0);
 }

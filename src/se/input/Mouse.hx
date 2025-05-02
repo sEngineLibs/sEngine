@@ -6,6 +6,7 @@ import kha.input.Mouse.MouseCursor;
 @:build(se.macro.SMacro.build())
 #end
 class Mouse {
+	var mouse:kha.input.Mouse;
 	var buttonHoldTimers:Map<MouseButton, Timer> = [];
 	var recentPressed:Map<MouseButton, Timer> = [];
 	var recentClicked:Map<MouseButton, Timer> = [];
@@ -18,7 +19,7 @@ class Mouse {
 	@track public var x:Int = 0;
 	@track public var y:Int = 0;
 	@track public var locked:Bool = false;
-	@track public var cursor:MouseCursor = MouseCursor.Default;
+	@track public var cursor:MouseCursor = Default;
 
 	@:signal function left();
 
@@ -47,7 +48,7 @@ class Mouse {
 	@:signal(button) function buttonDoubleClicked(button:MouseButton, x:Int, y:Int);
 
 	public function new(id:Int = 0) {
-		var mouse = kha.input.Mouse.get(id);
+		mouse = kha.input.Mouse.get(id);
 		mouse.notify(down.emit, up.emit, moved.emit, scrolled.emit, left.emit);
 
 		onCursorChanged(mouse.setSystemCursor);
@@ -57,7 +58,24 @@ class Mouse {
 		onHold(buttonHold.emit);
 	}
 
-	public function setSystemCursor(cursor:MouseCursor) {
+	/**
+	 * Hides the system cursor without locking
+	 */
+	public inline function hideSystemCursor():Void {
+		mouse.hideSystemCursor();
+	}
+
+	/**
+	 * Shows the system cursor
+	 */
+	public inline function showSystemCursor():Void {
+		mouse.showSystemCursor();
+	}
+ 
+	/**
+	 * Sets the system cursor
+	 */
+	public inline function setSystemCursor(cursor:MouseCursor) {
 		this.cursor = cursor;
 	}
 
