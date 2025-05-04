@@ -7,10 +7,10 @@ import kha.input.Mouse.MouseCursor;
 #end
 class Mouse {
 	var mouse:kha.input.Mouse;
-	var buttonHoldTimers:Map<MouseButton, Timer> = [];
-	var recentPressed:Map<MouseButton, Timer> = [];
-	var recentClicked:Map<MouseButton, Timer> = [];
 	var buttonsDown:Array<MouseButton> = [];
+	var recentlyPressed:Map<MouseButton, Timer> = [];
+	var recentlyClicked:Map<MouseButton, Timer> = [];
+	var buttonHoldTimers:Map<MouseButton, Timer> = [];
 
 	public var holdInterval = 0.8;
 	public var clickInterval = 0.3;
@@ -21,15 +21,15 @@ class Mouse {
 	@track public var locked:Bool = false;
 	@track public var cursor:MouseCursor = Default;
 
-	@:signal function left();
+	@:signal function exited();
 
 	@:signal function scrolled(delta:Int);
 
 	@:signal function moved(x:Int, y:Int, dx:Int, dy:Int);
 
-	@:signal function down(button:MouseButton, x:Int, y:Int);
+	@:signal function pressed(button:MouseButton, x:Int, y:Int);
 
-	@:signal function up(button:MouseButton, x:Int, y:Int);
+	@:signal function released(button:MouseButton, x:Int, y:Int);
 
 	@:signal function hold(button:MouseButton, x:Int, y:Int);
 
@@ -37,9 +37,9 @@ class Mouse {
 
 	@:signal function doubleClicked(button:MouseButton, x:Int, y:Int);
 
-	@:signal(button) function buttonDown(button:MouseButton, x:Int, y:Int);
+	@:signal(button) function buttonPressed(button:MouseButton, x:Int, y:Int);
 
-	@:signal(button) function buttonUp(button:MouseButton, x:Int, y:Int);
+	@:signal(button) function buttonReleased(button:MouseButton, x:Int, y:Int);
 
 	@:signal(button) function buttonHold(button:MouseButton, x:Int, y:Int);
 
@@ -49,7 +49,7 @@ class Mouse {
 
 	public function new(id:Int = 0) {
 		mouse = kha.input.Mouse.get(id);
-		mouse.notify(down.emit, up.emit, moved.emit, scrolled.emit, left.emit);
+		mouse.notify(pressed.emit, released.emit, moved.emit, scrolled.emit, exited.emit);
 
 		onCursorChanged(mouse.setSystemCursor);
 		onLockedChanged(locked -> if (locked) mouse.lock() else mouse.unlock());
@@ -79,12 +79,13 @@ class Mouse {
 		this.cursor = cursor;
 	}
 
-	@:slot(down) function _down(button:MouseButton, x:Int, y:Int) {
-		buttonDown(button, x, y);
+	@:slot(pressed) 
+	function __syncPressed__(button:MouseButton, x:Int, y:Int) {
+		buttonPressed(button, x, y);
 		buttonsDown.push(button);
 
-		recentPressed.set(button, Timer.set(() -> {
-			recentPressed.remove(button);
+		recentlyPressed.set(button, Timer.set(() -> {
+			recentlyPressed.remove(button);
 		}, clickInterval));
 		buttonHoldTimers.set(button, Timer.set(() -> {
 			if (buttonHoldTimers.exists(button))
@@ -92,10 +93,11 @@ class Mouse {
 		}, holdInterval));
 	}
 
-	@:slot(up) function _up(button:MouseButton, x:Int, y:Int) {
-		buttonUp(button, x, y);
+	@:slot(released) 
+	function __syncReleased__(button:MouseButton, x:Int, y:Int) {
+		buttonReleased(button, x, y);
 
-		if (recentPressed.exists(button))
+		if (recentlyPressed.exists(button))
 			clicked(button, x, y);
 
 		buttonHoldTimers.get(button)?.stop();
@@ -103,21 +105,24 @@ class Mouse {
 		buttonsDown.remove(button);
 	}
 
-	@:slot(clicked) function _clicked(button:MouseButton, x:Int, y:Int) {
+	@:slot(clicked) 
+	function __syncClicked__(button:MouseButton, x:Int, y:Int) {
 		buttonClicked(button, x, y);
 
-		if (recentClicked.exists(button))
+		if (recentlyClicked.exists(button))
 			doubleClicked(button, x, y);
 
-		recentClicked.set(button, Timer.set(() -> recentClicked.remove(button), doubleClickInterval));
+		recentlyClicked.set(button, Timer.set(() -> recentlyClicked.remove(button), doubleClickInterval));
 	}
 
-	@:slot(left) function _left() {
-		recentPressed.clear();
+	@:slot(exited) 
+	function __syncExited__() {
+		recentlyPressed.clear();
 		buttonHoldTimers.clear();
 	}
 
-	@:slot(moved) function _moved(x:Int, y:Int, dx:Int, dy:Int) {
+	@:slot(moved) 
+	function __syncMoved__(x:Int, y:Int, dx:Int, dy:Int) {
 		this.x = x;
 		this.y = y;
 	}

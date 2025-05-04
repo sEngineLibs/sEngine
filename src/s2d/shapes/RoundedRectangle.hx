@@ -11,8 +11,8 @@ class RoundedRectangle extends DrawableElement {
 	@track @:isVar public var radius(default, set):Float;
 	@track @:isVar public var softness(default, set):Float;
 
-	public function new(name:String = "rectangle", radius:Float = 10.0, softness:Float = 0.5, ?scene:WindowScene) {
-		super(name, scene);
+	public function new(name:String = "rectangle", radius:Float = 10.0, softness:Float = 0.5) {
+		super(name);
 		this.radius = radius;
 		this.softness = softness;
 	}

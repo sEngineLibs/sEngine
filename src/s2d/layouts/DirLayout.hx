@@ -13,8 +13,8 @@ abstract class DirLayout<S:ElementSlots, L:LayoutCell<S>> extends Element {
 	@:isVar public var spacing(default, set):Float = 10.0;
 	@:inject(syncLayout) public var direction:Direction;
 
-	public function new(name:String = "layout", ?direction:Direction, ?scene:WindowScene) {
-		super(name, scene);
+	public function new(name:String = "layout", ?direction:Direction) {
+		super(name);
 		this.direction = direction ?? TopToBottom | LeftToRight;
 	}
 

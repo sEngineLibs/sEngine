@@ -33,10 +33,9 @@ class Element extends PhysicalObject2D<Element> {
 		return element.mapToGlobal(p.x, p.y);
 	}
 
-	var scene:WindowScene;
 	var anchoring:Int = 0;
 
-	@track public var enabled:Bool = true;
+	@track public var enabled:Bool = false;
 	public var containsMouse:Bool = false;
 	@track public var focused:Bool = false;
 	public var focusPolicy:FocusPolicy = ClickFocus | TabFocus;
@@ -106,9 +105,9 @@ class Element extends PhysicalObject2D<Element> {
 
 	@:signal function mouseScrolled(m:MouseScrollEvent);
 
-	@:signal function mouseDown(m:MouseButtonEvent);
+	@:signal function mousePressed(m:MouseButtonEvent);
 
-	@:signal function mouseUp(m:MouseButtonEvent);
+	@:signal function mouseReleased(m:MouseButtonEvent);
 
 	@:signal function mouseHold(m:MouseButtonEvent);
 
@@ -116,9 +115,9 @@ class Element extends PhysicalObject2D<Element> {
 
 	@:signal function mouseDoubleClicked(m:MouseButtonEvent);
 
-	@:signal(button) function mouseButtonDown(button:MouseButton, m:MouseEvent);
+	@:signal(button) function mouseButtonPressed(button:MouseButton, m:MouseEvent);
 
-	@:signal(button) function mouseButtonUp(button:MouseButton, m:MouseEvent);
+	@:signal(button) function mouseButtonReleased(button:MouseButton, m:MouseEvent);
 
 	@:signal(button) function mouseButtonHold(button:MouseButton, m:MouseEvent);
 
@@ -131,11 +130,8 @@ class Element extends PhysicalObject2D<Element> {
 	public var rect(get, set):Rect;
 	public var contentRect(get, set):Rect;
 
-	public function new(name:String = "element", ?scene:WindowScene) @:privateAccess {
+	public function new(name:String = "element") {
 		super(name);
-
-		this.scene = scene ?? WindowScene.current;
-		this.scene.elements.push(this);
 
 		anchors = new ElementAnchors(this);
 		left = new LeftAnchor();
@@ -150,14 +146,10 @@ class Element extends PhysicalObject2D<Element> {
 		onKeyboardHold(keyboardKeyHold.emit);
 		onKeyboardPressed(keyboardCharPressed.emit);
 
-		onMouseDown(m -> mouseButtonDown(m.button, m));
-		onMouseUp(m -> mouseButtonUp(m.button, m));
+		onMousePressed(m -> mouseButtonPressed(m.button, m));
+		onMouseReleased(m -> mouseButtonReleased(m.button, m));
 		onMouseHold(m -> mouseButtonHold(m.button, m));
-		onMouseClicked(m -> {
-			mouseButtonClicked(m.button, m);
-			if (!focused && (focusPolicy & ClickFocus != 0))
-				this.scene.focused = this;
-		});
+		onMouseClicked(m -> mouseButtonClicked(m.button, m));
 		onMouseDoubleClicked(m -> mouseButtonDoubleClicked(m.button, m));
 	}
 
@@ -300,14 +292,6 @@ class Element extends PhysicalObject2D<Element> {
 			o += vec2(x, y);
 		transform *= Mat3.translation(-o.x, -o.y) * m * Mat3.translation(o.x, o.y);
 		syncTransform();
-	}
-
-	override function __parentChanged__(previous:Element) {
-		super.__parentChanged__(previous);
-		if (previous != null && parent == null)
-			scene.elements.push(this);
-		else if (previous == null && parent != null)
-			scene.elements.remove(this);
 	}
 
 	@:slot(left.positionChanged)

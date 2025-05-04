@@ -6,8 +6,8 @@ import se.Texture;
 abstract class DrawableElement extends Element {
 	public var color:Color = White;
 
-	public function new(name:String = "drawable", ?scene:WindowScene) {
-		super(name, scene);
+	public function new(name:String = "drawable") {
+		super(name);
 	}
 
 	abstract function draw(target:Texture):Void;

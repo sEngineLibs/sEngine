@@ -3,15 +3,16 @@ package s2d.elements;
 import kha.Assets;
 import se.Image;
 import se.Texture;
+import s2d.geometry.Rect;
 
 class ImageElement extends DrawableElement {
-	var image:Image;
-
-	public var source(default, set):String;
+	@:isVar public var source(default, set):String;
+	public var image(default, set):Image;
+	public var sourceClip:Rect;
 	public var fillMode:ImageFillMode = Stretch;
 
-	public function new(source:String = "", name:String = "image", ?scene:WindowScene) {
-		super(name, scene);
+	public function new(source:String = "", name:String = "image") {
+		super(name);
 		this.source = source;
 	}
 
@@ -19,23 +20,25 @@ class ImageElement extends DrawableElement {
 		if (image != null) {
 			switch fillMode {
 				case Pad:
-					target.ctx2D.drawSubImage(image, absX, absY, 0.0, 0.0, width, height);
+					target.ctx2D.drawSubImage(image, absX, absY, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height);
 				case Stretch:
-					target.ctx2D.drawScaledImage(image, absX, absY, width, height);
+					target.ctx2D.drawScaledSubImage(image, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height, absX, absY, width, height);
 				case Cover:
-					var scale = Math.max(width / image.width, height / image.height);
-					var scaledWidth = image.width * scale;
-					var scaledHeight = image.height * scale;
+					var scale = Math.max(width / sourceClip.width, height / sourceClip.height);
+					var scaledWidth = sourceClip.width * scale;
+					var scaledHeight = sourceClip.height * scale;
 					var offsetX = (scaledWidth - width) / 2;
 					var offsetY = (scaledHeight - height) / 2;
-					target.ctx2D.drawScaledSubImage(image, offsetX / scale, offsetY / scale, width / scale, height / scale, absX, absY, width, height);
+					target.ctx2D.drawScaledSubImage(image, sourceClip.x + offsetX / scale, sourceClip.y + offsetY / scale, width / scale, height / scale,
+						absX, absY, width, height);
 				case Contain:
-					var scale = Math.min(width / image.width, height / image.height);
-					var scaledWidth = image.width * scale;
-					var scaledHeight = image.height * scale;
+					var scale = Math.min(width / sourceClip.width, height / sourceClip.height);
+					var scaledWidth = sourceClip.width * scale;
+					var scaledHeight = sourceClip.height * scale;
 					var offsetX = (width - scaledWidth) / 2;
 					var offsetY = (height - scaledHeight) / 2;
-					target.ctx2D.drawScaledImage(image, absX + offsetX, absY + offsetY, scaledWidth, scaledHeight);
+					target.ctx2D.drawScaledSubImage(image, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height, absX + offsetX, absY + offsetY,
+						scaledWidth, scaledHeight);
 				case Tile:
 					throw new haxe.exceptions.NotImplementedException("Tile fill mode is not yet implemented");
 				case TileVertically:
@@ -50,6 +53,12 @@ class ImageElement extends DrawableElement {
 		source = value;
 		image = source != "" ? Assets.images.get(source) : null;
 		return source;
+	}
+
+	function set_image(value:Image):Image {
+		image = value;
+		sourceClip = sourceClip ?? new Rect(0.0, 0.0, image.width, image.height);
+		return image;
 	}
 }
 

@@ -6,8 +6,8 @@ import se.math.Mat3;
 class Canvas extends DrawableElement {
 	@:signal function paint(target:Texture):Void;
 
-	public function new(name:String = "canvas", ?scene:WindowScene) {
-		super(name, scene);
+	public function new(name:String = "canvas") {
+		super(name);
 	}
 
 	function draw(target:Texture) {

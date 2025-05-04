@@ -3,8 +3,8 @@ package s2d.shapes;
 import se.Texture;
 
 class Rectangle extends DrawableElement {
-	public function new(name:String = "rectangle", ?scene:WindowScene) {
-		super(name, scene);
+	public function new(name:String = "rectangle") {
+		super(name);
 	}
 
 	function draw(target:Texture) {

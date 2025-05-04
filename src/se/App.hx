@@ -1,11 +1,11 @@
 package se;
 
-import se.animation.Action;
 import kha.Assets;
 import kha.System;
 import se.Time;
 import se.input.Mouse;
 import se.input.Keyboard;
+import se.animation.Action;
 import s2d.WindowScene;
 import s2d.graphics.Drawers;
 
@@ -13,11 +13,11 @@ import s2d.graphics.Drawers;
 class App {
 	@:signal static function update();
 
-	public static var input:{
+	public static var input(default, null):{
 		var mouse:Mouse;
 		var keyboard:Keyboard;
 	};
-	public static var scenes:Array<WindowScene>;
+	public static var scenes(default, null):Array<WindowScene>;
 
 	public static function start(options:SystemOptions, setup:Void->Void) {
 		onUpdate(() -> @:privateAccess {
@@ -25,7 +25,7 @@ class App {
 			Action.update(Time.time);
 		});
 
-		System.start(options, function(window) {
+		System.start(options, window -> {
 			App.input = {
 				mouse: new Mouse(),
 				keyboard: new Keyboard()
@@ -33,10 +33,10 @@ class App {
 
 			scenes = [new WindowScene(window)];
 
-			Assets.loadEverything(function() {
+			Assets.loadEverything(() -> {
 				Drawers.compile();
 				setup();
-				System.notifyOnFrames(function(frames) {
+				System.notifyOnFrames(frames -> {
 					update();
 					for (i in 0...frames.length)
 						scenes[i].render(frames[i]);
@@ -47,6 +47,6 @@ class App {
 
 	public static function stop() {
 		if (!System.stop())
-			trace("This application can't be stopped!");
+			Log.error("This application can't be stopped!");
 	}
 }

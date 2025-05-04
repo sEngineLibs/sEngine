@@ -8,8 +8,8 @@ class TextInput extends Label {
 	public var cursor:Rectangle;
 	public var selection:Rectangle;
 
-	public function new(name:String = "textInput", ?scene:WindowScene) {
-		super(name, scene);
+	public function new(name:String = "textInput") {
+		super(name);
 
 		cursor = new Rectangle();
 		cursor.color = Black;
