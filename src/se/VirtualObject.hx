@@ -56,7 +56,7 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 	}
 
 	public function toString():String {
-		return Type.getClassName(Type.getClass(this));
+		return '${Type.getClassName(Type.getClass(this))} $name';
 	}
 
 	function set_parent(value:This):This {

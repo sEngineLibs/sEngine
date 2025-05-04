@@ -1,5 +1,6 @@
 package s2d.elements;
 
+import se.Log;
 import kha.Assets;
 import se.Image;
 import se.Texture;
@@ -51,13 +52,22 @@ class ImageElement extends DrawableElement {
 
 	function set_source(value:String):String {
 		source = value;
-		image = source != "" ? Assets.images.get(source) : null;
+		if (source != "" && source != null)
+			Assets.loadImageFromPath(source, false, img -> {
+				image = img;
+			}, err -> {
+				Log.error('Failed to load image ${err.url}: ${err.error}');
+			});
+		else
+			image = null;
 		return source;
 	}
 
 	function set_image(value:Image):Image {
+		image?.unload();
 		image = value;
-		sourceClip = sourceClip ?? new Rect(0.0, 0.0, image.width, image.height);
+		if (image != null)
+			sourceClip = sourceClip ?? new Rect(0.0, 0.0, image.width, image.height);
 		return image;
 	}
 }

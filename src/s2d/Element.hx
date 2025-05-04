@@ -49,8 +49,8 @@ class Element extends PhysicalObject2D<Element> {
 	public var anchors:ElementAnchors;
 	public var padding(never, set):Float;
 
-	public var layout:Layout = new Layout();
 	public var opacity:Float = 1.0;
+	public var layout:Layout = new Layout();
 
 	@:isVar var _absX(default, set):Float = 0.0;
 	@:isVar var _absY(default, set):Float = 0.0;
@@ -69,6 +69,11 @@ class Element extends PhysicalObject2D<Element> {
 	@:isVar public var width(default, set):Float = 0.0;
 	@:isVar public var height(default, set):Float = 0.0;
 
+	public var bounds(get, set):Bounds;
+	public var contentBounds(get, set):Bounds;
+	public var rect(get, set):Rect;
+	public var contentRect(get, set):Rect;
+	
 	@:signal.private function absXChanged(x:Float):Void;
 
 	@:signal.private function absYChanged(x:Float):Void;
@@ -124,11 +129,6 @@ class Element extends PhysicalObject2D<Element> {
 	@:signal(button) function mouseButtonClicked(button:MouseButton, m:MouseEvent);
 
 	@:signal(button) function mouseButtonDoubleClicked(button:MouseButton, m:MouseEvent);
-
-	public var bounds(get, set):Bounds;
-	public var contentBounds(get, set):Bounds;
-	public var rect(get, set):Rect;
-	public var contentRect(get, set):Rect;
 
 	public function new(name:String = "element") {
 		super(name);

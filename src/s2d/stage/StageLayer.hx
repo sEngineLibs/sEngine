@@ -8,7 +8,7 @@ import s2d.stage.objects.Light;
 import s2d.stage.graphics.ShadowBuffer;
 #end
 #end
-class Layer {
+class StageLayer {
 	var stage:Stage;
 
 	public var sprites:Array<Sprite> = [];

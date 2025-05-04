@@ -79,7 +79,7 @@ final class WindowScene {
 		root.addChild(el);
 	}
 
-	public inline function elementAt(x:Float, y:Float):Null<Element> {
+	public function elementAt(x:Float, y:Float):Null<Element> {
 		var i = root.children.length;
 		while (--i >= 0) {
 			final c = root.children[i];
@@ -249,20 +249,21 @@ final class WindowScene {
 	function drawBounds(e:Element, ctx:Context2D) {
 		final style = ctx.style;
 
+		style.opacity = 0.5;
 		style.font = Assets.fonts.get("Roboto_Regular");
 		style.fontSize = 16;
 
-		final lm = e.anchors.left == null ? 0.0 : e.anchors.left.margin;
-		final tm = e.anchors.top == null ? 0.0 : e.anchors.top.margin;
-		final rm = e.anchors.right == null ? 0.0 : e.anchors.right.margin;
-		final bm = e.anchors.bottom == null ? 0.0 : e.anchors.bottom.margin;
+		final lm = e.left.margin;
+		final tm = e.top.margin;
+		final rm = e.right.margin;
+		final bm = e.bottom.margin;
 		final lp = e.left.padding;
 		final tp = e.top.padding;
 		final rp = e.right.padding;
 		final bp = e.bottom.padding;
 
 		style.color = Black;
-		ctx.fillRect(e.absX - lm, e.absY - tm, e.width + rm, e.height + bm);
+		ctx.fillRect(e.absX - lm, e.absY - tm, e.width + lm + rm, e.height + tm + bm);
 
 		// margins
 		style.color = se.Color.rgb(0.75, 0.25, 0.75);
@@ -296,6 +297,7 @@ final class WindowScene {
 
 		// labels - values
 		style.fontSize = 14;
+
 		// margins
 		var i = 0;
 		for (m in [lm, tm, rm, bm]) {
@@ -316,6 +318,7 @@ final class WindowScene {
 			}
 			++i;
 		}
+
 		// padding
 		var i = 0;
 		for (p in [lp, tp, rp, bp]) {
@@ -349,6 +352,7 @@ final class WindowScene {
 			App.input.mouse.y
 			- style.font.height(style.fontSize)
 			+ style.fontSize);
+		style.opacity = 1.0;
 	}
 	#end
 
