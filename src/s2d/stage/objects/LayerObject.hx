@@ -4,9 +4,9 @@ import kha.FastFloat;
 import s2d.PhysicalObject2D;
 
 class LayerObject extends StageObject {
-	var layer:Layer;
+	var layer:StageLayer;
 
-	public function new(layer:Layer) {
+	public function new(layer:StageLayer) {
 		super();
 		this.layer = layer;
 	}

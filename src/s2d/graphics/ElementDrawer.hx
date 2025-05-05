@@ -1,33 +1,24 @@
 package s2d.graphics;
 
-import se.Texture;
-import kha.graphics4.PipelineState;
-import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
+import se.Texture;
+import se.graphics.ShaderPipeline;
+import se.graphics.ShaderPass;
 
 @:allow(s2d.Element)
-abstract class ElementDrawer<T> {
-	public var pipeline:PipelineState;
-
-	var structure:VertexStructure;
+abstract class ElementDrawer<T> extends ShaderPass {
 	var modelCL:ConstantLocation;
 
-	public function new() {}
+	public function new(state:ShaderPipelineState) {
+		super(state);
+	}
 
-	public function compile() {
-		initStructure();
-		pipeline = new PipelineState();
-		pipeline.inputLayout = [structure];
-		pipeline.alphaBlendSource = SourceAlpha;
-		pipeline.blendDestination = InverseSourceAlpha;
-		setShaders();
-		pipeline.compile();
+	function setup() {
 		modelCL = pipeline.getConstantLocation("model");
-		getUniforms();
 	}
 
 	function render(target:Texture, element:T) {
-		final ctx = target.ctx2D, ctx3d = target.ctx3D;
+		final ctx = target.context2D, ctx3d = target.context3D;
 
 		ctx.pipeline = pipeline;
 		ctx3d.setPipeline(pipeline);
@@ -35,12 +26,6 @@ abstract class ElementDrawer<T> {
 		draw(target, element);
 		ctx.pipeline = null;
 	}
-
-	abstract function initStructure():Void;
-
-	abstract function setShaders():Void;
-
-	abstract function getUniforms():Void;
 
 	abstract function draw(target:Texture, element:T):Void;
 }

@@ -5,7 +5,7 @@ import s2d.stage.objects.Sprite;
 #if (S2D_LIGHTING == 1)
 import s2d.stage.objects.Light;
 #if (S2D_LIGHTING_SHADOWS == 1)
-import s2d.stage.graphics.ShadowBuffer;
+import s2d.graphics.stage.ShadowBuffer;
 #end
 #end
 class StageLayer {
@@ -14,11 +14,8 @@ class StageLayer {
 	public var sprites:Array<Sprite> = [];
 	public var spriteAtlases:Array<SpriteAtlas> = [];
 
-	public function new(?stage:Stage) {
-		if (stage != null)
-			this.stage = stage;
-		else
-			this.stage = Stage.current;
+	public function new(stage:Stage) {
+		this.stage = stage;
 		this.stage.layers.push(this);
 		#if (S2D_LIGHTING && S2D_LIGHTING_SHADOWS == 1)
 		shadowBuffer = new ShadowBuffer();

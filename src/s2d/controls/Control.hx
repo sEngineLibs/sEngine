@@ -25,7 +25,7 @@ class Control extends Element {
 	}
 
 	override function render(target:Texture) {
-		final ctx = target.ctx2D;
+		final ctx = target.context2D;
 		ctx.style.pushOpacity(opacity);
 		ctx.transform = globalTransform;
 

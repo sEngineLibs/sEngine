@@ -1,7 +1,6 @@
-package s2d.stage.graphics;
+package se.graphics;
 
 import haxe.ds.Vector;
-import se.Texture;
 
 class RenderBuffer {
 	// ping-pong

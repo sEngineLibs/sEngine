@@ -1,5 +1,6 @@
 package se;
 
+import kha.Framebuffer;
 import kha.Assets;
 import kha.System;
 import se.Time;
@@ -30,9 +31,7 @@ class App {
 				mouse: new Mouse(),
 				keyboard: new Keyboard()
 			}
-
 			scenes = [new WindowScene(window)];
-
 			Assets.loadEverything(() -> {
 				Drawers.compile();
 				setup();

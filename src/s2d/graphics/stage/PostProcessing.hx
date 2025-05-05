@@ -1,16 +1,16 @@
-package s2d.stage.graphics;
+package s2d.graphics.stage;
 
 #if S2D_PP_BLOOM
-import s2d.stage.graphics.postprocessing.Bloom;
+import s2d.graphics.stage.postprocessing.Bloom;
 #end
 #if S2D_PP_FISHEYE
-import s2d.stage.graphics.postprocessing.Fisheye;
+import s2d.graphics.stage.postprocessing.Fisheye;
 #end
 #if S2D_PP_FILTER
-import s2d.stage.graphics.postprocessing.Filter;
+import s2d.graphics.stage.postprocessing.Filter;
 #end
 #if S2D_PP_COMPOSITOR
-import s2d.stage.graphics.postprocessing.Compositor;
+import s2d.graphics.stage.postprocessing.Compositor;
 #end
 
 class PostProcessing {

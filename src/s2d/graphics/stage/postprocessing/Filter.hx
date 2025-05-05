@@ -1,4 +1,4 @@
-package s2d.stage.graphics.postprocessing;
+package s2d.graphics.stage.postprocessing;
 
 import kha.Shaders;
 import kha.graphics4.TextureUnit;
@@ -26,10 +26,10 @@ class Filter extends PPEffect {
 		kernelCL = pipeline.getConstantLocation("kernel");
 	}
 
-	@:access(s2d.stage.graphics.Renderer)
+	@:access(s2d.graphics.stage.Renderer)
 	function render(target:Texture) {
-		final ctx = target.ctx2D;
-		final ctx3d = target.ctx3D;
+		final ctx = target.context2D;
+		final ctx3d = target.context3D;
 
 		ctx.begin();
 		ctx3d.setPipeline(pipeline);

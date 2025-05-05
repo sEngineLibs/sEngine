@@ -4,6 +4,7 @@ import kha.Window;
 import kha.Assets;
 import kha.Framebuffer;
 import se.App;
+import se.Time;
 import se.Color;
 import se.Texture;
 import se.input.Mouse;
@@ -40,7 +41,7 @@ final class WindowScene {
 		root = new Element("root");
 		root.width = window.width;
 		root.height = window.height;
-		
+
 		window.notifyOnResize((w, h) -> {
 			root.width = w;
 			root.height = h;
@@ -99,7 +100,7 @@ final class WindowScene {
 
 	inline function render(target:Framebuffer) {
 		final g2 = target.g2;
-		backbuffer.ctx2D.render(true, color, ctx -> {
+		backbuffer.context2D.render(true, color, ctx -> {
 			for (e in root.children)
 				e.render(backbuffer);
 			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
@@ -111,6 +112,15 @@ final class WindowScene {
 
 		g2.begin(true, Transparent);
 		g2.drawImage(backbuffer, 0, 0);
+		#if S2D_DEBUG_FPS
+		final fps = Std.int(1.0 / Time.delta);
+		g2.font = Assets.fonts.get("Roboto_Regular");
+		g2.fontSize = 14;
+		g2.color = Black;
+		g2.drawString('FPS: ${fps}', 6, 6);
+		g2.color = White;
+		g2.drawString('FPS: ${fps}', 5, 5);
+		#end
 		g2.end();
 	}
 

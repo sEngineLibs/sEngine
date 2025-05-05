@@ -6,21 +6,18 @@ import se.math.Mat3;
 import s2d.stage.objects.Sprite;
 #if (S2D_LIGHTING == 1)
 #if (S2D_LIGHTING_DEFERRED == 1)
-import s2d.stage.graphics.lighting.GeometryDeferred;
+import s2d.graphics.stage.lighting.StageDrawer;
 #else
-import s2d.stage.graphics.lighting.LightingForward;
+import s2d.graphics.stage.lighting.StageDrawer;
 #end
-#else
-import s2d.stage.graphics.Renderer;
 #end
 #if (S2D_SPRITE_INSTANCING == 1)
 import kha.graphics4.VertexBuffer;
 #end
 
 @:access(s2d.stage.objects.Sprite)
-@:access(s2d.stage.graphics.Renderer)
 class SpriteAtlas {
-	@:isVar public var layer(default, set):Layer;
+	@:isVar public var layer(default, set):StageLayer;
 	public var sprites:Vector<Sprite> = new Vector(0);
 
 	#if (S2D_LIGHTING == 1)
@@ -32,14 +29,14 @@ class SpriteAtlas {
 	public var textureMap:Image;
 	#end
 
-	public function new(layer:Layer) {
+	public function new(layer:StageLayer) {
 		this.layer = layer;
 		#if (S2D_SPRITE_INSTANCING == 1)
 		init();
 		#end
 	}
 
-	function set_layer(value:Layer) {
+	function set_layer(value:StageLayer) {
 		value.addSpriteAtlas(this);
 		layer = value;
 		return value;
@@ -49,23 +46,11 @@ class SpriteAtlas {
 	var vertices:Array<VertexBuffer>;
 
 	function init() {
-		vertices = [@:privateAccess
-			se.SEngine.vertices,
-			#if (S2D_LIGHTING == 1)
-			#if (S2D_LIGHTING_DEFERRED == 1)
-			new VertexBuffer(0, GeometryDeferred.structures[1], StaticUsage, 1), // crop rect
-			new VertexBuffer(0, GeometryDeferred.structures[2], StaticUsage, 1), // model
-			new VertexBuffer(0, GeometryDeferred.structures[3], StaticUsage, 1) // depth
-			#else
-			new VertexBuffer(0, LightingForward.structures[1], StaticUsage, 1), // crop rect
-			new VertexBuffer(0, LightingForward.structures[2], StaticUsage, 1), // model
-			new VertexBuffer(0, LightingForward.structures[3], StaticUsage, 1) // depth
-			#end
-			#else
-			new VertexBuffer(0, Renderer.structures[1], StaticUsage, 1), // crop rect
-			new VertexBuffer(0, Renderer.structures[2], StaticUsage, 1), // model
-			new VertexBuffer(0, Renderer.structures[3], StaticUsage, 1) // depth
-			#end
+		vertices = [
+			new VertexBuffer(0, StageDrawer.structures[0], StaticUsage, 1), // position
+			new VertexBuffer(0, StageDrawer.structures[1], StaticUsage, 1), // crop rect
+			new VertexBuffer(0, StageDrawer.structures[2], StaticUsage, 1), // model
+			new VertexBuffer(0, StageDrawer.structures[3], StaticUsage, 1) // depth
 		];
 	}
 
@@ -81,37 +66,17 @@ class SpriteAtlas {
 		vertices[2].delete();
 
 		#if (S2D_LIGHTING == 1)
-		#if (S2D_LIGHTING_DEFERRED == 1)
-		vertices[1] = new VertexBuffer(sprites.length, GeometryDeferred.structures[1], StaticUsage, 1);
-		vertices[2] = new VertexBuffer(sprites.length, GeometryDeferred.structures[2], StaticUsage, 1);
-		vertices[3] = new VertexBuffer(sprites.length, GeometryDeferred.structures[3], StaticUsage, 1);
-		#else
-		vertices[1] = new VertexBuffer(sprites.length, LightingForward.structures[1], StaticUsage, 1);
-		vertices[2] = new VertexBuffer(sprites.length, LightingForward.structures[2], StaticUsage, 1);
-		vertices[3] = new VertexBuffer(sprites.length, LightingForward.structures[3], StaticUsage, 1);
-		#end
-		#else
-		vertices[1] = new VertexBuffer(sprites.length, Renderer.structures[1], StaticUsage, 1);
-		vertices[2] = new VertexBuffer(sprites.length, Renderer.structures[2], StaticUsage, 1);
-		vertices[3] = new VertexBuffer(sprites.length, Renderer.structures[3], StaticUsage, 1);
+		vertices[1] = new VertexBuffer(sprites.length, StageDrawer.structures[1], StaticUsage, 1);
+		vertices[2] = new VertexBuffer(sprites.length, StageDrawer.structures[2], StaticUsage, 1);
+		vertices[3] = new VertexBuffer(sprites.length, StageDrawer.structures[3], StaticUsage, 1);
 		#end
 	}
 
 	function update() {
 		#if (S2D_LIGHTING == 1)
-		#if (S2D_LIGHTING_DEFERRED == 1)
-		final cStructSize = GeometryDeferred.structures[1].byteSize() >> 2;
-		final mStructSize = GeometryDeferred.structures[2].byteSize() >> 2;
-		final dStructSize = GeometryDeferred.structures[3].byteSize() >> 2;
-		#else
-		final cStructSize = LightingForward.structures[1].byteSize() >> 2;
-		final mStructSize = LightingForward.structures[2].byteSize() >> 2;
-		final dStructSize = LightingForward.structures[3].byteSize() >> 2;
-		#end
-		#else
-		final cStructSize = Renderer.structures[1].byteSize() >> 2;
-		final mStructSize = Renderer.structures[2].byteSize() >> 2;
-		final dStructSize = Renderer.structures[3].byteSize() >> 2;
+		final cStructSize = StageDrawer.structures[1].byteSize() >> 2;
+		final mStructSize = StageDrawer.structures[2].byteSize() >> 2;
+		final dStructSize = StageDrawer.structures[3].byteSize() >> 2;
 		#end
 		final cData = vertices[1].lock();
 		final mData = vertices[2].lock();

@@ -13,7 +13,7 @@ abstract class DrawableElement extends Element {
 	abstract function draw(target:Texture):Void;
 
 	override function render(target:Texture) {
-		final ctx = target.ctx2D;
+		final ctx = target.context2D;
 		ctx.style.pushOpacity(opacity);
 		ctx.style.color = color;
 		ctx.transform = globalTransform;
@@ -21,14 +21,5 @@ abstract class DrawableElement extends Element {
 		for (el in vChildren)
 			el.render(target);
 		ctx.style.popOpacity();
-	}
-
-	static function insert(a:Array<Element>, el:Element) {
-		for (i in 0...a.length)
-			if (a[i].z > el.z) {
-				a.insert(i, el);
-				return;
-			}
-		a.push(el);
 	}
 }

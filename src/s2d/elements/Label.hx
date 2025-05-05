@@ -23,7 +23,7 @@ class Label extends DrawableElement {
 	}
 
 	function draw(target:Texture) {
-		final ctx = target.ctx2D;
+		final ctx = target.context2D;
 
 		var drawX = absX;
 		if ((alignment & AlignHCenter) != 0)

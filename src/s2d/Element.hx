@@ -73,7 +73,7 @@ class Element extends PhysicalObject2D<Element> {
 	public var contentBounds(get, set):Bounds;
 	public var rect(get, set):Rect;
 	public var contentRect(get, set):Rect;
-	
+
 	@:signal.private function absXChanged(x:Float):Void;
 
 	@:signal.private function absYChanged(x:Float):Void;
@@ -249,7 +249,7 @@ class Element extends PhysicalObject2D<Element> {
 	}
 
 	function render(target:Texture) {
-		final ctx = target.ctx2D;
+		final ctx = target.context2D;
 		ctx.style.pushOpacity(opacity);
 		ctx.transform = globalTransform;
 		for (c in vChildren)

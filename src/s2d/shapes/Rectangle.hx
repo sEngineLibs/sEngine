@@ -8,6 +8,6 @@ class Rectangle extends DrawableElement {
 	}
 
 	function draw(target:Texture) {
-		target.ctx2D.fillRect(absX, absY, width, height);
+		target.context2D.fillRect(absX, absY, width, height);
 	}
 }

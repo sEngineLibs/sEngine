@@ -1,18 +1,34 @@
 package s2d.elements;
 
 import se.Texture;
-import se.math.Mat3;
+import se.graphics.Context2D;
 
-class Canvas extends DrawableElement {
-	@:signal function paint(target:Texture):Void;
+class Canvas2D extends DrawableElement {
+	@:isVar var texture(default, set):Texture;
+
+	@:signal function paint(ctx:Context2D):Void;
 
 	public function new(name:String = "canvas") {
 		super(name);
+		texture = new Texture(Std.int(width), Std.int(height));
+	}
+
+	@:slot(widthChanged, heightChanged)
+	function __syncSizeChanged__(_) {
+		texture = new Texture(Std.int(width), Std.int(height));
 	}
 
 	function draw(target:Texture) {
-		target.ctx2D.transform *= Mat3.translation(left.position, top.position);
-		paint(target);
-		target.ctx2D.transform *= Mat3.translation(-left.position, -top.position);
+		final tgtCtx = target.context2D;
+		tgtCtx.end();
+		texture.context2D.render(true, Transparent, paint.emit);
+		tgtCtx.begin();
+		tgtCtx.drawImage(texture, absX, absY);
+	}
+
+	function set_texture(value:Texture):Texture {
+		texture?.unload();
+		texture = value;
+		return texture;
 	}
 }

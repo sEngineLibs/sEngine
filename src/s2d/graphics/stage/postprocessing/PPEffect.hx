@@ -1,10 +1,10 @@
-package s2d.stage.graphics.postprocessing;
+package s2d.graphics.stage.postprocessing;
 
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import se.Texture;
 
-@:access(s2d.stage.graphics.Renderer)
+@:access(s2d.graphics.stage.Renderer)
 abstract class PPEffect {
 	var pipeline:PipelineState;
 	var index:Int;

@@ -18,16 +18,16 @@ class ImageElement extends DrawableElement {
 		if (image != null) {
 			switch fillMode {
 				case Pad:
-					target.ctx2D.drawSubImage(image, absX, absY, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height);
+					target.context2D.drawSubImage(image, absX, absY, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height);
 				case Stretch:
-					target.ctx2D.drawScaledSubImage(image, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height, absX, absY, width, height);
+					target.context2D.drawScaledSubImage(image, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height, absX, absY, width, height);
 				case Cover:
 					var scale = Math.max(width / sourceClip.width, height / sourceClip.height);
 					var scaledWidth = sourceClip.width * scale;
 					var scaledHeight = sourceClip.height * scale;
 					var offsetX = (scaledWidth - width) / 2;
 					var offsetY = (scaledHeight - height) / 2;
-					target.ctx2D.drawScaledSubImage(image, sourceClip.x + offsetX / scale, sourceClip.y + offsetY / scale, width / scale, height / scale,
+					target.context2D.drawScaledSubImage(image, sourceClip.x + offsetX / scale, sourceClip.y + offsetY / scale, width / scale, height / scale,
 						absX, absY, width, height);
 				case Contain:
 					var scale = Math.min(width / sourceClip.width, height / sourceClip.height);
@@ -35,8 +35,8 @@ class ImageElement extends DrawableElement {
 					var scaledHeight = sourceClip.height * scale;
 					var offsetX = (width - scaledWidth) / 2;
 					var offsetY = (height - scaledHeight) / 2;
-					target.ctx2D.drawScaledSubImage(image, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height, absX + offsetX, absY + offsetY,
-						scaledWidth, scaledHeight);
+					target.context2D.drawScaledSubImage(image, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height, absX + offsetX,
+						absY + offsetY, scaledWidth, scaledHeight);
 				case Tile:
 					throw new haxe.exceptions.NotImplementedException("Tile fill mode is not yet implemented");
 				case TileVertically:

@@ -1,4 +1,4 @@
-package s2d.stage.graphics;
+package s2d.graphics.stage;
 
 #if (S2D_LIGHTING_SHADOWS == 1)
 import kha.graphics4.IndexBuffer;
@@ -7,7 +7,7 @@ import se.math.Vec2;
 import se.math.Mat3;
 import se.math.VectorMath;
 import s2d.stage.objects.Sprite;
-import s2d.stage.graphics.lighting.ShadowPass;
+import s2d.graphics.stage.lighting.ShadowPass;
 
 class ShadowBuffer {
 	var indices:IndexBuffer;

@@ -1,4 +1,4 @@
-package s2d.stage.graphics.lighting;
+package s2d.graphics.stage.lighting;
 
 #if (S2D_LIGHTING && S2D_LIGHTING_SHADOWS == 1)
 import kha.Shaders;
@@ -38,7 +38,7 @@ class ShadowPass {
 		final target = @:privateAccess Renderer.buffer.shadowMap;
 		target.setDepthStencilFrom(Renderer.buffer.depthMap);
 
-		final ctx = target.ctx3D;
+		final ctx = target.context3D;
 		ctx.begin();
 		ctx.clear(White);
 		if (light.isMappingShadows) {
