@@ -1,20 +1,17 @@
 package s2d.elements;
 
-import se.Log;
-import kha.Assets;
 import se.Image;
 import se.Texture;
 import s2d.geometry.Rect;
 
 class ImageElement extends DrawableElement {
-	@:isVar public var source(default, set):String;
 	public var image(default, set):Image;
-	public var sourceClip:Rect;
+	public var sourceClip:Rect = new Rect(0.0, 0.0, 0.0, 0.0);
 	public var fillMode:ImageFillMode = Stretch;
 
-	public function new(source:String = "", name:String = "image") {
+	public function new(?image:Image, name:String = "image") {
 		super(name);
-		this.source = source;
+		this.image = image;
 	}
 
 	function draw(target:Texture) {
@@ -50,24 +47,10 @@ class ImageElement extends DrawableElement {
 		}
 	}
 
-	function set_source(value:String):String {
-		source = value;
-		if (source != "" && source != null)
-			Assets.loadImageFromPath(source, false, img -> {
-				image = img;
-			}, err -> {
-				Log.error('Failed to load image ${err.url}: ${err.error}');
-			});
-		else
-			image = null;
-		return source;
-	}
-
 	function set_image(value:Image):Image {
-		image?.unload();
 		image = value;
 		if (image != null)
-			sourceClip = sourceClip ?? new Rect(0.0, 0.0, image.width, image.height);
+			sourceClip = new Rect(0.0, 0.0, image.width, image.height);
 		return image;
 	}
 }
