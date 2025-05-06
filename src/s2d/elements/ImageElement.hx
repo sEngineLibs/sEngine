@@ -1,25 +1,36 @@
 package s2d.elements;
 
 import se.Image;
+import se.Assets.ImageAsset;
 import se.Texture;
 import s2d.geometry.Rect;
 
 class ImageElement extends DrawableElement {
-	var image(default, set):Image;
+	var asset:ImageAsset = new ImageAsset();
 
-	public var source(default, set):String = "";
 	public var sourceClip:Rect = new Rect(0.0, 0.0, 0.0, 0.0);
-	public var asynchronous:Bool = true;
 	public var fillMode:ImageFillMode = Stretch;
 
-	public function new(?source:String, asynchronous:Bool = false, name:String = "image") {
+	@alias public var source:String = asset.source;
+	@readonly @alias public var image:Image = asset.asset;
+
+	public function new(?source:String, name:String = "asset") {
 		super(name);
-		this.asynchronous = asynchronous;
+		asset.onAssetChanged(__syncAsset__);
 		this.source = source;
 	}
 
-	function draw(target:Texture) {
+	function __syncAsset__() {
 		if (image != null) {
+			sourceClip.x = 0.0;
+			sourceClip.y = 0.0;
+			sourceClip.width = image.width;
+			sourceClip.height = image.height;
+		}
+	}
+
+	function draw(target:Texture) {
+		if (image != null)
 			switch fillMode {
 				case Pad:
 					target.context2D.drawSubImage(image, absX, absY, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height);
@@ -48,28 +59,6 @@ class ImageElement extends DrawableElement {
 				case TileHorizontally:
 					throw new haxe.exceptions.NotImplementedException("TileHorizontally fill mode is not yet implemented");
 			}
-		}
-	}
-
-	function set_source(value:String):String {
-		source = value ?? "";
-		if (source != "")
-			if (asynchronous)
-				image = Image.fromName("");
-			else {
-				if (source.indexOf("/") + source.indexOf("\\") + source.indexOf(".") > -3)
-					Image.asyncLoadFromPath(source, img -> image = img);
-				else
-					Image.asyncLoadFromName(source, img -> image = img);
-			}
-		return source;
-	}
-
-	function set_image(value:Image):Image {
-		image = value;
-		if (image != null)
-			sourceClip = new Rect(0.0, 0.0, image.width, image.height);
-		return image;
 	}
 }
 

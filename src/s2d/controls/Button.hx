@@ -13,8 +13,12 @@ class Button extends AbstractButton {
 		background = {
 			var rect = new RoundedRectangle();
 			rect.color = Color.rgb(0.75, 0.75, 0.75);
-			onHoveredChanged((_) -> if (!pressed) rect.color = hovered ? Color.rgb(0.85, 0.85, 0.85) : Color.rgb(0.75, 0.75, 0.75));
-			onPressedChanged((_) -> rect.color = pressed ? Color.rgb(0.55, 0.55, 0.55) : Color.rgb(0.75, 0.75, 0.75));
+			onHoveredChanged((_) -> if (!pressed) 
+				rect.color = hovered ? Color.rgb(0.85, 0.85, 0.85) : Color.rgb(0.75, 0.75, 0.75)
+			);
+			onPressedChanged((_) -> 
+				rect.color = pressed ? Color.rgb(0.55, 0.55, 0.55) : Color.rgb(0.75, 0.75, 0.75)
+			);
 			rect;
 		}
 		content = {

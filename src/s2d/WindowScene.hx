@@ -1,6 +1,9 @@
 package s2d;
 
 import kha.Window;
+import se.Time;
+import se.Assets;
+import se.graphics.Context2D;
 import se.App;
 import se.Texture;
 import se.input.Mouse;
@@ -85,16 +88,32 @@ final class WindowScene extends DrawableElement {
 		window.resize(width, height);
 	}
 
-	function draw(target:Texture) {
+	override function render(target:Texture) {
 		target.context2D.render(true, color, ctx -> {
-			for (e in children)
-				e.render(backbuffer);
+			draw(target);
 			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 			var e = elementAt(App.input.mouse.x, App.input.mouse.y);
 			if (e != null)
 				drawBounds(e, ctx);
 			#end
+			#if S2D_DEBUG_FPS
+			var font:FontAsset = new FontAsset("font_default");
+			if (font.asset != null) {
+				final fps = Std.int(1.0 / Time.delta);
+				ctx.style.font = font;
+				ctx.style.fontSize = 14;
+				ctx.style.color = Black;
+				ctx.drawString('FPS: ${fps}', 6, 6);
+				ctx.style.color = White;
+				ctx.drawString('FPS: ${fps}', 5, 5);
+			}
+			#end
 		});
+	}
+
+	function draw(target:Texture) {
+		for (e in children)
+			e.render(backbuffer);
 	}
 
 	function adjustTabFocus() {
@@ -230,10 +249,14 @@ final class WindowScene extends DrawableElement {
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 	function drawBounds(e:Element, ctx:Context2D) {
+		var font:FontAsset = "font_default";
+		if (font.asset == null)
+			return;
+
 		final style = ctx.style;
 
 		style.opacity = 0.5;
-		style.font = "Roboto_Regular";
+		style.font = font;
 		style.fontSize = 16;
 
 		final lm = e.left.margin;
@@ -268,6 +291,7 @@ final class WindowScene extends DrawableElement {
 
 		// labels
 		style.color = se.Color.rgb(1.0, 1.0, 1.0);
+		style.opacity = 1.0;
 		final fs = style.fontSize + 5;
 
 		// labels - titles
@@ -335,7 +359,6 @@ final class WindowScene extends DrawableElement {
 			App.input.mouse.y
 			- style.font.height(style.fontSize)
 			+ style.fontSize);
-		style.opacity = 1.0;
 	}
 	#end
 

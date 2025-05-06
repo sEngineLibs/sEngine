@@ -487,7 +487,7 @@ class SMacro extends Builder {
 				// 	final __result__ = $e;
 				// 	${expr2};
 				// 	return __result__;
-				// } else 
+				// } else
 				macro {
 					${expr2};
 					return $e;
