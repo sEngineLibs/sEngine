@@ -24,7 +24,7 @@ void main() {
     #endif
     vec3 pos = viewProjection * model * vec3(vertCoord, 1.0);
     gl_Position = vec4(pos.xy, depth, 1.0);
-
+    
     fragCoord = gl_Position.xy;
     fragUV = cropRect.xy + (vertCoord * 0.5 + 0.5) * cropRect.zw;
 }

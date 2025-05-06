@@ -1,10 +1,10 @@
 package se.graphics;
 
 import kha.graphics2.Graphics;
-import s2d.Alignment;
 import se.math.Vec2;
 import se.math.Mat3;
 import se.math.VectorMath;
+import s2d.Alignment;
 
 @:forward(pipeline, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)
 extern abstract Context2D(Graphics) from Graphics {
@@ -466,9 +466,10 @@ extern abstract Context2D(Graphics) from Graphics {
 }
 
 @:dox(show)
-@:forward(opacity, font, fontSize)
+@:forward(opacity, fontSize)
 extern private abstract Context2DStyle(Graphics) from Graphics {
 	public var color(get, set):Color;
+	public var font(get, set):Font;
 
 	public inline function pushOpacity(value:Float):Void {
 		this.pushOpacity(this.opacity * value);
@@ -484,5 +485,13 @@ extern private abstract Context2DStyle(Graphics) from Graphics {
 
 	private inline function set_color(value:Color):Color {
 		return this.color = value;
+	}
+
+	private inline function get_font():Font {
+		return this.font;
+	}
+
+	private inline function set_font(value:Font):Font {
+		return this.font = value;
 	}
 }

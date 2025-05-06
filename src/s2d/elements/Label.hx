@@ -1,7 +1,6 @@
 package s2d.elements;
 
-import kha.Font;
-import kha.Assets;
+import se.Font;
 import se.Texture;
 import s2d.Alignment;
 
@@ -9,16 +8,15 @@ using se.extensions.StringExt;
 
 class Label extends DrawableElement {
 	@:inject(updateTextWidth) @track public var text:String;
-	@:inject(updateTextSize) public var font:Font;
+	@:inject(updateTextSize) public var font:Font = "Roboto_Regular";
 	@:inject(updateTextSize) @track @:isVar public var fontSize(default, set):Int = 32;
 
 	public var alignment:Alignment = AlignLeft | AlignTop;
-	public var textWidth(default, null):Float;
-	public var textHeight(default, null):Float;
+	public var textWidth(default, null):Float = 0.0;
+	public var textHeight(default, null):Float = 0.0;
 
 	public function new(text:String = "Text", name:String = "label") {
 		super(name);
-		this.font = Assets.fonts.get("Roboto_Regular");
 		this.text = text;
 	}
 

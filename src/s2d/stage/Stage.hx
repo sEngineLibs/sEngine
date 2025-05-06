@@ -19,11 +19,10 @@ class Stage extends DrawableElement {
 	@:inject(updateViewProjection) 
 	public var stageScale:Float = 1.0;
 	@:inject(updateViewProjection) 
-	public var aspectRatio(default, null):Float = 1.0;
+	public var aspectRatio:Float = 1.0;
 
 	public var layers:Array<StageLayer> = [];
 	public var camera:Camera = new Camera();
-	public var projection:Mat3 = Mat3.identity();
 	public var viewProjection:Mat3 = Mat3.identity();
 
 	#if (S2D_LIGHTING_ENVIRONMENT == 1)
@@ -72,7 +71,12 @@ class Stage extends DrawableElement {
 	}
 
 	function updateViewProjection() {
-		viewProjection = projection * camera.view;
+		var projection;
+		if (aspectRatio >= 1)
+			projection = Mat3.orthogonalProjection(-stageScale * aspectRatio, stageScale * aspectRatio, -stageScale, stageScale);
+		else 
+			projection = Mat3.orthogonalProjection(-stageScale, stageScale, -stageScale / aspectRatio, stageScale / aspectRatio);
+		viewProjection.copyFrom(projection * camera.view);
 	}
 
 	function draw(target:Texture) {

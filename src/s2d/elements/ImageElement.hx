@@ -5,13 +5,17 @@ import se.Texture;
 import s2d.geometry.Rect;
 
 class ImageElement extends DrawableElement {
-	public var image(default, set):Image;
+	var image(default, set):Image;
+
+	public var source(default, set):String = "";
 	public var sourceClip:Rect = new Rect(0.0, 0.0, 0.0, 0.0);
+	public var asynchronous:Bool = true;
 	public var fillMode:ImageFillMode = Stretch;
 
-	public function new(?image:Image, name:String = "image") {
+	public function new(?source:String, asynchronous:Bool = false, name:String = "image") {
 		super(name);
-		this.image = image;
+		this.asynchronous = asynchronous;
+		this.source = source;
 	}
 
 	function draw(target:Texture) {
@@ -45,6 +49,20 @@ class ImageElement extends DrawableElement {
 					throw new haxe.exceptions.NotImplementedException("TileHorizontally fill mode is not yet implemented");
 			}
 		}
+	}
+
+	function set_source(value:String):String {
+		source = value ?? "";
+		if (source != "")
+			if (asynchronous)
+				image = Image.fromName("");
+			else {
+				if (source.indexOf("/") + source.indexOf("\\") + source.indexOf(".") > -3)
+					Image.asyncLoadFromPath(source, img -> image = img);
+				else
+					Image.asyncLoadFromName(source, img -> image = img);
+			}
+		return source;
 	}
 
 	function set_image(value:Image):Image {

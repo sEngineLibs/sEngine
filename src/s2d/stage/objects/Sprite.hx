@@ -7,10 +7,10 @@ import s2d.geometry.Mesh;
 using se.extensions.VectorExt;
 
 class Sprite extends LayerObject {
-	var _id:UInt;
-
 	public var mesh:Mesh;
 	public var cropRect:Vec4 = new Vec4(0.0, 0.0, 1.0, 1.0);
+
+	@:isVar public var atlas(default, set):SpriteAtlas;
 
 	public function new(atlas:SpriteAtlas, ?polygons:Array<Vec2>) {
 		super(atlas.layer);
@@ -26,23 +26,19 @@ class Sprite extends LayerObject {
 
 	function set_isCastingShadows(value:Bool) {
 		if (!isCastingShadows && value)
-			@:privateAccess layer.shadowBuffer.addSprite(this);
+			layer.shadowBuffer.addSprite(this);
 		else if (isCastingShadows && !value)
-			@:privateAccess layer.shadowBuffer.removeSprite(this);
+			layer.shadowBuffer.removeSprite(this);
 		isCastingShadows = value;
 		return value;
 	}
 	#end
 
-	#if (S2D_SPRITE_INSTANCING == 1)
-	@:isVar public var atlas(default, set):SpriteAtlas;
-
 	function set_atlas(value:SpriteAtlas) {
-		value.addSprite(this);
 		atlas = value;
+		#if (S2D_SPRITE_INSTANCING == 1)
+		atlas.addSprite(this);
+		#end
 		return value;
 	}
-	#else
-	public var atlas:SpriteAtlas;
-	#end
 }

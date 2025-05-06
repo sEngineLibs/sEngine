@@ -1,12 +1,17 @@
 package s2d.graphics.stage.lighting;
 
 #if (S2D_LIGHTING)
+import kha.Shaders;
+import kha.graphics4.TextureUnit;
+import kha.graphics4.ConstantLocation;
 import kha.graphics4.VertexStructure;
 import se.Texture;
 import se.graphics.ShaderPass;
 import se.graphics.ShaderPipeline;
 import s2d.stage.Stage;
 
+@:access(s2d.stage.Stage)
+@:allow(s2d.graphics.StageDrawer)
 class LightingPass extends StageRenderPass {
 	var viewProjectionCL:ConstantLocation;
 	var lightPositionCL:ConstantLocation;
@@ -43,7 +48,7 @@ class LightingPass extends StageRenderPass {
 		lightAttribCL = pipeline.getConstantLocation("lightAttrib");
 		albedoMapTU = pipeline.getTextureUnit("albedoMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
-		emissionMapTU = envPipeline.getTextureUnit("emissionMap");
+		emissionMapTU = pipeline.getTextureUnit("emissionMap");
 		#if (S2D_LIGHTING_PBR == 1)
 		ormMapTU = lightPipeline.getTextureUnit("ormMap");
 		#end
@@ -91,13 +96,13 @@ class LightingPass extends StageRenderPass {
 		ctx.setVertexBuffer(StageDrawer.vertices);
 		#end
 		#if (S2D_LIGHTING_ENVIRONMENT == 1)
-		ctx.setTexture(envMapTU, Stage.current.environmentMap);
+		ctx.setTexture(envMapTU, stage.environmentMap);
 		ctx.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
-		for (layer in Stage.current.layers) {
+		for (layer in stage.layers) {
 			for (light in layer.lights) {
 				ctx.setFloat3(lightPositionCL, light.x, light.y, light.z);
-				ctx.setFloat3(lightColorCL, light.color.R, light.color.G, light.color.B);
+				ctx.setFloat3(lightColorCL, light.color.r, light.color.g, light.color.b);
 				ctx.setFloat2(lightAttribCL, light.power, light.radius);
 				#if (S2D_SPRITE_INSTANCING == 1)
 				for (atlas in layer.spriteAtlases) {
@@ -116,7 +121,9 @@ class LightingPass extends StageRenderPass {
 					ctx.setVec4(cropRectCL, sprite.cropRect);
 					ctx.setTexture(albedoMapTU, sprite.atlas.albedoMap);
 					ctx.setTexture(normalMapTU, sprite.atlas.normalMap);
+					#if (S2D_LIGHTING_PBR == 1)
 					ctx.setTexture(ormMapTU, sprite.atlas.ormMap);
+					#end
 					ctx.setTexture(emissionMapTU, sprite.atlas.emissionMap);
 					ctx.draw();
 					++i;

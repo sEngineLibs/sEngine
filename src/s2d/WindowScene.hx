@@ -1,14 +1,9 @@
 package s2d;
 
 import kha.Window;
-import kha.Assets;
-import kha.Framebuffer;
 import se.App;
-import se.Time;
-import se.Color;
 import se.Texture;
 import se.input.Mouse;
-import se.graphics.Context2D;
 import se.events.MouseEvents;
 import s2d.FocusPolicy;
 
@@ -18,72 +13,64 @@ using se.extensions.StringExt;
 @:allow(se.App)
 @:allow(se.SEngine)
 @:allow(s2d.Element)
-#if !macro
-@:build(se.macro.SMacro.build())
-#end
-final class WindowScene {
+final class WindowScene extends DrawableElement {
 	var window:Window;
 	var backbuffer:Texture;
 
 	var pending:Array<Element> = [];
 	var activeElements:Array<Element> = [];
-	@:isVar var focused(default, set):Element;
-
-	public var root(default, null):Element;
-	public var color:Color = White;
-	@readonly @alias public var width:Int = window.width;
-	@readonly @alias public var height:Int = window.height;
+	@:isVar var focusedElement(default, set):Element;
 
 	@:signal function resized(width:Int, height:Int):Void;
 
 	public function new(window:Window) {
-		// init root element
-		root = new Element("root");
-		root.width = window.width;
-		root.height = window.height;
+		super("scene");
+
+		width = window.width;
+		height = window.height;
 
 		window.notifyOnResize((w, h) -> {
-			root.width = w;
-			root.height = h;
+			width = w;
+			height = h;
 			resized(w, h);
 		});
 
 		// handle mouse events
 		var m = App.input.mouse;
-		m.onMoved(mouseMoved);
+		m.onMoved(processMouseMoved);
 		m.onScrolled(d -> {
-			mouseScrolled(d, m.x, m.y);
+			processMouseScrolled(d, m.x, m.y);
 			adjustWheelFocus(d);
 		});
-		m.onPressed(mouseDown);
-		m.onReleased(mouseUp);
-		m.onHold(mouseHold);
-		m.onClicked(mouseClicked);
-		m.onDoubleClicked(mouseDoubleClicked);
+		m.onPressed(processMouseDown);
+		m.onReleased(processMouseUp);
+		m.onHold(processMouseHold);
+		m.onClicked(processMouseClicked);
+		m.onDoubleClicked(processMouseDoubleClicked);
 
 		// handle keyboard events
 		var k = App.input.keyboard;
 		k.onKeyDown(Tab, adjustTabFocus);
 
-		k.onDown(key -> if (focused != null) focused.keyboardDown(key));
-		k.onUp(key -> if (focused != null) focused.keyboardUp(key));
-		k.onHold(key -> if (focused != null) focused.keyboardHold(key));
-		k.onPressed(char -> if (focused != null) focused.keyboardPressed(char));
+		k.onDown(key -> if (focusedElement != null) focusedElement.keyboardDown(key));
+		k.onUp(key -> if (focusedElement != null) focusedElement.keyboardUp(key));
+		k.onHold(key -> if (focusedElement != null) focusedElement.keyboardHold(key));
+		k.onPressed(char -> if (focusedElement != null) focusedElement.keyboardPressed(char));
 
 		// init backbuffer
 		this.window = window;
 		onResized((w, h) -> backbuffer = new Texture(w, h));
-		resized(width, height);
+		resized(Std.int(width), Std.int(height));
 	}
 
 	public inline function addElement(el:Element) {
-		root.addChild(el);
+		addChild(el);
 	}
 
 	public function elementAt(x:Float, y:Float):Null<Element> {
-		var i = root.children.length;
+		var i = children.length;
 		while (--i >= 0) {
-			final c = root.children[i];
+			final c = children[i];
 			var cat = c.descendantAt(x, y);
 			if (cat == null) {
 				if (c.contains(x, y))
@@ -98,10 +85,9 @@ final class WindowScene {
 		window.resize(width, height);
 	}
 
-	inline function render(target:Framebuffer) {
-		final g2 = target.g2;
-		backbuffer.context2D.render(true, color, ctx -> {
-			for (e in root.children)
+	function draw(target:Texture) {
+		target.context2D.render(true, color, ctx -> {
+			for (e in children)
 				e.render(backbuffer);
 			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 			var e = elementAt(App.input.mouse.x, App.input.mouse.y);
@@ -109,44 +95,31 @@ final class WindowScene {
 				drawBounds(e, ctx);
 			#end
 		});
-
-		g2.begin(true, Transparent);
-		g2.drawImage(backbuffer, 0, 0);
-		#if S2D_DEBUG_FPS
-		final fps = Std.int(1.0 / Time.delta);
-		g2.font = Assets.fonts.get("Roboto_Regular");
-		g2.fontSize = 14;
-		g2.color = Black;
-		g2.drawString('FPS: ${fps}', 6, 6);
-		g2.color = White;
-		g2.drawString('FPS: ${fps}', 5, 5);
-		#end
-		g2.end();
 	}
 
 	function adjustTabFocus() {
-		final i = focused == null ? -1 : root.children.indexOf(focused);
-		for (j in 1...root.children.length) {
-			var e = root.children[(i + j) % root.children.length];
+		final i = focusedElement == null ? -1 : children.indexOf(focusedElement);
+		for (j in 1...children.length) {
+			var e = children[(i + j) % children.length];
 			if (e.enabled && (e.focusPolicy & TabFocus != 0)) {
-				focused = e;
+				focusedElement = e;
 				return;
 			}
 		}
 	}
 
 	function adjustWheelFocus(d:Int) {
-		final i = root.children.length + (focused == null ? -1 : root.children.indexOf(focused));
-		for (j in 1...root.children.length) {
-			var e = root.children[(i + (d > 0 ? j : -j)) % root.children.length];
+		final i = children.length + (focusedElement == null ? -1 : children.indexOf(focusedElement));
+		for (j in 1...children.length) {
+			var e = children[(i + (d > 0 ? j : -j)) % children.length];
 			if (e.enabled && (e.focusPolicy & WheelFocus != 0)) {
-				focused = e;
+				focusedElement = e;
 				return;
 			}
 		}
 	}
 
-	function mouseMoved(x:Int, y:Int, dx:Int, dy:Int):Void {
+	function processMouseMoved(x:Int, y:Int, dx:Int, dy:Int):Void {
 		final moved = {
 			accepted: false,
 			x: x,
@@ -177,8 +150,8 @@ final class WindowScene {
 				}
 			}
 		};
-		for (i in 1...(root.children.length + 1)) {
-			final el = root.children[root.children.length - i];
+		for (i in 1...(children.length + 1)) {
+			final el = children[children.length - i];
 			if (el.visible)
 				f(el);
 		}
@@ -192,7 +165,7 @@ final class WindowScene {
 		}
 	}
 
-	function mouseScrolled(d:Int, x:Int, y:Int):Void {
+	function processMouseScrolled(d:Int, x:Int, y:Int):Void {
 		processMouseEvent({
 			accepted: true,
 			delta: d,
@@ -201,7 +174,7 @@ final class WindowScene {
 		}, (c, m) -> c.mouseScrolled(m));
 	}
 
-	function mouseDown(b:MouseButton, x:Int, y:Int):Void {
+	function processMouseDown(b:MouseButton, x:Int, y:Int):Void {
 		processMouseEvent({
 			accepted: true,
 			button: b,
@@ -213,7 +186,7 @@ final class WindowScene {
 		});
 	}
 
-	function mouseUp(b:MouseButton, x:Int, y:Int):Void {
+	function processMouseUp(b:MouseButton, x:Int, y:Int):Void {
 		final m = {
 			accepted: true,
 			button: b,
@@ -224,7 +197,7 @@ final class WindowScene {
 			el.mouseReleased(m);
 	}
 
-	function mouseHold(b:MouseButton, x:Int, y:Int):Void {
+	function processMouseHold(b:MouseButton, x:Int, y:Int):Void {
 		processMouseEvent({
 			accepted: true,
 			button: b,
@@ -233,7 +206,7 @@ final class WindowScene {
 		}, (c, m) -> c.mouseHold(m));
 	}
 
-	function mouseClicked(b:MouseButton, x:Int, y:Int):Void {
+	function processMouseClicked(b:MouseButton, x:Int, y:Int):Void {
 		processMouseEvent({
 			accepted: true,
 			button: b,
@@ -242,11 +215,11 @@ final class WindowScene {
 		}, (c, m) -> {
 			c.mouseClicked(m);
 			if (!c.focused && (c.focusPolicy & ClickFocus != 0))
-				this.focused = c;
+				this.focusedElement = c;
 		});
 	}
 
-	function mouseDoubleClicked(b:MouseButton, x:Int, y:Int):Void {
+	function processMouseDoubleClicked(b:MouseButton, x:Int, y:Int):Void {
 		processMouseEvent({
 			accepted: true,
 			button: b,
@@ -260,7 +233,7 @@ final class WindowScene {
 		final style = ctx.style;
 
 		style.opacity = 0.5;
-		style.font = Assets.fonts.get("Roboto_Regular");
+		style.font = "Roboto_Regular";
 		style.fontSize = 16;
 
 		final lm = e.left.margin;
@@ -366,13 +339,13 @@ final class WindowScene {
 	}
 	#end
 
-	function set_focused(value:Element):Element {
-		if (focused != value) {
-			if (focused != null)
-				focused.focused = false;
+	function set_focusedElement(value:Element):Element {
+		if (focusedElement != value) {
+			if (focusedElement != null)
+				focusedElement.focused = false;
 			value.focused = true;
-			focused = value;
+			focusedElement = value;
 		}
-		return focused;
+		return focusedElement;
 	}
 }

@@ -23,12 +23,13 @@ class StageLayer {
 	}
 
 	public function addSprite(sprite:Sprite) {
-		@:privateAccess sprite._id = sprites.length;
-		sprites.push(sprite);
+		if (!sprites.contains(sprite))
+			sprites.push(sprite);
 	}
 
 	public function addSpriteAtlas(atlas:SpriteAtlas) {
-		spriteAtlases.push(atlas);
+		if (!spriteAtlases.contains(atlas))
+			spriteAtlases.push(atlas);
 	}
 
 	#if (S2D_LIGHTING == 1)

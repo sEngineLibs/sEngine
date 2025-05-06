@@ -1,20 +1,18 @@
 package s2d.stage;
 
 import haxe.ds.Vector;
-import kha.Image;
-import se.math.Mat3;
-import s2d.stage.objects.Sprite;
-#if (S2D_LIGHTING == 1)
-#if (S2D_LIGHTING_DEFERRED == 1)
-import s2d.graphics.stage.lighting.StageDrawer;
-#else
-import s2d.graphics.stage.lighting.StageDrawer;
-#end
-#end
 #if (S2D_SPRITE_INSTANCING == 1)
 import kha.graphics4.VertexBuffer;
 #end
-
+import se.Image;
+import s2d.stage.objects.Sprite;
+#if (S2D_LIGHTING == 1)
+#if (S2D_LIGHTING_DEFERRED == 1)
+import s2d.graphics.StageDrawer;
+#else
+import s2d.graphics.StageDrawer;
+#end
+#end
 @:access(s2d.stage.objects.Sprite)
 class SpriteAtlas {
 	@:isVar public var layer(default, set):StageLayer;
@@ -23,8 +21,10 @@ class SpriteAtlas {
 	#if (S2D_LIGHTING == 1)
 	public var albedoMap:Image;
 	public var normalMap:Image;
-	public var ormMap:Image;
 	public var emissionMap:Image;
+	#if (S2D_LIGHTING_PBR == 1)
+	public var ormMap:Image;
+	#end
 	#else
 	public var textureMap:Image;
 	#end
@@ -33,6 +33,16 @@ class SpriteAtlas {
 		this.layer = layer;
 		#if (S2D_SPRITE_INSTANCING == 1)
 		init();
+		#end
+		#if (S2D_LIGHTING == 1)
+		albedoMap = "default_color";
+		normalMap = "default_normal";
+		emissionMap = "default_emission";
+		#if (S2D_LIGHTING_PBR == 1)
+		ormMap = "default_orm";
+		#end
+		#else
+		textureMap = "default_color";
 		#end
 	}
 
@@ -47,10 +57,8 @@ class SpriteAtlas {
 
 	function init() {
 		vertices = [
-			new VertexBuffer(0, StageDrawer.structures[0], StaticUsage, 1), // position
-			new VertexBuffer(0, StageDrawer.structures[1], StaticUsage, 1), // crop rect
-			new VertexBuffer(0, StageDrawer.structures[2], StaticUsage, 1), // model
-			new VertexBuffer(0, StageDrawer.structures[3], StaticUsage, 1) // depth
+			for (i in 0...4)
+				new VertexBuffer(0, StageDrawer.structures[i], StaticUsage, 1)
 		];
 	}
 

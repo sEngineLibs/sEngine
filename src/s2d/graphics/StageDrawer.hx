@@ -1,20 +1,25 @@
 package s2d.graphics;
 
 #if (S2D_LIGHTING != 1)
+import kha.graphics4.TextureUnit;
+import kha.graphics4.ConstantLocation;
+#else
+#if (S2D_LIGHTING_DEFERRED == 1)
+import s2d.graphics.stage.lighting.GeometryPass;
+#end
+import s2d.graphics.stage.lighting.LightingPass;
+#end
 import kha.Shaders;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
-import kha.graphics4.TextureUnit;
-import kha.graphics4.ConstantLocation;
-#end
 import se.Texture;
 import s2d.stage.Stage;
 
 @:access(s2d.stage.Stage)
 class StageDrawer extends ElementDrawer<Stage> {
-	static var indices:IndexBuffer;
-	static var vertices:VertexBuffer;
+	public static var indices:IndexBuffer;
+	public static var vertices:VertexBuffer;
 
 	#if (S2D_LIGHTING == 1)
 	#if (S2D_LIGHTING_DEFERRED == 1)
@@ -50,8 +55,8 @@ class StageDrawer extends ElementDrawer<Stage> {
 
 		super({
 			inputLayout: structures,
-			vertexShader: Reflect.field(Shaders, "drawer_colored_vert"),
-			fragmentShader: Reflect.field(Shaders, "rectangle_frag"),
+			vertexShader: Reflect.field(Shaders, "sprite_vert"),
+			fragmentShader: Reflect.field(Shaders, "sprite_frag"),
 			alphaBlendSource: SourceAlpha
 		});
 

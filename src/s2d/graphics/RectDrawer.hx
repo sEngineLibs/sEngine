@@ -1,7 +1,6 @@
 package s2d.graphics;
 
 import kha.Shaders;
-import kha.graphics4.VertexData;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 import se.Texture;
