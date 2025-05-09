@@ -49,18 +49,20 @@ class SpritePass extends StageRenderPass {
 		ctx.setMat3(viewProjectionCL, stage.viewProjection);
 		for (layer in stage.layers) {
 			#if (S2D_SPRITE_INSTANCING == 1)
-			for (atlas in layer.spriteAtlases) {
-				ctx.setVertexBuffers(atlas.vertices);
-				ctx.setTexture(textureMapTU, atlas.textureMap);
-				ctx.drawInstanced(atlas.sprites.length);
-			}
+			for (atlas in layer.spriteAtlases)
+				if (atlas.loaded) {
+					ctx.setVertexBuffers(atlas.vertices);
+					ctx.setTexture(textureMapTU, atlas.textureMap);
+					ctx.drawInstanced(atlas.sprites.length);
+				}
 			#else
-			for (sprite in layer.sprites) {
-				ctx.setMat3(modelCL, sprite.transform);
-				ctx.setVec4(cropRectCL, sprite.cropRect);
-				ctx.setTexture(textureMapTU, sprite.atlas.textureMap);
-				ctx.draw();
-			}
+			for (sprite in layer.sprites)
+				if (sprite.atlas.loaded) {
+					ctx.setMat3(modelCL, sprite.transform);
+					ctx.setVec4(cropRectCL, sprite.cropRect);
+					ctx.setTexture(textureMapTU, sprite.atlas.textureMap);
+					ctx.draw();
+				}
 			#end
 		}
 		ctx.end();

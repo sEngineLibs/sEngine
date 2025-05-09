@@ -3,7 +3,7 @@ package se.events;
 import se.input.Mouse.MouseButton;
 
 typedef MouseEvent = {
-	var ?accepted:Bool;
+	var accepted:Bool;
 	var x:Int;
 	var y:Int;
 }

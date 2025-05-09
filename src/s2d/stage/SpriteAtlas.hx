@@ -29,6 +29,8 @@ class SpriteAtlas {
 	public var textureMap:ImageAsset;
 	#end
 
+	public var loaded(get, never):Bool;
+
 	public function new(layer:StageLayer) {
 		this.layer = layer;
 		#if (S2D_SPRITE_INSTANCING == 1)
@@ -50,6 +52,17 @@ class SpriteAtlas {
 		value.addSpriteAtlas(this);
 		layer = value;
 		return value;
+	}
+
+	function get_loaded():Bool {
+		#if (S2D_LIGHTING == 1)
+		return albedoMap.loaded && normalMap.loaded && emissionMap.loaded;
+		#if (S2D_LIGHTING_PBR == 1)
+		return albedoMap.loaded && normalMap.loaded && emissionMap.loaded && ormMap.loaded;
+		#end
+		#else
+		return textureMap.loaded;
+		#end
 	}
 
 	#if (S2D_SPRITE_INSTANCING == 1)

@@ -70,29 +70,31 @@ class GeometryPass extends StageRenderPass {
 			@:privateAccess layer.shadowBuffer.updateBuffersData();
 			#end
 			#if (S2D_SPRITE_INSTANCING == 1)
-			for (atlas in layer.spriteAtlases) {
-				ctx.setVertexBuffers(atlas.vertices);
-				ctx.setTexture(albedoMapTU, atlas.albedoMap);
-				ctx.setTexture(normalMapTU, atlas.normalMap);
-				ctx.setTexture(emissionMapTU, atlas.emissionMap);
-				#if (S2D_LIGHTING_PBR == 1)
-				ctx.setTexture(ormMapTU, atlas.ormMap);
-				#end
-				ctx.drawInstanced(atlas.sprites.length);
-			}
+			for (atlas in layer.spriteAtlases)
+				if (atlas.loaded) {
+					ctx.setVertexBuffers(atlas.vertices);
+					ctx.setTexture(albedoMapTU, atlas.albedoMap);
+					ctx.setTexture(normalMapTU, atlas.normalMap);
+					ctx.setTexture(emissionMapTU, atlas.emissionMap);
+					#if (S2D_LIGHTING_PBR == 1)
+					ctx.setTexture(ormMapTU, atlas.ormMap);
+					#end
+					ctx.drawInstanced(atlas.sprites.length);
+				}
 			#else
-			for (sprite in layer.sprites) {
-				ctx.setFloat(depthCL, sprite.z);
-				ctx.setMat3(modelCL, sprite.finalModel);
-				ctx.setVec4(cropRectCL, sprite.cropRect);
-				ctx.setTexture(albedoMapTU, sprite.atlas.albedoMap);
-				ctx.setTexture(normalMapTU, sprite.atlas.normalMap);
-				ctx.setTexture(emissionMapTU, sprite.atlas.emissionMap);
-				#if (S2D_LIGHTING_PBR == 1)
-				ctx.setTexture(ormMapTU, sprite.atlas.ormMap);
-				#end
-				ctx.draw();
-			}
+			for (sprite in layer.sprites)
+				if (sprite.atlas.loaded) {
+					ctx.setFloat(depthCL, sprite.z);
+					ctx.setMat3(modelCL, sprite.finalModel);
+					ctx.setVec4(cropRectCL, sprite.cropRect);
+					ctx.setTexture(albedoMapTU, sprite.atlas.albedoMap);
+					ctx.setTexture(normalMapTU, sprite.atlas.normalMap);
+					ctx.setTexture(emissionMapTU, sprite.atlas.emissionMap);
+					#if (S2D_LIGHTING_PBR == 1)
+					ctx.setTexture(ormMapTU, sprite.atlas.ormMap);
+					#end
+					ctx.draw();
+				}
 			#end
 		}
 		ctx.end();

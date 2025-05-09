@@ -1,69 +1,23 @@
 package s2d;
 
-import kha.Window;
 import se.Time;
 import se.Assets;
-import se.graphics.Context2D;
-import se.App;
 import se.Texture;
-import se.input.Mouse;
-import se.events.MouseEvents;
-import s2d.FocusPolicy;
+import se.graphics.Context2D;
 
 using se.extensions.StringExt;
 
 @:structInit
 @:allow(se.App)
-@:allow(se.SEngine)
+@:allow(se.Window)
 @:allow(s2d.Element)
 final class WindowScene extends DrawableElement {
-	var window:Window;
-	var backbuffer:Texture;
-
 	var pending:Array<Element> = [];
 	var activeElements:Array<Element> = [];
 	@:isVar var focusedElement(default, set):Element;
 
-	@:signal function resized(width:Int, height:Int):Void;
-
-	public function new(window:Window) {
+	public function new() {
 		super("scene");
-
-		width = window.width;
-		height = window.height;
-
-		window.notifyOnResize((w, h) -> {
-			width = w;
-			height = h;
-			resized(w, h);
-		});
-
-		// handle mouse events
-		var m = App.input.mouse;
-		m.onMoved(processMouseMoved);
-		m.onScrolled(d -> {
-			processMouseScrolled(d, m.x, m.y);
-			adjustWheelFocus(d);
-		});
-		m.onPressed(processMouseDown);
-		m.onReleased(processMouseUp);
-		m.onHold(processMouseHold);
-		m.onClicked(processMouseClicked);
-		m.onDoubleClicked(processMouseDoubleClicked);
-
-		// handle keyboard events
-		var k = App.input.keyboard;
-		k.onKeyDown(Tab, adjustTabFocus);
-
-		k.onDown(key -> if (focusedElement != null) focusedElement.keyboardDown(key));
-		k.onUp(key -> if (focusedElement != null) focusedElement.keyboardUp(key));
-		k.onHold(key -> if (focusedElement != null) focusedElement.keyboardHold(key));
-		k.onPressed(char -> if (focusedElement != null) focusedElement.keyboardPressed(char));
-
-		// init backbuffer
-		this.window = window;
-		onResized((w, h) -> backbuffer = new Texture(w, h));
-		resized(Std.int(width), Std.int(height));
 	}
 
 	public inline function addElement(el:Element) {
@@ -84,167 +38,28 @@ final class WindowScene extends DrawableElement {
 		return null;
 	}
 
-	public inline function resize(width:Int, height:Int) {
-		window.resize(width, height);
-	}
-
-	override function render(target:Texture) {
-		target.context2D.render(true, color, ctx -> {
-			draw(target);
-			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-			var e = elementAt(App.input.mouse.x, App.input.mouse.y);
-			if (e != null)
-				drawBounds(e, ctx);
-			#end
-			#if S2D_DEBUG_FPS
-			var font:FontAsset = new FontAsset("font_default");
-			if (font.asset != null) {
-				final fps = Std.int(1.0 / Time.delta);
-				ctx.style.font = font;
-				ctx.style.fontSize = 14;
-				ctx.style.color = Black;
-				ctx.drawString('FPS: ${fps}', 6, 6);
-				ctx.style.color = White;
-				ctx.drawString('FPS: ${fps}', 5, 5);
-			}
-			#end
-		});
-	}
-
 	function draw(target:Texture) {
+		final ctx = target.context2D;
+
 		for (e in children)
-			e.render(backbuffer);
-	}
-
-	function adjustTabFocus() {
-		final i = focusedElement == null ? -1 : children.indexOf(focusedElement);
-		for (j in 1...children.length) {
-			var e = children[(i + j) % children.length];
-			if (e.enabled && (e.focusPolicy & TabFocus != 0)) {
-				focusedElement = e;
-				return;
-			}
+			e.render(target);
+		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
+		var e = elementAt(App.input.mouse.x, App.input.mouse.y);
+		if (e != null)
+			drawBounds(e, ctx);
+		#end
+		#if S2D_DEBUG_FPS
+		var font:FontAsset = new FontAsset("font_default");
+		if (font.loaded) {
+			final fps = Std.int(1.0 / Time.delta);
+			ctx.style.font = font;
+			ctx.style.fontSize = 14;
+			ctx.style.color = Black;
+			ctx.drawString('FPS: ${fps}', 6, 6);
+			ctx.style.color = White;
+			ctx.drawString('FPS: ${fps}', 5, 5);
 		}
-	}
-
-	function adjustWheelFocus(d:Int) {
-		final i = children.length + (focusedElement == null ? -1 : children.indexOf(focusedElement));
-		for (j in 1...children.length) {
-			var e = children[(i + (d > 0 ? j : -j)) % children.length];
-			if (e.enabled && (e.focusPolicy & WheelFocus != 0)) {
-				focusedElement = e;
-				return;
-			}
-		}
-	}
-
-	function processMouseMoved(x:Int, y:Int, dx:Int, dy:Int):Void {
-		final moved = {
-			accepted: false,
-			x: x,
-			y: y,
-			dx: dx,
-			dy: dy
-		}
-		function f(el) {
-			for (i in 1...(el.vChildren.length + 1))
-				f(el.vChildren[el.vChildren.length - i]);
-			if (el.enabled) {
-				if (el.contains(App.input.mouse.x, App.input.mouse.y)) {
-					if (!moved.accepted) {
-						if (!activeElements.contains(el)) {
-							activeElements.push(el);
-							el.containsMouse = true;
-							el.mouseEntered(x, y);
-						}
-						moved.accepted = true;
-						el.mouseMoved(moved);
-					} else if (activeElements.remove(el)) {
-						el.containsMouse = false;
-						el.mouseExited(x, y);
-					}
-				} else if (activeElements.remove(el)) {
-					el.containsMouse = false;
-					el.mouseExited(x, y);
-				}
-			}
-		};
-		for (i in 1...(children.length + 1)) {
-			final el = children[children.length - i];
-			if (el.visible)
-				f(el);
-		}
-	}
-
-	function processMouseEvent<T:MouseEvent>(event:T, f:(Element, T) -> Void) {
-		for (el in activeElements) {
-			f(el, event);
-			if (event.accepted)
-				break;
-		}
-	}
-
-	function processMouseScrolled(d:Int, x:Int, y:Int):Void {
-		processMouseEvent({
-			accepted: true,
-			delta: d,
-			x: x,
-			y: y
-		}, (c, m) -> c.mouseScrolled(m));
-	}
-
-	function processMouseDown(b:MouseButton, x:Int, y:Int):Void {
-		processMouseEvent({
-			accepted: true,
-			button: b,
-			x: x,
-			y: y
-		}, (c, m) -> {
-			pending.push(c);
-			c.mousePressed(m);
-		});
-	}
-
-	function processMouseUp(b:MouseButton, x:Int, y:Int):Void {
-		final m = {
-			accepted: true,
-			button: b,
-			x: x,
-			y: y
-		}
-		for (el in pending)
-			el.mouseReleased(m);
-	}
-
-	function processMouseHold(b:MouseButton, x:Int, y:Int):Void {
-		processMouseEvent({
-			accepted: true,
-			button: b,
-			x: x,
-			y: y
-		}, (c, m) -> c.mouseHold(m));
-	}
-
-	function processMouseClicked(b:MouseButton, x:Int, y:Int):Void {
-		processMouseEvent({
-			accepted: true,
-			button: b,
-			x: x,
-			y: y
-		}, (c, m) -> {
-			c.mouseClicked(m);
-			if (!c.focused && (c.focusPolicy & ClickFocus != 0))
-				this.focusedElement = c;
-		});
-	}
-
-	function processMouseDoubleClicked(b:MouseButton, x:Int, y:Int):Void {
-		processMouseEvent({
-			accepted: true,
-			button: b,
-			x: x,
-			y: y
-		}, (c, m) -> c.mouseDoubleClicked(m));
+		#end
 	}
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)

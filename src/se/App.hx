@@ -1,14 +1,12 @@
 package se;
 
-import kha.Framebuffer;
-import kha.Assets;
 import kha.System;
+import kha.Framebuffer;
 import se.Time;
+import se.Window;
 import se.input.Mouse;
 import se.input.Keyboard;
 import se.animation.Action;
-import se.graphics.Context2D;
-import s2d.WindowScene;
 import s2d.graphics.Drawers;
 
 @:build(se.macro.SMacro.build())
@@ -19,9 +17,9 @@ class App {
 		var mouse:Mouse;
 		var keyboard:Keyboard;
 	};
-	public static var scenes(default, null):Array<WindowScene>;
+	public static var windows(default, null):Array<Window>;
 
-	public static function start(options:SystemOptions, setup:WindowScene->Void) {
+	public static function start(options:SystemOptions, setup:Window->Void) {
 		onUpdate(() -> @:privateAccess {
 			Time.update();
 			Action.update(Time.time);
@@ -33,15 +31,14 @@ class App {
 				mouse: new Mouse(),
 				keyboard: new Keyboard()
 			}
-			var scene = new WindowScene(window);
-			scenes = [scene];
-			setup(scene);
 
-			Assets.loadEverything(() -> {
-				System.notifyOnFrames(frames -> {
-					update();
-					render(frames);
-				});
+			var w = new Window(window);
+			windows = [w];
+			setup(w);
+
+			System.notifyOnFrames(frames -> {
+				update();
+				render(frames);
 			});
 		});
 	}
@@ -52,13 +49,7 @@ class App {
 	}
 
 	static inline function render(frames:Array<Framebuffer>) @:privateAccess {
-		for (i in 0...frames.length) {
-			final scene = scenes[i];
-			final frame = frames[i];
-			scene.render(scene.backbuffer);
-
-			final ctx:Context2D = frame.g2;
-			ctx.render(true, Transparent, ctx -> ctx.drawImage(scene.backbuffer, 0, 0));
-		}
+		for (i in 0...frames.length)
+			windows[i].render(frames[i]);
 	}
 }

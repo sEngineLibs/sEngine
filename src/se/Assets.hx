@@ -45,6 +45,8 @@ private abstract class AssetData<T> {
 	@:isVar public var asset(default, set):T;
 	@:isVar public var source(default, set):String;
 
+	public var loaded(get, never):Bool;
+
 	public function new(?source:String) {
 		this.source = source;
 	}
@@ -90,6 +92,10 @@ private abstract class AssetData<T> {
 		if (old != asset && assetChanged != null)
 			assetChanged();
 		return asset;
+	}
+
+	function get_loaded():Bool {
+		return asset != null;
 	}
 }
 

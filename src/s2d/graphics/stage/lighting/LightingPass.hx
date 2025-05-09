@@ -105,29 +105,31 @@ class LightingPass extends StageRenderPass {
 				ctx.setFloat3(lightColorCL, light.color.r, light.color.g, light.color.b);
 				ctx.setFloat2(lightAttribCL, light.power, light.radius);
 				#if (S2D_SPRITE_INSTANCING == 1)
-				for (atlas in layer.spriteAtlases) {
-					ctx.setVertexBuffers(atlas.vertices);
-					ctx.setTexture(albedoMapTU, atlas.albedoMap);
-					ctx.setTexture(normalMapTU, atlas.normalMap);
-					ctx.setTexture(ormMapTU, atlas.ormMap);
-					ctx.setTexture(emissionMapTU, atlas.emissionMap);
-					ctx.drawInstanced(atlas.sprites.length);
-				}
+				for (atlas in layer.spriteAtlases)
+					if (atlas.loaded) {
+						ctx.setVertexBuffers(atlas.vertices);
+						ctx.setTexture(albedoMapTU, atlas.albedoMap);
+						ctx.setTexture(normalMapTU, atlas.normalMap);
+						ctx.setTexture(ormMapTU, atlas.ormMap);
+						ctx.setTexture(emissionMapTU, atlas.emissionMap);
+						ctx.drawInstanced(atlas.sprites.length);
+					}
 				#else
 				var i = 0;
-				for (sprite in layer.sprites) {
-					ctx.setFloat(depthCL, i / layer.sprites.length);
-					ctx.setMat3(modelCL, sprite.transform);
-					ctx.setVec4(cropRectCL, sprite.cropRect);
-					ctx.setTexture(albedoMapTU, sprite.atlas.albedoMap);
-					ctx.setTexture(normalMapTU, sprite.atlas.normalMap);
-					#if (S2D_LIGHTING_PBR == 1)
-					ctx.setTexture(ormMapTU, sprite.atlas.ormMap);
-					#end
-					ctx.setTexture(emissionMapTU, sprite.atlas.emissionMap);
-					ctx.draw();
-					++i;
-				}
+				for (sprite in layer.sprites)
+					if (sprite.atlas.loaded) {
+						ctx.setFloat(depthCL, i / layer.sprites.length);
+						ctx.setMat3(modelCL, sprite.transform);
+						ctx.setVec4(cropRectCL, sprite.cropRect);
+						ctx.setTexture(albedoMapTU, sprite.atlas.albedoMap);
+						ctx.setTexture(normalMapTU, sprite.atlas.normalMap);
+						#if (S2D_LIGHTING_PBR == 1)
+						ctx.setTexture(ormMapTU, sprite.atlas.ormMap);
+						#end
+						ctx.setTexture(emissionMapTU, sprite.atlas.emissionMap);
+						ctx.draw();
+						++i;
+					}
 				#end
 			}
 		}
