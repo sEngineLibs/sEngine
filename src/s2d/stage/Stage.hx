@@ -16,9 +16,9 @@ import s2d.graphics.Drawers;
 class Stage extends DrawableElement {
 	var renderBuffer:RenderBuffer;
 
-	@:inject(updateViewProjection) 
+	@:inject(updateViewProjection)
 	public var stageScale:Float = 1.0;
-	@:inject(updateViewProjection) 
+	@:inject(updateViewProjection)
 	public var aspectRatio:Float = 1.0;
 
 	public var layers:Array<StageLayer> = [];
@@ -74,12 +74,18 @@ class Stage extends DrawableElement {
 		var projection;
 		if (aspectRatio >= 1)
 			projection = Mat3.orthogonalProjection(-stageScale * aspectRatio, stageScale * aspectRatio, -stageScale, stageScale);
-		else 
+		else
 			projection = Mat3.orthogonalProjection(-stageScale, stageScale, -stageScale / aspectRatio, stageScale / aspectRatio);
 		viewProjection.copyFrom(projection * camera.view);
 	}
 
 	function draw(target:Texture) {
-		Drawers.stageDrawer.render(target, this);
+		final ctx = target.context2D;
+		ctx.end();
+		// render to buffer
+		Drawers.stageRenderer.render(target, this);
+		// render to target
+		ctx.begin();
+		ctx.drawScaledImage(renderBuffer.tgt, absX, absY, width, height);
 	}
 }

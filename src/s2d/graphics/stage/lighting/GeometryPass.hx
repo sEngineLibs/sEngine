@@ -8,7 +8,7 @@ import kha.graphics4.VertexStructure;
 import kha.graphics4.PipelineState;
 
 @:access(s2d.stage.Stage)
-@:allow(s2d.graphics.StageDrawer)
+@:allow(s2d.graphics.StageRenderer)
 class GeometryPass extends StageRenderPass {
 	var viewProjectionCL:ConstantLocation;
 	#if (S2D_SPRITE_INSTANCING != 1)

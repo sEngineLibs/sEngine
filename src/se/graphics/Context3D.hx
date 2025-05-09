@@ -3,6 +3,7 @@ package se.graphics;
 import kha.arrays.Int32Array;
 import kha.arrays.Float32Array;
 import kha.graphics4.Graphics;
+import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
 import se.math.Vec2;
 import se.math.Vec3;
@@ -14,7 +15,7 @@ import se.math.Mat3;
 import se.math.Mat4;
 import se.math.VectorMath;
 
-@:forward(begin, clear, flush, end, scissor, disableScissor, setPipeline, setIndexBuffer, setVertexBuffer, setVertexBuffers, setTexture, setTextureParameters)
+@:forward(begin, clear, flush, end, scissor, disableScissor, setPipeline, setIndexBuffer, setVertexBuffer, setVertexBuffers, setTextureParameters)
 extern abstract Context3D(Graphics) from Graphics {
 	public inline function setBool(location:ConstantLocation, value:Bool) {
 		this.setBool(location, value);
@@ -132,6 +133,10 @@ extern abstract Context3D(Graphics) from Graphics {
 	overload public inline function setMat4(location:ConstantLocation, a00:Float, a10:Float, a20:Float, a30:Float, a01:Float, a11:Float, a21:Float, a31:Float,
 			a02:Float, a12:Float, a22:Float, a32:Float, a03:Float, a13:Float, a23:Float, a33:Float) {
 		setMat4(location, mat4(a00, a10, a20, a30, a01, a11, a21, a31, a02, a12, a22, a32, a03, a13, a23, a33));
+	}
+
+	public inline function setTexture(unit:TextureUnit, texture:Image) {
+		this.setTexture(unit, texture);
 	}
 
 	public inline function draw(start:Int = 0, count:Int = -1) {

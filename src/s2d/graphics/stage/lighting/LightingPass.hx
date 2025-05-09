@@ -11,7 +11,7 @@ import se.graphics.ShaderPipeline;
 import s2d.stage.Stage;
 
 @:access(s2d.stage.Stage)
-@:allow(s2d.graphics.StageDrawer)
+@:allow(s2d.graphics.StageRenderer)
 class LightingPass extends StageRenderPass {
 	var viewProjectionCL:ConstantLocation;
 	var lightPositionCL:ConstantLocation;
@@ -66,9 +66,9 @@ class LightingPass extends StageRenderPass {
 		ctx.begin();
 		ctx.clear(Black);
 		ctx.setMat3(viewProjectionCL, stage.viewProjection);
-		ctx.setIndexBuffer(StageDrawer.indices);
+		ctx.setIndexBuffer(Drawers.indices);
 		#if (S2D_LIGHTING_DEFERRED == 1)
-		ctx.setVertexBuffer(StageDrawer.vertices);
+		ctx.setVertexBuffer(Drawers.vertices);
 		ctx.setPipeline(pipeline);
 		ctx.setTexture(albedoMapTU, buffer.albedoMap);
 		ctx.setTexture(normalMapTU, buffer.normalMap);
@@ -80,8 +80,8 @@ class LightingPass extends StageRenderPass {
 				ShadowPass.render(light);
 				ctx.begin();
 				ctx.setPipeline(pipeline);
-				ctx.setIndexBuffer(StageDrawer.indices);
-				ctx.setVertexBuffer(StageDrawer.vertices);
+				ctx.setIndexBuffer(Drawers.indices);
+				ctx.setVertexBuffer(Drawers.vertices);
 				ctx.setTexture(shadowMapTU, buffer.shadowMap);
 				#end
 				ctx.setFloat3(lightPositionCL, light.x, light.y, light.z);
@@ -93,7 +93,7 @@ class LightingPass extends StageRenderPass {
 		#else
 		ctx.setPipeline(pipeline);
 		#if (S2D_SPRITE_INSTANCING != 1)
-		ctx.setVertexBuffer(StageDrawer.vertices);
+		ctx.setVertexBuffer(Drawers.vertices);
 		#end
 		#if (S2D_LIGHTING_ENVIRONMENT == 1)
 		ctx.setTexture(envMapTU, stage.environmentMap);

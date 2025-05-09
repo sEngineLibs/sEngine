@@ -4,9 +4,10 @@ import kha.graphics4.ConstantLocation;
 import se.Texture;
 import se.graphics.ShaderPipeline;
 import se.graphics.ShaderPass;
+import s2d.Element;
 
 @:allow(s2d.Element)
-abstract class ElementDrawer<T> extends ShaderPass {
+abstract class ElementDrawer<T:Element> extends ShaderPass {
 	var modelCL:ConstantLocation;
 
 	public function new(state:ShaderPipelineState) {

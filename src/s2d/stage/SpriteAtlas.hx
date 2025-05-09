@@ -4,13 +4,13 @@ import haxe.ds.Vector;
 #if (S2D_SPRITE_INSTANCING == 1)
 import kha.graphics4.VertexBuffer;
 #end
-import se.Image;
+import se.Assets;
 import s2d.stage.objects.Sprite;
 #if (S2D_LIGHTING == 1)
 #if (S2D_LIGHTING_DEFERRED == 1)
-import s2d.graphics.StageDrawer;
+import s2d.graphics.StageRenderer;
 #else
-import s2d.graphics.StageDrawer;
+import s2d.graphics.StageRenderer;
 #end
 #end
 @:access(s2d.stage.objects.Sprite)
@@ -19,14 +19,14 @@ class SpriteAtlas {
 	public var sprites:Vector<Sprite> = new Vector(0);
 
 	#if (S2D_LIGHTING == 1)
-	public var albedoMap:Image;
-	public var normalMap:Image;
-	public var emissionMap:Image;
+	public var albedoMap:ImageAsset;
+	public var normalMap:ImageAsset;
+	public var emissionMap:ImageAsset;
 	#if (S2D_LIGHTING_PBR == 1)
-	public var ormMap:Image;
+	public var ormMap:ImageAsset;
 	#end
 	#else
-	public var textureMap:Image;
+	public var textureMap:ImageAsset;
 	#end
 
 	public function new(layer:StageLayer) {
@@ -58,7 +58,7 @@ class SpriteAtlas {
 	function init() {
 		vertices = [
 			for (i in 0...4)
-				new VertexBuffer(0, StageDrawer.structures[i], StaticUsage, 1)
+				new VertexBuffer(0, StageRenderer.structures[i], StaticUsage, 1)
 		];
 	}
 
@@ -74,17 +74,17 @@ class SpriteAtlas {
 		vertices[2].delete();
 
 		#if (S2D_LIGHTING == 1)
-		vertices[1] = new VertexBuffer(sprites.length, StageDrawer.structures[1], StaticUsage, 1);
-		vertices[2] = new VertexBuffer(sprites.length, StageDrawer.structures[2], StaticUsage, 1);
-		vertices[3] = new VertexBuffer(sprites.length, StageDrawer.structures[3], StaticUsage, 1);
+		vertices[1] = new VertexBuffer(sprites.length, StageRenderer.structures[1], StaticUsage, 1);
+		vertices[2] = new VertexBuffer(sprites.length, StageRenderer.structures[2], StaticUsage, 1);
+		vertices[3] = new VertexBuffer(sprites.length, StageRenderer.structures[3], StaticUsage, 1);
 		#end
 	}
 
 	function update() {
 		#if (S2D_LIGHTING == 1)
-		final cStructSize = StageDrawer.structures[1].byteSize() >> 2;
-		final mStructSize = StageDrawer.structures[2].byteSize() >> 2;
-		final dStructSize = StageDrawer.structures[3].byteSize() >> 2;
+		final cStructSize = StageRenderer.structures[1].byteSize() >> 2;
+		final mStructSize = StageRenderer.structures[2].byteSize() >> 2;
+		final dStructSize = StageRenderer.structures[3].byteSize() >> 2;
 		#end
 		final cData = vertices[1].lock();
 		final mData = vertices[2].lock();

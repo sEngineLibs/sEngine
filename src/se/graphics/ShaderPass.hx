@@ -1,8 +1,5 @@
 package se.graphics;
 
-import kha.graphics4.VertexStructure;
-import kha.graphics4.ConstantLocation;
-import se.Texture;
 import se.graphics.ShaderPipeline;
 
 abstract class ShaderPass {

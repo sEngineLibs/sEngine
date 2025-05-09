@@ -46,7 +46,7 @@ class App {
 		});
 	}
 
-	public static function stop() {
+	public static function exit() {
 		if (!System.stop())
 			Log.error("This application can't be stopped!");
 	}

@@ -1,7 +1,6 @@
 package s2d.graphics.stage;
 
 import se.Texture;
-import se.graphics.ShaderPipeline;
 import se.graphics.ShaderPass;
 import s2d.stage.Stage;
 

@@ -39,13 +39,13 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 	}
 
 	public function findChild(name:String):This {
-		for (c in children)
-			if (c.name == name)
-				return c;
+		for (child in children)
+			if (child.name == name)
+				return child;
 			else {
-				var _c = c.findChild(name);
-				if (_c != null)
-					return _c;
+				var c = child.findChild(name);
+				if (c != null)
+					return c;
 			}
 		return null;
 	}
