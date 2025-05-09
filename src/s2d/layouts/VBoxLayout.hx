@@ -71,19 +71,19 @@ class VBoxLayout extends DirLayout<ElementVSlots, VLayoutCell> {
 
 	function setCellSlots(cell:VLayoutCell):CellSlots {
 		return {
-			requiredHeightChanged: (rw:Float) -> {
+			requiredHeightChanged: (rh:Float) -> {
 				if (!updating) {
 					if (cell.fillHeight)
 						syncAvailableHeightPerCell();
 					else
-						availableHeight += rw - cell.requiredHeight;
+						availableHeight += rh - cell.requiredHeight;
 				}
 			},
-			fillHeightChanged: (fw:Bool) -> {
-				if (!fw && cell.el.layout.fillHeight) {
+			fillHeightChanged: (fh:Bool) -> {
+				if (!fh && cell.el.layout.fillHeight) {
 					++fillHeightCellsNum;
 					availableHeight += cell.requiredHeight;
-				} else if (fw && !cell.el.layout.fillHeight) {
+				} else if (fh && !cell.el.layout.fillHeight) {
 					--fillHeightCellsNum;
 					@:privateAccess cell.syncRequiredHeight();
 				}
@@ -124,7 +124,7 @@ class VBoxLayout extends DirLayout<ElementVSlots, VLayoutCell> {
 	}
 
 	function syncLayout() {
-		if (direction & RightToLeft != 0)
+		if (direction & BottomToTop != 0)
 			for (cellSlots in cells) {
 				final cell = cellSlots.cell;
 				cell.top.position = cell.bottom.position - cell.requiredHeight + availableHeightPerCell;
@@ -145,7 +145,7 @@ class VBoxLayout extends DirLayout<ElementVSlots, VLayoutCell> {
 
 	function syncSpacing(d:Float) {
 		if (cells.length > 1) {
-			if (direction & RightToLeft != 0)
+			if (direction & BottomToTop != 0)
 				for (cellSlots in cells.slice(1))
 					cellSlots.cell.bottom.margin = spacing;
 			else

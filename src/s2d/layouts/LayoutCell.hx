@@ -150,6 +150,7 @@ abstract class LayoutCell<S:ElementSlots> {
 @:dox(hide)
 class HLayoutCell extends LayoutCell<ElementHSlots> {
 	public function addSlots() {
+		syncRequiredWidth();
 		slots = {
 			widthChanged: (_:Float) -> if (!fillWidth) syncRequiredWidth(),
 			widthLayoutChanged: (_:Float) -> syncRequiredWidth()
@@ -171,6 +172,7 @@ class HLayoutCell extends LayoutCell<ElementHSlots> {
 @:dox(hide)
 class VLayoutCell extends LayoutCell<ElementVSlots> {
 	public function addSlots() {
+		syncRequiredHeight();
 		slots = {
 			heightChanged: (_:Float) -> if (!fillHeight) syncRequiredHeight(),
 			heightLayoutChanged: (_:Float) -> syncRequiredHeight()
