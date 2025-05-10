@@ -15,9 +15,9 @@ import kha.graphics4.VertexStructure;
 
 @:forward()
 @:forward.new
-abstract ShaderPipeline(PipelineState) from PipelineState to PipelineState {
+extern abstract ShaderPipeline(PipelineState) from PipelineState to PipelineState {
 	@:from
-	static function fromState(state:ShaderPipelineState):ShaderPipeline {
+	static inline function fromState(state:ShaderPipelineState):ShaderPipeline {
 		final pipeline = new PipelineState();
 		pipeline.inputLayout = state.inputLayout;
 		pipeline.vertexShader = state.vertexShader;
@@ -46,8 +46,7 @@ abstract ShaderPipeline(PipelineState) from PipelineState to PipelineState {
 		pipeline.alphaBlendDestination = state.alphaBlendDestination ?? pipeline.alphaBlendDestination;
 		pipeline.alphaBlendOperation = state.alphaBlendOperation ?? pipeline.alphaBlendOperation;
 
-		if (state.colorWriteMask != null)
-			pipeline.colorWriteMask = state.colorWriteMask;
+		pipeline.colorWriteMask = state.colorWriteMask ?? true;
 		pipeline.colorWriteMaskRed = state.colorWriteMaskRed ?? pipeline.colorWriteMaskRed;
 		pipeline.colorWriteMaskGreen = state.colorWriteMaskGreen ?? pipeline.colorWriteMaskGreen;
 		pipeline.colorWriteMaskBlue = state.colorWriteMaskBlue ?? pipeline.colorWriteMaskBlue;

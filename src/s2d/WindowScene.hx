@@ -1,6 +1,8 @@
 package s2d;
 
+import se.Window;
 import se.Time;
+import se.Color;
 import se.Assets;
 import se.Texture;
 import se.graphics.Context2D;
@@ -11,17 +13,17 @@ using se.extensions.StringExt;
 @:allow(se.App)
 @:allow(se.Window)
 @:allow(s2d.Element)
-final class WindowScene extends DrawableElement {
-	var pending:Array<Element> = [];
-	var activeElements:Array<Element> = [];
-	@:isVar var focusedElement(default, set):Element;
+class WindowScene extends Element {
+	public var backgroundColor:Color = White;
 
-	public function new() {
-		super("scene");
-	}
-
-	public inline function addElement(el:Element) {
-		addChild(el);
+	public function new(name:String = "scene", window:Window) {
+		super(name);
+		width = window.width;
+		height = window.height;
+		window.onResized((w, h) -> {
+			width = w;
+			height = h;
+		});
 	}
 
 	public function elementAt(x:Float, y:Float):Null<Element> {
@@ -38,28 +40,29 @@ final class WindowScene extends DrawableElement {
 		return null;
 	}
 
-	function draw(target:Texture) {
-		final ctx = target.context2D;
+	override function render(target:Texture) {
+		target.context2D.render(true, backgroundColor, ctx -> {
+			for (e in children)
+				e.render(target);
 
-		for (e in children)
-			e.render(target);
-		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-		var e = elementAt(App.input.mouse.x, App.input.mouse.y);
-		if (e != null)
-			drawBounds(e, ctx);
-		#end
-		#if S2D_DEBUG_FPS
-		var font:FontAsset = new FontAsset("font_default");
-		if (font.loaded) {
-			final fps = Std.int(1.0 / Time.delta);
-			ctx.style.font = font;
-			ctx.style.fontSize = 14;
-			ctx.style.color = Black;
-			ctx.drawString('FPS: ${fps}', 6, 6);
-			ctx.style.color = White;
-			ctx.drawString('FPS: ${fps}', 5, 5);
-		}
-		#end
+			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
+			var e = elementAt(App.input.mouse.x, App.input.mouse.y);
+			if (e != null)
+				drawBounds(e, ctx);
+			#end
+			#if S2D_DEBUG_FPS
+			var font:FontAsset = new FontAsset("font_default");
+			if (font.loaded) {
+				final fps = Std.int(1.0 / Time.delta);
+				ctx.style.font = font;
+				ctx.style.fontSize = 14;
+				ctx.style.color = Black;
+				ctx.drawString('FPS: ${fps}', 6, 6);
+				ctx.style.color = White;
+				ctx.drawString('FPS: ${fps}', 5, 5);
+			}
+			#end
+		});
 	}
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
@@ -176,14 +179,4 @@ final class WindowScene extends DrawableElement {
 			+ style.fontSize);
 	}
 	#end
-
-	function set_focusedElement(value:Element):Element {
-		if (focusedElement != value) {
-			if (focusedElement != null)
-				focusedElement.focused = false;
-			value.focused = true;
-			focusedElement = value;
-		}
-		return focusedElement;
-	}
 }

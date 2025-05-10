@@ -1,21 +1,19 @@
 package s2d.stage.objects;
 
 import se.math.Vec2;
-import se.math.Vec4;
 import s2d.geometry.Mesh;
+import s2d.geometry.Rect;
 
 using se.extensions.VectorExt;
 
-class Sprite extends LayerObject {
+class Sprite extends StageObject {
 	public var mesh:Mesh;
-	public var cropRect:Vec4 = new Vec4(0.0, 0.0, 1.0, 1.0);
+	public var cropRect:Rect = new Rect(0.0, 0.0, 1.0, 1.0);
+	@:isVar public var material(default, set):SpriteMaterial;
 
-	@:isVar public var atlas(default, set):SpriteAtlas;
-
-	public function new(atlas:SpriteAtlas, ?polygons:Array<Vec2>) {
-		super(atlas.layer);
-		layer.addSprite(this);
-		this.atlas = atlas;
+	public function new(name:String = "sprite", material:SpriteMaterial, ?polygons:Array<Vec2>) {
+		super(name);
+		this.material = material;
 		if (polygons != null)
 			this.mesh = polygons;
 	}
@@ -34,11 +32,14 @@ class Sprite extends LayerObject {
 	}
 	#end
 
-	function set_atlas(value:SpriteAtlas) {
-		atlas = value;
-		#if (S2D_SPRITE_INSTANCING == 1)
-		atlas.addSprite(this);
-		#end
+	function set_material(value:SpriteMaterial) {
+		if (material != value) {
+			#if (S2D_SPRITE_INSTANCING == 1)
+			material.removeSprite(this);
+			value.addSprite(this);
+			#end
+			material = value;
+		}
 		return value;
 	}
 }

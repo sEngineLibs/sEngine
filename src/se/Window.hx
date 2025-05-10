@@ -13,14 +13,17 @@ import s2d.FocusPolicy;
 #if !macro
 @:build(se.macro.SMacro.build())
 #end
-@:nullSafety
-class Window {
+final class Window {
 	public static function create():Window {
 		return new Window(KhaWindow.create());
 	}
 
 	var window:KhaWindow;
 	var backbuffer:Texture;
+
+	var pending:Array<Element> = [];
+	var activeElements:Array<Element> = [];
+	@:isVar var focusedElement(default, set):Element;
 
 	public var scene:WindowScene;
 
@@ -48,13 +51,12 @@ class Window {
 
 	public function new(window:KhaWindow) {
 		this.window = window;
-		this.backbuffer = new Texture(window.width, window.height);
-		this.scene = createScene();
+
+		scene = createScene();
+		backbuffer = new Texture(window.width, window.height);
 
 		window.notifyOnResize((w, h) -> {
 			backbuffer = new Texture(w, h);
-			scene.width = w;
-			scene.height = h;
 			resized(w, h);
 		});
 
@@ -74,10 +76,14 @@ class Window {
 		// handle keyboard events
 		var k = App.input.keyboard;
 		k.onKeyDown(Tab, adjustTabFocus);
-		k.onDown(key -> scene.focusedElement?.keyboardDown(key));
-		k.onUp(key -> scene.focusedElement?.keyboardUp(key));
-		k.onHold(key -> scene.focusedElement?.keyboardHold(key));
-		k.onPressed(char -> scene.focusedElement?.keyboardPressed(char));
+		k.onDown(key -> focusedElement?.keyboardDown(key));
+		k.onUp(key -> focusedElement?.keyboardUp(key));
+		k.onHold(key -> focusedElement?.keyboardHold(key));
+		k.onPressed(char -> focusedElement?.keyboardPressed(char));
+	}
+
+	public function resize(width:Int, height:Int) {
+		window.resize(width, height);
 	}
 
 	public function destroy() {
@@ -85,19 +91,13 @@ class Window {
 	}
 
 	public function createScene() {
-		var s = new WindowScene();
-		s.width = window.width;
-		s.height = window.height;
-		return s;
+		return new WindowScene(this);
 	}
 
 	function render(frame:Framebuffer) @:privateAccess {
+		scene.render(backbuffer);
+
 		final g2 = frame.g2;
-
-		backbuffer.context2D.render(true, scene.color, _ -> {
-			scene.render(backbuffer);
-		});
-
 		g2.begin(true);
 		g2.drawImage(backbuffer, 0, 0);
 		g2.end();
@@ -124,22 +124,22 @@ class Window {
 	}
 
 	function adjustTabFocus() {
-		final i = scene.focusedElement == null ? -1 : scene.children.indexOf(scene.focusedElement);
+		final i = scene.children.indexOf(focusedElement);
 		for (j in 1...scene.children.length) {
 			var e = scene.children[(i + j) % scene.children.length];
 			if (e.enabled && (e.focusPolicy & TabFocus != 0)) {
-				scene.focusedElement = e;
+				focusedElement = e;
 				return;
 			}
 		}
 	}
 
 	function adjustWheelFocus(d:Int) {
-		final i = scene.children.length + (scene.focusedElement == null ? -1 : scene.children.indexOf(scene.focusedElement));
+		final i = scene.children.length + scene.children.indexOf(focusedElement);
 		for (j in 1...scene.children.length) {
 			var e = scene.children[(i + (d > 0 ? j : -j)) % scene.children.length];
 			if (e.enabled && (e.focusPolicy & WheelFocus != 0)) {
-				scene.focusedElement = e;
+				focusedElement = e;
 				return;
 			}
 		}
@@ -159,18 +159,18 @@ class Window {
 			if (el.enabled) {
 				if (el.contains(App.input.mouse.x, App.input.mouse.y)) {
 					if (!moved.accepted) {
-						if (!scene.activeElements.contains(el)) {
-							scene.activeElements.push(el);
+						if (!activeElements.contains(el)) {
+							activeElements.push(el);
 							el.containsMouse = true;
 							el.mouseEntered(x, y);
 						}
 						moved.accepted = true;
 						el.mouseMoved(moved);
-					} else if (scene.activeElements.remove(el)) {
+					} else if (activeElements.remove(el)) {
 						el.containsMouse = false;
 						el.mouseExited(x, y);
 					}
-				} else if (scene.activeElements.remove(el)) {
+				} else if (activeElements.remove(el)) {
 					el.containsMouse = false;
 					el.mouseExited(x, y);
 				}
@@ -184,7 +184,7 @@ class Window {
 	}
 
 	function processMouseEvent<T:MouseEvent>(event:T, f:(Element, T) -> Void) {
-		for (el in scene.activeElements) {
+		for (el in activeElements) {
 			f(el, event);
 			if (event.accepted)
 				break;
@@ -207,7 +207,7 @@ class Window {
 			x: x,
 			y: y
 		}, (c, m) -> {
-			scene.pending.push(c);
+			pending.push(c);
 			c.mousePressed(m);
 		});
 	}
@@ -219,7 +219,7 @@ class Window {
 			x: x,
 			y: y
 		}
-		for (el in scene.pending)
+		for (el in pending)
 			el.mouseReleased(m);
 	}
 
@@ -241,7 +241,7 @@ class Window {
 		}, (c, m) -> {
 			c.mouseClicked(m);
 			if (!c.focused && (c.focusPolicy & ClickFocus != 0))
-				scene.focusedElement = c;
+				focusedElement = c;
 		});
 	}
 
@@ -252,5 +252,15 @@ class Window {
 			x: x,
 			y: y
 		}, (c, m) -> c.mouseDoubleClicked(m));
+	}
+
+	function set_focusedElement(value:Element):Element {
+		if (focusedElement != value) {
+			if (focusedElement != null)
+				focusedElement.focused = false;
+			value.focused = true;
+			focusedElement = value;
+		}
+		return focusedElement;
 	}
 }

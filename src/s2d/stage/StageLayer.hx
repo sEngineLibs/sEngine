@@ -1,6 +1,6 @@
 package s2d.stage;
 
-import s2d.stage.SpriteAtlas;
+import s2d.stage.SpriteMaterial;
 import s2d.stage.objects.Sprite;
 #if (S2D_LIGHTING == 1)
 import s2d.stage.objects.Light;
@@ -9,38 +9,45 @@ import s2d.graphics.stage.ShadowBuffer;
 #end
 #end
 class StageLayer {
-	var stage:Stage;
+	var sprites:Array<Sprite> = [];
+	var materials:Array<SpriteMaterial> = [];
 
-	public var sprites:Array<Sprite> = [];
-	public var spriteAtlases:Array<SpriteAtlas> = [];
-
-	public function new(stage:Stage) {
-		this.stage = stage;
-		this.stage.layers.push(this);
+	public function new() {
 		#if (S2D_LIGHTING && S2D_LIGHTING_SHADOWS == 1)
 		shadowBuffer = new ShadowBuffer();
 		#end
 	}
 
 	public function addSprite(sprite:Sprite) {
-		if (!sprites.contains(sprite))
+		if (!sprites.contains(sprite)) {
 			sprites.push(sprite);
+			if (!materials.contains(sprite.material))
+				materials.push(sprite.material);
+		}
 	}
 
-	public function addSpriteAtlas(atlas:SpriteAtlas) {
-		if (!spriteAtlases.contains(atlas))
-			spriteAtlases.push(atlas);
+	public function removeSprite(sprite:Sprite) {
+		sprites.remove(sprite);
+		for (s in sprites)
+			if (s.material == sprite.material)
+				return;
+		materials.remove(sprite.material);
 	}
 
 	#if (S2D_LIGHTING == 1)
-	public var lights:Array<Light> = [];
-
-	public function addLight(light:Light) {
-		lights.push(light);
-	}
-
 	#if (S2D_LIGHTING_SHADOWS == 1)
 	var shadowBuffer:ShadowBuffer;
 	#end
+
+	public var lights:Array<Light> = [];
+
+	public function addLight(light:Light) {
+		if (!lights.contains(light))
+			lights.push(light);
+	}
+
+	public function removeLight(light:Light) {
+		lights.remove(light);
+	}
 	#end
 }

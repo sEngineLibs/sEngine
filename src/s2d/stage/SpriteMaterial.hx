@@ -1,6 +1,5 @@
 package s2d.stage;
 
-import haxe.ds.Vector;
 #if (S2D_SPRITE_INSTANCING == 1)
 import kha.graphics4.VertexBuffer;
 #end
@@ -14,9 +13,8 @@ import s2d.graphics.StageRenderer;
 #end
 #end
 @:access(s2d.stage.objects.Sprite)
-class SpriteAtlas {
-	@:isVar public var layer(default, set):StageLayer;
-	public var sprites:Vector<Sprite> = new Vector(0);
+class SpriteMaterial {
+	var sprites:Array<Sprite> = [];
 
 	#if (S2D_LIGHTING == 1)
 	public var albedoMap:ImageAsset;
@@ -31,11 +29,7 @@ class SpriteAtlas {
 
 	public var loaded(get, never):Bool;
 
-	public function new(layer:StageLayer) {
-		this.layer = layer;
-		#if (S2D_SPRITE_INSTANCING == 1)
-		init();
-		#end
+	public function new() {
 		#if (S2D_LIGHTING == 1)
 		albedoMap = "default_color";
 		normalMap = "default_normal";
@@ -46,12 +40,9 @@ class SpriteAtlas {
 		#else
 		textureMap = "default_color";
 		#end
-	}
-
-	function set_layer(value:StageLayer) {
-		value.addSpriteAtlas(this);
-		layer = value;
-		return value;
+		#if (S2D_SPRITE_INSTANCING == 1)
+		init();
+		#end
 	}
 
 	function get_loaded():Bool {
@@ -68,29 +59,22 @@ class SpriteAtlas {
 	#if (S2D_SPRITE_INSTANCING == 1)
 	var vertices:Array<VertexBuffer>;
 
-	function init() {
+	function deleteVertices() {
+		for (i in 0...StageRenderer.structures.length)
+			vertices[i].delete();
+	}
+
+	function initVertices() {
 		vertices = [
-			for (i in 0...4)
-				new VertexBuffer(0, StageRenderer.structures[i], StaticUsage, 1)
+			for (structure in StageRenderer.structures)
+				new VertexBuffer(0, structure, StaticUsage, 1)
 		];
 	}
 
-	public function addSprite(sprite:Sprite) {
-		final tmp = sprites;
-		sprites = new Vector(tmp.length + 1);
-
-		for (i in 0...tmp.length)
-			sprites[i] = tmp[i];
-		sprites[tmp.length] = sprite;
-
-		vertices[1].delete();
-		vertices[2].delete();
-
-		#if (S2D_LIGHTING == 1)
-		vertices[1] = new VertexBuffer(sprites.length, StageRenderer.structures[1], StaticUsage, 1);
-		vertices[2] = new VertexBuffer(sprites.length, StageRenderer.structures[2], StaticUsage, 1);
-		vertices[3] = new VertexBuffer(sprites.length, StageRenderer.structures[3], StaticUsage, 1);
-		#end
+	function addSprite(sprite:Sprite) {
+		sprites.push(sprite);
+		deleteVertices();
+		initVertices();
 	}
 
 	function update() {
@@ -102,31 +86,28 @@ class SpriteAtlas {
 		final cData = vertices[1].lock();
 		final mData = vertices[2].lock();
 		final dData = vertices[3].lock();
-		var i = 0;
-		for (sprite in sprites) {
-			final c = sprite.cropRect;
-			final m = sprite.transform;
+		for (i in 0...sprites.length) {
+			final sprite = sprites[i];
 			// crop rect
 			final ci = i * cStructSize;
-			cData[ci + 0] = c.x;
-			cData[ci + 1] = c.y;
-			cData[ci + 2] = c.z;
-			cData[ci + 3] = c.w;
+			cData[ci + 0] = sprite.cropRect.x;
+			cData[ci + 1] = sprite.cropRect.y;
+			cData[ci + 2] = sprite.cropRect.z;
+			cData[ci + 3] = sprite.cropRect.w;
 			// model
 			final mi = i * mStructSize;
-			mData[mi + 0] = m._00;
-			mData[mi + 1] = m._01;
-			mData[mi + 2] = m._02;
-			mData[mi + 3] = m._10;
-			mData[mi + 4] = m._11;
-			mData[mi + 5] = m._12;
-			mData[mi + 6] = m._20;
-			mData[mi + 7] = m._21;
-			mData[mi + 8] = m._22;
+			mData[mi + 0] = sprite.transform._00;
+			mData[mi + 1] = sprite.transform._01;
+			mData[mi + 2] = sprite.transform._02;
+			mData[mi + 3] = sprite.transform._10;
+			mData[mi + 4] = sprite.transform._11;
+			mData[mi + 5] = sprite.transform._12;
+			mData[mi + 6] = sprite.transform._20;
+			mData[mi + 7] = sprite.transform._21;
+			mData[mi + 8] = sprite.transform._22;
 			// depth
 			final di = i * dStructSize;
 			dData[di] = sprite.z;
-			++i;
 		}
 		vertices[1].unlock();
 		vertices[2].unlock();

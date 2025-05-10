@@ -7,6 +7,7 @@ import se.Texture;
 import s2d.shapes.RoundedRectangle;
 
 @:access(s2d.Element)
+@:dox(hide)
 class RectDrawer extends ElementDrawer<RoundedRectangle> {
 	var rectCL:ConstantLocation;
 	var rectDataCL:ConstantLocation;

@@ -7,6 +7,7 @@ import se.graphics.ShaderPass;
 import s2d.Element;
 
 @:allow(s2d.Element)
+@:dox(hide)
 abstract class ElementDrawer<T:Element> extends ShaderPass {
 	var modelCL:ConstantLocation;
 

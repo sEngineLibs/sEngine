@@ -1,10 +1,13 @@
 package s2d.stage.objects;
 
-class StageObject extends s2d.PhysicalObject2D<StageObject> {
-	@alias public var x:Float = this.transform._20;
-	@alias public var y:Float = this.transform._21;
+import s2d.geometry.Position;
 
-	public function new() {
-		super("stageObject");
+class StageObject extends s2d.PhysicalObject2D<StageObject> {
+	@alias public var x:Float = this.translationX;
+	@alias public var y:Float = this.translationY;
+	@alias public var position:Position = this.translation;
+
+	public function new(name:String = "stageObject") {
+		super(name);
 	}
 }

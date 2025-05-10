@@ -14,16 +14,16 @@ import s2d.graphics.Drawers;
 
 @:access(s2d.stage.objects.Object)
 class Stage extends DrawableElement {
-	var renderBuffer:RenderBuffer;
+	var layers:Array<StageLayer> = [];
+	var renderBuffer:RenderBuffer = new RenderBuffer();
+	@:inject(updateViewProjection)
+	var aspectRatio:Float = 1.0;
+	var viewProjection:Mat3 = Mat3.identity();
 
 	@:inject(updateViewProjection)
 	public var stageScale:Float = 1.0;
-	@:inject(updateViewProjection)
-	public var aspectRatio:Float = 1.0;
 
-	public var layers:Array<StageLayer> = [];
 	public var camera:Camera = new Camera();
-	public var viewProjection:Mat3 = Mat3.identity();
 
 	#if (S2D_LIGHTING_ENVIRONMENT == 1)
 	@:isVar public var environmentMap(default, set):Image;
@@ -37,7 +37,15 @@ class Stage extends DrawableElement {
 
 	public function new(name:String = "stage") {
 		super(name);
-		renderBuffer = new RenderBuffer(Std.int(width), Std.int(height));
+	}
+
+	public function addLayer(layer:StageLayer) {
+		if (!layers.contains(layer))
+			layers.push(layer);
+	}
+
+	public function removeLayer(layer:StageLayer) {
+		layers.remove(layer);
 	}
 
 	public function local2WorldSpace(point:Vec2):Vec2 {
@@ -80,12 +88,6 @@ class Stage extends DrawableElement {
 	}
 
 	function draw(target:Texture) {
-		final ctx = target.context2D;
-		ctx.end();
-		// render to buffer
 		Drawers.stageRenderer.render(target, this);
-		// render to target
-		ctx.begin();
-		ctx.drawScaledImage(renderBuffer.tgt, absX, absY, width, height);
 	}
 }

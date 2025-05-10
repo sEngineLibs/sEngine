@@ -13,6 +13,7 @@ import s2d.graphics.stage.postprocessing.Filter;
 import s2d.graphics.stage.postprocessing.Compositor;
 #end
 
+@:dox(hide)
 class PostProcessing {
 	#if S2D_PP_BLOOM
 	@:isVar public static var bloom(default, never) = new Bloom();

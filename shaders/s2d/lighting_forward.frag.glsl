@@ -48,14 +48,6 @@ void main() {
 
     vec3 position = inverse(viewProjection) * vec3(fragCoord, 0.0);
 
-    // output color
-    vec3 col = vec3(0.0);
-
-    // environment lighting
-    #if S2D_LIGHTING_ENVIRONMENT == 1
-    col += envLighting(envMap, normal, albedo.rgb, orm);
-    #endif
-
     Light light = Light(
             lightPosition,
             lightColor,
@@ -64,9 +56,17 @@ void main() {
         // 0.0
         );
 
-    vec3 l = lighting(light, position, normal, albedo.rgb, orm);
+    // output color
+    vec3 col = emission;
+
+    // environment lighting
+    #if S2D_LIGHTING_ENVIRONMENT == 1
+    col += envLighting(envMap, normal, albedo.rgb, orm);
+    #endif
+
+    col += lighting(light, position, normal, albedo.rgb, orm);
     // #if S2D_LIGHTING_SHADOWS == 1
     // l *= texture(shadowMap, fragCoord).r;
     // #endif
-    fragColor = vec4(emission + l, albedo.a);
+    fragColor = vec4(col, albedo.a);
 }

@@ -1,24 +1,19 @@
 package s2d.graphics;
 
 import s2d.graphics.stage.SpritePass;
-#if (S2D_LIGHTING != 1)
-import kha.graphics4.PipelineState;
-import kha.graphics4.TextureUnit;
-import kha.graphics4.ConstantLocation;
-#else
+#if (S2D_LIGHTING == 1)
 #if (S2D_LIGHTING_DEFERRED == 1)
 import s2d.graphics.stage.lighting.GeometryPass;
 #end
 import s2d.graphics.stage.lighting.LightingPass;
 #end
-import kha.graphics4.IndexBuffer;
-import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
 import se.Texture;
 import s2d.stage.Stage;
 
 @:allow(s2d.stage.Stage)
 @:access(s2d.stage.Stage)
+@:dox(hide)
 class StageRenderer {
 	#if (S2D_LIGHTING == 1)
 	#if (S2D_LIGHTING_DEFERRED == 1)
@@ -58,15 +53,21 @@ class StageRenderer {
 		#end
 	}
 
-	@:access(s2d.stage.objects.Sprite)
 	function render(target:Texture, stage:Stage) {
+		final ctx = target.context2D;
+		ctx.end();
+		// render to buffer
 		#if (S2D_LIGHTING == 1)
 		#if (S2D_LIGHTING_DEFERRED == 1)
-		geometryPass.render(target, stage);
+		geometryPass.render(stage);
 		#end
-		lightingPass.render(target, stage);
+		lightingPass.render(stage);
 		#else
-		spritePass.render(target, stage);
+		spritePass.render(stage);
 		#end
+		// render to target
+		ctx.begin();
+		ctx.style.color = White;
+		ctx.drawScaledImage(stage.renderBuffer.tgt, stage.absX, stage.absY, stage.width, stage.height);
 	}
 }

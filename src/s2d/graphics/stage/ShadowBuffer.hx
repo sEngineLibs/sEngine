@@ -9,6 +9,7 @@ import se.math.VectorMath;
 import s2d.stage.objects.Sprite;
 import s2d.graphics.stage.lighting.ShadowPass;
 
+@:dox(hide)
 class ShadowBuffer {
 	var indices:IndexBuffer;
 	var vertices:VertexBuffer;

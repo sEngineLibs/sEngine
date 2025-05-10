@@ -127,7 +127,7 @@ project.addAssets("assets/**", {
 // S2D_DEBUG_FPS -> enables FPS debugging
 
 // Renderer:
-// S2D_SPRITE_INSTANCING -> enables atlas instancing
+// S2D_SPRITE_INSTANCING -> enables sprite instancing
 // S2D_LIGHTING -> enables lighting
 // S2D_LIGHTING_PBR -> enables PBR lighting
 // S2D_LIGHTING_SHADOWS -> enables shadows

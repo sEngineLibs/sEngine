@@ -7,6 +7,7 @@ import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 import s2d.stage.objects.Light;
 
+@:dox(hide)
 class ShadowPass {
 	public static var structure:VertexStructure;
 	static var pipeline:PipelineState;
