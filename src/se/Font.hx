@@ -1,6 +1,6 @@
 package se;
 
-import se.Assets.FontAsset;
+import se.Assets;
 import kha.Font as KhaFont;
 
 @:forward()

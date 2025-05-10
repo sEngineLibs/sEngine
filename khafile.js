@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const cwd = process.cwd();
 const verbose = process.verbose;
 
 function clearDirectory(directory) {
@@ -110,7 +109,7 @@ function assembleShaders(shaderDir, outputDir) {
 }
 
 const shaderInputDir = path.join(__dirname, "shaders");
-const shaderOutputDir = path.join(cwd, "build", "shaders_assembled");
+const shaderOutputDir = path.join(process.cwd(), "build", "shaders_assembled");
 assembleShaders(shaderInputDir, shaderOutputDir);
 
 let project = new Project("s2D");
@@ -126,7 +125,10 @@ project.addAssets("assets/**", {
 // Debug:
 // S2D_DEBUG_FPS -> enables FPS debugging
 
-// Renderer:
+// UI:
+// S2D_UI_DEBUG_ELEMENT_BOUNDS -> enables ui element bounds debugging
+
+// Stage Renderer:
 // S2D_SPRITE_INSTANCING -> enables sprite instancing
 // S2D_LIGHTING -> enables lighting
 // S2D_LIGHTING_PBR -> enables PBR lighting
@@ -137,9 +139,6 @@ project.addAssets("assets/**", {
 // S2D_PP_FISHEYE -> enables Fisheye PP effect
 // S2D_PP_FILTERS -> enables 3x3 image convolution multi-pass PP effects
 // S2D_PP_COMPOSITOR -> enables compositor / single-pass combination of various (AA, CC etc.) PP effects
-
-// UI:
-// S2D_UI_DEBUG_ELEMENT_BOUNDS -> enables ui element bounds debugging
 
 // Not yet implemented:
 // S2D_LIGHTING_VOLUMETRIC -> enables volumetric lighting
@@ -161,5 +160,7 @@ for (const def of process.defines) {
 project.addShaders(`${shaderOutputDir}/**/*{frag,vert}.glsl`, {
     defines: defs,
 });
+
+await project.addProject("libraries/aura");
 
 resolve(project);

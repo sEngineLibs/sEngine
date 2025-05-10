@@ -23,7 +23,7 @@ class Label extends DrawableElement {
 	public function new(text:String = "Text", name:String = "label") {
 		super(name);
 		this.text = text;
-		asset.onAssetChanged(updateTextSize);
+		asset.onAssetLoaded(_ -> updateTextSize());
 	}
 
 	function draw(target:Texture) {

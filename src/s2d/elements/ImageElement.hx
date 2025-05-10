@@ -16,7 +16,7 @@ class ImageElement extends DrawableElement {
 
 	public function new(?source:String, name:String = "asset") {
 		super(name);
-		asset.onAssetChanged(__syncAsset__);
+		asset.onAssetLoaded(_ -> __syncAsset__());
 		this.source = source;
 	}
 

@@ -1,9 +1,9 @@
 package s2d;
 
-import se.Window;
 import se.Time;
 import se.Color;
 import se.Assets;
+import se.Window;
 import se.Texture;
 import se.graphics.Context2D;
 
@@ -68,7 +68,7 @@ class WindowScene extends Element {
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 	function drawBounds(e:Element, ctx:Context2D) {
 		var font:FontAsset = "font_default";
-		if (font.asset == null)
+		if (!font.loaded)
 			return;
 
 		final style = ctx.style;

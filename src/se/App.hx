@@ -2,6 +2,7 @@ package se;
 
 import kha.System;
 import kha.Framebuffer;
+import aura.Aura;
 import se.Time;
 import se.Window;
 import se.input.Mouse;
@@ -25,6 +26,7 @@ class App {
 			Action.update(Time.time);
 		});
 		System.start(options, window -> {
+			Aura.init();
 			Drawers.compile();
 
 			App.input = {
