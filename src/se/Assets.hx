@@ -42,18 +42,18 @@ abstract ImageAsset(ImageAssetData) {
 
 @:forward()
 @:forward.new
-abstract AudioAsset(AudioAssetData) {
+abstract SoundAsset(SoundAssetData) {
 	@:from
 	public static function fromString(value:String) {
-		return AudioAsset.load(value);
+		return SoundAsset.load(value);
 	}
 
-	public static function load(source:String, uncompress:Bool = true) {
-		return new AudioAsset(source, uncompress);
+	public static function load(source:String, uncompressed:Bool = true) {
+		return new SoundAsset(source, uncompressed);
 	}
 
 	@:to
-	public function toAudio():Audio {
+	public function toSound():Sound {
 		return this.asset;
 	}
 }
@@ -111,7 +111,7 @@ private class ImageAssetData extends AssetData<Image> {
 	}
 }
 
-private class AudioAssetData extends AssetData<Audio> {
+private class SoundAssetData extends AssetData<Sound> {
 	var uncompressed:Bool;
 
 	public function new(?source:String, uncompressed:Bool = true) {
@@ -119,8 +119,8 @@ private class AudioAssetData extends AssetData<Audio> {
 		this.uncompressed = uncompressed;
 	}
 
-	override function load(?callback:Audio->Void) {
-		static final assets:Map<String, Audio> = [];
+	override function load(?callback:Sound->Void) {
+		static final assets:Map<String, Sound> = [];
 
 		if (assets.exists(source))
 			asset = assets.get(source);
@@ -128,15 +128,15 @@ private class AudioAssetData extends AssetData<Audio> {
 			super.load(a -> assets.set(source, a));
 	}
 
-	function loadFromName(callback:Audio->Void, errorCallback:AssetError->Void) {
-		Assets.loadSound(source, audio -> processSound(audio, callback), errorCallback);
+	function loadFromName(callback:Sound->Void, errorCallback:AssetError->Void) {
+		Assets.loadSound(source, sound -> processSound(sound, callback), errorCallback);
 	}
 
-	function loadFromPath(callback:Audio->Void, errorCallback:AssetError->Void) {
-		Assets.loadSoundFromPath(source, audio -> processSound(audio, callback), errorCallback);
+	function loadFromPath(callback:Sound->Void, errorCallback:AssetError->Void) {
+		Assets.loadSoundFromPath(source, sound -> processSound(sound, callback), errorCallback);
 	}
 
-	function processSound(sound:Sound, callback:Audio->Void) {
+	function processSound(sound:Sound, callback:Sound->Void) {
 		if (uncompressed)
 			sound.uncompress(() -> callback(sound));
 		else // Krom only uses uncompressedData

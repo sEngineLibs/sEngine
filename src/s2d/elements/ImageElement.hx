@@ -7,26 +7,23 @@ import s2d.geometry.Rect;
 
 class ImageElement extends DrawableElement {
 	var asset:ImageAsset = new ImageAsset();
+	@readonly @alias var image:Image = asset.asset;
 
+	@alias public var source:String = asset.source;
 	public var sourceClip:Rect = new Rect(0.0, 0.0, 0.0, 0.0);
 	public var fillMode:ImageFillMode = Stretch;
 
-	@alias public var source:String = asset.source;
-	@readonly @alias public var image:Image = asset.asset;
-
 	public function new(?source:String, name:String = "asset") {
 		super(name);
-		asset.onAssetLoaded(_ -> __syncAsset__());
+		asset.onAssetLoaded(__syncAsset__);
 		this.source = source;
 	}
 
-	function __syncAsset__() {
-		if (image != null) {
-			sourceClip.x = 0.0;
-			sourceClip.y = 0.0;
-			sourceClip.width = image.width;
-			sourceClip.height = image.height;
-		}
+	function __syncAsset__(image:Image) {
+		sourceClip.x = 0.0;
+		sourceClip.y = 0.0;
+		sourceClip.width = image.width;
+		sourceClip.height = image.height;
 	}
 
 	function draw(target:Texture) {
