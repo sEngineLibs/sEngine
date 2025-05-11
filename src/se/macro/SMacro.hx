@@ -323,7 +323,7 @@ class SMacro extends Builder {
 								}
 							}), [APublic, AInline],
 								[meta(":op", [macro a()])]),
-							method("connect", fun(args(sKeys).concat([arg("slot", _t)]), macro :Void, macro {
+							method("connect", fun(args(sKeys).concat([arg("slot", _t), arg("keep", macro :Bool, macro true)]), macro :Void, macro {
 								var flag = false;
 								for (p in this.keyValueIterator())
 									if ($cond) {
@@ -376,8 +376,8 @@ class SMacro extends Builder {
 							field.access.push(AStatic);
 
 						// add connector
-						var cargs = sidentsExpr.concat([macro slot]);
-						var connector = method('on${field.name.capitalize()}', fun(args(sKeys).concat([arg("slot", _t)]), macro {
+						var cargs = sidentsExpr.concat([macro slot, macro keep]);
+						var connector = method('on${field.name.capitalize()}', fun(args(sKeys).concat([arg("slot", _t), arg("keep", macro :Bool, macro true)]), macro {
 							$i{field.name}.connect($a{cargs});
 						}), [APublic, AInline]);
 						if (isStatic)
