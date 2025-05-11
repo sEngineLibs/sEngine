@@ -119,10 +119,11 @@ function fun(args:Array<FunctionArg>, ?ret:ComplexType, ?expr:Expr, ?params:Arra
 	}
 }
 
-function arg(name:String, ?type:ComplexType):FunctionArg {
+function arg(name:String, ?type:ComplexType, ?value:Expr):FunctionArg {
 	return {
 		name: name,
-		type: type
+		type: type,
+		value: value
 	}
 }
 

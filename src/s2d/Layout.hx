@@ -5,7 +5,6 @@ import s2d.Alignment;
 #if !macro
 @:build(se.macro.SMacro.build())
 #end
-@:nullSafety(Strict)
 class Layout {
 	public static function clampWidth(el:Element, width:Float) {
 		final l = el.layout;

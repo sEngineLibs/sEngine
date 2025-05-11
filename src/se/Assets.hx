@@ -4,6 +4,12 @@ import kha.Sound;
 import kha.Assets;
 import kha.AssetError;
 
+enum AssetState {
+	None;
+	Loaded;
+	Loading;
+}
+
 @:forward()
 @:forward.new
 abstract FontAsset(FontAssetData) {
@@ -59,25 +65,26 @@ abstract SoundAsset(SoundAssetData) {
 }
 
 private class FontAssetData extends AssetData<Font> {
-	override function load(?callback:Font->Void) {
-		static final assets:Map<String, Font> = [];
-
-		if (assets.exists(source))
-			asset = assets.get(source);
-		else
-			super.load(a -> assets.set(source, a));
-	}
+	static final assets:Map<String, Font> = [];
 
 	function loadFromName(callback:Font->Void, errorCallback:AssetError->Void) {
-		Assets.loadFont(source, callback, errorCallback);
+		if (assets.exists(source))
+			callback(assets.get(source));
+		else
+			Assets.loadFont(source, callback, errorCallback);
 	}
 
 	function loadFromPath(callback:Font->Void, errorCallback:AssetError->Void) {
-		Assets.loadFontFromPath(source, callback, errorCallback);
+		if (assets.exists(source))
+			callback(assets.get(source));
+		else
+			Assets.loadFontFromPath(source, callback, errorCallback);
 	}
 }
 
 private class ImageAssetData extends AssetData<Image> {
+	static final assets:Map<String, Image> = [];
+
 	@:isVar public var readable(default, set):Bool;
 
 	public function new(?source:String, readable:Bool = false) {
@@ -85,21 +92,18 @@ private class ImageAssetData extends AssetData<Image> {
 		this.readable = readable;
 	}
 
-	override function load(?callback:Image->Void) {
-		static final assets:Map<String, Image> = [];
-
-		if (assets.exists(source))
-			asset = assets.get(source);
-		else
-			super.load(a -> assets.set(source, a));
-	}
-
 	function loadFromName(callback:Image->Void, errorCallback:AssetError->Void) {
-		Assets.loadImage(source, callback, errorCallback);
+		if (assets.exists(source))
+			callback(assets.get(source));
+		else
+			Assets.loadImage(source, callback, errorCallback);
 	}
 
 	function loadFromPath(callback:Image->Void, errorCallback:AssetError->Void) {
-		Assets.loadImageFromPath(source, readable, callback, errorCallback);
+		if (assets.exists(source))
+			callback(assets.get(source));
+		else
+			Assets.loadImageFromPath(source, readable, callback, errorCallback);
 	}
 
 	function set_readable(value:Bool):Bool {
@@ -112,6 +116,8 @@ private class ImageAssetData extends AssetData<Image> {
 }
 
 private class SoundAssetData extends AssetData<Sound> {
+	static final assets:Map<String, Sound> = [];
+
 	var uncompressed:Bool;
 
 	public function new(?source:String, uncompressed:Bool = true) {
@@ -119,21 +125,18 @@ private class SoundAssetData extends AssetData<Sound> {
 		this.uncompressed = uncompressed;
 	}
 
-	override function load(?callback:Sound->Void) {
-		static final assets:Map<String, Sound> = [];
-
-		if (assets.exists(source))
-			asset = assets.get(source);
-		else
-			super.load(a -> assets.set(source, a));
-	}
-
 	function loadFromName(callback:Sound->Void, errorCallback:AssetError->Void) {
-		Assets.loadSound(source, sound -> processSound(sound, callback), errorCallback);
+		if (assets.exists(source))
+			callback(assets.get(source));
+		else
+			Assets.loadSound(source, sound -> processSound(sound, callback), errorCallback);
 	}
 
 	function loadFromPath(callback:Sound->Void, errorCallback:AssetError->Void) {
-		Assets.loadSoundFromPath(source, sound -> processSound(sound, callback), errorCallback);
+		if (assets.exists(source))
+			callback(assets.get(source));
+		else
+			Assets.loadSoundFromPath(source, sound -> processSound(sound, callback), errorCallback);
 	}
 
 	function processSound(sound:Sound, callback:Sound->Void) {
@@ -149,26 +152,27 @@ private class SoundAssetData extends AssetData<Sound> {
 	}
 }
 
-private abstract class AssetData<T:AssetType> {
-	var assetLoaded:T->Void;
-
+#if !macro
+@:build(se.macro.SMacro.build())
+#end
+abstract class AssetData<T:AssetType> {
 	@:isVar public var asset(default, set):T;
 	@:isVar public var source(default, set):String;
 
+	public var state(default, null):AssetState = None;
 	public var loaded(get, never):Bool;
+
+	@:signal function assetLoaded();
 
 	public function new(?source:String) {
 		this.source = source;
-	}
-
-	public function onAssetLoaded(cb:T->Void) {
-		assetLoaded = cb;
 	}
 
 	public function unload() {
 		if (loaded) {
 			asset.unload();
 			asset = null;
+			state = None;
 		}
 	}
 
@@ -177,25 +181,27 @@ private abstract class AssetData<T:AssetType> {
 		load();
 	}
 
-	public function load(?callback:T->Void) {
+	public function load() {
 		if (source != "") {
+			state = Loading;
 			if (source.indexOf("/") + source.indexOf("\\") + source.indexOf(".") > -3)
-				loadFromPath(a -> {
-					asset = a;
-					if (callback != null)
-						callback(asset);
-				}, err -> {
+				loadFromPath(a -> asset = a, err -> {
+					state = loaded ? Loaded : None;
 					Log.error('Failed to load asset ${err.url}: ${err.error ?? "Unknown Error"}');
 				});
 			else
-				loadFromName(a -> {
-					asset = a;
-					if (callback != null)
-						callback(asset);
-				}, err -> {
+				loadFromName(a -> asset = a, err -> {
+					state = loaded ? Loaded : None;
 					Log.error('Failed to load asset ${err.url}: ${err.error ?? "Unknown Error"}');
 				});
 		}
+	}
+
+	public function delay(f:Void->Void, waitForLoad:Bool = true) {
+		if (state == Loaded)
+			f();
+		else if (waitForLoad && state == Loading)
+			onAssetLoaded(f, false);
 	}
 
 	abstract function loadFromName(callback:T->Void, errorCallback:AssetError->Void):Void;
@@ -215,9 +221,13 @@ private abstract class AssetData<T:AssetType> {
 	}
 
 	function set_asset(value:T):T {
-		asset = value;
-		if (assetLoaded != null)
-			assetLoaded(asset);
+		if (value != asset) {
+			asset = value;
+			if (asset != null) {
+				state = Loaded;
+				assetLoaded();
+			}
+		}
 		return asset;
 	}
 

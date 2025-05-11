@@ -19,7 +19,7 @@ class ImageElement extends DrawableElement {
 		this.source = source;
 	}
 
-	function __syncAsset__(image:Image) {
+	function __syncAsset__() {
 		sourceClip.x = 0.0;
 		sourceClip.y = 0.0;
 		sourceClip.width = image.width;

@@ -190,12 +190,13 @@ class SMacro extends Builder {
 					}
 
 					// define underlying type
-					var _t = ComplexType.TFunction([
+					var _t_args = [
 						for (arg in sArgs) {
 							var t = TNamed(arg.name, arg.type);
 							if (arg.opt) TOptional(t) else t;
 						}
-					], macro :Void);
+					];
+					var _t = ComplexType.TFunction(_t_args, macro :Void);
 
 					signalsTypes.get(cls.name).push({
 						name: field.name,
@@ -213,16 +214,39 @@ class SMacro extends Builder {
 					};
 					if (sKeys.length == 0) {
 						Context.defineType(tdAbstract(cls.pack, typeName, macro :Array<$_t>, [
-							method("emit", fun(f.args, macro :Void,
-								macro {
-									for (slot in this)
-										slot(${
-											for (arg in f.args)
-												macro $i{arg.name}
-										});
-								}),
+							method("emit", fun(f.args, macro :Void, macro {
+								for (slot in this)
+									slot(${
+										for (arg in f.args)
+											macro $i{arg.name}
+									});
+							}),
 								[APublic, AInline], [meta(":op", [macro a()])]),
-							method("connect", fun([arg("slot", _t)], macro :Void, macro this.push(slot)), [APublic, AInline]),
+							method("connect", fun([arg("slot", _t), arg("keep", macro :Bool, macro true)], macro :Void,
+								macro {
+									if (keep)
+										this.push(slot);
+									else {
+										${
+											{
+												expr: EFunction(FNamed("_slot"), {
+													args: f.args,
+													ret: macro :Void,
+													expr: macro {
+														slot(${
+															for (arg in f.args)
+																macro $i{arg.name}
+														});
+														disconnect(_slot);
+													}
+												}),
+												pos: Context.currentPos()
+											}
+										};
+										this.push(_slot);
+									}
+								}),
+								[APublic, AInline]),
 							method("disconnect", fun([arg("slot", _t)], macro :Void, macro this.remove(slot)), [APublic, AInline]),
 							method("clear", fun([], macro :Void, macro this = new $stypepath()), [APublic, AInline])
 						],
@@ -246,24 +270,24 @@ class SMacro extends Builder {
 						paramDoc = '`${paramDoc.substring(0, paramDoc.length - 2)}`' + (f.args.length == 1 ? " parameter" : " parameters");
 						callDoc = '${callDoc.substring(0, callDoc.length - 2)}';
 						field.doc = '
-					This signal invokes its slots ${f.args.length > 0 ? 'with $paramDoc' : ""} when emitted.
-					Call `${field.name}($callDoc)` or `${field.name}.emit($callDoc)` to emit the signal
-					';
+							This signal invokes its slots ${f.args.length > 0 ? 'with $paramDoc' : ""} when emitted.
+							Call `${field.name}($callDoc)` or `${field.name}.emit($callDoc)` to emit the signal
+						';
 						field.kind = FVar(TPath(stypepath), macro new $stypepath());
 						field.access = [isPublic ? APublic : APrivate];
 						if (isStatic)
 							field.access.push(AStatic);
 
 						// add connector
-						var connector = method('on${field.name.capitalize()}', fun([arg("slot", _t)], macro {
-							$i{field.name}.connect(slot);
+						var connector = method('on${field.name.capitalize()}', fun([arg("slot", _t), arg("keep", macro :Bool, macro true)], macro {
+							$i{field.name}.connect(slot, keep);
 						}), [APublic, AInline]);
 						if (isStatic)
 							connector.access.push(AStatic);
 						connector.doc = '
-					Shortcut for `${field.name}` signal\'s function `connect` which connects slots to it.
-					@param slot a callback to invoke when `${field.name}` is emitted
-					';
+							Shortcut for `${field.name}` signal\'s function `connect` which connects slots to it.
+							@param slot a callback to invoke when `${field.name}` is emitted
+						';
 						add(connector);
 					}
 					// masked signal
