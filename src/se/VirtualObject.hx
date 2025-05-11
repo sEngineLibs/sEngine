@@ -28,7 +28,8 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 	}
 
 	public function addChild(value:This):Void {
-		value.parent = cast this;
+		if (value != null)
+			value.parent = cast this;
 	}
 
 	public function getChild(name:String):This {
@@ -51,7 +52,7 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 	}
 
 	public function removeChild(value:This):Void {
-		if (children.contains(value))
+		if (value != null && children.contains(value))
 			value.parent = null;
 	}
 

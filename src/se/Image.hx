@@ -7,6 +7,11 @@ import kha.Image as KhaImage;
 extern abstract Image(KhaImage) from KhaImage to KhaImage {
 	@:from
 	public static inline function fromString(value:String):Image {
+		return Image.load(value);
+	}
+
+	@:from
+	public static inline function load(value:String):Image {
 		return ImageAsset.load(value);
 	}
 }

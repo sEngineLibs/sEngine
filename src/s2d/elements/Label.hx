@@ -24,6 +24,7 @@ class Label extends DrawableElement {
 		super(name);
 		this.text = text;
 		asset.onAssetLoaded(updateTextSize);
+		font = "font_default";
 	}
 
 	function draw(target:Texture) {

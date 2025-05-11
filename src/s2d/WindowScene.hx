@@ -14,16 +14,23 @@ using se.extensions.StringExt;
 @:allow(se.Window)
 @:allow(s2d.Element)
 class WindowScene extends Element {
+	var window:Window;
+
 	public var backgroundColor:Color = White;
 
 	public function new(name:String = "scene", window:Window) {
 		super(name);
+		this.window = window;
 		width = window.width;
 		height = window.height;
 		window.onResized((w, h) -> {
 			width = w;
 			height = h;
 		});
+	}
+
+	public function set() {
+		window.scene = this;
 	}
 
 	public function elementAt(x:Float, y:Float):Null<Element> {

@@ -12,6 +12,11 @@ import se.math.Vec3;
 abstract Audio(AudioData) from AudioData to AudioData {
 	@:from
 	public static inline function fromString(source:String):Audio {
+		return Audio.load(source);
+	}
+
+	@:from
+	public static inline function load(source:String):Audio {
 		return new Audio(source);
 	}
 }
