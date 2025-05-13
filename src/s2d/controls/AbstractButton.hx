@@ -3,10 +3,6 @@ package s2d.controls;
 import se.events.MouseEvents;
 
 class AbstractButton extends Control {
-	@track public var text:String;
-	@track public var checkable:Bool = false;
-
-	@track public var checked:Bool = false;
 	@track public var pressed:Bool = false;
 	@track public var hovered:Bool = false;
 
@@ -15,11 +11,8 @@ class AbstractButton extends Control {
 
 	@:signal function cancelled();
 
-	@:signal function toggled();
-
-	public function new(text:String = "Button", name:String = "button") {
+	public function new(name:String = "button") {
 		super(name);
-		this.text = text;
 	}
 
 	@:slot(mouseEntered)
@@ -45,12 +38,5 @@ class AbstractButton extends Control {
 	@:slot(mouseReleased)
 	function __syncMouseReleased__(m:MouseButtonEvent) {
 		pressed = false;
-		if (checkable && hovered)
-			checked = !checked;
-	}
-
-	@:slot(checkedChanged)
-	function __syncCheckedChanged__(_) {
-		toggled();
 	}
 }

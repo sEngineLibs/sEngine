@@ -242,12 +242,9 @@ final class Window {
 					if (m.accepted)
 						return;
 					if (el.contains(m.x, m.y)) {
-						trace(el);
 						f(el, m);
-						if (m.accepted) {
-							trace(el);
+						if (m.accepted)
 							return;
-						}
 					}
 				}
 			}

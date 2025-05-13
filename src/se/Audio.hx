@@ -4,17 +4,20 @@ import kha.math.FastVector3;
 import aura.Aura;
 import aura.dsp.panner.Panner;
 import aura.dsp.panner.StereoPanner;
-import se.Resource;
+import se.Assets;
 import se.math.Vec3;
 
 #if !macro
 @:build(se.macro.SMacro.build())
 #end
 class Audio {
-	var sound:Sound;
+	var asset:SoundAsset = new SoundAsset();
 	var panner:AudioPanner = new AudioPanner();
 
-	@:isVar public var source(default, set):String;
+	@readonly @alias var sound:Sound = asset.asset;
+	@alias public var source:String = asset.source;
+	@readonly @alias public var isLoaded:Bool = asset.isLoaded;
+	
 	@:isVar public var uncompressed(default, set):Bool;
 
 	@alias public var volume:Float = panner.volume;
@@ -31,7 +34,7 @@ class Audio {
 	}
 
 	public inline function play(retrigger:Bool = false, waitForAsset:Bool = true) @:privateAccess {
-		panner.handle?.play(retrigger);
+		asset.delay(_ -> panner.handle?.play(retrigger));
 	}
 
 	public inline function pause(waitForAsset:Bool = true) @:privateAccess {
@@ -55,23 +58,15 @@ class Audio {
 		return uncompressed;
 	}
 
-	function set_source(value:String) {
-		value = value ?? "";
-		source = value;
-		if (source != "")
-			Resource.getSound(source, s -> {
-				sound = s;
-				if (uncompressed)
-					if (sound.uncompressedData == null)
-						sound.uncompress(() -> panner.handle = Aura.createUncompBufferChannel(sound));
-					else
-						panner.handle = Aura.createUncompBufferChannel(sound);
-				else
-					panner.handle = Aura.createCompBufferChannel(sound);
-			});
+	@:slot(asset.assetLoaded)
+	function __syncAsset__(sound:Sound) {
+		if (uncompressed)
+			if (sound.uncompressedData == null)
+				sound.uncompress(() -> panner.handle = Aura.createUncompBufferChannel(sound));
+			else
+				panner.handle = Aura.createUncompBufferChannel(sound);
 		else
-			sound = null;
-		return source;
+			panner.handle = Aura.createCompBufferChannel(sound);
 	}
 }
 

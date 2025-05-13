@@ -141,6 +141,13 @@ abstract class AssetData<T:kha.Resource> {
 
 	abstract function _reload(?done:T->Void, ?failed:ResourceError->Void):Void;
 
+	public inline function delay(f:T -> Void, waitForLoaded:Bool = true) {
+		if (isLoaded)
+			f(asset);
+		else if (waitForLoaded)
+			assetLoaded.connect(f, false);
+	}
+
 	public inline function reload(?done:T->Void, ?failed:ResourceError->Void) {
 		_reload(a -> {
 			this.asset = a;
