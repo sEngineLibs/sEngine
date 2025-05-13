@@ -153,6 +153,7 @@ final class Window {
 			dx: dx,
 			dy: dy
 		}
+		activeElements = [];
 		function f(el) {
 			for (i in 1...(el.vChildren.length + 1))
 				f(el.vChildren[el.vChildren.length - i]);
@@ -186,8 +187,10 @@ final class Window {
 	function processMouseEvent<T:MouseEvent>(event:T, f:(Element, T) -> Void) {
 		for (el in activeElements) {
 			f(el, event);
-			if (event.accepted)
+			if (event.accepted) {
+				trace(el);
 				break;
+			}
 		}
 	}
 
