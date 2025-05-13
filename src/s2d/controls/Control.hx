@@ -31,8 +31,9 @@ class Control extends Element {
 
 		background?.render(target);
 		content?.render(target);
-		for (el in vChildren)
-			el.render(target);
+		for (c in children)
+			if (c.visible)
+				c.render(target);
 
 		ctx.style.popOpacity();
 	}

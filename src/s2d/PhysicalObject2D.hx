@@ -6,16 +6,7 @@ import se.math.VectorMath;
 
 abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualObject<This> {
 	@track public var visible:Bool = true;
-	public var vChildren:Array<This> = [];
-	@:isVar public var z(default, set):Float = 0;
-
-	@:signal function vChildAdded(child:This):Void;
-
-	@:signal function vChildMoved(child:This):Void;
-
-	@:signal function vChildRemoved(child:This):Void;
-
-	@:signal function zChanged(z:Float):Void;
+	@track @:isVar public var z(default, set):Float = 0;
 
 	var globalTransform:Mat3 = Mat3.identity();
 
@@ -39,57 +30,31 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 
 	@:slot(childAdded)
 	function __childAdded__(child:This) {
-		if (child.visible) {
-			insertVChild(child);
-			vChildAdded(child);
-		}
-		var slot = v -> {
-			if (!v && child.visible) {
-				insertVChild(child);
-				vChildAdded(child);
-			} else if (v && !child.visible) {
-				removeVChild(child);
-				vChildRemoved(child);
-			}
-		};
-		child.onVisibleChanged(slot);
-		child.onParentChanged(_ -> child.offVisibleChanged(slot));
+		insertChild(child);
 	}
 
-	@:slot(childRemoved)
-	function __childRemoved__(child:This) {
-		if (child.visible)
-			removeVChild(child);
-	}
-
-	function insertVChild(el:This) {
-		for (i in 0...vChildren.length)
-			if (vChildren[i].z > el.z) {
-				vChildren.insert(i, el);
+	function insertChild(child:This) {
+		children.remove(child);
+		for (i in 0...children.length)
+			if (children[i].z > child.z) {
+				children.insert(i, child);
 				return;
 			}
-		vChildren.push(el);
-		vChildMoved(el);
-	}
-
-	function removeVChild(el:This) {
-		vChildren.remove(el);
+		children.push(child);
 	}
 
 	function set_z(value:Float):Float {
 		if (value != z) {
-			final prev = z;
 			z = Math.max(0.0, value);
 			if (parent != null)
-				parent.insertVChild(cast this);
-			zChanged(prev);
+				parent.insertChild(cast this);
 		}
 		return z;
 	}
 
 	function syncParentTransform():Void {
 		globalTransform.copyFrom(parent.globalTransform * transform);
-		for (c in vChildren)
+		for (c in children)
 			c.syncParentTransform();
 	}
 
@@ -98,7 +63,7 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 			globalTransform.copyFrom(parent.globalTransform * transform);
 		else
 			globalTransform.copyFrom(transform);
-		for (c in vChildren)
+		for (c in children)
 			c.syncParentTransform();
 	}
 

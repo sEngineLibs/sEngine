@@ -56,6 +56,10 @@ abstract class VirtualObject<This:VirtualObject<This>> {
 			value.parent = null;
 	}
 
+	public function isDescendantOf() {
+		
+	}
+
 	public function toString():String {
 		return '${Type.getClassName(Type.getClass(this))} $name';
 	}

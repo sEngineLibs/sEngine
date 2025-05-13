@@ -22,7 +22,7 @@ final class Window {
 	var backbuffer:Texture;
 
 	var pending:Array<Element> = [];
-	var activeElements:Array<Element> = [];
+	var entered:Array<Element> = [];
 	@:isVar var focusedElement(default, set):Element;
 
 	public var scene:WindowScene;
@@ -146,57 +146,32 @@ final class Window {
 	}
 
 	function processMouseMoved(x:Int, y:Int, dx:Int, dy:Int):Void {
-		final moved = {
+		var containsMouse = [];
+		processMouseEvent({
 			accepted: false,
 			x: x,
 			y: y,
 			dx: dx,
 			dy: dy
-		}
-		activeElements = [];
-		function f(el) {
-			for (i in 1...(el.vChildren.length + 1))
-				f(el.vChildren[el.vChildren.length - i]);
-			if (el.enabled) {
-				if (el.contains(App.input.mouse.x, App.input.mouse.y)) {
-					if (!moved.accepted) {
-						if (!activeElements.contains(el)) {
-							activeElements.push(el);
-							el.containsMouse = true;
-							el.mouseEntered(x, y);
-						}
-						moved.accepted = true;
-						el.mouseMoved(moved);
-					} else if (activeElements.remove(el)) {
-						el.containsMouse = false;
-						el.mouseExited(x, y);
-					}
-				} else if (activeElements.remove(el)) {
-					el.containsMouse = false;
-					el.mouseExited(x, y);
-				}
+		}, (c, m) -> {
+			containsMouse.push(c);
+			if (!entered.contains(c)) {
+				entered.push(c);
+				c.mouseEntered(x, y);
 			}
-		};
-		for (i in 1...(scene.children.length + 1)) {
-			final el = scene.children[scene.children.length - i];
-			if (el.visible)
-				f(el);
-		}
-	}
-
-	function processMouseEvent<T:MouseEvent>(event:T, f:(Element, T) -> Void) {
-		for (el in activeElements) {
-			f(el, event);
-			if (event.accepted) {
-				trace(el);
-				break;
+			c.mouseMoved(m);
+		});
+		for (c in entered) {
+			if (!containsMouse.contains(c)) {
+				entered.remove(c);
+				c.mouseExited(x, y);
 			}
 		}
 	}
 
 	function processMouseScrolled(d:Int, x:Int, y:Int):Void {
 		processMouseEvent({
-			accepted: true,
+			accepted: false,
 			delta: d,
 			x: x,
 			y: y
@@ -205,7 +180,7 @@ final class Window {
 
 	function processMouseDown(b:MouseButton, x:Int, y:Int):Void {
 		processMouseEvent({
-			accepted: true,
+			accepted: false,
 			button: b,
 			x: x,
 			y: y
@@ -217,7 +192,7 @@ final class Window {
 
 	function processMouseUp(b:MouseButton, x:Int, y:Int):Void {
 		final m = {
-			accepted: true,
+			accepted: false,
 			button: b,
 			x: x,
 			y: y
@@ -228,7 +203,7 @@ final class Window {
 
 	function processMouseHold(b:MouseButton, x:Int, y:Int):Void {
 		processMouseEvent({
-			accepted: true,
+			accepted: false,
 			button: b,
 			x: x,
 			y: y
@@ -237,7 +212,7 @@ final class Window {
 
 	function processMouseClicked(b:MouseButton, x:Int, y:Int):Void {
 		processMouseEvent({
-			accepted: true,
+			accepted: false,
 			button: b,
 			x: x,
 			y: y
@@ -250,11 +225,34 @@ final class Window {
 
 	function processMouseDoubleClicked(b:MouseButton, x:Int, y:Int):Void {
 		processMouseEvent({
-			accepted: true,
+			accepted: false,
 			button: b,
 			x: x,
 			y: y
 		}, (c, m) -> c.mouseDoubleClicked(m));
+	}
+
+	function processMouseEvent<T:MouseEvent>(m:T, f:(Element, T) -> Void) {
+		function process(els:Array<Element>) {
+			var i = 0;
+			while (++i <= els.length) {
+				var el = els[els.length - i];
+				if (el.enabled && el.visible) {
+					process(el.children);
+					if (m.accepted)
+						return;
+					if (el.contains(m.x, m.y)) {
+						trace(el);
+						f(el, m);
+						if (m.accepted) {
+							trace(el);
+							return;
+						}
+					}
+				}
+			}
+		}
+		process(scene.children);
 	}
 
 	function set_focusedElement(value:Element):Element {

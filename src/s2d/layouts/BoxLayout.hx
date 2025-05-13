@@ -14,6 +14,8 @@ class BoxLayout extends Element {
 	}
 
 	override function __childAdded__(child:Element) {
+		super.__childAdded__(child);
+		fit(child);
 		var dirtyWidthSlot = w -> {
 			if (child.layout.fillWidth)
 				child.width = Layout.clampWidth(child, freeWidth);
@@ -22,8 +24,8 @@ class BoxLayout extends Element {
 			if (child.layout.fillHeight)
 				child.height = Layout.clampWidth(child, freeHeight);
 		}
-		slots.set(child, {
-			alignmentChanged: a -> fit(child),
+		var childSlots:BoxLayoutSlots = {
+			alignmentChanged: _ -> fit(child),
 			fillWidthChanged: fw -> {
 				if (!fw && child.layout.fillWidth) {
 					fillWidthElements.push(child);
@@ -48,20 +50,7 @@ class BoxLayout extends Element {
 			minimumHeightChanged: dirtyHeightSlot,
 			maximumHeightChanged: dirtyHeightSlot,
 			preferredHeightChanged: dirtyHeightSlot
-		});
-		super.__childAdded__(child);
-	}
-
-	override function __childRemoved__(child:Element) {
-		super.__childRemoved__(child);
-		slots.remove(child);
-		child.anchors.clear();
-	}
-
-	@:slot(vChildAdded)
-	function add(child:Element) {
-		fit(child);
-		var childSlots = slots.get(child);
+		};
 		child.layout.onAlignmentChanged(childSlots.alignmentChanged);
 		child.layout.onFillWidthChanged(childSlots.fillWidthChanged);
 		child.layout.onMinimumWidthChanged(childSlots.minimumWidthChanged);
@@ -71,14 +60,14 @@ class BoxLayout extends Element {
 		child.layout.onMinimumHeightChanged(childSlots.minimumHeightChanged);
 		child.layout.onMaximumHeightChanged(childSlots.maximumHeightChanged);
 		child.layout.onPreferredHeightChanged(childSlots.preferredHeightChanged);
+		slots.set(child, childSlots);
 		if (child.layout.fillWidth)
 			fillWidthElements.push(child);
 		if (child.layout.fillHeight)
 			fillHeightElements.push(child);
 	}
 
-	@:slot(vChildRemoved)
-	function remove(child:Element) {
+	override function __childRemoved__(child:Element) {
 		var childSlots = slots.get(child);
 		child.anchors.clear();
 		child.layout.offAlignmentChanged(childSlots.alignmentChanged);
@@ -94,6 +83,8 @@ class BoxLayout extends Element {
 			fillWidthElements.remove(child);
 		if (child.layout.fillHeight)
 			fillHeightElements.remove(child);
+		slots.remove(child);
+		child.anchors.clear();
 	}
 
 	@:slot(widthChanged)

@@ -18,7 +18,7 @@ abstract class DrawableElement extends Element {
 		ctx.style.color = color;
 		ctx.transform = globalTransform;
 		draw(target);
-		for (el in vChildren)
+		for (el in children)
 			el.render(target);
 		ctx.style.popOpacity();
 	}

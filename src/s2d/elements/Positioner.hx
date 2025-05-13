@@ -40,7 +40,7 @@ class Positioner extends Element {
 		slots.remove(child);
 	}
 
-	@:slot(vChildAdded)
+	@:slot(childAdded)
 	function trackElement(el:Element) {
 		rebuild();
 		if (axis == Vertical)
@@ -49,7 +49,7 @@ class Positioner extends Element {
 			trackElementH(el);
 	}
 
-	@:slot(vChildRemoved)
+	@:slot(childRemoved)
 	function untrackElement(el:Element) {
 		if (axis == Vertical)
 			untrackElementV(el);
@@ -139,32 +139,32 @@ class Positioner extends Element {
 
 	function adjustH(dir:Direction, d:Float) {
 		if (direction & dir != 0)
-			for (c in vChildren)
+			for (c in children)
 				c.x += d;
 	}
 
 	function adjustV(dir:Direction, d:Float) {
 		if (direction & dir != 0)
-			for (c in vChildren)
+			for (c in children)
 				c.y += d;
 	}
 
 	function adjustElementH(el:Element, dir:Alignment, d:Float) {
 		if (direction & dir != 0)
-			for (i in vChildren.indexOf(el)...vChildren.length)
-				vChildren[i].x += d;
+			for (i in children.indexOf(el)...children.length)
+				children[i].x += d;
 		else
-			for (i in (vChildren.indexOf(el) + 1)...vChildren.length)
-				vChildren[i].x -= d;
+			for (i in (children.indexOf(el) + 1)...children.length)
+				children[i].x -= d;
 	}
 
 	function adjustElementV(el:Element, dir:Alignment, d:Float) {
 		if (direction & dir != 0)
-			for (i in vChildren.indexOf(el)...vChildren.length)
-				vChildren[i].y += d;
+			for (i in children.indexOf(el)...children.length)
+				children[i].y += d;
 		else
-			for (i in (vChildren.indexOf(el) + 1)...vChildren.length)
-				vChildren[i].y -= d;
+			for (i in (children.indexOf(el) + 1)...children.length)
+				children[i].y -= d;
 	}
 
 	function rebuild() {
@@ -175,15 +175,15 @@ class Positioner extends Element {
 	}
 
 	function rebuildH() {
-		if (vChildren.length > 0)
-			for (i in 0...vChildren.length)
-				positionH(vChildren[i], vChildren[i - 1]);
+		if (children.length > 0)
+			for (i in 0...children.length)
+				positionH(children[i], children[i - 1]);
 	}
 
 	function rebuildV() {
-		if (vChildren.length > 0)
-			for (i in 0...vChildren.length)
-				positionV(vChildren[i], vChildren[i - 1]);
+		if (children.length > 0)
+			for (i in 0...children.length)
+				positionV(children[i], children[i - 1]);
 	}
 
 	function set_spacing(value:Float):Float {
@@ -194,14 +194,14 @@ class Positioner extends Element {
 		if (axis == Vertical) {
 			if (direction & BottomToTop != 0)
 				d = -d;
-			for (c in vChildren) {
+			for (c in children) {
 				c.y += offset;
 				offset += d;
 			}
 		} else {
 			if (direction & RightToLeft != 0)
 				d = -d;
-			for (c in vChildren) {
+			for (c in children) {
 				c.x += offset;
 				offset += d;
 			}
@@ -218,7 +218,7 @@ class Positioner extends Element {
 	function set_axis(value:Axis) {
 		axis = value;
 		if (axis == Vertical) {
-			for (c in vChildren) {
+			for (c in children) {
 				untrackElementH(c);
 				trackElementV(c);
 			}
@@ -229,7 +229,7 @@ class Positioner extends Element {
 			top.onPaddingChanged(syncTopPadding);
 			bottom.onPaddingChanged(syncBottomPadding);
 		} else {
-			for (c in vChildren) {
+			for (c in children) {
 				untrackElementV(c);
 				trackElementH(c);
 			}

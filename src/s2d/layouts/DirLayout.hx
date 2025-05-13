@@ -18,8 +18,8 @@ abstract class DirLayout<S:ElementSlots, L:LayoutCell<S>> extends Element {
 		this.direction = direction ?? TopToBottom | LeftToRight;
 	}
 
-	@:slot(vChildAdded)
-	function add(child:Element) {
+	override function __childAdded__(child:Element) {
+		super.__childAdded__(child);
 		var cell = getCell(child);
 		var slots = setCellSlots(cell);
 		if (slots.requiredWidthChanged != null)
@@ -37,14 +37,8 @@ abstract class DirLayout<S:ElementSlots, L:LayoutCell<S>> extends Element {
 		initCell(cell);
 	}
 
-	abstract function getCell(el:Element):L;
-
-	abstract function setCellSlots(cell:L):CellSlots;
-
-	abstract function initCell(cell:L):Void;
-
-	@:slot(vChildRemoved)
-	function remove(child:Element) {
+	override function __childRemoved__(child:Element) {
+		super.__childRemoved__(child);
 		for (cellSlots in cells)
 			if (cellSlots.cell.el == child) {
 				cells.remove(cellSlots);
@@ -63,6 +57,12 @@ abstract class DirLayout<S:ElementSlots, L:LayoutCell<S>> extends Element {
 				return;
 			}
 	}
+
+	abstract function getCell(el:Element):L;
+
+	abstract function setCellSlots(cell:L):CellSlots;
+
+	abstract function initCell(cell:L):Void;
 
 	abstract function cellRemoved(cell:L):Void;
 

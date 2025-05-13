@@ -35,8 +35,7 @@ class Element extends PhysicalObject2D<Element> {
 
 	var anchoring:Int = 0;
 
-	@track public var enabled:Bool = false;
-	public var containsMouse:Bool = false;
+	@track public var enabled:Bool = true;
 	@track public var focused:Bool = false;
 	public var focusPolicy:FocusPolicy = ClickFocus | TabFocus;
 
@@ -154,15 +153,15 @@ class Element extends PhysicalObject2D<Element> {
 	}
 
 	override function __childAdded__(child:Element) {
+		super.__childAdded__(child);
 		child._absX = absX + child.x;
 		child._absY = absY + child.y;
-		super.__childAdded__(child);
 	}
 
-	override function __childRemoved__(child:Element) {
+	@:slot(childRemoved)
+	function __childRemoved__(child:Element) {
 		child._absX = absX - child.x;
 		child._absY = absY - child.y;
-		super.__childRemoved__(child);
 	}
 
 	public function setPadding(value:Float):Void {
@@ -252,8 +251,9 @@ class Element extends PhysicalObject2D<Element> {
 		final ctx = target.context2D;
 		ctx.style.pushOpacity(opacity);
 		ctx.transform = globalTransform;
-		for (c in vChildren)
-			c.render(target);
+		for (c in children)
+			if (c.visible)
+				c.render(target);
 		ctx.style.popOpacity();
 	}
 
