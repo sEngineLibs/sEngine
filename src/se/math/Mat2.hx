@@ -100,7 +100,7 @@ extern abstract Mat2(KhaMat2) from KhaMat2 to KhaMat2 {
 
 	@:op(a *= b)
 	static private inline function mulEqScalar(a:Mat2, f:Float):Mat2
-		return a.copyFrom(a * f);
+		return a.copyFrom(mulScalar(a, f));
 
 	@:op(a /= b)
 	static private inline function divEq(a:Mat2, b:Mat2):Mat2

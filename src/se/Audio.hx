@@ -60,7 +60,7 @@ class Audio {
 
 	@:slot(asset.assetLoaded)
 	function __syncAsset__(sound:Sound) {
-		if (uncompressed)
+		if (uncompressed || sound.compressedData == null)
 			if (sound.uncompressedData == null)
 				sound.uncompress(() -> panner.handle = Aura.createUncompBufferChannel(sound));
 			else

@@ -58,7 +58,7 @@ class App {
 
 	public static function exit() {
 		if (!System.stop())
-			Log.error("This application can't be stopped!");
+			Log.warning("This application can't be stopped!");
 	}
 
 	static inline function render(frames:Array<Framebuffer>) @:privateAccess {

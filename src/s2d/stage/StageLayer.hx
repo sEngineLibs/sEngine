@@ -11,8 +11,8 @@ import s2d.graphics.stage.ShadowBuffer;
 class StageLayer {
 	var stage:Stage;
 
-	var sprites:Array<Sprite> = [];
-	var materials:Array<SpriteMaterial> = [];
+	public var sprites:Array<Sprite> = [];
+	public var materials:Array<SpriteMaterial> = [];
 
 	public function new() {
 		#if (S2D_LIGHTING && S2D_LIGHTING_SHADOWS == 1)

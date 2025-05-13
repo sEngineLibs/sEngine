@@ -10,6 +10,11 @@ import kha.math.FastVector2 as KhaVec2;
 @:forward(x, y) #if !macro @:build(se.math.VectorMath.Swizzle.generateFields(2)) #end
 extern abstract Vec2(KhaVec2) from KhaVec2 to KhaVec2 {
 	#if !macro
+	@:from
+	public static inline function fromFloat(value:Float) {
+		return new Vec2(value, value);
+	}
+
 	@:to
 	public inline function toVec2I():Vec2I {
 		return Vec2I.fromVec2(this);
@@ -121,60 +126,60 @@ extern abstract Vec2(KhaVec2) from KhaVec2 to KhaVec2 {
 		return (this : Vec2) - floor();
 	}
 
-	extern overload public inline function mod(d:Vec2):Vec2 {
+	overload public inline function mod(d:Vec2):Vec2 {
 		return (this : Vec2) - d * ((this : Vec2) / d).floor();
 	}
 
-	extern overload public inline function mod(d:Float):Vec2 {
+	overload public inline function mod(d:Float):Vec2 {
 		return (this : Vec2) - d * ((this : Vec2) / d).floor();
 	}
 
-	extern overload public inline function min(b:Vec2):Vec2 {
+	overload public inline function min(b:Vec2):Vec2 {
 		return new Vec2(b.x < this.x ? b.x : this.x, b.y < this.y ? b.y : this.y);
 	}
 
-	extern overload public inline function min(b:Float):Vec2 {
+	overload public inline function min(b:Float):Vec2 {
 		return new Vec2(b < this.x ? b : this.x, b < this.y ? b : this.y);
 	}
 
-	extern overload public inline function max(b:Vec2):Vec2 {
+	overload public inline function max(b:Vec2):Vec2 {
 		return new Vec2(this.x < b.x ? b.x : this.x, this.y < b.y ? b.y : this.y);
 	}
 
-	extern overload public inline function max(b:Float):Vec2 {
+	overload public inline function max(b:Float):Vec2 {
 		return new Vec2(this.x < b ? b : this.x, this.y < b ? b : this.y);
 	}
 
-	extern overload public inline function clamp(minLimit:Vec2, maxLimit:Vec2) {
+	overload public inline function clamp(minLimit:Vec2, maxLimit:Vec2) {
 		return max(minLimit).min(maxLimit);
 	}
 
-	extern overload public inline function clamp(minLimit:Float, maxLimit:Float) {
+	overload public inline function clamp(minLimit:Float, maxLimit:Float) {
 		return max(minLimit).min(maxLimit);
 	}
 
-	extern overload public inline function mix(b:Vec2, t:Vec2):Vec2 {
+	overload public inline function mix(b:Vec2, t:Vec2):Vec2 {
 		return (this : Vec2) * (1.0 - t) + b * t;
 	}
 
-	extern overload public inline function mix(b:Vec2, t:Float):Vec2 {
+	overload public inline function mix(b:Vec2, t:Float):Vec2 {
 		return (this : Vec2) * (1.0 - t) + b * t;
 	}
 
-	extern overload public inline function step(edge:Vec2):Vec2 {
+	overload public inline function step(edge:Vec2):Vec2 {
 		return new Vec2(this.x < edge.x ? 0.0 : 1.0, this.y < edge.y ? 0.0 : 1.0);
 	}
 
-	extern overload public inline function step(edge:Float):Vec2 {
+	overload public inline function step(edge:Float):Vec2 {
 		return new Vec2(this.x < edge ? 0.0 : 1.0, this.y < edge ? 0.0 : 1.0);
 	}
 
-	extern overload public inline function smoothstep(edge0:Vec2, edge1:Vec2):Vec2 {
+	overload public inline function smoothstep(edge0:Vec2, edge1:Vec2):Vec2 {
 		var t = (((this : Vec2) - edge0) / (edge1 - edge0)).clamp(0, 1);
 		return t * t * (3.0 - 2.0 * t);
 	}
 
-	extern overload public inline function smoothstep(edge0:Float, edge1:Float):Vec2 {
+	overload public inline function smoothstep(edge0:Float, edge1:Float):Vec2 {
 		var t = (((this : Vec2) - edge0) / (edge1 - edge0)).clamp(0, 1);
 		return t * t * (3.0 - 2.0 * t);
 	}

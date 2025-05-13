@@ -17,6 +17,8 @@ using se.extensions.StringExt;
 class WindowScene extends DrawableElement {
 	var window:Window;
 
+	public var active(get, never):Bool;
+
 	public function new(name:String = "scene", window:Window) {
 		super(name);
 		this.window = window;
@@ -67,6 +69,10 @@ class WindowScene extends DrawableElement {
 		#end
 	}
 
+	function get_active() {
+		return window?.scene == this;	
+	}
+	
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 	function drawBounds(e:Element, ctx:Context2D) {
 		final style = ctx.style;
