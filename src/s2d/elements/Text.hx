@@ -7,7 +7,7 @@ import s2d.Alignment;
 
 using se.extensions.StringExt;
 
-class Label extends DrawableElement {
+class Text extends DrawableElement {
 	var asset:FontAsset = new FontAsset();
 	@readonly @alias var kravur:Font = asset.asset;
 

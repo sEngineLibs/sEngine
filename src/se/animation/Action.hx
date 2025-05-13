@@ -7,7 +7,7 @@ import se.Time;
 
 	@see `Actuator`
  */
-@:allow(se.SEngine)
+@:allow(se.App)
 class Action {
 	static var actuators:Array<Actuator> = [];
 

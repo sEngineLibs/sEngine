@@ -1,6 +1,7 @@
 package s2d;
 
 import s2d.Alignment;
+import s2d.elements.Element;
 
 #if !macro
 @:build(se.macro.SMacro.build())

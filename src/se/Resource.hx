@@ -274,7 +274,9 @@ class Resource {
 		var progress = 0;
 
 		function adjust() {
-			onProgress(++progress / total);
+			final p = ++progress / total;
+			if (onProgress != null)
+				onProgress(p);
 			if (progress == total && done != null)
 				done(shelf);
 		}
@@ -285,7 +287,8 @@ class Resource {
 					tgt.add(source, asset);
 					adjust();
 				}, err -> {
-					failed(err);
+					if (failed != null)
+						failed(err);
 					adjust();
 				});
 		}

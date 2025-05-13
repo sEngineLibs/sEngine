@@ -4,7 +4,7 @@ import kha.graphics4.ConstantLocation;
 import se.Texture;
 import se.graphics.ShaderPipeline;
 import se.graphics.ShaderPass;
-import s2d.Element;
+import s2d.elements.Element;
 
 @:allow(s2d.Element)
 @:dox(hide)

@@ -1,12 +1,13 @@
 package s2d.controls;
 
 import se.events.MouseEvents;
-import s2d.elements.Label;
-import s2d.layouts.HBoxLayout;
-import s2d.shapes.RoundedRectangle;
+import s2d.elements.Text;
+import s2d.elements.Element;
+import s2d.elements.layouts.HBoxLayout;
+import s2d.elements.shapes.RoundedRectangle;
 
 class Button extends AbstractButton {
-	public var label:Label;
+	public var label:Text;
 	public var indicator:Element;
 
 	@alias public var checkable:Bool = indicator.visible;
@@ -38,7 +39,7 @@ class Button extends AbstractButton {
 				indicator = ind;
 			});
 			layout.addChild({
-				label = new Label(text);
+				label = new Text(text);
 				label.layout.fillWidth = true;
 				label.layout.fillHeight = true;
 				label.color = Black;

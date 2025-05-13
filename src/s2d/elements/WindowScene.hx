@@ -1,13 +1,12 @@
-package s2d;
+package s2d.elements;
 
-import se.math.Mat3;
 import se.App;
-import se.Time;
-import se.Font;
 import se.Color;
+import se.graphics.Context2D;
+import se.Time;
 import se.Window;
 import se.Texture;
-import se.graphics.Context2D;
+import se.math.Mat3;
 
 using se.extensions.StringExt;
 
@@ -15,20 +14,14 @@ using se.extensions.StringExt;
 @:allow(se.App)
 @:allow(se.Window)
 @:allow(s2d.Element)
-class WindowScene extends Element {
+class WindowScene extends DrawableElement {
 	var window:Window;
-
-	public var backgroundColor:Color = White;
 
 	public function new(name:String = "scene", window:Window) {
 		super(name);
 		this.window = window;
 		width = window.width;
 		height = window.height;
-		window.onResized((w, h) -> {
-			width = w;
-			height = h;
-		});
 	}
 
 	public function set() {
@@ -50,25 +43,28 @@ class WindowScene extends Element {
 	}
 
 	override function render(target:Texture) {
-		target.context2D.render(true, backgroundColor, ctx -> {
-			for (e in children)
-				e.render(target);
-			ctx.transform = Mat3.identity();
-			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
-			var e = elementAt(App.input.mouse.x, App.input.mouse.y);
-			if (e != null)
-				drawBounds(e, ctx);
-			#end
-			#if S2D_DEBUG_FPS
-			final fps = Std.int(1.0 / Time.delta);
-			ctx.style.font = "font_default";
-			ctx.style.fontSize = 14;
-			ctx.style.color = Black;
-			ctx.drawString('FPS: ${fps}', 6, 6);
-			ctx.style.color = White;
-			ctx.drawString('FPS: ${fps}', 5, 5);
-			#end
-		});
+		for (e in children)
+			e.render(target);
+		draw(target);
+	}
+
+	function draw(target:Texture) {
+		final ctx = target.context2D;
+		ctx.transform = Mat3.identity();
+		#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
+		var e = elementAt(App.input.mouse.x, App.input.mouse.y);
+		if (e != null)
+			drawBounds(e, ctx);
+		#end
+		#if S2D_DEBUG_FPS
+		final fps = Std.int(1.0 / Time.delta);
+		ctx.style.font = "font_default";
+		ctx.style.fontSize = 14;
+		ctx.style.color = Black;
+		ctx.drawString('FPS: ${fps}', 6, 6);
+		ctx.style.color = White;
+		ctx.drawString('FPS: ${fps}', 5, 5);
+		#end
 	}
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)

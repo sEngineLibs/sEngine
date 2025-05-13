@@ -1,5 +1,7 @@
 package s2d;
 
+import s2d.elements.Element;
+
 extern enum abstract Alignment(Int) from Int to Int {
 	var AlignLeft:Int = 1 << 0;
 	var AlignRight:Int = 1 << 1;

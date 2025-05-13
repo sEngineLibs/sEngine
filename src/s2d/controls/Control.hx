@@ -1,6 +1,7 @@
 package s2d.controls;
 
 import se.Texture;
+import s2d.elements.Element;
 
 @:generic
 class Control extends Element {

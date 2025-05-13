@@ -4,9 +4,9 @@ import kha.Shaders;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 import se.Texture;
-import s2d.shapes.RoundedRectangle;
+import s2d.elements.shapes.RoundedRectangle;
 
-@:access(s2d.Element)
+@:access(s2d.elements.Element)
 @:dox(hide)
 class RectDrawer extends ElementDrawer<RoundedRectangle> {
 	var rectCL:ConstantLocation;

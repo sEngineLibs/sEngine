@@ -1,4 +1,4 @@
-package s2d.layouts;
+package s2d.elements.layouts;
 
 import s2d.Alignment;
 

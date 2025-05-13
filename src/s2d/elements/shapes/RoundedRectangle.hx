@@ -1,9 +1,11 @@
-package s2d.shapes;
+package s2d.elements.shapes;
 
 import se.Texture;
 import s2d.geometry.Rect;
 import s2d.graphics.Drawers;
 
+@:allow(s2d.graphics.RectDrawer)
+@:access(s2d.graphics.RectDrawer)
 class RoundedRectangle extends DrawableElement {
 	var _rect:Rect = new Rect(0.0, 0.0, 0.0, 0.0);
 	var _radius:Float = 0.0;

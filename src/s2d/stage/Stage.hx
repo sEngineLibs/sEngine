@@ -11,6 +11,7 @@ import se.graphics.RenderBuffer;
 import s2d.stage.Camera;
 import s2d.stage.StageLayer;
 import s2d.graphics.Drawers;
+import s2d.elements.DrawableElement;
 
 @:access(s2d.stage.objects.Object)
 class Stage extends DrawableElement {

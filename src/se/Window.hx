@@ -6,9 +6,9 @@ import kha.Window as KhaWindow;
 import kha.Framebuffer;
 import se.input.Mouse;
 import se.events.MouseEvents;
-import s2d.Element;
-import s2d.WindowScene;
 import s2d.FocusPolicy;
+import s2d.elements.Element;
+import s2d.elements.WindowScene;
 
 #if !macro
 @:build(se.macro.SMacro.build())
@@ -26,6 +26,7 @@ final class Window {
 	@:isVar var focusedElement(default, set):Element;
 
 	public var scene:WindowScene;
+	@:isVar public var overlay(default, set):Element;
 
 	@alias public var title:String = window.title;
 	@alias public var mode:WindowMode = window.mode;
@@ -56,7 +57,16 @@ final class Window {
 		backbuffer = new Texture(window.width, window.height);
 
 		window.notifyOnResize((w, h) -> {
+			backbuffer?.unload();
 			backbuffer = new Texture(w, h);
+			if (scene != null) {
+				scene.width = w;
+				scene.height = h;
+			}
+			if (overlay != null) {
+				overlay.width = w;
+				overlay.height = h;
+			}
 			resized(w, h);
 		});
 
@@ -95,7 +105,10 @@ final class Window {
 	}
 
 	function render(frame:Framebuffer) @:privateAccess {
-		scene.render(backbuffer);
+		backbuffer.context2D.render(true, scene.color, ctx -> {
+			scene.render(backbuffer);
+			overlay?.render(backbuffer);
+		});
 
 		final g2 = frame.g2;
 		g2.begin(true);
@@ -250,6 +263,15 @@ final class Window {
 			}
 		}
 		process(scene.children);
+	}
+
+	function set_overlay(value:Element):Element {
+		overlay = value;
+		if (overlay != null) {
+			overlay.width = width;
+			overlay.height = height;
+		}
+		return overlay;
 	}
 
 	function set_focusedElement(value:Element):Element {

@@ -1,4 +1,4 @@
-package s2d;
+package s2d.elements;
 
 import kha.input.KeyCode;
 import se.Log;

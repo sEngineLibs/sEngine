@@ -1,4 +1,4 @@
-package s2d.shapes;
+package s2d.elements.shapes;
 
 import se.Texture;
 

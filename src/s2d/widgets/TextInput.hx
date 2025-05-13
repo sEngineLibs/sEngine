@@ -1,10 +1,11 @@
-package s2d.elements;
+package s2d.widgets;
 
-import s2d.shapes.Rectangle;
+import s2d.elements.Text;
+import s2d.elements.shapes.Rectangle;
 
 using se.extensions.StringExt;
 
-class TextInput extends Label {
+class TextInput extends Text {
 	public var cursor:Rectangle;
 	public var selection:Rectangle;
 
