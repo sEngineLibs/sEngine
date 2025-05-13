@@ -1,20 +1,23 @@
 package s2d.elements;
 
-import kha.Kravur;
+import se.Font;
+import se.Assets;
 import se.Texture;
-import se.Assets.FontAsset;
 import s2d.Alignment;
 
 using se.extensions.StringExt;
 
 class Label extends DrawableElement {
 	var asset:FontAsset = new FontAsset();
-	@readonly @alias var kravur:Kravur = asset.asset;
+	@readonly @alias var kravur:Font = asset.asset;
 
 	@alias public var font:String = asset.source;
 
-	@:inject(updateTextWidth) @track public var text:String;
-	@:inject(updateTextSize) @track @:isVar public var fontSize(default, set):Int = 32;
+	@:inject(syncTextWidth)
+	@track public var text:String;
+
+	@:inject(syncTextSize)
+	@track @:isVar public var fontSize(default, set):Int = 32;
 
 	public var alignment:Alignment = AlignLeft | AlignTop;
 	public var textWidth(default, null):Float = 0.0;
@@ -23,12 +26,12 @@ class Label extends DrawableElement {
 	public function new(text:String = "Text", name:String = "label") {
 		super(name);
 		this.text = text;
-		asset.onAssetLoaded(updateTextSize);
 		font = "font_default";
+		asset.onAssetLoaded(_ -> syncTextSize());
 	}
 
 	function draw(target:Texture) {
-		if (kravur != null) {
+		if (asset.isLoaded) {
 			final ctx = target.context2D;
 
 			var drawX = absX;
@@ -43,28 +46,28 @@ class Label extends DrawableElement {
 			else if ((alignment & AlignBottom) != 0)
 				drawY += height - textHeight;
 
-			ctx.style.font = kravur;
+			ctx.style.font = font;
 			ctx.style.fontSize = fontSize;
 			ctx.drawString(text, drawX, drawY);
 		}
 	}
 
-	function updateTextWidth() {
-		if (kravur != null && text != null)
+	function syncTextSize() {
+		syncTextWidth();
+		syncTextHeight();
+	}
+
+	function syncTextWidth() {
+		if (asset.isLoaded && text != null)
 			textWidth = kravur.widthOfCharacters(fontSize, text.toCharArray(), 0, text.length);
 	}
 
-	function updateTextHeight() {
-		if (kravur != null)
+	function syncTextHeight() {
+		if (asset.isLoaded)
 			textHeight = kravur.height(fontSize);
 	}
 
-	function updateTextSize() {
-		updateTextWidth();
-		updateTextHeight();
-	}
-
-	private function setkravurSize(value:Int) {
+	function set_fontSize(value:Int) {
 		fontSize = value < 0 ? 0 : value;
 		return value;
 	}

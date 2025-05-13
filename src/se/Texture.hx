@@ -14,16 +14,16 @@ extern abstract Texture(Image) from Image to Image {
 	public var context2D(get, never):Context2D;
 	public var context3D(get, never):Context3D;
 
-	public inline function new(width:Int, height:Int, ?format:TextureFormat, ?depthStencil:DepthStencilFormat, aaSamples:Int = 2) {
+	public inline function new(width:Int, height:Int, ?format:TextureFormat, ?depthStencil:DepthStencilFormat, aaSamples:Int = 1) {
 		this = kha.Image.createRenderTarget(width, height, format, depthStencil, aaSamples);
 	}
 
 	public inline function generateMipmaps(levels:Int = 1) {
-		(this : kha.Image).generateMipmaps(levels);
+		self.generateMipmaps(levels);
 	}
 
 	public inline function setDepthStencilFrom(image:Image) {
-		(this : kha.Image).setDepthStencilFrom(image);
+		self.setDepthStencilFrom(image);
 	}
 
 	@:to

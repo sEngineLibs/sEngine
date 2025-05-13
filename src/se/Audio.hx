@@ -4,30 +4,18 @@ import kha.math.FastVector3;
 import aura.Aura;
 import aura.dsp.panner.Panner;
 import aura.dsp.panner.StereoPanner;
-import se.Assets;
+import se.Resource;
 import se.math.Vec3;
-
-@:forward()
-@:forward.new
-abstract Audio(AudioData) from AudioData to AudioData {
-	@:from
-	public static inline function fromString(source:String):Audio {
-		return Audio.load(source);
-	}
-
-	@:from
-	public static inline function load(source:String):Audio {
-		return new Audio(source);
-	}
-}
 
 #if !macro
 @:build(se.macro.SMacro.build())
 #end
-private class AudioData {
+class Audio {
+	var sound:Sound;
 	var panner:AudioPanner = new AudioPanner();
 
-	@:isVar public var asset(default, null):SoundAsset;
+	@:isVar public var source(default, set):String;
+	@:isVar public var uncompressed(default, set):Bool;
 
 	@alias public var volume:Float = panner.volume;
 	@alias public var balance:Float = panner.balance;
@@ -38,36 +26,60 @@ private class AudioData {
 	@alias public var attenuationFactor:Float = panner.attenuationFactor;
 
 	public function new(?source:String, uncomressed:Bool = true) {
-		asset = new SoundAsset(uncomressed);
-		asset.onAssetLoaded(__syncAsset__);
-		asset.source = source;
+		this.uncompressed = uncompressed;
+		this.source = source;
 	}
 
 	public inline function play(retrigger:Bool = false, waitForAsset:Bool = true) @:privateAccess {
-		asset.delay(() -> panner.handle?.play(retrigger), waitForAsset);
+		panner.handle?.play(retrigger);
 	}
 
 	public inline function pause(waitForAsset:Bool = true) @:privateAccess {
-		asset.delay(() -> panner.handle?.pause(), waitForAsset);
+		panner.handle?.pause();
 	}
 
 	public inline function stop(waitForAsset:Bool = true) @:privateAccess {
-		asset.delay(() -> panner.handle?.stop(), waitForAsset);
+		panner.handle?.stop();
 	}
 
-	function __syncAsset__() @:privateAccess {
-		final sound = asset.asset;
-		if (sound.uncompressedData != null)
-			panner.handle = Aura.createUncompBufferChannel(sound);
+	function set_uncompressed(value:Bool) {
+		if (value != uncompressed) {
+			uncompressed = value;
+			if (uncompressed)
+				if (sound != null && sound.uncompressedData == null)
+					if (sound.uncompressedData == null)
+						sound.uncompress(() -> panner.handle = Aura.createUncompBufferChannel(sound));
+					else
+						panner.handle = Aura.createUncompBufferChannel(sound);
+		}
+		return uncompressed;
+	}
+
+	function set_source(value:String) {
+		value = value ?? "";
+		source = value;
+		if (source != "")
+			Resource.getSound(source, s -> {
+				sound = s;
+				if (uncompressed)
+					if (sound.uncompressedData == null)
+						sound.uncompress(() -> panner.handle = Aura.createUncompBufferChannel(sound));
+					else
+						panner.handle = Aura.createUncompBufferChannel(sound);
+				else
+					panner.handle = Aura.createCompBufferChannel(sound);
+			});
 		else
-			panner.handle = Aura.createCompBufferChannel(sound);
+			sound = null;
+		return source;
 	}
 }
 
 @:allow(se.Audio.AudioPanner)
 private class AudioPanner {
-	@:isVar private var handle(default, set):BaseChannelHandle;
-	@:isVar private var panner(default, set):StereoPanner;
+	@:isVar var panner(default, set):StereoPanner;
+
+	@:isVar public var handle(default, set):BaseChannelHandle;
 
 	@:isVar public var volume(default, set):Float = 1.0;
 	@:isVar public var balance(default, set):Float = 0.0;

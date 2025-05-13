@@ -2,32 +2,27 @@ package s2d.stage;
 
 #if (S2D_SPRITE_INSTANCING == 1)
 import kha.graphics4.VertexBuffer;
+#if (S2D_LIGHTING == 1)
+import s2d.graphics.StageRenderer;
+#end
 #end
 import se.Assets;
 import s2d.stage.objects.Sprite;
-#if (S2D_LIGHTING == 1)
-#if (S2D_LIGHTING_DEFERRED == 1)
-import s2d.graphics.StageRenderer;
-#else
-import s2d.graphics.StageRenderer;
-#end
-#end
+
 @:access(s2d.stage.objects.Sprite)
 class SpriteMaterial {
 	var sprites:Array<Sprite> = [];
 
 	#if (S2D_LIGHTING == 1)
-	public var albedoMap:ImageAsset;
-	public var normalMap:ImageAsset;
-	public var emissionMap:ImageAsset;
+	public var albedoMap(default, null):ImageAsset;
+	public var normalMap(default, null):ImageAsset;
+	public var emissionMap(default, null):ImageAsset;
 	#if (S2D_LIGHTING_PBR == 1)
-	public var ormMap:ImageAsset;
+	public var ormMap(default, null):ImageAsset;
 	#end
 	#else
-	public var textureMap:ImageAsset;
+	public var textureMap(default, null):ImageAsset;
 	#end
-
-	public var loaded(get, never):Bool;
 
 	public function new() {
 		#if (S2D_LIGHTING == 1)
@@ -42,17 +37,6 @@ class SpriteMaterial {
 		#end
 		#if (S2D_SPRITE_INSTANCING == 1)
 		init();
-		#end
-	}
-
-	function get_loaded():Bool {
-		#if (S2D_LIGHTING == 1)
-		return albedoMap.loaded && normalMap.loaded && emissionMap.loaded;
-		#if (S2D_LIGHTING_PBR == 1)
-		return albedoMap.loaded && normalMap.loaded && emissionMap.loaded && ormMap.loaded;
-		#end
-		#else
-		return textureMap.loaded;
 		#end
 	}
 

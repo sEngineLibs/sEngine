@@ -1,17 +1,19 @@
 package se;
 
-import se.Assets;
-import kha.Font as KhaFont;
+import se.Resource;
 
 @:forward()
-abstract Font(KhaFont) from KhaFont to KhaFont {
+extern abstract Font(kha.Font) from kha.Font to kha.Font {
 	@:from
-	public static inline function fromString(value:String):Font {
-		return Font.load(value);
+	public static inline function get(source:String):Font {
+		return Resource.getFont(source);
 	}
 
-	@:from
-	public static inline function load(value:String):Font {
-		return FontAsset.load(value);
+	public static inline function load(source:String, done:Font->Void, ?failed:ResourceError->Void):Void {
+		Resource.loadFont(source, done, failed);
+	}
+
+	public static inline function reload(source:String, done:Font->Void, ?failed:ResourceError->Void) {
+		Resource.reloadFont(source, done, failed);
 	}
 }

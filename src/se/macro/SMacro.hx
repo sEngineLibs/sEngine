@@ -309,20 +309,21 @@ class SMacro extends Builder {
 							]
 						};
 						Context.defineType(tdAbstract(cls.pack, typeName, underlying, [
-							method("emit", fun(f.args, macro :Void, macro {
-								for (p in this.keyValueIterator()) {
-									if ($cond) {
-										for (slot in p.value) {
-											slot(${
-												for (arg in sArgs)
-													macro $i{arg.name}
-											});
-											break;
+							method("emit", fun(f.args, macro :Void,
+								macro {
+									for (p in this.keyValueIterator()) {
+										if ($cond) {
+											for (slot in p.value) {
+												slot(${
+													for (arg in sArgs)
+														macro $i{arg.name}
+												});
+												break;
+											}
 										}
 									}
-								}
-							}), [APublic, AInline],
-								[meta(":op", [macro a()])]),
+								}),
+								[APublic, AInline], [meta(":op", [macro a()])]),
 							method("connect", fun(args(sKeys).concat([arg("slot", _t), arg("keep", macro :Bool, macro true)]), macro :Void, macro {
 								var flag = false;
 								for (p in this.keyValueIterator())
@@ -377,9 +378,10 @@ class SMacro extends Builder {
 
 						// add connector
 						var cargs = sidentsExpr.concat([macro slot, macro keep]);
-						var connector = method('on${field.name.capitalize()}', fun(args(sKeys).concat([arg("slot", _t), arg("keep", macro :Bool, macro true)]), macro {
-							$i{field.name}.connect($a{cargs});
-						}), [APublic, AInline]);
+						var connector = method('on${field.name.capitalize()}',
+							fun(args(sKeys).concat([arg("slot", _t), arg("keep", macro :Bool, macro true)]), macro {
+								$i{field.name}.connect($a{cargs});
+							}), [APublic, AInline]);
 						if (isStatic)
 							connector.access.push(AStatic);
 						var maskDoc = "";
@@ -529,7 +531,6 @@ class SMacro extends Builder {
 	function buildInjection(field:Field, injections:Map<String, Function>) {
 		function injectCalls(f:Function, injections:Map<String, Function>) {
 			var injected = false;
-
 			if (f.ret != null && f?.ret.toString() != "Void") {
 				var block = [];
 				for (func in injections.keyValueIterator()) {

@@ -1,8 +1,10 @@
 package s2d;
 
+import se.math.Mat3;
+import se.App;
 import se.Time;
+import se.Font;
 import se.Color;
-import se.Assets;
 import se.Window;
 import se.Texture;
 import se.graphics.Context2D;
@@ -51,37 +53,30 @@ class WindowScene extends Element {
 		target.context2D.render(true, backgroundColor, ctx -> {
 			for (e in children)
 				e.render(target);
-
+			ctx.transform = Mat3.identity();
 			#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 			var e = elementAt(App.input.mouse.x, App.input.mouse.y);
 			if (e != null)
 				drawBounds(e, ctx);
 			#end
 			#if S2D_DEBUG_FPS
-			var font:FontAsset = new FontAsset("font_default");
-			if (font.loaded) {
-				final fps = Std.int(1.0 / Time.delta);
-				ctx.style.font = font;
-				ctx.style.fontSize = 14;
-				ctx.style.color = Black;
-				ctx.drawString('FPS: ${fps}', 6, 6);
-				ctx.style.color = White;
-				ctx.drawString('FPS: ${fps}', 5, 5);
-			}
+			final fps = Std.int(1.0 / Time.delta);
+			ctx.style.font = "font_default";
+			ctx.style.fontSize = 14;
+			ctx.style.color = Black;
+			ctx.drawString('FPS: ${fps}', 6, 6);
+			ctx.style.color = White;
+			ctx.drawString('FPS: ${fps}', 5, 5);
 			#end
 		});
 	}
 
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 	function drawBounds(e:Element, ctx:Context2D) {
-		var font:FontAsset = "font_default";
-		if (!font.loaded)
-			return;
-
 		final style = ctx.style;
 
 		style.opacity = 0.5;
-		style.font = font;
+		style.font = "font_default";
 		style.fontSize = 16;
 
 		final lm = e.left.margin;

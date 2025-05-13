@@ -461,7 +461,8 @@ extern abstract Context2D(Graphics) from Graphics {
 	}
 
 	private inline function set_transform(value:Mat3):Mat3 {
-		return this.transformation = value;
+		this.transformation.setFrom(value);
+		return this.transformation;
 	}
 }
 

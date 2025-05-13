@@ -1,29 +1,29 @@
 package s2d.elements;
 
 import se.Image;
-import se.Assets.ImageAsset;
+import se.Assets;
 import se.Texture;
 import s2d.geometry.Rect;
 
 class ImageElement extends DrawableElement {
 	var asset:ImageAsset = new ImageAsset();
-	@readonly @alias var image:Image = asset.asset;
 
+	@readonly @alias var image:Image = asset.asset;
 	@alias public var source:String = asset.source;
 	public var sourceClip:Rect = new Rect(0.0, 0.0, 0.0, 0.0);
 	public var fillMode:ImageFillMode = Stretch;
 
-	public function new(?source:String, name:String = "asset") {
+	public function new(source:String = "", name:String = "asset") {
 		super(name);
-		asset.onAssetLoaded(__syncAsset__);
-		this.source = source;
+		asset.source = source;
 	}
 
-	function __syncAsset__() {
+	@:slot(asset.assetLoaded)
+	function __syncAsset__(img:Image) {
 		sourceClip.x = 0.0;
 		sourceClip.y = 0.0;
-		sourceClip.width = image.width;
-		sourceClip.height = image.height;
+		sourceClip.width = img.width;
+		sourceClip.height = img.height;
 	}
 
 	function draw(target:Texture) {

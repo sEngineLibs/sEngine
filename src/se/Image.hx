@@ -1,17 +1,19 @@
 package se;
 
-import se.Assets;
-import kha.Image as KhaImage;
+import se.Resource;
 
 @:forward(width, height, format, unload, at, fromImage, fromCanvas, fromVideo, fromBytes, fromBytes3D, fromEncodedBytes)
-extern abstract Image(KhaImage) from KhaImage to KhaImage {
+extern abstract Image(kha.Image) from kha.Image to kha.Image {
 	@:from
-	public static inline function fromString(value:String):Image {
-		return Image.load(value);
+	public static inline function get(source:String):Image {
+		return Resource.getImage(source);
 	}
 
-	@:from
-	public static inline function load(value:String):Image {
-		return ImageAsset.load(value);
+	public static inline function load(source:String, done:Image->Void, ?failed:ResourceError->Void):Void {
+		Resource.loadImage(source, done, failed);
+	}
+
+	public static inline function reload(source:String, done:Image->Void, ?failed:ResourceError->Void) {
+		Resource.reloadImage(source, done, failed);
 	}
 }

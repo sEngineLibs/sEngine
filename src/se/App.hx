@@ -3,8 +3,6 @@ package se;
 import kha.System;
 import kha.Framebuffer;
 import aura.Aura;
-import se.Time;
-import se.Window;
 import se.input.Mouse;
 import se.input.Keyboard;
 import se.animation.Action;
@@ -25,23 +23,37 @@ class App {
 			Time.update();
 			Action.update(Time.time);
 		});
-		System.start(options, window -> {
-			Aura.init();
-			Drawers.compile();
+		var loaded = true;
+		Resource.loadShelf({
+			fonts: ["font_default"],
+			images: ["image_default"]
+		}, _ -> {
+			if (loaded)
+				System.start(options, window -> {
+					Aura.init();
+					Drawers.compile();
 
-			App.input = {
-				mouse: new Mouse(),
-				keyboard: new Keyboard()
-			}
+					App.input = {
+						mouse: new Mouse(),
+						keyboard: new Keyboard()
+					}
 
-			var w = new Window(window);
-			windows = [w];
-			setup(w);
+					var w = new Window(window);
+					windows = [w];
+					setup(w);
 
-			System.notifyOnFrames(frames -> {
-				update();
-				render(frames);
-			});
+					System.notifyOnFrames(frames -> {
+						update();
+						render(frames);
+					});
+				});
+			else
+				App.exit();
+		}, progress -> {
+			Log.debug('Loading starter assets: ${Std.int(progress * 100)}%');
+		}, err -> {
+			Log.error('Failed to load starter asset ${err.source}: ${err.message}');
+			loaded = false;
 		});
 	}
 

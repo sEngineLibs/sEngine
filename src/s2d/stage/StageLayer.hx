@@ -9,6 +9,8 @@ import s2d.graphics.stage.ShadowBuffer;
 #end
 #end
 class StageLayer {
+	var stage:Stage;
+
 	var sprites:Array<Sprite> = [];
 	var materials:Array<SpriteMaterial> = [];
 

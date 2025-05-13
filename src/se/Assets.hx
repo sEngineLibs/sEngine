@@ -1,241 +1,169 @@
 package se;
 
-import kha.Sound;
-import kha.Assets;
-import kha.AssetError;
+import se.Resource;
 
-enum AssetState {
-	None;
-	Loaded;
-	Loading;
+@:forward()
+@:forward.new
+extern abstract BlobAsset(BlobAssetData) {
+	@:from
+	public static inline function get(source:String):BlobAsset {
+		return new BlobAsset(source);
+	}
+
+	@:to
+	public inline function toAsset():Blob {
+		return this.asset;
+	}
 }
 
 @:forward()
 @:forward.new
-abstract FontAsset(FontAssetData) {
+extern abstract FontAsset(FontAssetData) {
 	@:from
-	public static function fromString(value:String) {
-		return FontAsset.load(value);
-	}
-
-	public static function load(source:String) {
+	public static inline function get(source:String):FontAsset {
 		return new FontAsset(source);
 	}
 
 	@:to
-	public function toFont():Font {
+	public inline function toAsset():Font {
 		return this.asset;
 	}
 }
 
 @:forward()
 @:forward.new
-abstract ImageAsset(ImageAssetData) {
+extern abstract ImageAsset(ImageAssetData) {
 	@:from
-	public static function fromString(value:String) {
-		return ImageAsset.load(value);
-	}
-
-	public static function load(source:String, readable:Bool = false) {
-		return new ImageAsset(source, readable);
+	public static inline function get(source:String):ImageAsset {
+		return new ImageAsset(source);
 	}
 
 	@:to
-	public function toImage():Image {
+	public inline function toAsset():Image {
 		return this.asset;
 	}
 }
 
 @:forward()
 @:forward.new
-abstract SoundAsset(SoundAssetData) {
+extern abstract SoundAsset(SoundAssetData) {
 	@:from
-	public static function fromString(value:String) {
-		return SoundAsset.load(value);
-	}
-
-	public static function load(source:String, uncompressed:Bool = true) {
-		return new SoundAsset(source, uncompressed);
+	public static inline function get(source:String):SoundAsset {
+		return new SoundAsset(source);
 	}
 
 	@:to
-	public function toSound():Sound {
+	public inline function toAsset():Sound {
 		return this.asset;
+	}
+}
+
+@:forward()
+@:forward.new
+extern abstract VideoAsset(VideoAssetData) {
+	@:from
+	public static inline function get(source:String):VideoAsset {
+		return new VideoAsset(source);
+	}
+
+	@:to
+	public inline function toAsset():Video {
+		return this.asset;
+	}
+}
+
+private class BlobAssetData extends AssetData<Blob> {
+	function _get(?done:Blob->Void, ?failed:ResourceError->Void):Void {
+		Resource.getBlob(source, done, failed);
+	}
+
+	function _reload(?done:Blob->Void, ?failed:ResourceError->Void):Void {
+		Resource.reloadBlob(source, done, failed);
 	}
 }
 
 private class FontAssetData extends AssetData<Font> {
-	static final assets:Map<String, Font> = [];
-
-	function loadFromName(callback:Font->Void, errorCallback:AssetError->Void) {
-		if (assets.exists(source))
-			callback(assets.get(source));
-		else
-			Assets.loadFont(source, callback, errorCallback);
+	function _get(?done:Font->Void, ?failed:ResourceError->Void):Void {
+		Resource.getFont(source, done, failed);
 	}
 
-	function loadFromPath(callback:Font->Void, errorCallback:AssetError->Void) {
-		if (assets.exists(source))
-			callback(assets.get(source));
-		else
-			Assets.loadFontFromPath(source, callback, errorCallback);
+	function _reload(?done:Font->Void, ?failed:ResourceError->Void):Void {
+		Resource.reloadFont(source, done, failed);
 	}
 }
 
 private class ImageAssetData extends AssetData<Image> {
-	static final assets:Map<String, Image> = [];
-
-	@:isVar public var readable(default, set):Bool;
-
-	public function new(?source:String, readable:Bool = false) {
-		super(source);
-		this.readable = readable;
+	function _get(?done:Image->Void, ?failed:ResourceError->Void):Void {
+		Resource.getImage(source, done, failed);
 	}
 
-	function loadFromName(callback:Image->Void, errorCallback:AssetError->Void) {
-		if (assets.exists(source))
-			callback(assets.get(source));
-		else
-			Assets.loadImage(source, callback, errorCallback);
-	}
-
-	function loadFromPath(callback:Image->Void, errorCallback:AssetError->Void) {
-		if (assets.exists(source))
-			callback(assets.get(source));
-		else
-			Assets.loadImageFromPath(source, readable, callback, errorCallback);
-	}
-
-	function set_readable(value:Bool):Bool {
-		if (readable != value) {
-			readable = value;
-			reload();
-		}
-		return readable;
+	function _reload(?done:Image->Void, ?failed:ResourceError->Void):Void {
+		Resource.reloadImage(source, done, failed);
 	}
 }
 
 private class SoundAssetData extends AssetData<Sound> {
-	static final assets:Map<String, Sound> = [];
-
-	var uncompressed:Bool;
-
-	public function new(?source:String, uncompressed:Bool = true) {
-		super(source);
-		this.uncompressed = uncompressed;
+	function _get(?done:Sound->Void, ?failed:ResourceError->Void):Void {
+		Resource.getSound(source, done, failed);
 	}
 
-	function loadFromName(callback:Sound->Void, errorCallback:AssetError->Void) {
-		if (assets.exists(source))
-			callback(assets.get(source));
-		else
-			Assets.loadSound(source, sound -> processSound(sound, callback), errorCallback);
+	function _reload(?done:Sound->Void, ?failed:ResourceError->Void):Void {
+		Resource.reloadSound(source, done, failed);
+	}
+}
+
+private class VideoAssetData extends AssetData<Video> {
+	function _get(?done:Video->Void, ?failed:ResourceError->Void):Void {
+		Resource.getVideo(source, done, failed);
 	}
 
-	function loadFromPath(callback:Sound->Void, errorCallback:AssetError->Void) {
-		if (assets.exists(source))
-			callback(assets.get(source));
-		else
-			Assets.loadSoundFromPath(source, sound -> processSound(sound, callback), errorCallback);
-	}
-
-	function processSound(sound:Sound, callback:Sound->Void) {
-		if (uncompressed)
-			sound.uncompress(() -> callback(sound));
-		else // Krom only uses uncompressedData
-			#if !kha_krom
-			if (sound.compressedData != null)
-			#end
-		{
-			callback(sound);
-		}
+	function _reload(?done:Video->Void, ?failed:ResourceError->Void):Void {
+		Resource.reloadVideo(source, done, failed);
 	}
 }
 
 #if !macro
 @:build(se.macro.SMacro.build())
 #end
-abstract class AssetData<T:AssetType> {
-	@:isVar public var asset(default, set):T;
-	@:isVar public var source(default, set):String;
+abstract class AssetData<T:kha.Resource> {
+	@:isVar public var asset(default, null):T = null;
+	@:isVar public var source(default, set):String = "";
 
-	public var state(default, null):AssetState = None;
-	public var loaded(get, never):Bool;
+	public var isLoaded(get, never):Bool;
 
-	@:signal function assetLoaded();
+	@:signal function assetLoaded(asset:T):Void;
 
-	public function new(?source:String) {
+	public inline function new(?source:String) {
 		this.source = source;
 	}
 
-	public function unload() {
-		if (loaded) {
-			asset.unload();
-			asset = null;
-			state = None;
-		}
+	abstract function _get(?done:T->Void, ?failed:ResourceError->Void):Void;
+
+	abstract function _reload(?done:T->Void, ?failed:ResourceError->Void):Void;
+
+	public inline function reload(?done:T->Void, ?failed:ResourceError->Void) {
+		_reload(a -> {
+			this.asset = a;
+			this.assetLoaded(asset);
+		});
 	}
 
-	public function reload() {
-		unload();
-		load();
-	}
-
-	public function load() {
-		if (source != "") {
-			state = Loading;
-			if (source.indexOf("/") + source.indexOf("\\") + source.indexOf(".") > -3)
-				loadFromPath(a -> asset = a, err -> {
-					state = loaded ? Loaded : None;
-					Log.error('Failed to load asset ${err.url}: ${err.error ?? "Unknown Error"}');
-				});
-			else
-				loadFromName(a -> asset = a, err -> {
-					state = loaded ? Loaded : None;
-					Log.error('Failed to load asset ${err.url}: ${err.error ?? "Unknown Error"}');
-				});
-		}
-	}
-
-	public function delay(f:Void->Void, waitForLoad:Bool = true) {
-		if (state == Loaded)
-			f();
-		else if (waitForLoad && state == Loading)
-			onAssetLoaded(f, false);
-	}
-
-	abstract function loadFromName(callback:T->Void, errorCallback:AssetError->Void):Void;
-
-	abstract function loadFromPath(callback:T->Void, errorCallback:AssetError->Void):Void;
-
-	function set_source(value:String):String {
+	inline function set_source(value:String):String {
 		value = value ?? "";
-		if (source != value) {
+		if (value != source) {
 			source = value;
 			if (source != "")
-				load();
+				_get(a -> {
+					asset = a;
+					assetLoaded(this.asset);
+				});
 			else
-				unload();
+				asset = null;
 		}
 		return source;
 	}
 
-	function set_asset(value:T):T {
-		if (value != asset) {
-			asset = value;
-			if (asset != null) {
-				state = Loaded;
-				assetLoaded();
-			}
-		}
-		return asset;
+	inline function get_isLoaded():Bool {
+		return this.asset != null;
 	}
-
-	function get_loaded():Bool {
-		return asset != null;
-	}
-}
-
-private typedef AssetType = {
-	function unload():Void;
 }
