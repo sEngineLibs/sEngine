@@ -10,9 +10,10 @@ class Timer {
 	};
 
 	var callback:Void->Void;
+	var originalCallback:Void->Void;
 	var delay:Float;
 
-	public var started(default, null):Bool = false;
+	public var started(get, set):Bool;
 
 	/**
 		Creates a timer and immediately starts it
@@ -32,6 +33,7 @@ class Timer {
 		@param delay Amount of seconds to wait
 	 */
 	public function new(callback:Void->Void, delay:Float) {
+		this.originalCallback = callback;
 		this.callback = callback;
 		this.delay = delay;
 	}
@@ -43,11 +45,8 @@ class Timer {
 	 */
 	public function start(lock:Bool = true):Bool {
 		if (!lock || !started) {
-			started = true;
-			listener = Time.notifyOnTime(() -> {
-				callback();
-				started = false;
-			}, Time.time + delay);
+			callback = originalCallback;
+			listener = Time.notifyOnTime(callback, Time.time + delay);
 			return true;
 		}
 		return false;
@@ -57,8 +56,8 @@ class Timer {
 		Stops the timer
 	 */
 	public function stop() {
-		started = false;
 		Time.timeListeners.remove(listener);
+		callback = originalCallback;
 	}
 
 	/**
@@ -70,20 +69,16 @@ class Timer {
 	public function repeat(count:Int = 1, lock:Bool = true):Bool {
 		if (count < 0)
 			return false;
-
 		if (!lock || !started) {
-			started = true;
-			final f = callback;
+			final f = originalCallback;
 			if (count > 0)
 				callback = function() {
 					f();
 					count--;
-					if (count > 0) {
+					if (count > 0)
 						listener = Time.notifyOnTime(callback, Time.time + delay);
-					} else {
-						started = false;
+					else
 						callback = f;
-					}
 				};
 			else
 				callback = function() {
@@ -103,5 +98,17 @@ class Timer {
 	 */
 	public function loop(lock:Bool = true):Bool {
 		return repeat(0, lock);
+	}
+
+	function get_started():Bool {
+		return Time.timeListeners.contains(listener);
+	}
+
+	function set_started(value:Bool):Bool {
+		if (!started && value)
+			start();
+		else if (started && !value)
+			stop();
+		return started;
 	}
 }

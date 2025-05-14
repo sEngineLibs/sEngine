@@ -25,7 +25,7 @@ final class Window {
 	var entered:Array<Element> = [];
 	@:isVar var focusedElement(default, set):Element;
 
-	public var scene:WindowScene;
+	@:isVar public var scene(default, set):WindowScene;
 	@:isVar public var overlay(default, set):Element;
 
 	@alias public var title:String = window.title;
@@ -53,8 +53,7 @@ final class Window {
 	public function new(window:KhaWindow) {
 		this.window = window;
 
-		scene = createScene();
-		backbuffer = new Texture(window.width, window.height);
+		backbuffer = new Texture(width, height);
 
 		window.notifyOnResize((w, h) -> {
 			backbuffer?.unload();
@@ -100,13 +99,9 @@ final class Window {
 		KhaWindow.destroy(window);
 	}
 
-	public function createScene() {
-		return new WindowScene(this);
-	}
-
 	function render(frame:Framebuffer) @:privateAccess {
-		backbuffer.context2D.render(true, scene.color, ctx -> {
-			scene.render(backbuffer);
+		backbuffer.context2D.render(true, scene?.color ?? Black, ctx -> {
+			scene?.render(backbuffer);
 			overlay?.render(backbuffer);
 		});
 
@@ -137,23 +132,27 @@ final class Window {
 	}
 
 	function adjustTabFocus() {
-		final i = scene.children.indexOf(focusedElement);
-		for (j in 1...scene.children.length) {
-			var e = scene.children[(i + j) % scene.children.length];
-			if (e.enabled && (e.focusPolicy & TabFocus != 0)) {
-				focusedElement = e;
-				return;
+		if (scene != null) {
+			final i = scene.children.indexOf(focusedElement);
+			for (j in 1...scene.children.length) {
+				var e = scene.children[(i + j) % scene.children.length];
+				if (e.enabled && (e.focusPolicy & TabFocus != 0)) {
+					focusedElement = e;
+					return;
+				}
 			}
 		}
 	}
 
 	function adjustWheelFocus(d:Int) {
-		final i = scene.children.length + scene.children.indexOf(focusedElement);
-		for (j in 1...scene.children.length) {
-			var e = scene.children[(i + (d > 0 ? j : -j)) % scene.children.length];
-			if (e.enabled && (e.focusPolicy & WheelFocus != 0)) {
-				focusedElement = e;
-				return;
+		if (scene != null) {
+			final i = scene.children.length + scene.children.indexOf(focusedElement);
+			for (j in 1...scene.children.length) {
+				var e = scene.children[(i + (d > 0 ? j : -j)) % scene.children.length];
+				if (e.enabled && (e.focusPolicy & WheelFocus != 0)) {
+					focusedElement = e;
+					return;
+				}
 			}
 		}
 	}
@@ -262,7 +261,18 @@ final class Window {
 				}
 			}
 		}
-		process(scene.children);
+		if (scene != null)
+			process(scene.children);
+	}
+
+	function set_scene(value:WindowScene):WindowScene {
+		if (value != scene && value.window == this) {
+			final old = scene;
+			scene = value;
+			old?.unset();
+			scene?.set();
+		}
+		return scene;
 	}
 
 	function set_overlay(value:Element):Element {

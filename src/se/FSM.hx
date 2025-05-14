@@ -7,16 +7,12 @@ class FSM {
 		this.state = state;
 	}
 
-	public function goto(state:State) {
-		if (state != null) {
-			final old = this.state;
-			if (old != null) {
-				if (old.hasTransition(state)) {
-					this.state = state;
-					old.getTransition(state)();
-				}
-			} else
-				this.state = state;
+	@:nullSafety
+	public function goto(to:State) {
+		final transition = state.getTransition(to);
+		if (transition != null) {
+			state = to;
+			transition();
 		}
 	}
 }
