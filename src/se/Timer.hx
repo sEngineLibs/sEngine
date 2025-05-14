@@ -12,7 +12,7 @@ class Timer {
 	var callback:Void->Void;
 	var delay:Float;
 
-	public var started:Bool = false;
+	public var started(default, null):Bool = false;
 
 	/**
 		Creates a timer and immediately starts it
@@ -41,7 +41,7 @@ class Timer {
 		@param lock Whether to skip if the timer is already started
 		@return Returns true if the timer was started
 	 */
-	public function start(?lock:Bool = true):Bool {
+	public function start(lock:Bool = true):Bool {
 		if (!lock || !started) {
 			started = true;
 			listener = Time.notifyOnTime(() -> {
@@ -67,7 +67,7 @@ class Timer {
 		@param lock Whether to skip if the timer is already started
 		@return Returns true if the timer was repeated
 	 */
-	public function repeat(count:Int = 1, ?lock:Bool = true):Bool {
+	public function repeat(count:Int = 1, lock:Bool = true):Bool {
 		if (count < 0)
 			return false;
 
@@ -101,7 +101,7 @@ class Timer {
 		@param lock Whether to skip if the timer is already started
 		@return Returns true if the timer was looped
 	 */
-	public function loop(?lock:Bool = true):Bool {
+	public function loop(lock:Bool = true):Bool {
 		return repeat(0, lock);
 	}
 }

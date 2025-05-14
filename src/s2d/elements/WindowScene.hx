@@ -17,17 +17,17 @@ using se.extensions.StringExt;
 class WindowScene extends DrawableElement {
 	var window:Window;
 
-	public var active(get, never):Bool;
+	@:signal function set():Void;
+
+	@:signal function unset():Void;
+
+	public var active(get, set):Bool;
 
 	public function new(name:String = "scene", window:Window) {
 		super(name);
 		this.window = window;
 		width = window.width;
 		height = window.height;
-	}
-
-	public function set() {
-		window.scene = this;
 	}
 
 	public function elementAt(x:Float, y:Float):Null<Element> {
@@ -70,9 +70,19 @@ class WindowScene extends DrawableElement {
 	}
 
 	function get_active() {
-		return window?.scene == this;	
+		return window?.scene == this;
 	}
-	
+
+	function set_active(value:Bool) {
+		if (window != null) {
+			if (!active && value)
+				window.scene = this;
+			else if (active && !value)
+				window.scene = null;
+		}
+		return active;
+	}
+
 	#if (S2D_UI_DEBUG_ELEMENT_BOUNDS == 1)
 	function drawBounds(e:Element, ctx:Context2D) {
 		final style = ctx.style;

@@ -1,9 +1,9 @@
 package se;
 
-import se.Resource.ResourceError;
 import kha.System;
 import kha.Framebuffer;
 import aura.Aura;
+import se.Resource;
 import se.input.Mouse;
 import se.input.Keyboard;
 import se.animation.Action;
@@ -27,10 +27,12 @@ class App {
 		System.start(options, window -> {
 			Aura.init();
 			Drawers.compile();
+
 			App.input = {
 				mouse: new Mouse(),
 				keyboard: new Keyboard()
 			}
+
 			var w = new Window(window);
 			windows = [w];
 			setup(w);
