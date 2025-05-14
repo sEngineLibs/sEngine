@@ -38,7 +38,6 @@ layout(location = 0) out vec4 fragColor;
 void main() {
     // fetch material textures
     vec4 albedo = texture(albedoMap, fragUV);
-    albedo.rgb /= albedo.a;
     vec3 emission = texture(emissionMap, fragUV).rgb;
     vec3 orm = texture(ormMap, fragUV).rgb;
 
@@ -68,5 +67,5 @@ void main() {
     // #if S2D_LIGHTING_SHADOWS == 1
     // l *= texture(shadowMap, fragCoord).r;
     // #endif
-    fragColor = vec4(col, albedo.a);
+    fragColor = vec4(col * albedo.a, albedo.a);
 }

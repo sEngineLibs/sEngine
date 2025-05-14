@@ -30,14 +30,10 @@ class LightingPass extends StageRenderPass {
 	public function new(inputLayout:Array<VertexStructure>) {
 		super({
 			#if (S2D_LIGHTING_DEFERRED == 1)
-			inputLayout: [inputLayout[0]], 
-			vertexShader: Reflect.field(Shaders, "s2d_2d_vert"), 
-			fragmentShader: Reflect.field(Shaders,"lighting_deferred_frag")
+			inputLayout: [inputLayout[0]], vertexShader: Reflect.field(Shaders, "s2d_2d_vert"), fragmentShader: Reflect.field(Shaders, "lighting_deferred_frag")
 			#else
-			inputLayout: inputLayout, 
-			vertexShader: Reflect.field(Shaders, "sprite_vert"), 
-			fragmentShader: Reflect.field(Shaders, "lighting_forward_frag"),
-			alphaBlendSource: SourceAlpha
+			inputLayout: inputLayout, vertexShader: Reflect.field(Shaders, "sprite_vert"), fragmentShader: Reflect.field(Shaders, "lighting_forward_frag"),
+			alphaBlendSource: SourceAlpha, alphaBlendDestination: InverseSourceAlpha, blendSource: SourceAlpha, blendDestination: InverseSourceAlpha
 			#end
 		});
 	}
@@ -122,11 +118,11 @@ class LightingPass extends StageRenderPass {
 					ctx.setFloat(depthCL, sprite.z);
 					ctx.setMat3(modelCL, sprite.globalTransform);
 					ctx.setVec4(cropRectCL, sprite.cropRect);
-					ctx.setTexture(albedoMapTU, sprite.material.albedoMap);
-					ctx.setTexture(normalMapTU, sprite.material.normalMap);
-					ctx.setTexture(emissionMapTU, sprite.material.emissionMap);
+					ctx.setTexture(albedoMapTU, sprite.material.albedoMap, {});
+					ctx.setTexture(normalMapTU, sprite.material.normalMap, {});
+					ctx.setTexture(emissionMapTU, sprite.material.emissionMap, {});
 					#if (S2D_LIGHTING_PBR == 1)
-					ctx.setTexture(ormMapTU, sprite.material.ormMap);
+					ctx.setTexture(ormMapTU, sprite.material.ormMap, {});
 					#end
 					ctx.draw();
 				}

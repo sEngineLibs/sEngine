@@ -5,6 +5,7 @@ import kha.arrays.Float32Array;
 import kha.graphics4.Graphics;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
+import se.Texture;
 import se.math.Vec2;
 import se.math.Vec3;
 import se.math.Vec4;
@@ -135,8 +136,24 @@ extern abstract Context3D(Graphics) from Graphics {
 		setMat4(location, mat4(a00, a10, a20, a30, a01, a11, a21, a31, a02, a12, a22, a32, a03, a13, a23, a33));
 	}
 
-	public inline function setTexture(unit:TextureUnit, texture:Image) {
+	public inline function setTexture(unit:TextureUnit, texture:Image, ?parameters:TextureParameters) {
 		this.setTexture(unit, texture);
+		if (parameters != null)
+			this.setTextureParameters(unit, 
+				parameters.uAddressing ?? Clamp,
+				parameters.vAddressing ?? Clamp,
+				parameters.minificationFilter ?? PointFilter,
+				parameters.magnificationFilter ?? PointFilter,
+				parameters.mipmapFilter ?? NoMipFilter
+			);
+		else 
+			this.setTextureParameters(unit, 
+				Clamp,
+				Clamp,
+				PointFilter,
+				PointFilter,
+				NoMipFilter
+			);
 	}
 
 	public inline function draw(start:Int = 0, count:Int = -1) {

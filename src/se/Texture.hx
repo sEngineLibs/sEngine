@@ -1,6 +1,10 @@
 package se;
 
+import se.Image;
+import kha.graphics4.MipMapFilter;
+import kha.graphics4.TextureFilter;
 import kha.graphics4.TextureFormat;
+import kha.graphics4.TextureAddressing;
 import kha.graphics4.DepthStencilFormat;
 import se.graphics.Context1D;
 import se.graphics.Context2D;
@@ -9,6 +13,11 @@ import se.graphics.Context3D;
 @:forward(unload, width, height)
 extern abstract Texture(Image) from Image to Image {
 	var self(get, never):kha.Image;
+
+	@:to
+	private inline function get_self():kha.Image {
+		return this;
+	}
 
 	public var context1D(get, never):Context1D;
 	public var context2D(get, never):Context2D;
@@ -26,11 +35,6 @@ extern abstract Texture(Image) from Image to Image {
 		self.setDepthStencilFrom(image);
 	}
 
-	@:to
-	private inline function get_self():kha.Image {
-		return this;
-	}
-
 	private inline function get_context1D():Context1D {
 		return self.g1;
 	}
@@ -42,4 +46,12 @@ extern abstract Texture(Image) from Image to Image {
 	private inline function get_context3D():Context3D {
 		return self.g4;
 	}
+}
+
+typedef TextureParameters = {
+	var ?uAddressing:TextureAddressing;
+	var ?vAddressing:TextureAddressing;
+	var ?minificationFilter:TextureFilter;
+	var ?magnificationFilter:TextureFilter;
+	var ?mipmapFilter:MipMapFilter;
 }

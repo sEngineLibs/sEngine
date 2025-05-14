@@ -21,7 +21,10 @@ class RectDrawer extends ElementDrawer<RoundedRectangle> {
 			inputLayout: [structure],
 			vertexShader: Reflect.field(Shaders, "drawer_colored_vert"),
 			fragmentShader: Reflect.field(Shaders, "rectangle_frag"),
-			alphaBlendSource: SourceAlpha
+			alphaBlendSource: SourceAlpha,
+			alphaBlendDestination: InverseSourceAlpha,
+			blendSource: SourceAlpha,
+			blendDestination: InverseSourceAlpha
 		});
 	}
 

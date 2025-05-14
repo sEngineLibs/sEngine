@@ -14,14 +14,14 @@ class SpriteMaterial {
 	var sprites:Array<Sprite> = [];
 
 	#if (S2D_LIGHTING == 1)
-	public var albedoMap(default, null):ImageAsset;
-	public var normalMap(default, null):ImageAsset;
-	public var emissionMap(default, null):ImageAsset;
+	public var albedoMap:ImageAsset;
+	public var normalMap:ImageAsset;
+	public var emissionMap:ImageAsset;
 	#if (S2D_LIGHTING_PBR == 1)
-	public var ormMap(default, null):ImageAsset;
+	public var ormMap:ImageAsset;
 	#end
 	#else
-	public var textureMap(default, null):ImageAsset;
+	public var textureMap:ImageAsset;
 	#end
 
 	public function new() {

@@ -7,5 +7,5 @@ layout(location = 0) out vec4 fragColor;
 
 void main() {
     vec4 color = texture(textureMap, fragUV);
-    fragColor = vec4(color.rgb, color.a);
+    fragColor = vec4(color.rgb * color.a, color.a);
 }
