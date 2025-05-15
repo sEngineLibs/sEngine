@@ -32,7 +32,7 @@ class Text extends DrawableElement {
 	}
 
 	function draw(target:Texture) {
-		if (asset.isLoaded) {
+		if (text != "" && asset.isLoaded) {
 			final ctx = target.context2D;
 
 			var drawX = absX;

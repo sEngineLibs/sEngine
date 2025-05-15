@@ -39,6 +39,10 @@ class Element extends PhysicalObject2D<Element> {
 	@track public var focused:Bool = false;
 	public var focusPolicy:FocusPolicy = ClickFocus | TabFocus;
 
+	public var clip:Bool = false;
+	public var opacity:Float = 1.0;
+	public var layout:Layout = new Layout();
+
 	public var left:HorizontalAnchor = new LeftAnchor();
 	public var hCenter:HorizontalAnchor = new HCenterAnchor();
 	public var right:HorizontalAnchor = new RightAnchor();
@@ -47,9 +51,6 @@ class Element extends PhysicalObject2D<Element> {
 	public var bottom:VerticalAnchor = new BottomAnchor();
 	public var anchors:ElementAnchors;
 	public var padding(never, set):Float;
-
-	public var opacity:Float = 1.0;
-	public var layout:Layout = new Layout();
 
 	@:isVar var _absX(default, set):Float = 0.0;
 	@:isVar var _absY(default, set):Float = 0.0;
@@ -251,9 +252,13 @@ class Element extends PhysicalObject2D<Element> {
 		final ctx = target.context2D;
 		ctx.style.pushOpacity(opacity);
 		ctx.transform = globalTransform;
+		if (clip)
+			ctx.scissor(Std.int(absX), Std.int(absY), Std.int(width), Std.int(height));
 		for (c in children)
 			if (c.visible)
 				c.render(target);
+		if (clip)
+			ctx.disableScissor();
 		ctx.style.popOpacity();
 	}
 

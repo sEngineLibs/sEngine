@@ -7,7 +7,6 @@ class FSM {
 		this.state = state;
 	}
 
-	@:nullSafety
 	public function goto(to:State) {
 		final transition = state.getTransition(to);
 		if (transition != null) {
@@ -32,7 +31,7 @@ abstract State(StateData) from StateData to StateData {
 
 	@:op([])
 	public function getTransition(to:State) {
-		return this.transitions.get(to);
+		return to != null ? this.transitions.get(to) : null;
 	}
 
 	public function hasTransition(to:State) {
