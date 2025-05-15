@@ -237,8 +237,12 @@ class Resource {
 	}
 
 	static function wrapGet<T:kha.Resource>(l:FResource<T>, source:String, list:ResourceList<T>, ?done:T->Void, ?failed:ResourceError->Void):Null<T> {
-		if (list.has(source))
-			return list[source];
+		if (list.has(source)) {
+			final a = list[source];
+			if (done != null)
+				done(a);
+			return a;
+		}
 		l(source, done ?? _ -> {}, failed);
 		return null;
 	}

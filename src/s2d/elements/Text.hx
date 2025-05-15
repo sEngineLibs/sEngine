@@ -12,7 +12,6 @@ class Text extends DrawableElement {
 	@readonly @alias var kravur:Font = asset.asset;
 
 	@alias public var font:String = asset.source;
-	@readonly @alias public var isLoaded:Bool = asset.isLoaded;
 
 	@:inject(syncTextWidth)
 	@track public var text:String;

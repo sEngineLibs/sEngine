@@ -2,12 +2,15 @@ package s2d.elements.shapes;
 
 import se.Texture;
 
-class Rectangle extends DrawableElement {
+class Rectangle extends Shape {
 	public function new(name:String = "rectangle") {
 		super(name);
 	}
 
 	function draw(target:Texture) {
-		target.context2D.fillRect(absX, absY, width, height);
+		final ctx = target.context2D;
+		ctx.fillRect(absX, absY, width, height);
+		ctx.style.color = border.color;
+		ctx.drawRect(absX, absY, width, height, border.width);
 	}
 }

@@ -11,6 +11,7 @@ import s2d.elements.shapes.RoundedRectangle;
 class RectDrawer extends ElementDrawer<RoundedRectangle> {
 	var rectCL:ConstantLocation;
 	var rectDataCL:ConstantLocation;
+	var bordColCL:ConstantLocation;
 
 	public function new() {
 		var structure = new VertexStructure();
@@ -32,14 +33,18 @@ class RectDrawer extends ElementDrawer<RoundedRectangle> {
 		super.setup();
 		rectCL = pipeline.getConstantLocation("rect");
 		rectDataCL = pipeline.getConstantLocation("rectData");
+		bordColCL = pipeline.getConstantLocation("bordCol");
 	}
 
 	function draw(target:Texture, rectangle:RoundedRectangle) {
 		final ctx = target.context2D, ctx3d = target.context3D;
 		final rect = rectangle._rect;
+		final bordCol = rectangle.border.color;
 
 		ctx3d.setFloat4(rectCL, rectangle.absX, rectangle.absY, rectangle.width, rectangle.height);
-		ctx3d.setFloat2(rectDataCL, rectangle._radius, rectangle.softness);
+		ctx3d.setFloat3(rectDataCL, rectangle._radius, rectangle.softness, rectangle.border.width);
+		ctx3d.setFloat4(bordColCL, bordCol.r, bordCol.g, bordCol.b, bordCol.a);
+
 		ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 }

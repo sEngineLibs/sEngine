@@ -255,10 +255,8 @@ final class Window {
 						return;
 					if (el.contains(m.x, m.y)) {
 						f(el, m);
-						if (m.accepted) {
-							trace(el);
+						if (m.accepted)
 							return;
-						}
 					}
 				}
 			}
@@ -272,7 +270,11 @@ final class Window {
 			final old = scene;
 			scene = value;
 			old?.unset();
-			scene?.set();
+			if (scene != null) {
+				scene.width = width;
+				scene.height = height;
+				scene.set();
+			}
 		}
 		return scene;
 	}

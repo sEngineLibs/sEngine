@@ -6,7 +6,7 @@ import s2d.graphics.Drawers;
 
 @:allow(s2d.graphics.RectDrawer)
 @:access(s2d.graphics.RectDrawer)
-class RoundedRectangle extends DrawableElement {
+class RoundedRectangle extends Shape {
 	var _rect:Rect = new Rect(0.0, 0.0, 0.0, 0.0);
 	var _radius:Float = 0.0;
 
