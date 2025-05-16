@@ -2,7 +2,7 @@ package se.extensions;
 
 import se.math.Vec3;
 import se.math.Mat4;
-import se.math.VectorMath;
+import se.math.SMath;
 
 using se.extensions.Mat4Ext;
 

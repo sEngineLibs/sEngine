@@ -7,7 +7,7 @@ import kha.math.FastVector4 as KhaVec4;
 
 @:nullSafety
 @:forward.new
-@:forward(x, y, z, w) #if !macro @:build(se.math.VectorMath.Swizzle.generateFields(4)) #end
+@:forward(x, y, z, w) #if !macro @:build(se.math.SMath.Swizzle.generateFields(4)) #end
 extern abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 	#if !macro
 	@:to
@@ -81,7 +81,7 @@ extern abstract Vec4(KhaVec4) from KhaVec4 to KhaVec4 {
 	}
 
 	public inline function log2():Vec4 @:privateAccess {
-		return new Vec4(VectorMath.log2f(this.x), VectorMath.log2f(this.y), VectorMath.log2f(this.z), VectorMath.log2f(this.w));
+		return new Vec4(SMath.log2f(this.x), SMath.log2f(this.y), SMath.log2f(this.z), SMath.log2f(this.w));
 	}
 
 	public inline function sqrt():Vec4 {

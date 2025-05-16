@@ -27,7 +27,6 @@ class ImageWidget extends DrawableElement {
 		sourceClip.y = 0.0;
 		sourceClip.width = img.width;
 		sourceClip.height = img.height;
-		trace(sourceClip);
 	}
 
 	function draw(target:Texture) {

@@ -6,7 +6,7 @@ import se.Image;
 import se.Texture;
 import se.math.Vec2;
 import se.math.Mat3;
-import se.math.VectorMath;
+import se.math.SMath;
 import se.graphics.RenderBuffer;
 import s2d.stage.Camera;
 import s2d.stage.StageLayer;

@@ -2,7 +2,7 @@ package se;
 
 import se.math.Vec3;
 import se.math.Vec4;
-import se.math.VectorMath;
+import se.math.SMath;
 
 @:forward.new
 extern enum abstract Color(Int) from Int to Int {

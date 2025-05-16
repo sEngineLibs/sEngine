@@ -1,7 +1,7 @@
 package se.math;
 
 /**
-	Macros required by VectorMath
+	Macros required by SMath
 
 	xyzw
 	rgba

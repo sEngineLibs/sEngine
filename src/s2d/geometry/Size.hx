@@ -1,7 +1,7 @@
 package s2d.geometry;
 
 import se.math.Vec2;
-import se.math.VectorMath;
+import se.math.SMath;
 
 extern abstract Size(Vec2) from Vec2 to Vec2 {
 	public var width(get, set):Float;

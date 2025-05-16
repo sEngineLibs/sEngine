@@ -1,6 +1,6 @@
 package se.animation;
 
-import se.math.VectorMath;
+import se.math.SMath;
 
 class NumberAnimation extends Animation<Float> {
 	function update(t:Float):Float {

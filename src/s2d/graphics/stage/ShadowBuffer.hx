@@ -5,7 +5,7 @@ import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 import se.math.Vec2;
 import se.math.Mat3;
-import se.math.VectorMath;
+import se.math.SMath;
 import s2d.stage.objects.Sprite;
 import s2d.graphics.stage.lighting.ShadowPass;
 

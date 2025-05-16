@@ -2,7 +2,7 @@ package s2d;
 
 import se.math.Vec2;
 import se.math.Mat3;
-import se.math.VectorMath;
+import se.math.SMath;
 
 abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualObject<This> {
 	@track public var visible:Bool = true;

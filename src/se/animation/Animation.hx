@@ -1,7 +1,7 @@
 package se.animation;
 
 import se.Time;
-import se.math.VectorMath;
+import se.math.SMath;
 import se.animation.Action.Actuator;
 
 #if !macro

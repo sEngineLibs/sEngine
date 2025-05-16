@@ -1,7 +1,7 @@
 package se.extensions;
 
 import haxe.ds.Vector;
-import se.math.VectorMath;
+import se.math.SMath;
 
 class VectorExt {
 	/**

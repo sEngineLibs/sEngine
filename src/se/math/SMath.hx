@@ -8,7 +8,7 @@ package se.math;
 	Reference Spec GLSL ES 1.0: https://www.khronos.org/files/opengles_shading_language.pdf
 
 	**Usage**:
-	Add `import se.math.VectorMath;` to be able to use GLSL functions and constructors
+	Add `import se.math.SMath;` to be able to use GLSL functions and constructors
 
 	Original author: haxiomic (George Corney)
 
@@ -18,7 +18,6 @@ package se.math;
 	Overrides default haxe's 64-bit Float type to use 32-bit floats on platforms that support it.
 **/
 // @:eager typedef Float = kha.FastFloat;
-
 // # Built-in Functions
 // trigonometric
 

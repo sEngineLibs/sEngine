@@ -5,14 +5,12 @@ import se.Log;
 import se.Texture;
 import se.math.Vec2;
 import se.math.Mat3;
-import se.math.VectorMath;
+import se.math.SMath;
 import se.input.Mouse;
 import se.events.MouseEvents;
 import s2d.Anchors;
 import s2d.FocusPolicy;
 import s2d.geometry.Size;
-import s2d.geometry.Rect;
-import s2d.geometry.Bounds;
 import s2d.geometry.Position;
 
 @:allow(s2d.WindowScene)
@@ -68,11 +66,6 @@ class Element extends PhysicalObject2D<Element> {
 	@:isVar public var y(default, set):Float = 0.0;
 	@:isVar public var width(default, set):Float = 0.0;
 	@:isVar public var height(default, set):Float = 0.0;
-
-	public var bounds(get, set):Bounds;
-	public var contentBounds(get, set):Bounds;
-	public var rect(get, set):Rect;
-	public var contentRect(get, set):Rect;
 
 	@:signal.private function absXChanged(x:Float):Void;
 
@@ -169,10 +162,6 @@ class Element extends PhysicalObject2D<Element> {
 		padding = value;
 	}
 
-	public function setBounds(bounds:Bounds) {
-		this.bounds = bounds;
-	}
-
 	overload extern public inline function setSize(width:Float, height:Float):Void {
 		setSize(new Size(width, height));
 	}
@@ -189,18 +178,6 @@ class Element extends PhysicalObject2D<Element> {
 	overload extern public inline function setPosition(position:Position):Void {
 		x = position.x;
 		y = position.y;
-	}
-
-	overload extern public inline function setRect(position:Position, size:Size):Void {
-		setRect(position.x, position.y, size.width, size.height);
-	}
-
-	overload extern public inline function setRect(x:Float, y:Float, width:Float, height:Float):Void {
-		setRect(new Rect(x, y, width, height));
-	}
-
-	overload extern public inline function setRect(rect:Rect):Void {
-		this.rect = rect;
 	}
 
 	overload extern public inline function mapFromGlobal(p:Position):Position {
@@ -550,54 +527,6 @@ class Element extends PhysicalObject2D<Element> {
 		top.padding = value;
 		right.padding = value;
 		bottom.padding = value;
-		return value;
-	}
-
-	function get_bounds():Bounds {
-		return new Bounds(x, y, x + width, y + height);
-	}
-
-	function set_bounds(value:Bounds):Bounds {
-		x = value.left;
-		y = value.top;
-		width = value.right - value.left;
-		height = value.bottom - value.top;
-		return value;
-	}
-
-	function get_contentBounds():Bounds {
-		return new Bounds(x + left.padding, y + top.padding, x + width - right.padding, y + height - bottom.padding);
-	}
-
-	function set_contentBounds(value:Bounds):Bounds {
-		x = value.left - left.padding;
-		y = value.top - top.padding;
-		width = value.right - value.left + right.padding;
-		height = value.bottom - value.top + bottom.padding;
-		return value;
-	}
-
-	function get_rect():Rect {
-		return new Rect(x, y, width, height);
-	}
-
-	function set_rect(value:Rect):Rect {
-		x = value.x;
-		y = value.y;
-		width = value.width;
-		height = value.height;
-		return value;
-	}
-
-	function get_contentRect():Rect {
-		return new Rect(x + left.padding, y + top.padding, width - left.padding - right.padding, height - top.padding - bottom.padding);
-	}
-
-	function set_contentRect(value:Rect):Rect {
-		x = value.x - left.padding;
-		y = value.y - top.padding;
-		width = value.width + right.padding;
-		height = value.height + bottom.padding;
 		return value;
 	}
 }

@@ -3,7 +3,7 @@ package se.graphics;
 import kha.graphics2.Graphics;
 import se.math.Vec2;
 import se.math.Mat3;
-import se.math.VectorMath;
+import se.math.SMath;
 import s2d.Alignment;
 
 @:forward(pipeline, end, scissor, disableScissor, drawLine, fillTriangle, drawRect, fillRect, drawString, drawCharacters)

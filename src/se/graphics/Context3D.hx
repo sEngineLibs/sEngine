@@ -14,7 +14,7 @@ import se.math.Vec3I;
 import se.math.Vec2I;
 import se.math.Mat3;
 import se.math.Mat4;
-import se.math.VectorMath;
+import se.math.SMath;
 
 @:forward(begin, clear, flush, end, scissor, disableScissor, setPipeline, setIndexBuffer, setVertexBuffer, setVertexBuffers, setTextureParameters)
 extern abstract Context3D(Graphics) from Graphics {
@@ -139,21 +139,10 @@ extern abstract Context3D(Graphics) from Graphics {
 	public inline function setTexture(unit:TextureUnit, texture:Image, ?parameters:TextureParameters) {
 		this.setTexture(unit, texture);
 		if (parameters != null)
-			this.setTextureParameters(unit, 
-				parameters.uAddressing ?? Clamp,
-				parameters.vAddressing ?? Clamp,
-				parameters.minificationFilter ?? PointFilter,
-				parameters.magnificationFilter ?? PointFilter,
-				parameters.mipmapFilter ?? NoMipFilter
-			);
-		else 
-			this.setTextureParameters(unit, 
-				Clamp,
-				Clamp,
-				PointFilter,
-				PointFilter,
-				NoMipFilter
-			);
+			this.setTextureParameters(unit, parameters.uAddressing ?? Clamp, parameters.vAddressing ?? Clamp, parameters.minificationFilter ?? PointFilter,
+				parameters.magnificationFilter ?? PointFilter, parameters.mipmapFilter ?? NoMipFilter);
+		else
+			this.setTextureParameters(unit, Clamp, Clamp, PointFilter, PointFilter, NoMipFilter);
 	}
 
 	public inline function draw(start:Int = 0, count:Int = -1) {

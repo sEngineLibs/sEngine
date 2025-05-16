@@ -1,7 +1,7 @@
 package s2d.geometry;
 
 import se.math.Vec4;
-import se.math.VectorMath;
+import se.math.SMath;
 
 @:forward.new
 extern abstract Bounds(Vec4) from Vec4 to Vec4 {

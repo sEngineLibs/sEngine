@@ -1,7 +1,7 @@
 package s2d.stage;
 
 import se.math.Mat3;
-import se.math.VectorMath;
+import se.math.SMath;
 import s2d.stage.objects.StageObject;
 
 @:allow(s2d.stage.Stage)

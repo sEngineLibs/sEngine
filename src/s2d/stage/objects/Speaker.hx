@@ -2,7 +2,7 @@ package s2d.stage.objects;
 
 import aura.dsp.panner.Panner;
 import se.Audio;
-import se.math.VectorMath;
+import se.math.SMath;
 
 class Speaker extends StageObject {
 	var audio:Audio = new Audio();
