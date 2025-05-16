@@ -181,7 +181,7 @@ class Element extends PhysicalObject2D<Element> {
 	}
 
 	overload extern public inline function mapFromGlobal(p:Position):Position {
-		return globalTransform * p;
+		return globalTransform * p - vec2(absX, absY);
 	}
 
 	overload extern public inline function mapFromGlobal(x:Float, y:Float):Position {
