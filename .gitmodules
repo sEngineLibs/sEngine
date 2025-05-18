@@ -1,6 +1,13 @@
 [submodule "sEngine-APIs"]
 	path = api/build/html
 	url = https://github.com/sEngineLibs/api
+[submodule "snet"]
+	path = libraries/snet
+	url = https://github.com/sEngineLibs/snet
 [submodule "Kha"]
 	path = Kha
 	url = https://github.com/Kode/Kha
+[submodule "aura"]
+	path = libraries/aura
+	url = https://github.com/MoritzBrueckner/aura
+
