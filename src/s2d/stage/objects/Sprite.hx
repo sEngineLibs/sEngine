@@ -6,13 +6,13 @@ import s2d.geometry.Rect;
 
 using se.extensions.VectorExt;
 
-class Sprite extends StageObject {
+class Sprite extends LayerObject {
 	public var mesh:Mesh;
 	public var cropRect:Rect = new Rect(0.0, 0.0, 1.0, 1.0);
 	@:isVar public var material(default, set):SpriteMaterial;
 
-	public function new(name:String = "sprite", material:SpriteMaterial, ?polygons:Array<Vec2>) {
-		super(name);
+	public function new(name:String = "sprite", material:SpriteMaterial, ?layer:StageLayer, ?polygons:Array<Vec2>) {
+		super(name, layer);
 		this.material = material;
 		if (polygons != null)
 			this.mesh = polygons;
@@ -41,5 +41,19 @@ class Sprite extends StageObject {
 			material = value;
 		}
 		return value;
+	}
+
+	function set_layer(value:StageLayer):StageLayer {
+		if (value != layer) {
+			if (layer != null && layer.sprites.contains(this))
+				layer.sprites.remove(this);
+			if (value != null && !value.sprites.contains(this)) {
+				value.sprites.push(this);
+				if (!value.materials.contains(material))
+					value.materials.push(material);
+			}
+			layer = value;
+		}
+		return layer;
 	}
 }

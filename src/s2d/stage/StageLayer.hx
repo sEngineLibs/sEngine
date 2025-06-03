@@ -21,19 +21,11 @@ class StageLayer {
 	}
 
 	public function addSprite(sprite:Sprite) {
-		if (!sprites.contains(sprite)) {
-			sprites.push(sprite);
-			if (!materials.contains(sprite.material))
-				materials.push(sprite.material);
-		}
+		sprite.layer = this;
 	}
 
 	public function removeSprite(sprite:Sprite) {
-		sprites.remove(sprite);
-		for (s in sprites)
-			if (s.material == sprite.material)
-				return;
-		materials.remove(sprite.material);
+		sprite.layer = null;
 	}
 
 	#if (S2D_LIGHTING == 1)
@@ -44,12 +36,11 @@ class StageLayer {
 	public var lights:Array<Light> = [];
 
 	public function addLight(light:Light) {
-		if (!lights.contains(light))
-			lights.push(light);
+		light.layer = this;
 	}
 
 	public function removeLight(light:Light) {
-		lights.remove(light);
+		light.layer = null;
 	}
 	#end
 }

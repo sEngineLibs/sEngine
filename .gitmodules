@@ -10,4 +10,3 @@
 [submodule "aura"]
 	path = libraries/aura
 	url = https://github.com/MoritzBrueckner/aura
-
