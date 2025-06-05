@@ -35,26 +35,20 @@ class App {
 
 			var w = new Window(window);
 			windows = [w];
-			setup(w);
+			if (setup != null)
+				setup(w);
 
-			var loaded = true;
 			Resource.loadShelf({
 				fonts: ["font_default"],
 				images: ["image_default"]
 			}, _ -> {
-				if (loaded) {
-					if (started != null)
-						started();
-					System.notifyOnFrames(frames -> {
-						update();
-						render(frames);
-					});
-				} else
-					App.exit();
-			}, progress, err -> {
-				failed(err);
-				loaded = false;
-			});
+				if (started != null)
+					started();
+				System.notifyOnFrames(frames -> {
+					update();
+					render(frames);
+				});
+			}, progress, failed);
 		});
 	}
 
