@@ -1,7 +1,7 @@
 package s2d.controls;
 
 import s2d.elements.Text;
-import s2d.elements.layouts.HBoxLayout;
+import s2d.layouts.HBoxLayout;
 import s2d.elements.shapes.RoundedRectangle;
 
 class Button extends AbstractButton {

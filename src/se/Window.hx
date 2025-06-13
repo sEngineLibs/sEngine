@@ -7,7 +7,7 @@ import kha.Framebuffer;
 import se.input.Mouse;
 import se.events.MouseEvents;
 import s2d.FocusPolicy;
-import s2d.elements.Element;
+import s2d.Element;
 import s2d.elements.WindowScene;
 
 #if !macro

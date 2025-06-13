@@ -6,7 +6,7 @@ import kha.graphics4.ConstantLocation;
 import se.Texture;
 import s2d.elements.shapes.RoundedRectangle;
 
-@:access(s2d.elements.Element)
+@:access(s2d.Element)
 @:dox(hide)
 class RectDrawer extends ElementDrawer<RoundedRectangle> {
 	var rectCL:ConstantLocation;

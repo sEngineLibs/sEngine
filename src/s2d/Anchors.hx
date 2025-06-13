@@ -1,7 +1,7 @@
 package s2d;
 
 import se.Log;
-import s2d.elements.Element;
+import s2d.Element;
 
 class ElementAnchors {
 	var el:Element;

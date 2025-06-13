@@ -1,7 +1,7 @@
-package s2d.elements.layouts;
+package s2d.layouts;
 
 import s2d.Direction;
-import s2d.elements.layouts.LayoutCell;
+import s2d.layouts.LayoutCell;
 
 using se.extensions.ArrayExt;
 
