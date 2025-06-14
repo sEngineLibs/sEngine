@@ -2,7 +2,7 @@ package s2d.controls;
 
 import se.events.MouseEvents;
 
-class AbstractButton extends Control {
+class AbstractButton<B:Element, C:Element> extends Control<B, C> {
 	@track public var pressed:Bool = false;
 	@track public var hovered:Bool = false;
 
