@@ -45,7 +45,7 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 
 	function set_z(value:Float):Float {
 		if (value != z) {
-			z = Math.max(0.0, value);
+			z = value;
 			if (parent != null)
 				parent.insertChild(cast this);
 		}

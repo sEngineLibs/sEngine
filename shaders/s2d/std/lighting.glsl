@@ -7,7 +7,6 @@ struct Light {
     vec3 color;
     float power;
     float radius;
-    // float volume;
 };
 
 vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, vec3 orm) {
@@ -15,28 +14,28 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 albedo, vec3 orm) {
     float roughness = clamp(orm.g, 0.05, 1.0);
     float metalness = orm.b;
 
-    vec3 dir = normalize(light.position - position);
-    float distSq = dot(dir, dir);
-    float lightAttenuation = light.power / (4.0 * PI * distSq + light.radius * light.radius);
+    vec3 lightVec = light.position - position;
+    float dist = length(lightVec);
+    vec3 dir = lightVec / dist;
+    float distSq = dist * dist;
+
+    float attenuation = light.power / (4.0 * PI * distSq + light.radius * light.radius);
 
     vec3 V = normalize(viewDir);
     vec3 H = normalize(dir + V);
 
-    // Fresnel
     vec3 F0 = mix(vec3(0.04), albedo, metalness);
     vec3 F = fresnelSchlick(dot(H, V), F0);
 
-    // BRDF components
     float roughnessE2 = roughness * roughness;
     float NDF = distributionGGX(normal, H, roughnessE2);
     float G = geometrySmith(normal, V, dir, roughnessE2);
     vec3 specularLight = (NDF * G * F) / 4.0 * dot(normal, V) * dot(normal, dir);
 
-    // diffuse
     vec3 kD = (1.0 - F) * (1.0 - metalness);
-    vec3 diffuseLight = kD * albedo * max(dot(normal, dir), 0.0) / PI;
+    vec3 diffuseLight = kD * albedo * dot(normal, dir) / PI;
 
-    return occlusion * (diffuseLight + specularLight) * light.color * lightAttenuation;
+    return occlusion * (diffuseLight + specularLight) * light.color * attenuation;
 }
 
 #if S2D_LIGHTING_ENVIRONMENT == 1

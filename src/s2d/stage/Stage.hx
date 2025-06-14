@@ -1,8 +1,5 @@
 package s2d.stage;
 
-#if (S2D_LIGHTING_ENVIRONMENT == 1)
-import se.Image;
-#end
 import se.Texture;
 import se.math.Vec2;
 import se.math.Mat3;
@@ -27,17 +24,23 @@ class Stage extends DrawableElement {
 	public var camera:Camera = new Camera();
 
 	#if (S2D_LIGHTING_ENVIRONMENT == 1)
-	@:isVar public var environmentMap(default, set):Image;
+	@:isVar public var environmentMap(default, set):se.Assets.ImageAsset;
 
-	function set_environmentMap(value:Image):Image {
-		environmentMap = value;
-		environmentMap.generateMipmaps(4);
+	function set_environmentMap(value) {
+		if (value != null) {
+			value.onAssetLoaded(asset -> (asset : Texture).generateMipmaps(4));
+			environmentMap = value;
+		}
 		return value;
 	}
 	#end
 
 	public function new(name:String = "stage") {
 		super(name);
+
+		#if (S2D_LIGHTING_ENVIRONMENT == 1)
+		environmentMap = "default_emission";
+		#end
 	}
 
 	public function addLayer(layer:StageLayer) {

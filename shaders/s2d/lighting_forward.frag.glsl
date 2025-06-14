@@ -4,20 +4,12 @@
 
 // stage uniforms
 uniform mat3 viewProjection;
-
-// light uniforms
-// #if S2D_LIGHTING_SHADOWS == 1
-// uniform sampler2D shadowMap;
-// #endif
-uniform vec3 lightPosition;
-uniform vec3 lightColor;
-uniform vec2 lightAttrib;
-#define lightPower lightAttrib.x
-#define lightRadius lightAttrib.y
-
 #if S2D_LIGHTING_ENVIRONMENT == 1
 uniform sampler2D envMap;
 #endif
+
+// layer uniforms
+uniform float[1 + 4 * 8] lights;
 
 // material uniforms
 uniform sampler2D albedoMap;
@@ -47,25 +39,19 @@ void main() {
 
     vec3 position = inverse(viewProjection) * vec3(fragCoord, 0.0);
 
-    Light light = Light(
-            lightPosition,
-            lightColor,
-            lightPower,
-            lightRadius
-        // 0.0
-        );
-
     // output color
     vec3 col = emission;
 
-    // environment lighting
-    #if S2D_LIGHTING_ENVIRONMENT == 1
-    col += envLighting(envMap, normal, albedo.rgb, orm);
-    #endif
+    int offset = 1;
+    for (int i = 0; i < lights[0]; i++) {
+        Light light = Light(
+            vec3(lights[offset++], lights[offset++], lights[offset++]),
+            vec3(lights[offset++], lights[offset++], lights[offset++]),
+            lights[offset++],
+            lights[offset++]
+        );
+        col += lighting(light, position, normal, albedo.rgb, orm);
+    }
 
-    col += lighting(light, position, normal, albedo.rgb, orm);
-    // #if S2D_LIGHTING_SHADOWS == 1
-    // l *= texture(shadowMap, fragCoord).r;
-    // #endif
     fragColor = vec4(col * albedo.a, albedo.a);
 }

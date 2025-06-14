@@ -12,14 +12,16 @@ import s2d.stage.Stage;
 @:dox(hide)
 class LightingPass extends StageRenderPass {
 	var viewProjectionCL:ConstantLocation;
-	var lightPositionCL:ConstantLocation;
-	var lightColorCL:ConstantLocation;
-	var lightAttribCL:ConstantLocation;
+	var lightsCL:ConstantLocation;
 	var albedoMapTU:TextureUnit;
 	var normalMapTU:TextureUnit;
 	var emissionMapTU:TextureUnit;
 	#if (S2D_LIGHTING_PBR == 1)
 	var ormMapTU:TextureUnit;
+	#end
+	#if (S2D_LIGHTING_ENVIRONMENT == 1)
+	var envPipeline:PipelineState;
+	var envMapTU:TextureUnit;
 	#end
 	#if (S2D_LIGHTING_DEFERRED != 1 && S2D_SPRITE_INSTANCING != 1)
 	var depthCL:ConstantLocation;
@@ -30,24 +32,33 @@ class LightingPass extends StageRenderPass {
 	public function new(inputLayout:Array<VertexStructure>) {
 		super({
 			#if (S2D_LIGHTING_DEFERRED == 1)
-			inputLayout: [inputLayout[0]], vertexShader: Reflect.field(Shaders, "s2d_2d_vert"), fragmentShader: Reflect.field(Shaders, "lighting_deferred_frag")
+			inputLayout: [inputLayout[0]], 
+			vertexShader: Reflect.field(Shaders, "s2d_2d_vert"), 
+			fragmentShader: Reflect.field(Shaders, "lighting_deferred_frag")
 			#else
-			inputLayout: inputLayout, vertexShader: Reflect.field(Shaders, "sprite_vert"), fragmentShader: Reflect.field(Shaders, "lighting_forward_frag"),
-			alphaBlendSource: SourceAlpha, alphaBlendDestination: InverseSourceAlpha, blendSource: SourceAlpha, blendDestination: InverseSourceAlpha
+			inputLayout: inputLayout, 
+			vertexShader: Reflect.field(Shaders, "sprite_vert"), 
+			fragmentShader: Reflect.field(Shaders, "lighting_forward_frag"),
+			alphaBlendSource: SourceAlpha, 
+			alphaBlendDestination: InverseSourceAlpha, 
+			blendSource: SourceAlpha, 
+			blendDestination: InverseSourceAlpha
 			#end
 		});
 	}
 
 	function setup() {
 		viewProjectionCL = pipeline.getConstantLocation("viewProjection");
-		lightPositionCL = pipeline.getConstantLocation("lightPosition");
-		lightColorCL = pipeline.getConstantLocation("lightColor");
-		lightAttribCL = pipeline.getConstantLocation("lightAttrib");
+		lightsCL = pipeline.getConstantLocation("lights");
 		albedoMapTU = pipeline.getTextureUnit("albedoMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		emissionMapTU = pipeline.getTextureUnit("emissionMap");
 		#if (S2D_LIGHTING_PBR == 1)
 		ormMapTU = pipeline.getTextureUnit("ormMap");
+		#end
+		#if (S2D_LIGHTING_ENVIRONMENT == 1)
+		envPipeline = new PipelineState();
+		envMapTU = envPipeline.getTextureUnit("envMap");
 		#end
 		#if (S2D_LIGHTING_DEFERRED != 1 && S2D_SPRITE_INSTANCING != 1)
 		depthCL = pipeline.getConstantLocation("depth");
@@ -69,6 +80,7 @@ class LightingPass extends StageRenderPass {
 		#end
 		ctx.setMat3(viewProjectionCL, stage.viewProjection);
 		#if (S2D_LIGHTING_ENVIRONMENT == 1)
+		ctx.setPipeline(envPipeline);
 		ctx.setTexture(envMapTU, stage.environmentMap);
 		ctx.setTextureParameters(envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		#end
@@ -98,36 +110,32 @@ class LightingPass extends StageRenderPass {
 		}
 		#else
 		for (layer in stage.layers) {
-			for (light in layer.lights) {
-				ctx.setFloat3(lightPositionCL, light.x, light.y, light.z);
-				ctx.setFloat3(lightColorCL, light.color.r, light.color.g, light.color.b);
-				ctx.setFloat2(lightAttribCL, light.power, light.radius);
-				#if (S2D_SPRITE_INSTANCING == 1)
-				for (material in layer.materials) {
-					ctx.setVertexBuffers(material.vertices);
-					ctx.setTexture(albedoMapTU, material.albedoMap);
-					ctx.setTexture(normalMapTU, material.normalMap);
-					ctx.setTexture(emissionMapTU, material.emissionMap);
-					#if (S2D_LIGHTING_PBR == 1)
-					ctx.setTexture(ormMapTU, material.ormMap);
-					#end
-					ctx.drawInstanced(material.sprites.length);
-				}
-				#else
-				for (sprite in layer.sprites) {
-					ctx.setFloat(depthCL, sprite.z);
-					ctx.setMat3(modelCL, sprite.globalTransform);
-					ctx.setVec4(cropRectCL, sprite.cropRect);
-					ctx.setTexture(albedoMapTU, sprite.material.albedoMap, {});
-					ctx.setTexture(normalMapTU, sprite.material.normalMap, {});
-					ctx.setTexture(emissionMapTU, sprite.material.emissionMap, {});
-					#if (S2D_LIGHTING_PBR == 1)
-					ctx.setTexture(ormMapTU, sprite.material.ormMap, {});
-					#end
-					ctx.draw();
-				}
+			ctx.setFloats(lightsCL, layer.getLightsBuffer());
+			#if (S2D_SPRITE_INSTANCING == 1)
+			for (material in layer.materials) {
+				ctx.setVertexBuffers(material.vertices);
+				ctx.setTexture(albedoMapTU, material.albedoMap, {});
+				ctx.setTexture(normalMapTU, material.normalMap, {});
+				ctx.setTexture(emissionMapTU, material.emissionMap, {});
+				#if (S2D_LIGHTING_PBR == 1)
+				ctx.setTexture(ormMapTU, material.ormMap, {});
 				#end
+				ctx.drawInstanced(material.sprites.length);
 			}
+			#else
+			for (sprite in layer.sprites) {
+				ctx.setFloat(depthCL, sprite.z);
+				ctx.setMat3(modelCL, sprite.globalTransform);
+				ctx.setVec4(cropRectCL, sprite.cropRect);
+				ctx.setTexture(albedoMapTU, sprite.material.albedoMap, {});
+				ctx.setTexture(normalMapTU, sprite.material.normalMap, {});
+				ctx.setTexture(emissionMapTU, sprite.material.emissionMap, {});
+				#if (S2D_LIGHTING_PBR == 1)
+				ctx.setTexture(ormMapTU, sprite.material.ormMap, {});
+				#end
+				ctx.draw();
+			}
+			#end
 		}
 		#end
 		ctx.end();
