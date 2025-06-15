@@ -26,11 +26,18 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 	public function zsorted() {
 		var i = 0;
 		while (i < children.length)
-			if (children[i++].z >= 0.0)
+			if (children[i].z >= 0.0)
 				break;
+			else
+				++i;
+		if (i > 0)
+			return {
+				below: children.slice(0, i),
+				above: children.slice(i)
+			}
 		return {
-			below: children.slice(0, i),
-			above: children.slice(i)
+			below: [],
+			above: children
 		}
 	}
 
