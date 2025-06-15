@@ -36,6 +36,7 @@ class TextInput extends Text {
 	}
 
 	function setCursorPosition(pos:Int) {
-		cursor.x = x + font.widthOfCharacters(fontSize, text.toCharArray(), 0, pos);
+		if (kravur != null)
+			cursor.x = x + kravur.widthOfCharacters(fontSize, text.toCharArray(), 0, pos);
 	}
 }

@@ -1,7 +1,7 @@
-package s2d.elements.layouts;
+package s2d.layouts;
 
 import s2d.Direction;
-import s2d.elements.layouts.LayoutCell;
+import s2d.layouts.LayoutCell;
 
 using se.extensions.ArrayExt;
 
@@ -17,6 +17,18 @@ abstract class DirLayout<S:ElementSlots, L:LayoutCell<S>> extends Element {
 		super(name);
 		this.direction = direction ?? TopToBottom | LeftToRight;
 	}
+
+	abstract function getCell(el:Element):L;
+
+	abstract function setCellSlots(cell:L):CellSlots;
+
+	abstract function initCell(cell:L):Void;
+
+	abstract function cellRemoved(cell:L):Void;
+
+	abstract function syncLayout():Void;
+
+	abstract function syncSpacing(d:Float):Void;
 
 	override function __childAdded__(child:Element) {
 		super.__childAdded__(child);
@@ -57,18 +69,6 @@ abstract class DirLayout<S:ElementSlots, L:LayoutCell<S>> extends Element {
 				return;
 			}
 	}
-
-	abstract function getCell(el:Element):L;
-
-	abstract function setCellSlots(cell:L):CellSlots;
-
-	abstract function initCell(cell:L):Void;
-
-	abstract function cellRemoved(cell:L):Void;
-
-	abstract function syncLayout():Void;
-
-	abstract function syncSpacing(d:Float):Void;
 
 	function set_spacing(value:Float) {
 		value = Math.max(0.0, value);

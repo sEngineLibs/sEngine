@@ -23,6 +23,17 @@ abstract class PhysicalObject2D<This:PhysicalObject2D<This>> extends se.VirtualO
 		super(name);
 	}
 
+	public function zsorted() {
+		var i = 0;
+		while (i < children.length)
+			if (children[i++].z >= 0.0)
+				break;
+		return {
+			below: children.slice(0, i),
+			above: children.slice(i)
+		}
+	}
+
 	@:slot(parentChanged)
 	function __parentChanged__(previous:This) {
 		syncTransform();

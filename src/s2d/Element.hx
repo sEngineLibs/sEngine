@@ -1,6 +1,5 @@
-package s2d.elements;
+package s2d;
 
-import kha.input.KeyCode;
 import se.Log;
 import se.Texture;
 import se.math.Vec2;
@@ -79,19 +78,19 @@ class Element extends PhysicalObject2D<Element> {
 
 	@:signal.private function heightChanged(x:Float):Void;
 
-	@:signal function keyboardDown(key:KeyCode);
+	@:signal function keyboardDown(key:kha.input.KeyCode);
 
-	@:signal function keyboardUp(key:KeyCode);
+	@:signal function keyboardUp(key:kha.input.KeyCode);
 
-	@:signal function keyboardHold(key:KeyCode);
+	@:signal function keyboardHold(key:kha.input.KeyCode);
 
 	@:signal function keyboardPressed(char:String);
 
-	@:signal(key) function keyboardKeyDown(key:KeyCode);
+	@:signal(key) function keyboardKeyDown(key:kha.input.KeyCode);
 
-	@:signal(key) function keyboardKeyUp(key:KeyCode);
+	@:signal(key) function keyboardKeyUp(key:kha.input.KeyCode);
 
-	@:signal(key) function keyboardKeyHold(key:KeyCode);
+	@:signal(key) function keyboardKeyHold(key:kha.input.KeyCode);
 
 	@:signal(char) function keyboardCharPressed(char:String);
 

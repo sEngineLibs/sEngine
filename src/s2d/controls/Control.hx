@@ -1,12 +1,11 @@
 package s2d.controls;
 
 import se.Texture;
-import s2d.elements.Element;
+import s2d.Element;
 
-@:generic
-class Control extends Element {
-	public var background(default, set):Element;
-	public var content(default, set):Element;
+class Control<B:Element, C:Element> extends Element {
+	public var background(default, set):B;
+	public var content(default, set):C;
 
 	@alias public var topInset:Float = background.top.margin;
 	@alias public var leftInset:Float = background.left.margin;
@@ -39,14 +38,14 @@ class Control extends Element {
 		ctx.style.popOpacity();
 	}
 
-	function set_background(value:Element):Element {
+	function set_background(value:B):B {
 		background = value;
 		if (background != null)
 			background.anchors.fill(this);
 		return background;
 	}
 
-	function set_content(value:Element):Element {
+	function set_content(value:C):C {
 		content = value;
 		if (content != null)
 			content.anchors.fill(this);

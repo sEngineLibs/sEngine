@@ -23,9 +23,11 @@ void main() {
     vec2 center = rect.xy + halfSize;
 
     float dist = sdf(fragCoord.xy - center, halfSize);
-    float alpha = 1.0 - smoothstep(-softness, softness, dist);
-    float bordAlpha = 1.0 - smoothstep(bordWidth - softness, bordWidth + softness, abs(dist));
 
-    fragColor = color * alpha;
-    fragColor = mix(fragColor, bordCol, bordAlpha);
+    float fillAlpha = 1.0 - smoothstep(-softness, softness, dist);
+    float borderAlpha = smoothstep(bordWidth - softness, bordWidth + softness, abs(dist));
+
+    vec4 baseColor = vec4(color.rgb, color.a * fillAlpha);
+    vec4 borderColor = vec4(bordCol.rgb, bordCol.a * (1.0 - borderAlpha));
+    fragColor = baseColor + borderColor * (1.0 - baseColor.a);
 }

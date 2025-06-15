@@ -5,7 +5,7 @@ import se.Color;
 abstract class Shape extends DrawableElement {
 	public var border:ShapeBorder = {
 		width: 0.0,
-		color: Black
+		color: Transparent
 	};
 
 	public function new(name:String = "shape") {

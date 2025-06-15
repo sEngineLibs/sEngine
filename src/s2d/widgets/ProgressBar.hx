@@ -1,7 +1,5 @@
 package s2d.elements;
 
-import s2d.elements.layouts.VBoxLayout;
+import s2d.layouts.VBoxLayout;
 
-class ProgressBar extends VBoxLayout {
-    
-}
+class ProgressBar extends VBoxLayout {}
