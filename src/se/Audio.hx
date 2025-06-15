@@ -16,6 +16,7 @@ class Audio {
 
 	@readonly @alias var sound:Sound = asset.asset;
 	@alias public var source:String = asset.source;
+	@readonly @alias public var duration:Float = sound.length;
 	@readonly @alias public var isLoaded:Bool = asset.isLoaded;
 	
 	@:isVar public var uncompressed(default, set):Bool;
