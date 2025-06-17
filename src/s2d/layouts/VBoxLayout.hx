@@ -91,7 +91,7 @@ class VBoxLayout extends DirLayout<ElementVSlots, VLayoutCell> {
 		};
 	}
 
-	function initCell(cell:VLayoutCell) {
+	function cellAdded(cell:VLayoutCell) {
 		if (cell.fillHeight) {
 			++fillHeightCellsNum;
 			syncAvailableHeightPerCell();
@@ -100,7 +100,11 @@ class VBoxLayout extends DirLayout<ElementVSlots, VLayoutCell> {
 	}
 
 	function cellRemoved(cell:VLayoutCell) {
-		availableHeight += cell.requiredHeight + (cells.length > 1 ? spacing : 0.0);
+		if (cell.fillHeight) {
+			--fillHeightCellsNum;
+			syncAvailableHeightPerCell();
+		} else
+			availableHeight += cell.requiredHeight + (cells.length > 1 ? spacing : 0.0);
 	}
 
 	function syncAvailableHeightPerCell() {

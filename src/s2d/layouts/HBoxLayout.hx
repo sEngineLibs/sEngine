@@ -91,7 +91,7 @@ class HBoxLayout extends DirLayout<ElementHSlots, HLayoutCell> {
 		}
 	}
 
-	function initCell(cell:HLayoutCell) {
+	function cellAdded(cell:HLayoutCell) {
 		if (cell.fillWidth) {
 			++fillWidthCellsNum;
 			syncAvailableWidthPerCell();
@@ -100,7 +100,11 @@ class HBoxLayout extends DirLayout<ElementHSlots, HLayoutCell> {
 	}
 
 	function cellRemoved(cell:HLayoutCell) {
-		availableWidth += cell.requiredWidth + (cells.length > 1 ? spacing : 0.0);
+		if (cell.fillWidth) {
+			--fillWidthCellsNum;
+			syncAvailableWidthPerCell();
+		} else
+			availableWidth += cell.requiredWidth + (cells.length > 1 ? spacing : 0.0);
 	}
 
 	function syncAvailableWidthPerCell() {

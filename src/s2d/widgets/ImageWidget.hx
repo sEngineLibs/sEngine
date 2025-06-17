@@ -19,6 +19,8 @@ class ImageWidget extends DrawableElement {
 	public function new(source:String = "", name:String = "asset") {
 		super(name);
 		asset.source = source;
+		if (asset.isLoaded)
+			__syncAsset__(asset);
 	}
 
 	@:slot(asset.assetLoaded)
@@ -30,7 +32,7 @@ class ImageWidget extends DrawableElement {
 	}
 
 	function draw(target:Texture) {
-		if (image != null)
+		if (image != null) {
 			switch fillMode {
 				case Pad:
 					target.context2D.drawSubImage(image, absX, absY, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height);
@@ -52,13 +54,10 @@ class ImageWidget extends DrawableElement {
 					var offsetY = (height - scaledHeight) / 2;
 					target.context2D.drawScaledSubImage(image, sourceClip.x, sourceClip.y, sourceClip.width, sourceClip.height, absX + offsetX,
 						absY + offsetY, scaledWidth, scaledHeight);
-				case Tile:
-					throw new haxe.exceptions.NotImplementedException("Tile fill mode is not yet implemented");
-				case TileVertically:
-					throw new haxe.exceptions.NotImplementedException("TileVertically fill mode is not yet implemented");
-				case TileHorizontally:
-					throw new haxe.exceptions.NotImplementedException("TileHorizontally fill mode is not yet implemented");
+				default:
+					throw new haxe.exceptions.NotImplementedException("This fill mode is not yet implemented");
 			}
+		}
 	}
 }
 

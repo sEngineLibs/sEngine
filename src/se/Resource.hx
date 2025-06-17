@@ -260,6 +260,8 @@ class Resource {
 					source: source,
 					message: Std.string(err.error)
 				});
+			else
+				Log.error('Failed to load asset $source');
 		});
 	}
 
@@ -293,6 +295,8 @@ class Resource {
 				}, err -> {
 					if (failed != null)
 						failed(err);
+					else
+						Log.error('Failed to load asset "$source": $err');
 					adjust();
 				});
 		}

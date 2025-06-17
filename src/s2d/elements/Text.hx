@@ -46,7 +46,7 @@ class Text extends DrawableElement {
 			else if ((alignment & AlignBottom) != 0)
 				drawY += height - textHeight;
 
-			ctx.style.font = font;
+			ctx.style.font = kravur;
 			ctx.style.fontSize = fontSize;
 			ctx.drawString(text, drawX, drawY);
 		}

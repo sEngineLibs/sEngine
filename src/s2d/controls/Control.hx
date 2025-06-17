@@ -24,31 +24,29 @@ class Control<B:Element, C:Element> extends Element {
 		enabled = true;
 	}
 
-	override function render(target:Texture) {
-		final ctx = target.context2D;
-		ctx.style.pushOpacity(opacity);
-		ctx.transform = globalTransform;
-
-		background?.render(target);
-		content?.render(target);
-		for (c in children)
-			if (c.visible)
-				c.render(target);
-
-		ctx.style.popOpacity();
-	}
-
 	function set_background(value:B):B {
+		if (background != null) {
+			removeChild(background);
+			background.anchors.unfill();
+		}
+		if (value != null) {
+			addChild(value);
+			value.anchors.fill(this);
+		}
 		background = value;
-		if (background != null)
-			background.anchors.fill(this);
 		return background;
 	}
 
 	function set_content(value:C):C {
+		if (content != null) {
+			removeChild(content);
+			content.anchors.unfill();
+		}
+		if (value != null) {
+			addChild(value);
+			value.anchors.fill(this);
+		}
 		content = value;
-		if (content != null)
-			content.anchors.fill(this);
 		return content;
 	}
 }

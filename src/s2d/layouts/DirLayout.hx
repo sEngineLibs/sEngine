@@ -22,7 +22,7 @@ abstract class DirLayout<S:ElementSlots, L:LayoutCell<S>> extends Element {
 
 	abstract function setCellSlots(cell:L):CellSlots;
 
-	abstract function initCell(cell:L):Void;
+	abstract function cellAdded(cell:L):Void;
 
 	abstract function cellRemoved(cell:L):Void;
 
@@ -46,7 +46,7 @@ abstract class DirLayout<S:ElementSlots, L:LayoutCell<S>> extends Element {
 			cell: cell,
 			slots: slots
 		});
-		initCell(cell);
+		cellAdded(cell);
 	}
 
 	override function __childRemoved__(child:Element) {
