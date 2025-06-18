@@ -161,6 +161,6 @@ project.addShaders(`${shaderOutputDir}/**/*{frag,vert}.glsl`, {
     defines: defs,
 });
 
-await project.addProject("libraries/aura");
+await project.addProject("libs/aura");
 
 resolve(project);

@@ -1,9 +1,9 @@
-package s2d.elements;
+package s2d;
 
 import se.App;
+import se.Time;
 import se.Color;
 import se.graphics.Context2D;
-import se.Time;
 import se.Window;
 import se.Texture;
 import se.math.Mat3;

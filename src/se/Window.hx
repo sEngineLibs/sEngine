@@ -8,7 +8,7 @@ import se.input.Mouse;
 import se.events.MouseEvents;
 import s2d.FocusPolicy;
 import s2d.Element;
-import s2d.elements.WindowScene;
+import s2d.WindowScene;
 
 #if !macro
 @:build(se.macro.SMacro.build())
@@ -173,12 +173,11 @@ final class Window {
 			}
 			c.mouseMoved(m);
 		});
-		for (c in entered) {
+		for (c in entered)
 			if (!containsMouse.contains(c)) {
 				entered.remove(c);
 				c.mouseExited(x, y);
 			}
-		}
 	}
 
 	function processMouseScrolled(d:Int, x:Int, y:Int):Void {
@@ -223,6 +222,7 @@ final class Window {
 	}
 
 	function processMouseClicked(b:MouseButton, x:Int, y:Int):Void {
+		var focusedSet = false;
 		processMouseEvent({
 			accepted: false,
 			button: b,
@@ -230,8 +230,10 @@ final class Window {
 			y: y
 		}, (c, m) -> {
 			c.mouseClicked(m);
-			if (!c.focused && (c.focusPolicy & ClickFocus != 0))
+			if (!focusedSet && (c.focusPolicy & ClickFocus != 0)) {
+				focusedSet = true;
 				focusedElement = c;
+			}
 		});
 	}
 

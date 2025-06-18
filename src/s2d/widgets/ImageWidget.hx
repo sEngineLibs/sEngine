@@ -3,8 +3,8 @@ package s2d.widgets;
 import se.Image;
 import se.Assets;
 import se.Texture;
+import s2d.DrawableElement;
 import s2d.geometry.Rect;
-import s2d.elements.DrawableElement;
 
 class ImageWidget extends DrawableElement {
 	var asset:ImageAsset = new ImageAsset();

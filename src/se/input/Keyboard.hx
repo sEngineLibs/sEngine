@@ -9,7 +9,7 @@ class Keyboard {
 	var keysTimers:Map<KeyCode, Timer> = [];
 
 	public var keysDown:Array<KeyCode> = [];
-	public var holdInterval = 0.8;
+	public var holdInterval = 0.5;
 
 	@:signal function down(key:KeyCode);
 
@@ -19,6 +19,8 @@ class Keyboard {
 
 	@:signal function pressed(char:String);
 
+	@:signal function hotkey(hotkey:Array<KeyCode>);
+
 	@:signal(key) function keyDown(key:KeyCode);
 
 	@:signal(key) function keyUp(key:KeyCode);
@@ -27,7 +29,7 @@ class Keyboard {
 
 	@:signal(char) function charPressed(char:String);
 
-	var hotkeyListeners:Map<Array<KeyCode>, Array<Void->Void>> = [];
+	var hotkeyPressedListeners:Map<Array<KeyCode>, Array<Void->Void>> = [];
 
 	public function new(id:Int = 0) {
 		kha.input.Keyboard.get(id).notify(down.emit, up.emit, pressed.emit);
@@ -36,19 +38,24 @@ class Keyboard {
 		onHold(keyHold.emit);
 	}
 
-	public function onHotkeyDown(hotkey:Array<KeyCode>, slot:Void->Void) {
-		for (hkl in hotkeyListeners.keys())
+	public function onHotkeyPressed(hotkey:Array<KeyCode>, slot:Void->Void) {
+		for (hkl in hotkeyPressedListeners.keys())
 			if (hkl == hotkey) {
-				hotkeyListeners.get(hkl).push(slot);
+				hotkeyPressedListeners.get(hkl).push(slot);
 				return;
 			}
-		hotkeyListeners.set(hotkey, [slot]);
+		hotkeyPressedListeners.set(hotkey, [slot]);
+	}
+
+	public function offHotkeyPressed(slot:Void->Void) {
+		for (key in hotkeyPressedListeners.keys())
+			if (hotkeyPressedListeners.get(key).remove(slot))
+				return;
 	}
 
 	@:slot(down) function _down(key:KeyCode) {
 		keyDown(key);
 		keysDown.push(key);
-
 		hotkeyDown(keysDown);
 
 		keysTimers.set(key, Timer.set(() -> {
@@ -60,7 +67,6 @@ class Keyboard {
 	@:slot(up) function _up(key:KeyCode) {
 		keyUp(key);
 		keysDown.remove(key);
-
 		hotkeyDown(keysDown);
 
 		keysTimers.get(key)?.stop();
@@ -68,19 +74,22 @@ class Keyboard {
 	}
 
 	function hotkeyDown(hotkey:Array<KeyCode>) {
-		for (listener in hotkeyListeners.keyValueIterator())
-			if (listener.key.length == hotkey.length) {
-				var flag = true;
-				for (k in listener.key)
-					if (!hotkey.contains(k)) {
-						flag = false;
+		if (hotkey.length > 1) {
+			this.hotkey(hotkey);
+			for (listener in hotkeyPressedListeners.keyValueIterator())
+				if (listener.key.length == hotkey.length) {
+					var flag = true;
+					for (k in listener.key)
+						if (!hotkey.contains(k)) {
+							flag = false;
+							break;
+						}
+					if (flag) {
+						for (callback in listener.value)
+							callback();
 						break;
 					}
-				if (flag) {
-					for (callback in listener.value)
-						callback();
-					break;
 				}
-			}
+		}
 	}
 }

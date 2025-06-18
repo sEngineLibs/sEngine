@@ -1,5 +1,6 @@
 package se.graphics;
 
+import s2d.geometry.Rect;
 import kha.graphics2.Graphics;
 import se.math.Vec2;
 import se.math.Mat3;
@@ -57,6 +58,22 @@ extern abstract Context2D(Graphics) from Graphics {
 	 */
 	public inline function drawScaledSubImage(img:Image, sx:Float, sy:Float, sw:Float, sh:Float, dx:Float, dy:Float, dw:Float, dh:Float) {
 		this.drawScaledSubImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+	}
+
+	overload public inline function drawRect(x:Float, y:Float, width:Float, height:Float, strength:Float = 1.0) {
+		this.drawRect(x, y, width, height, strength);
+	}
+
+	overload public inline function drawRect(rect:Rect, strength:Float = 1.0) {
+		drawRect(rect.x, rect.y, rect.width, rect.height, strength);
+	}
+
+	overload public inline function fillRect(x:Float, y:Float, width:Float, height:Float) {
+		this.fillRect(x, y, width, height);
+	}
+
+	overload public inline function fillRect(rect:Rect) {
+		fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 
 	/**

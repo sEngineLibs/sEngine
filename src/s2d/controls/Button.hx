@@ -11,28 +11,24 @@ class Button extends AbstractButton<RoundedRectangle, HBoxLayout> {
 
 	public function new(text:String = "Button", name:String = "button") {
 		super(name);
-		background = {
-			var rect = new RoundedRectangle();
-			rect.color = Color.rgb(0.75, 0.75, 0.75);
-			onHoveredChanged((_) -> if (!pressed) {
-				rect.color = hovered ? Color.rgb(0.85, 0.85, 0.85) : Color.rgb(0.75, 0.75, 0.75);
-			});
-			onPressedChanged((_) -> {
-				rect.color = pressed ? Color.rgb(0.55, 0.55, 0.55) : Color.rgb(0.75, 0.75, 0.75);
-			});
-			rect;
-		}
-		content = {
-			var layout = new HBoxLayout();
-			layout.addChild({
-				label = new Text(text);
-				label.layout.fillWidth = true;
-				label.layout.fillHeight = true;
-				label.color = Black;
-				label.alignment = AlignCenter;
-				label;
-			});
-			layout;
-		}
+
+		background = new RoundedRectangle();
+		background.color = Color.rgb(0.75, 0.75, 0.75);
+		onHoveredChanged((_) -> if (!pressed) {
+			background.color = hovered ? Color.rgb(0.85, 0.85, 0.85) : Color.rgb(0.75, 0.75, 0.75);
+		});
+		onPressedChanged((_) -> {
+			background.color = pressed ? Color.rgb(0.55, 0.55, 0.55) : Color.rgb(0.75, 0.75, 0.75);
+		});
+
+		content = new HBoxLayout();
+		content.addChild({
+			label = new Text(text);
+			label.layout.fillWidth = true;
+			label.layout.fillHeight = true;
+			label.color = Black;
+			label.alignment = AlignCenter;
+			label;
+		});
 	}
 }

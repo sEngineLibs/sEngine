@@ -11,6 +11,9 @@ import s2d.graphics.Drawers;
 
 @:build(se.macro.SMacro.build())
 class App {
+	static var undoListener:Void->Void;
+	static var redoListener:Void->Void;
+
 	@:signal static function update();
 
 	public static var input(default, null):{
@@ -24,20 +27,8 @@ class App {
 			Time.update();
 			Action.update(Time.time);
 		});
+
 		System.start(options, window -> {
-			Aura.init();
-			Drawers.compile();
-
-			App.input = {
-				mouse: new Mouse(),
-				keyboard: new Keyboard()
-			}
-
-			var w = new Window(window);
-			windows = [w];
-			if (setup != null)
-				setup(w);
-
 			Resource.loadShelf({
 				fonts: ["font_default"],
 				images: ["image_default"]
@@ -49,12 +40,45 @@ class App {
 					render(frames);
 				});
 			}, progress, failed);
+
+			Aura.init();
+			Drawers.compile();
+
+			App.input = {
+				mouse: new Mouse(),
+				keyboard: new Keyboard()
+			}
+
+			input.keyboard.onHotkey(hotkey -> switch hotkey {
+				case [Control, Z] if (undoListener != null):
+					undoListener();
+				case [Control, Shift, Z] if (undoListener != null):
+					undoListener();
+				default:
+			});
+
+			var w = new Window(window);
+			windows = [w];
+			if (setup != null)
+				setup(w);
 		});
 	}
 
 	public static function exit() {
 		if (!System.stop())
 			Log.warning("This application can't be stopped!");
+	}
+
+	public static function onUndo(listener:Void->Void) {
+		undoListener = listener;
+	}
+
+	public static function onRedo(listener:Void->Void) {
+		redoListener = listener;
+	}
+
+	public static function onCutCopyPaste(cut:Void->String, copy:Void->String, paste:String->Void) {
+		System.notifyOnCutCopyPaste(cut, copy, paste);
 	}
 
 	static inline function render(frames:Array<Framebuffer>) @:privateAccess {
