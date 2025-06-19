@@ -1,6 +1,6 @@
 package se.input;
 
-import kha.input.Mouse.MouseCursor;
+typedef MouseCursor = kha.input.Mouse.MouseCursor;
 
 #if !macro
 @:build(se.macro.SMacro.build())
@@ -16,10 +16,10 @@ class Mouse {
 	public var clickInterval = 0.3;
 	public var doubleClickInterval = 0.5;
 
-	@track public var x:Int = 0;
-	@track public var y:Int = 0;
-	@track public var locked:Bool = false;
-	@track public var cursor:MouseCursor = Default;
+	public var x:Int = 0;
+	public var y:Int = 0;
+	@:isVar public var locked(default, set):Bool = false;
+	@:isVar public var cursor(default, set):MouseCursor = Default;
 
 	@:signal function exited();
 
@@ -50,10 +50,6 @@ class Mouse {
 	public function new(id:Int = 0) {
 		mouse = kha.input.Mouse.get(id);
 		mouse.notify(pressed.emit, released.emit, moved.emit, scrolled.emit, exited.emit);
-
-		onCursorChanged(mouse.setSystemCursor);
-		onLockedChanged(locked -> if (locked) mouse.lock() else mouse.unlock());
-
 		onDoubleClicked(buttonDoubleClicked.emit);
 		onHold(buttonHold.emit);
 	}
@@ -71,7 +67,7 @@ class Mouse {
 	public inline function showSystemCursor():Void {
 		mouse.showSystemCursor();
 	}
- 
+
 	/**
 	 * Sets the system cursor
 	 */
@@ -79,7 +75,7 @@ class Mouse {
 		this.cursor = cursor;
 	}
 
-	@:slot(pressed) 
+	@:slot(pressed)
 	function __syncPressed__(button:MouseButton, x:Int, y:Int) {
 		buttonPressed(button, x, y);
 		buttonsDown.push(button);
@@ -93,7 +89,7 @@ class Mouse {
 		}, holdInterval));
 	}
 
-	@:slot(released) 
+	@:slot(released)
 	function __syncReleased__(button:MouseButton, x:Int, y:Int) {
 		buttonReleased(button, x, y);
 
@@ -105,7 +101,7 @@ class Mouse {
 		buttonsDown.remove(button);
 	}
 
-	@:slot(clicked) 
+	@:slot(clicked)
 	function __syncClicked__(button:MouseButton, x:Int, y:Int) {
 		buttonClicked(button, x, y);
 
@@ -115,16 +111,29 @@ class Mouse {
 		recentlyClicked.set(button, Timer.set(() -> recentlyClicked.remove(button), doubleClickInterval));
 	}
 
-	@:slot(exited) 
+	@:slot(exited)
 	function __syncExited__() {
 		recentlyPressed.clear();
 		buttonHoldTimers.clear();
 	}
 
-	@:slot(moved) 
+	@:slot(moved)
 	function __syncMoved__(x:Int, y:Int, dx:Int, dy:Int) {
 		this.x = x;
 		this.y = y;
+	}
+
+	function set_locked(value:Bool):Bool {
+		if (locked = value)
+			mouse.lock();
+		else
+			mouse.unlock();
+		return locked;
+	}
+
+	function set_cursor(value:MouseCursor):MouseCursor {
+		mouse.setSystemCursor(value);
+		return cursor = value;
 	}
 }
 

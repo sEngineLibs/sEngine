@@ -47,6 +47,8 @@ class TextEdit extends Text {
 			_selecting = true;
 		});
 		onMouseButtonReleased(Left, m -> _selecting = false);
+		onMouseEntered((x, y) -> App.input.mouse.cursor = Text);
+		onMouseExited((x, y) -> App.input.mouse.cursor = Default);
 		onMouseMoved(m -> if (_selecting) adjustSelection(posAt(m.x)));
 		onMouseButtonDoubleClicked(Left, m -> {
 			var i = posAt(m.x);
