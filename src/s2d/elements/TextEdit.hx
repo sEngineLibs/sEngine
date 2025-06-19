@@ -33,8 +33,12 @@ class TextEdit extends Text {
 	public var cursorWidth:Float = 2.0;
 	@:isVar public var cursorPosition(default, set):Int = 0;
 
-	public function new(text:String = "", name:String = "textEdit") {
+	public var placeholder:String;
+	public var placeholderColor:Color = 0x44000000;
+
+	public function new(text:String = "", placeholder:String = "Text", name:String = "textEdit") {
 		super(text, name);
+		this.placeholder = placeholder;
 
 		onMouseButtonPressed(Left, m -> {
 			cursorPosition = posAt(m.x);
@@ -126,7 +130,8 @@ class TextEdit extends Text {
 					Timer.set(tick, 0.5);
 				}
 			tick();
-		}
+		} else
+			_cursorVisible = false;
 	}
 
 	@:slot(keyboardDown)
@@ -191,39 +196,43 @@ class TextEdit extends Text {
 	}
 
 	override function draw(target:Texture) {
-		if (text != "" && fontAsset.isLoaded) {
+		if (fontAsset.isLoaded) {
 			final ctx = target.context2D;
-
-			ctx.style.color = color;
 			ctx.style.font = kravur;
 			ctx.style.fontSize = fontSize;
 
-			if (focused) {
-				var part1 = text.substring(0, selectionStart);
-				var offsetX = textX + kravur.width(fontSize, part1);
-				ctx.drawString(part1, textX, textY);
-
-				// selection
-				var selection = text.substring(selectionStart, selectionEnd);
-				var selectionWidth = kravur.width(fontSize, selection);
-				ctx.style.color = selectionColor;
-				ctx.fillRect(offsetX, textY, selectionWidth, fontSize);
-
-				ctx.style.color = selectedTextColor;
-				ctx.drawString(selection, offsetX, textY);
-				offsetX += selectionWidth;
-
-				var part2 = text.substring(selectionEnd);
+			if (text != null && text != "") {
 				ctx.style.color = color;
-				ctx.drawString(part2, offsetX, textY);
+				if (focused) {
+					var part1 = text.substring(0, selectionStart);
+					var offsetX = textX + kravur.width(fontSize, part1);
+					ctx.drawString(part1, textX, textY);
 
-				// cursor
-				if (_cursorVisible) {
-					ctx.style.color = cursorColor;
-					ctx.fillRect(textX + cursorX, textY, cursorWidth, fontSize);
-				}
-			} else
-				ctx.drawString(text, textX, textY);
+					// selection
+					var selection = text.substring(selectionStart, selectionEnd);
+					var selectionWidth = kravur.width(fontSize, selection);
+					ctx.style.color = selectionColor;
+					ctx.fillRect(offsetX, textY, selectionWidth, fontSize);
+
+					ctx.style.color = selectedTextColor;
+					ctx.drawString(selection, offsetX, textY);
+					offsetX += selectionWidth;
+
+					var part2 = text.substring(selectionEnd);
+					ctx.style.color = color;
+					ctx.drawString(part2, offsetX, textY);
+				} else
+					ctx.drawString(text, textX, textY);
+			} else if (placeholder != null && placeholder != "") {
+				ctx.style.color = placeholderColor;
+				ctx.drawString(placeholder, textX, textY);
+			}
+
+			// cursor
+			if (_cursorVisible) {
+				ctx.style.color = cursorColor;
+				ctx.fillRect(textX + cursorX, textY, cursorWidth, fontSize);
+			}
 		}
 	}
 
