@@ -1,6 +1,6 @@
-[submodule "sEngine-APIs"]
+[submodule "sengine-APIs"]
 	path = api/build/html
-	url = https://github.com/sEngineLibs/api
+	url = https://github.com/selibs/api
 [submodule "aura"]
 	path = libs/aura
 	url = https://github.com/MoritzBrueckner/aura

@@ -32,8 +32,8 @@ class Bloom extends PPEffect {
 
 		ctx.begin();
 		ctx3d.setPipeline(pipeline);
-		ctx3d.setIndexBuffer(@:privateAccess se.SEngine.indices);
-		ctx3d.setVertexBuffer(@:privateAccess se.SEngine.vertices);
+		ctx3d.setIndexBuffer(@:privateAccess se.sengine.indices);
+		ctx3d.setVertexBuffer(@:privateAccess se.sengine.vertices);
 		ctx3d.setTexture(textureMapTU, Renderer.buffer.src);
 		ctx3d.setTextureParameters(textureMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		ctx3d.setFloat3(paramsCL, radius, threshold, intensity);

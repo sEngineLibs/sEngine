@@ -1,7 +1,8 @@
 # s2D
+
 2D game engine written with [Kha](https://kha.tech/)
 
-APIs are available [here](https://senginelibs.github.io/api/)
+APIs are available [here](https://selibs.github.io/api/)
 
 Please disregard for now
 

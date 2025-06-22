@@ -46,10 +46,10 @@ class Compositor extends PPEffect {
 		final ctx3d = target.context3D;
 
 		ctx.begin();
-		ctx3d.scissor(0, letterBoxHeight, se.SEngine.width, se.SEngine.height - letterBoxHeight * 2);
+		ctx3d.scissor(0, letterBoxHeight, se.sengine.width, se.sengine.height - letterBoxHeight * 2);
 		ctx3d.setPipeline(pipeline);
-		ctx3d.setIndexBuffer(@:privateAccess se.SEngine.indices);
-		ctx3d.setVertexBuffer(@:privateAccess se.SEngine.vertices);
+		ctx3d.setIndexBuffer(@:privateAccess se.sengine.indices);
+		ctx3d.setVertexBuffer(@:privateAccess se.sengine.vertices);
 		ctx3d.setTexture(textureMapTU, Renderer.buffer.src);
 		ctx3d.setFloats(paramsCL, params);
 		ctx3d.draw();

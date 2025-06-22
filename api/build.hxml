@@ -47,4 +47,4 @@
 --next
 --cmd if exist "build/html/pages" rd /s /q "build/html/pages"
 --next
---cmd haxelib run dox -i build -o build/html/pages -in "se|s2d" --title "sEngine API" -D version 1.0.0a -D description "sEngine libraries APIs" -D source-path https://github.com/sEngineLibs/sEngine/tree/main/src
+--cmd haxelib run dox -i build -o build/html/pages -in "se|s2d" --title "sengine API" -D version 1.0.0a -D description "sengine libraries APIs" -D source-path https://github.com/selibs/sengine/tree/main/src
