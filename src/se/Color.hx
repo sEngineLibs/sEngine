@@ -37,27 +37,59 @@ extern enum abstract Color(Int) from Int to Int {
 		return rgba(Math.random(), Math.random(), Math.random());
 	}
 
-	public static inline function rgb(r:Float, g:Float, b:Float):Color {
-		return rgba(r, g, b, 1.0);
+	overload public static inline function rgb(r:Int, g:Int, b:Int):Color {
+		return rgb(r / 255, g / 255, b / 255);
 	}
 
-	public static inline function rgba(r:Float, g:Float, b:Float, a:Float = 1.0):Color {
+	overload public static inline function rgb(r:Float, g:Float, b:Float):Color {
+		return rgba(r, g, b);
+	}
+
+	overload public static inline function rgba(r:Int, g:Int, b:Int, a:Int = 255):Color {
+		return rgba(r / 255, g / 255, b / 255, a / 255);
+	}
+
+	overload public static inline function rgba(r:Int, g:Int, b:Int, a:Float = 1.0):Color {
+		return rgba(r / 255, g / 255, b / 255, a);
+	}
+
+	overload public static inline function rgba(r:Float, g:Float, b:Float, a:Float = 1.0):Color {
 		return (Std.int(a * 255) << 24) | (Std.int(r * 255) << 16) | (Std.int(g * 255) << 8) | Std.int(b * 255);
 	}
 
-	public static inline function hsv(h:Float, s:Float, v:Float):Color {
+	overload public static inline function hsv(h:Float, s:Float, v:Float):Color {
 		return rgb2hsv(rgb(h, s, v));
 	}
 
-	public static inline function hsva(h:Float, s:Float, v:Float, a:Float = 1.0):Color {
+	overload public static inline function hsv(h:Int, s:Int, v:Int):Color {
+		return hsv(h / 360, s / 100, v / 100);
+	}
+
+	overload public static inline function hsva(h:Int, s:Int, v:Int, a:Float = 1.0):Color {
+		return hsva(h / 360, s / 100, v / 100, a);
+	}
+
+	overload public static inline function hsva(h:Int, s:Int, v:Int, a:Int = 255):Color {
+		return hsva(h / 360, s / 100, v / 100, a / 255);
+	}
+
+	overload public static inline function hsva(h:Float, s:Float, v:Float, a:Float = 1.0):Color {
 		return rgb2hsv(rgba(h, s, v, a));
 	}
 
-	public static inline function hsl(h:Float, s:Float, l:Float):Color {
+	overload public static inline function hsl(h:Float, s:Float, l:Float):Color {
 		return rgb2hsl(rgb(h, s, l));
 	}
 
-	public static inline function hsla(h:Float, s:Float, l:Float, a:Float = 1.0):Color {
+	overload public static inline function hsla(h:Int, s:Int, l:Int, a:Int = 255):Color {
+		return hsla(h / 360, s / 100, l / 100, a / 255);
+	}
+
+	overload public static inline function hsla(h:Int, s:Int, l:Int, a:Float = 1.0):Color {
+		return hsla(s / 360, h / 100, l / 100, a);
+	}
+
+	overload public static inline function hsla(h:Float, s:Float, l:Float, a:Float = 1.0):Color {
 		return rgb2hsl(rgba(h, s, l, a));
 	}
 
